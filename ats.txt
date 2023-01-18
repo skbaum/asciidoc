@@ -1,0 +1,2759 @@
+ATS Notes
+=========
+Steven K. Baum
+0.5, Nov. 30, 2021
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+*Note*:  Search for *PROBLEM* to find where things didn't go quite right.
+
+== Introduction
+
+These are notes on how to install the hardware and software needed for the
+Intel Arctic Sound-P accelerator cards on ats.hprc.tamu.edu.
+The Arctic Sound-P card is a multi-tile, multi-purpose GPU for data center
+workloads.
+
+An overview of the system is found in the PDF document:
+
+*631277_Arctic-Sound-P-Product-Family-Software-Guide_Rev1p02.pdf*
+
+which states:
+
+=====
+The Arctic Sound-P family accelerator cards equip Intel Xeon Scalable
+processor-based platforms with Xe architecture Graphic Processing Units
+(GPUs) for accelerating multiple data center workloads.
+
+The Arctic Sound-P card connects to the host via a PCIe connector.
+The card contains an Add-In-Card Manageaability Controller (AMC) that
+controls the power sequence of the Xe architecture System on Chip (SOC), and
+provides card manageability functionality.
+
+The Arctic Sound-P card has its own firmware that initializes different
+subcomponents of the SoC.  The AMC FW and SoC FW are independent firmware
+components of the card and both support redundant recovery mechanisms.
+
+The Arctic Sound-P card communicates with the host server via the standard
+PCIe interface, and the host baseboard management controller (BMC)
+communicates with the Arctic Sound-P management controller through a
+System Management Bus (SMBus) interface.
+=====
+
+=== Official Documentation
+
+The documents from which the information herein has been extracted are:
+
+* *TAMU_632006_Beta_Arctic-Sound-P_PCIe-Card-Samples-DCL.pdf*
+
+=====
+A letter detailing the allowable usage of the Arctic Sound-P card
+samples being loaned to TAMU, as well as instructions on how to
+obtain the necessary software and documentation to use them.
+It contains a useful summary of the steps required to get the cards
+up and running.
+=====
+
+* *631277_Arctic-Sound-P-Product-Family-Software-Guide_Rev1p02.pdf*
+
+=====
+The is a reference guide for installing and using the Arctic
+Sound-P software.  It details the OS and driver level software.
+=====
+
+* *633850_Arctic Sound-P Product Family Tools Guide_rev1p1.pdf*
+
+=====
+This is a reference guide to the Arctic Sound-P tools.  The important tools
+for our purposes are three Linux command-line utilities:
+
+** `GfxFwInfo` provides a test to see if the firmware is alive as well as the
+retrieval of data from the firmware.
+** `GfxFwFPT` is used to program the
+Arctic Sound-P SPI flash.
+** `dGPU_script.sh` is an automated script that collect system hardware
+and software stack information.
+=====
+
+* *631276 Arctic Sound Product Family GPU Management Guide Rev1p0.pdf*
+
+=====
+A guide to Arctic Sound-P PCI Express* (PCIe*) Add-In-Card (AIC)
+manageability functionality.  It is manageable in two ways: Out-of-Band
+(OOB) management the SMBUS/I2C and In-Band (INB)
+Management over the PCIe device.
+Manageability functionality includes telemetry, monitoring, debug and
+configuration of Arctic Sound-P.
+=====
+
+* *618616_Arctic Sound-P Product Family Datasheet_rev1p2.pdf*
+
+=====
+This document provides the specification for Intel’s first datacenter discrete
+Graphics Processing Unit (GPU) product family, Arctic Sound-P. It includes
+architectural, thermal, mechanical, and electrical specifications for the PCI
+Express (PCIe) cards at 150W- and 300W-Thermal Design Power (TDP).
+=====
+
+* *616579-Arctic-sound-P-design-overview-rev1_2.pdf*
+
+=====
+Presentation slides that provide an overview of the information contained in
+the previous document.
+=====
+
+== Installation
+
+=== Overview
+
+The steps for installing the Arctic Sound-P card and software as outlined in
+the document *631277_Arctic-Sound-P-Product-Family-Software-Guide_Rev1p02.pdf* are:
+
+* xref:bios-changes[Make host BIOS changes.]
+* xref:hardware-installation[Install the card in the host system.]
+* xref:update-firmwave[Update the Firmware.]
+* xref:install-os[Install the OS.]
+* xref:install-graphics-driver[Install the graphics driver for the card.]
+* xref:verify-card[Verify card detection]
+* xref:install-oneapi[Install oneAPI.]
+* xref:run-samples[Run sample applications to verify that the system is healthy.]
+
+=== Host BIOS Changes [[bios-changes]]
+
+Appendix B of `631277_Arctic-Sound-P-Product-Family-Software-Guide_Rev1p02.pdf`.
+
+==== PCI Configuration
+
+Change `Memory Mapped I/O above 4` to `<Enabled.`
+This enables or disables memory mapped I/O of 64-bit PCI devices to
+4 GB or greater address space.
+
+Successfully done via BMC on 11/23/21.
+
+==== IIO Configuration
+
+This setting is under:
+
+Advanced -> Socket Configuration -> IIO Configuration - > “PCI-E ASPM Support (Global)" -> Set it to No”.
+
+*PROBLEM*: This setting couldn't be found via BMC on 11/23/11.
+
+=== Install Arctic Sound-P in Host System [[hardware-installation]]
+
+Appendix B of `631277_Arctic-Sound-P-Product-Family-Software-Guide_Rev1p02.pdf`.
+
+The hardware is already installed on the system as of 11/23/21.
+
+=== Update Firmware [[update-firmwave]]
+
+Follow the steps in `633850_Arctic Sound-P Product Family Tools Guide.pdf`.
+
+==== Introduction
+
+The Arctic Sound-P FW package contains Add-In-Card Management Controller
+(AMC) FW, IFWI and FW tools required.
+The firmware package is located in the `driver_firmware/ats-fw` subdirectory with the
+directory structure:
+
+-----
+|---- AMC FW
+|---- FW Tools
+|        |-- EFI_64
+|        |     |-- WW49.5_20_version
+|        |     |-- WW5.3_21_version
+|        |     |-- WW9.4_21_version
+|        |-- Linux64
+|              |-- WW9.4_version
+|-- IFWI
+-----
+
+==== Updating the IFWI
+
+=====
+The IFWI update on the Arctic Sound-P is supported through the UEFI shell,
+direct programming with DediProg*, and from Linux* OS-based tools.
+
+The GfxFwInfo and GfxFwFPT scripts are used to obtain the current IFWI
+information and updating the IFWI from the OS.
+=====
+
+We must identify the correct firmware files to use for an OS-based update as
+well as the appropriate tools to use to do so.
+First, we figure out which firmware file(s) to use.
+
+===== Firmware File Naming
+
+====== Card Identification
+
+To decide which IFWI binary file you need you must first identify whether you
+have an A1 or B0 card.  This is done on `ats` via:
+
+-----
+lspci -k | grep -i Display
+
+4d:00.0 Display controller: Intel Corporation Device 020a (rev 04)
+b3:00.0 Display controller: Intel Corporation Device 020a (rev 04)
+-----
+
+The `rev04` represents a `B0` Sound-P card.
+
+====== Available Binaries for Identified Card
+
+Table 3-1 provides a key for deciding which of the IFWI files to use.
+The entries in the table appropriate to our `B0` cards are in two categories: debug and
+production.
+
+The debug entires are:
+
+-----
+ATS.DS.B.P.Si.YYYY.WWXX.X_14MHz_SingleIO_IFWI.bin
+ATS.DS.B.P.Si.YYYY.WWXX.X_14MHz_SingleIO_DAMen_IFWI.bin
+ATS.DS.B.P.Si.YYYY.WWXX.X_25MHz_Quad_DAMen_IFWI.bin
+-----
+
+The production entries are:
+
+-----
+ATS.PS.B.P.Si.YYYY.WWXX.X_14MHz_SingleIO_IFWI.bin
+ATS.PS.B.P.Si.YYYY.WWXX.X_14MHz_SingleIO_DAMen_IFWI.bin
+ATS.PS.B.P.Si.YYYY.WWXX.X_25MHz_Quad_DAMen_IFWI.bin
+-----
+
+where `YYYY` represents the year and `XX.X` the work week and day of the IFWI release.
+
+The available IFWI files that correspond to these table entries are:
+
+-----
+/driver-firmware/ats-fw/IFWI/ATS.DS.A.P.Si.2020.WW49.5_14MHz_SingleIO_IFWI.bin
+/driver-firmware/ats-fw/IFWI/ATS.DS.A.P.Si.2021.WW12.4_14MHz_SingleIO_IFWI.bin
+/driver-firmware/ats-fw/IFWI/ATS.DS.A.P.Si.2021.WW25.5_14MHz_SingleIO_IFWI.bin
+/driver-firmware/ats-fw/IFWI/ATS.DS.A.P.Si.2021.WW5.3_14MHz_SingleIO_IFWI.bin
+/driver-firmware/ats-fw/IFWI/ATS.DS.A.P.Si.2021.WW9.4_14MHz_SingleIO_IFWI.bin
+/driver-firmware/ats-fw/IFWI/ATS.PS.B.P.Si.2021.WW26.1_25MHz_Quad_IFWI.bin
+-----
+
+====== The Correct Binaries to Use for an Update
+
+We presumably want the most recent IFWI versions which narrows this list down to
+two entries.  For the production binaries containing `PS` there is a single
+binary:
+
+-----
+/driver-firmware/ats-fw/IFWI/ATS.PS.B.P.Si.2021.WW26.1_25MHz_Quad_IFWI.bin
+-----
+
+For the debug binaries containing `DS1` the most recent binary is:
+
+-----
+/driver-firmware/ats-fw/IFWI/ATS.DS.A.P.Si.2021.WW25.5_14MHz_SingleIO_IFWI.bin
+-----
+
+===== Tools to Update the IFWI
+
+Now we decide which tool(s) to use to install the firmware update.
+
+====== The Tool Menagerie
+
+There are several pages showing how to update the IFWI using the EFI versions of
+the tools followed by a smaller number explaining the use of the OS-based tools.
+The tools are the `GfxFwInfo` information tool and the `GfxFwFPT` flash
+programming tool.  The available OS-based tools are:
+
+-----
+/driver-firmware/ats-fw/FW Tools/Linux64/WW9.4_version/GfxFwFPT
+/driver-firmware/ats-fw/FW Tools/Linux64/WW9.4_version/GfxFwInfo
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwFPT
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwInfo
+-----
+
+The `WW9.4` versions of the tools correspond to binaries that are not the
+latest available versions, so I presume that the tools with no version information
+are for all other binaries.
+
+====== The Appropriate Tools to Use
+
+The correct tools to use to update the firmware are:
+
+-----
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwFPT
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwInfo
+-----
+
+===== The `GfxFwInfo` Tool for Finding Device Information
+
+The help information for the `/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwInfo` tool is:
+
+-----
+GfxFwInfo -H
+Intel (R) GfxFw Info Version: 200.0.0.1310
+Copyright (C) 2005 - 2021, Intel Corporation. All rights reserved.
+
+GfxFwInfo [-EXP] [-H|?] [-VER] [-GfxFWFITVER] [-FEAT] [-VALUE] 
+          [-GfxFWSTS] [-VERBOSE] [-PAGE] [-DisplayDevices] [-Device] 
+
+-EXP [arg_name]       Display example usage of this tool 
+-H|?                  Display help screen 
+-VER                  Display version information 
+-GfxFWFITVER          Display Intel(R) GfxFWFIT version 
+-FEAT <name>          Retrieve a related platform setting 
+-VALUE <value>        An expected platform setting value 
+-GfxFWSTS             Retrieve/decode GfxFW Firmware status register 
+-VERBOSE [filename]   Display the debug information of the tool 
+-PAGE                 Pause after each screenful of information 
+-DisplayDevices       Display all available Gfx devices 
+-Device <device_name> Run command on specific GFX device 
+
+Note: Name/value more than one word has to be between quotations.
+-----
+
+*PROBLEM*: Presently (11/29/21) the `-DisplayDevices` argument yields nothing.
+
+*SOLUTION*:  Reload to kernel modules as hinted at in:
+
+`/home/sysadmin/driver_firmware/intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/README-dkms.md`
+
+=====
+Due to a race condition between the kernel mounting the root file
+system and loading the driver, the firmware might not be available for
+the kernel to load.
+
+If you see an error message similar to the following in kernel log (via
+`dmesg`):
+
+-----
+i915 0000:4d:00.0: Direct firmware load for i915/ats_guc_48.0.0.bin failed with error
+-----
+
+please reload the kernel module:
+
+-----
+sudo rmmod i915
+sudo modprobe i915
+-----
+=====
+
+After the modules have been reloaded, we find:
+
+-----
+fxFwInfo -DisplayDevices
+Intel (R) GfxFw Info Version: 200.0.0.1310
+Copyright (C) 2005 - 2021, Intel Corporation. All rights reserved.
+
+GFX DEVICE      #1
+        Slot B:D:F      b3:00:00
+        Device ID       0x20a
+        Vendor ID       0x8086
+        Base Address    0x0000000000000000
+
+GFX DEVICE      #2
+        Slot B:D:F      4d:00:00
+        Device ID       0x20a
+        Vendor ID       0x8086
+        Base Address    0x0000000000000000
+-----
+
+===== The `GfxFwFPT` Tool for Updating the Firmware
+
+`GfxFwFPT` is used to completely program the Arctic Sound-P SPI flash.
+`GfxFwFPT` requires that the card be powered up and booted. A current
+limitation of the program is that it only programs one card at a time, and the
+device needs to be explicitly provided.
+
+The help info for `GfxFwFPT` is:
+
+-----
+GfxFwFPT -H
+Intel (R) Flash Programming Tool Version: 200.0.0.1310
+Copyright (C) 2005 - 2021, Intel Corporation. All rights reserved.
+
+GfxFwFPT [-H|?] [-VER] [-EXP] [-VERBOSE] [-Y] [-I] [-F] [-VERIFY] 
+         [-NOVERIFY] [-D] [-DESC] [-GFXFW] [-SHARED_DATA] [-E] [-REWRITE] 
+         [-ADDRESS|A] [-LENGTH|L] [-CVARS] [-CFGGEN] [-U] [-CLEAR] [-O] [-IN] [-N] 
+         [-V] [-CLOSEMNF] [-PAGE] [-R] [-VARS] [-COMMIT] [-GETPID] 
+         [-SETDAM] [-DisplayDevices] [-Device] [-STRAPUPDATE] [-READSTRAPS] 
+
+-H|?                     Display help screen 
+-VER                     Displays version information. 
+-EXP [arg_name]          Displays example usage of this tool. 
+-VERBOSE <file>          Display the debug information of the tool. 
+-Y                       Do NOT prompt when a warning occurs. 
+-I                       Displays information about the flash image. 
+-F <file> [NOVERIFY]     Load binary file into flash.  "NoVerify" skips verify. 
+-VERIFY <file>           Compare binary file to flash. 
+-NOVERIFY                Disable the automatic verify when flashing a new file to flash. 
+-D <file>                Dump flash contents to file or "STDOUT". 
+-DESC                    Load/verify/dump Gfx DESC region. 
+-GFXFW                   Load/verify/dump Gfx FW region. 
+-SHARED_DATA             Load/verify/dump Gfx Shared Data region. 
+-E                       Do NOT erase area before writing to flash. 
+-REWRITE                 Rewrite the SPI with file data even if flash is identical. 
+-ADDRESS|A <address>     Flash address to load/verify/dump file. 
+-LENGTH|L <length>       Number of bytes to load/verify/dump. 
+-CVARS                   Displays a list of Manufacturing Line Configurable NVARs supported. 
+-CFGGEN                  Generates a Manufacturing Line Configurable NVAR Input File. 
+-U                       Update Manufacturing Line Configurable NVAR. 
+-CLEAR                   Overwrites a pending NVAR value update request with the file system's current. 
+-O <file>                Sets an output file name. 
+-IN <file>               Input Manufacturing Line Configurable NVAR/MasterAccess file. 
+-N <name>                Name of variable. 
+-V <value>               Value for variable. 
+-CLOSEMNF                End of Manufacturing. Details on NoReset use -exp option. 
+-PAGE                    Pauses the screen when a page of text is reached. 
+-R <name>                Read a variable. 
+-VARS                    Display supported variables. 
+-COMMIT                  Commit Manufacturing Line Configurable NVARs. 
+-GETPID [file]           Retrieve the part id. 
+-SETDAM <Enable/Disable> Set DAM Mode: 1 Enable/0 Disable 
+-DisplayDevices          Display all available Gfx devices 
+-Device <device_name>    Run command on specific Gfx device 
+-STRAPUPDATE             Update Manufacturing Line Configurable SoftStrap. 
+-READSTRAPS              Read all the softStraps.
+-----
+
+Use this to identify the display devices..
+
+-----
+GfxFwFPT -DisplayDevices
+Intel (R) Flash Programming Tool Version: 200.0.0.1310
+Copyright (C) 2005 - 2021, Intel Corporation. All rights reserved.
+
+GFX DEVICE      #1
+        Slot B:D:F      b3:00:00
+        Device ID       0x20a
+        Vendor ID       0x8086
+        Base Address    0x0000000000000000
+
+GFX DEVICE      #2
+        Slot B:D:F      4d:00:00
+        Device ID       0x20a
+        Vendor ID       0x8086
+        Base Address    0x0000000000000000
+
+FPT Operation Successful.
+-----
+
+There is also an argument `-EXP` to find usage examples:
+
+-----
+./GfxFwFPT -EXP
+Intel (R) Flash Programming Tool Version: 200.0.0.1310
+Copyright (C) 2005 - 2021, Intel Corporation. All rights reserved.
+
+ Below are examples of common command-line input:
+
+  GfxFwFPT -f image.bin 
+  This usage will write the data in the bin file to the SPI flash part
+  starting at address zero.
+
+  GfxFwFPT -f image.bin -gfxfw 
+  This usage will write the data in the bin file to GfxFW region of the SPI
+  flash part.
+
+  GfxFwFPT -closemnf
+  This usage should be performed at close of manufacturing.  It will set
+  End of Manufacturing and also sets SPI flash region access to Intel
+  recommended values.
+
+ Using -EXP followed by parameters (without - or / prefix) will display
+ all supported command-line sequences with the parameters given.
+-----
+
+===== Performing the Update
+
+Now that we know which tool and binary to use we can actually update the firmware.
+
+On page 30-31 of `633850_Arctic Sound-P Product Family Tools Guide_rev1p1.pdf` we are
+told that:
+
+=====
+A current
+limitation of the program is that it only programs one card at a time, and the
+device needs to be explicitly provided.
+=====
+
+and then given the example:
+
+-----
+sudo ./GfxFwFPT -F ATS.IFWI.bin -Device 4d:00:0000000000
+-----
+
+Our production binary fireware file is:
+
+-----
+/driver-firmware/ats-fw/IFWI/ATS.PS.B.P.Si.2021.WW26.1_25MHz_Quad_IFWI.bin
+-----
+
+and our tool is:
+
+-----
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwFPT
+-----
+
+and our device names - as found via `GfxFwInfo -DisplayDevices` - are
+`b3:00:00` and `4d:00:00`.
+
+These will make our firmware update command for GFX device #1:
+
+-----
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwFPT \ 
+   -F /driver-firmware/ats-fw/IFWI/ATS.PS.B.P.Si.2021.WW26.1_25MHz_Quad_IFWI.bin \
+   -Device b3:00:00
+-----
+
+and for GFX device #2:
+
+-----
+/driver-firmware/ats-fw/FW Tools/Linux64/GfxFwFPT \
+    -F /driver-firmware/ats-fw/IFWI/ATS.PS.B.P.Si.2021.WW26.1_25MHz_Quad_IFWI.bin \
+     -Device 4d:00:00
+-----
+
+
+
+=== Install OS [[install-os]]
+
+=====
+Follow the steps in either Appendix A or Appendix C of 631277_Arctic Sound-P
+Product Family Software Guide.
+=====
+
+These appendices detail how to install Ubuntu (A) and SLES/SUSE (B).
+Rocky Linux 8.4 has been installed on ats, and is a downstream version of
+RHEL 8.4 designed to replace CentOS 8.4.
+
+=== Install Arctic Sound-P graphics driver. [[install-graphics-driver]]
+
+Choose the readme file corresponding to your OS and follow the instructions:
+
+* Readme_SLES_[BUILD]_[Release_Name].md
+* Readme_Ubuntu_[BUILD]_[Release_Name].md
+* Readme_RHEL_[BUILD]_[Release_Name].md
+
+None of these `*.md` files are available in the `driver_firmwave` directory as of 11/23/21.
+
+We will follow the instructions in:
+
+-----
+/driver_firmware/intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/README-dkms.md
+-----
+
+==== Prequisites for Installing Kernel Modules
+
+A command to subscribe to the CodeReady Linux Builder repository, which is apparently only available to
+those with Red Hat Enterprise Linux subscriptions.
+As far as I can tell, though, nothing is every actually needed from that repository.
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/package_manifest/codereadylinuxbuilder-repository[`https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/package_manifest/codereadylinuxbuilder-repository`]
+
+=====
+The CodeReady Linux Builder repository contains additional packages for use by developers. This repository is available with all Red Hat Enterprise Linux subscriptions but does not need to be enabled on your runtime deployments. 
+=====
+
+-----
+sudo subscription-manager repos --enable "codeready-builder-for-rhel-8-$(arch)-rpms"
+This system has no repositories available through subscriptions.
+-----
+
+A command to update all RPMs.
+
+-----
+sudo dnf update
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Extra Packages for Enterprise Linux Modular 8 - x86_64                                                    755 kB/s | 958 kB     00:01    
+Extra Packages for Enterprise Linux 8 - x86_64                                                            348 kB/s |  11 MB     00:32    
+Last metadata expiration check: 0:00:01 ago on Mon 29 Nov 2021 12:49:26 PM CST.
+Dependencies resolved.
+Nothing to do.
+Complete!
+-----
+
+A command to install EPEL.
+
+-----
+sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Last metadata expiration check: 0:04:58 ago on Mon 29 Nov 2021 12:49:26 PM CST.
+epel-release-latest-8.noarch.rpm                                                                          156 kB/s |  23 kB     00:00    
+Package epel-release-8-13.el8.noarch is already installed.
+Dependencies resolved.
+Nothing to do.
+Complete!
+-----
+
+A command to install various RPMs.
+
+-----
+sudo dnf install -y openssl-devel gcc bison flex bc elfutils-libelf-devel rsync rpm-build make perl lz4 redhat-lsb-core patch kernel-headers kernel-debug-devel kernel-devel dkms
+...
+Transaction Summary
+======================================================================================================
+Install  17 Packages
+
+Total download size: 20 M
+Installed size: 53 M
+Downloading Packages:
+(1/17): esmtp-1.2-15.el8.x86_64.rpm                                            278 kB/s |  57 kB     00:00    
+(2/17): libesmtp-1.0.6-18.el8.x86_64.rpm                                       336 kB/s |  70 kB     00:00    
+(3/17): at-3.1.20-11.el8.x86_64.rpm                                             53 MB/s |  80 kB     00:00    
+(4/17): ed-1.14.2-4.el8.x86_64.rpm                                              47 MB/s |  80 kB     00:00    
+(5/17): lz4-1.8.3-3.el8_4.x86_64.rpm                                            44 MB/s | 102 kB     00:00    
+(6/17): mailx-12.5-29.el8.x86_64.rpm                                            53 MB/s | 256 kB     00:00    
+(7/17): dkms-2.8.6-1.el8.noarch.rpm                                            372 kB/s |  81 kB     00:00    
+(8/17): ncurses-compat-libs-6.1-7.20180224.el8.1.x86_64.rpm                     46 MB/s | 327 kB     00:00    
+(9/17): psmisc-23.1-5.el8.x86_64.rpm                                            16 MB/s | 150 kB     00:00    
+(10/17): spax-1.5.3-13.el8.x86_64.rpm                                           33 MB/s | 215 kB     00:00    
+(11/17): time-1.9-3.el8.x86_64.rpm                                              16 MB/s |  53 kB     00:00    
+(12/17): util-linux-user-2.32.1-27.el8.x86_64.rpm                               37 MB/s |  98 kB     00:00    
+(13/17): liblockfile-1.14-1.el8.x86_64.rpm                                      10 MB/s |  31 kB     00:00    
+(14/17): redhat-lsb-core-4.1-47.el8.x86_64.rpm                                  20 MB/s |  44 kB     00:00    
+(15/17): redhat-lsb-submod-security-4.1-47.el8.x86_64.rpm                      9.2 MB/s |  21 kB     00:00    
+(16/17): cups-client-2.2.6-38.el8.x86_64.rpm                                    16 MB/s | 168 kB     00:00    
+(17/17): kernel-debug-devel-4.18.0-305.25.1.el8_4.x86_64.rpm                    95 MB/s |  19 MB     00:00    
+...
+-----
+
+Commands to install kernel sources and headers.
+
+-----
+sudo dnf install -y kernel-devel-$(uname -r)
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Last metadata expiration check: 0:09:39 ago on Mon 29 Nov 2021 12:49:26 PM CST.
+Package kernel-devel-4.18.0-305.25.1.el8_4.x86_64 is already installed.
+Dependencies resolved.
+Nothing to do.
+Complete!
+
+sudo dnf install -y kernel-headers-$(uname -r)
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Last metadata expiration check: 0:09:54 ago on Mon 29 Nov 2021 12:49:26 PM CST.
+Package kernel-headers-4.18.0-305.25.1.el8_4.x86_64 is already installed.
+Dependencies resolved.
+Nothing to do.
+Complete!
+-----
+
+==== Compiling the Kernel Modules
+
+Process the DKMS tree.
+
+-----
+cd /home/sysadmin/driver-firmware/intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/dkms/gpl
+tar xf dkms-DII_4678.tgz
+cd dkms-DII_4678
+patch -p1 < ../intel-gpl-4678.patch
+patch -p1 < ../../intel-proprietary-4678.patch
+-----
+
+Build the DKMS tree.
+
+-----
+cd intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/dkms/gpl/dkms-DII_4678
+cp defconfigs/drm .config
+make BUILD_VERSION=4678 dmadkmsrpm-pkg i915dkmsrpm-pkg
+-----
+
+This creates the following files in `~/rpmbuild/RPMS/x86_64/`.
+
+-----
+~/rpmbuild/RPMS/x86_64/intel-dmabuf-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1-embargo4678.el8_4.x86_64.rpm
+~/rpmbuild/RPMS/x86_64/intel-i915-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1-embargo4678.el8_4.x86_64.rpm
+-----
+
+Copy the RPM files to the work directory, but do not install them yet.
+
+-----
+cd /home/sysadmin/driver_firmware/intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/dkms/gpl
+cp -pr ~/rpmbuild/RPMS/x86_64/intel-dmabuf-dkms-prerelease*.rpm .
+cp -pr ~/rpmbuild/RPMS/x86_64/intel-i915-dkms-prerelease*.rpm .
+-----
+
+==== Configure the Local Repository
+
+Install and enable the Intel graphics repository.
+
+-----
+cat << EOF | sudo tee /etc/yum.repos.d/intel-graphics-local.repo
+[intel-graphics-local]
+name=intel-graphics-local
+baseurl=file:///home/sysadmin/driver_firmware/intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/packages
+enabled=1
+gpgcheck=0
+EOF
+-----
+
+The local repository contains (as of 11/30/21.
+
+-----
+-rw-r--r-- 1 baum baum  5276788 Sep 28 01:42 intel-fw-gpu-2021.36.6-75.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  2257048 Sep 28 01:42 intel-fw-gpu-prerelease-2021.36.6-75.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   162552 Sep 28 01:42 intel-gmmlib-21.3.5949.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   824596 Sep 28 01:42 intel-gmmlib-devel-21.3.5949.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum 17217052 Sep 28 01:42 intel-igc-cm-1.0.280-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    10972 Sep 28 01:42 intel-igc-cm-devel-1.0.280-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum 24322244 Sep 28 01:42 intel-igc-core-1.0.12654.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum 26041908 Sep 28 01:42 intel-igc-opencl-1.0.12654.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   100080 Sep 28 01:42 intel-igc-opencl-devel-1.0.12654.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  1888896 Sep 28 01:42 intel-level-zero-gpu-1.2.020941.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  8712860 Sep 28 01:42 intel-media-driver-21.3.4.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    82348 Sep 28 01:42 intel-media-driver-devel-21.3.4.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  3577004 Sep 28 01:42 intel-mediasdk-21.3.1.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    51724 Sep 28 01:42 intel-mediasdk-devel-21.3.1.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  1888816 Sep 28 01:42 intel-mediasdk-utils-21.3.1.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  4139968 Sep 28 01:42 intel-metrics-discovery-1.10.256-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    19136 Sep 28 01:42 intel-metrics-discovery-devel-1.10.256-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   474232 Sep 28 01:42 intel-metrics-library-1.0.67-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    14148 Sep 28 01:42 intel-metrics-library-devel-1.0.67-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   237160 Sep 28 01:42 intel-ocloc-21.37.020941.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  1868152 Sep 28 01:42 intel-opencl-21.37.020941.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    93992 Sep 28 01:42 intel-platform-cse-dkms-2021.21-34.x86_64.rpm
+-rw-r--r-- 1 baum baum    29112 Sep 28 01:42 intel-platform-pmt-dkms-2021.21-34.x86_64.rpm
+-rw-r--r-- 1 baum baum   134016 Sep 28 01:42 level-zero-1.4.1.1-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    91796 Sep 28 01:42 level-zero-devel-1.4.1.1-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum  3161564 Sep 28 01:42 libmfxgen1-21.3.4.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   104576 Sep 28 01:42 libva-2.13.0.1.1-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   120968 Sep 28 01:42 libva-devel-2.13.0.1.1-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   529384 Sep 28 01:42 libva-utils-2.13.0.1.1-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum    87384 Sep 28 01:42 libvpl2-2021.5.0.0.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   131096 Sep 28 01:42 libvpl-devel-2021.5.0.0.9175-main.el8.x86_64.rpm
+-rw-r--r-- 1 baum baum   561104 Sep 28 01:42 libvpl-tools-2021.5.0.0.9175-main.el8.x86_64.rpm
+-----
+
+==== Configure Default 1915 Module Parameters.
+
+-----
+cat << EOF | sudo tee /etc/modprobe.d/i915.conf
+options i915 force_probe=*
+EOF
+-----
+
+==== Install the Driver Kernel Modules
+
+Install the `dmabuf` RPM first.
+
+-----
+sudo rpm -Uvh intel-dmabuf-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1-embargo4678.el8_4.x86_64.rpm
+Verifying...                          ################################# [100%]
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:intel-dmabuf-dkms-prerelease-0.46################################# [100%]
+Creating symlink /var/lib/dkms/intel-dmabuf-dkms-prerelease/0.4678.210916.0.4.18.0.305.12.1/source -> /usr/src/intel-dmabuf-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1
+
+Kernel preparation unnecessary for this kernel. Skipping...
+
+Building module:
+cleaning build area...
+export LEX=flex; export YACC=bison; cp defconfigs/dmabuf .config; 'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64 olddefconfig; 'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64 ; mkdir -p /var/lib/dkms/intel-dmabuf-dkms-prerelease/0.4678.210916.0.4.18.0.305.12.1/4.18.0-305.25.1.el8_4.x86_64/x86_64/build/; cp Module.symvers /var/lib/dkms/intel-dmabuf-dkms-prerelease/0.4678.210916.0.4.18.0.305.12.1/4.18.0-305.25.1.el8_4.x86_64/x86_64/build/..........
+cleaning build area.......
+
+dmabuf.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+Adding any weak-modules
+
+depmod.
+-----
+
+Install the `i915` RPM next.
+
+-----
+sudo rpm -Uvh intel-i915-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1-embargo4678.el8_4.x86_64.rpm
+Verifying...                          ################################# [100%]
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:intel-i915-dkms-prerelease-0.4678################################# [100%]
+Creating symlink /var/lib/dkms/intel-i915-dkms-prerelease/0.4678.210916.0.4.18.0.305.12.1/source -> /usr/src/intel-i915-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1
+
+Kernel preparation unnecessary for this kernel. Skipping...
+
+Building module:
+cleaning build area...
+export KBUILD_EXTRA_SYMBOLS=/var/lib/dkms/intel-dmabuf-dkms-prerelease/kernel-4.18.0-305.25.1.el8_4.x86_64-x86_64/build/Module.symvers ; export LEX=flex; export YACC=bison; cp defconfigs/i915 .config; 'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64 olddefconfig; 'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64..............................
+cleaning build area.......
+
+dmabuf.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+Adding any weak-modules
+
+depmod...
+[baum@ats gpl]$ sudo rpm -Uvh intel-i915-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1-embargo4678.el8_4.x86_64.rpm 
+Verifying...                          ################################# [100%]
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:intel-i915-dkms-prerelease-0.4678################################# [100%]
+Creating symlink /var/lib/dkms/intel-i915-dkms-prerelease/0.4678.210916.0.4.18.0.305.12.1/source -> /usr/src/intel-i915-dkms-prerelease-0.4678.210916.0.4.18.0.305.12.1
+
+Kernel preparation unnecessary for this kernel. Skipping...
+
+Building module:
+cleaning build area...
+export KBUILD_EXTRA_SYMBOLS=/var/lib/dkms/intel-dmabuf-dkms-prerelease/kernel-4.18.0-305.25.1.el8_4.x86_64-x86_64/build/Module.symvers ; export LEX=flex; export YACC=bison; cp defconfigs/i915 .config; 'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64 olddefconfig; 'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64..............................
+cleaning build area........
+
+i915-compat.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+intel-gtt.ko.xz:
+Running module version sanity check.
+ - Original module
+   - Found /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/char/agp/intel-gtt.ko.xz
+   - Storing in /var/lib/dkms/intel-i915-dkms-prerelease/original_module/4.18.0-305.25.1.el8_4.x86_64/x86_64/
+   - Archiving for uninstallation purposes
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+drm_kms_helper.ko.xz:
+Running module version sanity check.
+ - Original module
+   - Found /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/drm_kms_helper.ko.xz
+   - Storing in /var/lib/dkms/intel-i915-dkms-prerelease/original_module/4.18.0-305.25.1.el8_4.x86_64/x86_64/
+   - Archiving for uninstallation purposes
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+drm.ko.xz:
+Running module version sanity check.
+ - Original module
+   - Found /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/drm.ko.xz
+   - Storing in /var/lib/dkms/intel-i915-dkms-prerelease/original_module/4.18.0-305.25.1.el8_4.x86_64/x86_64/
+   - Archiving for uninstallation purposes
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+drm_panel_orientation_quirks.ko.xz:
+Running module version sanity check.
+ - Original module
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+i915.ko.xz:
+Running module version sanity check.
+ - Original module
+   - Found /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/i915.ko.xz
+   - Storing in /var/lib/dkms/intel-i915-dkms-prerelease/original_module/4.18.0-305.25.1.el8_4.x86_64/x86_64/
+   - Archiving for uninstallation purposes
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+vgem.ko.xz:
+Running module version sanity check.
+ - Original module
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+i915_spi.ko.xz:
+Running module version sanity check.
+ - Original module
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+iaf.ko.xz:
+Running module version sanity check.
+ - Original module
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+Adding any weak-modules
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/radeon/radeon.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/gvt/kvmgt.ko.xz needs unknown symbol intel_gvt_register_hypervisor
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/gvt/kvmgt.ko.xz needs unknown symbol intel_gvt_unregister_hypervisor
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drmm_add_final_kfree
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drm_dev_init
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_create_object_cached
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/ast/ast.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_get_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_unpin
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_free_object
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_print_info
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_pin
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_mmap
+
+depmod...
+-----
+
+*PROBLEM*:  A goodly number of warnings in the above about `drm_gem*` symbols not being found.
+
+Configure kernel to avoid specific init syscalls to avoid interfering with dmabuf dkms module.
+
+-----
+sudo sed -i 's/ initcall_blacklist=sync_debugfs_init,dma_buf_init//' /etc/default/grub
+sudo sed -i 's/\(GRUB_CMDLINE_LINUX_DEFAULT=\".*\)\(\"\)/\1 initcall_blacklist=sync_debugfs_init,dma_buf_init\2/' /etc/default/grub
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+Adding boot menu entry for EFI firmware configuration
+done
+-----
+
+==== Install Platform Monitoring and Security Engine Modules
+
+Install pmt and cse modules.
+
+-----
+sudo dnf --nogpgcheck install -y intel-platform-pmt-dkms intel-platform-cse-dkms
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+intel-graphics-local                                                                                       20 MB/s |  20 kB     00:00    
+Dependencies resolved.
+==========================================================================================================================================
+ Package                                  Architecture            Version                     Repository                             Size
+==========================================================================================================================================
+Installing:
+ intel-platform-cse-dkms                  x86_64                  2021.21-34                  intel-graphics-local                   92 k
+ intel-platform-pmt-dkms                  x86_64                  2021.21-34                  intel-graphics-local                   28 k
+
+Transaction Summary
+==========================================================================================================================================
+Install  2 Packages
+
+Total size: 120 k
+Installed size: 499 k
+Downloading Packages:
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                  1/1 
+  Running scriptlet: intel-platform-pmt-dkms-2021.21-34.x86_64                                                                        1/2 
+  Installing       : intel-platform-pmt-dkms-2021.21-34.x86_64                                                                        1/2 
+  Running scriptlet: intel-platform-pmt-dkms-2021.21-34.x86_64                                                                        1/2 
+Creating symlink /var/lib/dkms/intel-platform-pmt-dkms/2021.21/source -> /usr/src/intel-platform-pmt-dkms-2021.21
+Warning: I do not know how to handle /usr/src/linux-5.3.18*-obj/x86_64/default.
+
+Kernel preparation unnecessary for this kernel. Skipping...
+
+Building module:
+cleaning build area...
+'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64...
+cleaning build area...
+
+intel_pmt.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+intel_pmt_class.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+intel_pmt_telemetry.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+intel_pmt_crashlog.ko.xz:
+Running module version sanity check.
+ - Original module
+   - No original module exists within this kernel
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+Adding any weak-modules
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/radeon/radeon.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/gvt/kvmgt.ko.xz needs unknown symbol intel_gvt_register_hypervisor
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/gvt/kvmgt.ko.xz needs unknown symbol intel_gvt_unregister_hypervisor
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drmm_add_final_kfree
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drm_dev_init
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_create_object_cached
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/ast/ast.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_get_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_unpin
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_free_object
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_print_info
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_pin
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_mmap
+
+depmod...
+Warning: I do not know how to handle /usr/src/linux-5.3.18*-obj/x86_64/preempt.
+Module intel-platform-pmt-dkms/2021.21 already installed on kernel 4.18.0-305.25.1.el8_4.x86_64 (x86_64).
+
+  Running scriptlet: intel-platform-cse-dkms-2021.21-34.x86_64                                                                        2/2 
+  Installing       : intel-platform-cse-dkms-2021.21-34.x86_64                                                                        2/2 
+  Running scriptlet: intel-platform-cse-dkms-2021.21-34.x86_64                                                                        2/2 
+Creating symlink /var/lib/dkms/intel-platform-cse-dkms/2021.21/source -> /usr/src/intel-platform-cse-dkms-2021.21
+Warning: I do not know how to handle /usr/src/linux-5.3.18*-obj/x86_64/default.
+
+Kernel preparation unnecessary for this kernel. Skipping...
+
+Building module:
+cleaning build area...
+'make' -j96 KLIB=/lib/modules/4.18.0-305.25.1.el8_4.x86_64...
+cleaning build area...
+
+mei.ko.xz:
+Running module version sanity check.
+ - Original module
+   - Found /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/misc/mei/mei.ko.xz
+   - Storing in /var/lib/dkms/intel-platform-cse-dkms/original_module/4.18.0-305.25.1.el8_4.x86_64/x86_64/
+   - Archiving for uninstallation purposes
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+mei-me.ko.xz:
+Running module version sanity check.
+ - Original module
+   - Found /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/misc/mei/mei-me.ko.xz
+   - Storing in /var/lib/dkms/intel-platform-cse-dkms/original_module/4.18.0-305.25.1.el8_4.x86_64/x86_64/
+   - Archiving for uninstallation purposes
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+
+mei-gsc.ko.xz:
+Running module version sanity check.
+ - Original module
+ - Installation
+   - Installing to /lib/modules/4.18.0-305.25.1.el8_4.x86_64/updates/
+Adding any weak-modules
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/tiny/cirrus.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/radeon/radeon.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/amd/amdgpu/amdgpu.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/gvt/kvmgt.ko.xz needs unknown symbol intel_gvt_register_hypervisor
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/i915/gvt/kvmgt.ko.xz needs unknown symbol intel_gvt_unregister_hypervisor
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/mgag200/mgag200.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drmm_add_final_kfree
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/vkms/vkms.ko.xz needs unknown symbol drm_dev_init
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz needs unknown symbol drm_prime_sg_to_page_addr_arrays
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_dumb_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_prime_import_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/udl/udl.ko.xz needs unknown symbol drm_gem_shmem_create_object_cached
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/ast/ast.ko.xz needs unknown symbol drm_atomic_helper_legacy_gamma_set
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_vmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_get_sg_table
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_create
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_unpin
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_vunmap
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_free_object
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_print_info
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_pin
+depmod: WARNING: /lib/modules/4.18.0-305.25.1.el8_4.x86_64/kernel/drivers/gpu/drm/virtio/virtio-gpu.ko.xz needs unknown symbol drm_gem_shmem_mmap
+
+depmod...
+Warning: I do not know how to handle /usr/src/linux-5.3.18*-obj/x86_64/preempt.
+Module intel-platform-cse-dkms/2021.21 already installed on kernel 4.18.0-305.25.1.el8_4.x86_64 (x86_64).
+
+  Verifying        : intel-platform-cse-dkms-2021.21-34.x86_64                                                                        1/2 
+  Verifying        : intel-platform-pmt-dkms-2021.21-34.x86_64                                                                        2/2 
+Installed products updated.
+
+Installed:
+  intel-platform-cse-dkms-2021.21-34.x86_64                           intel-platform-pmt-dkms-2021.21-34.x86_64                          
+
+Complete!
+-----
+
+*PROBLEM*:  More warnings about `drm_gem` symbols not being found.
+
+==== Install the GPU Firmware
+
+-----
+sudo dnf --nogpgcheck install -y intel-fw-gpu intel-fw-gpu-prerelease
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Last metadata expiration check: 0:05:13 ago on Mon 29 Nov 2021 02:08:39 PM CST.
+Dependencies resolved.
+==========================================================================================================================================
+ Package                                Architecture          Version                           Repository                           Size
+==========================================================================================================================================
+Installing:
+ intel-fw-gpu                           x86_64                2021.36.6-75.el8                  intel-graphics-local                5.0 M
+ intel-fw-gpu-prerelease                x86_64                2021.36.6-75.el8                  intel-graphics-local                2.2 M
+
+Transaction Summary
+==========================================================================================================================================
+Install  2 Packages
+
+Total size: 7.2 M
+Installed size: 69 M
+Downloading Packages:
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                  1/1 
+  Installing       : intel-fw-gpu-2021.36.6-75.el8.x86_64                                                                             1/2 
+  Installing       : intel-fw-gpu-prerelease-2021.36.6-75.el8.x86_64                                                                  2/2 
+  Running scriptlet: intel-fw-gpu-prerelease-2021.36.6-75.el8.x86_64                                                                  2/2 
+  Verifying        : intel-fw-gpu-2021.36.6-75.el8.x86_64                                                                             1/2 
+  Verifying        : intel-fw-gpu-prerelease-2021.36.6-75.el8.x86_64                                                                  2/2 
+Installed products updated.
+
+Installed:
+  intel-fw-gpu-2021.36.6-75.el8.x86_64                           intel-fw-gpu-prerelease-2021.36.6-75.el8.x86_64                          
+
+Complete!
+-----
+
+==== Install User Mode Drivers Including OpenCL Runtime `intel-opencl`
+
+-----
+sudo dnf --nogpgcheck install -y intel-opencl
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Last metadata expiration check: 0:07:07 ago on Mon 29 Nov 2021 02:08:39 PM CST.
+Dependencies resolved.
+==========================================================================================================================================
+ Package                        Architecture         Version                                     Repository                          Size
+==========================================================================================================================================
+Installing:
+ intel-opencl                   x86_64               1:21.37.020941.9175-main.el8                intel-graphics-local               1.8 M
+Installing dependencies:
+ intel-gmmlib                   x86_64               1:21.3.5949.9175-main.el8                   intel-graphics-local               159 k
+ intel-igc-core                 x86_64               1:1.0.12654.9175-main.el8                   intel-graphics-local                23 M
+ intel-igc-opencl               x86_64               1:1.0.12654.9175-main.el8                   intel-graphics-local                25 M
+
+Transaction Summary
+==========================================================================================================================================
+Install  4 Packages
+
+Total size: 50 M
+Installed size: 210 M
+Downloading Packages:
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                  1/1 
+  Installing       : intel-igc-core-1:1.0.12654.9175-main.el8.x86_64                                                                  1/4 
+  Installing       : intel-igc-opencl-1:1.0.12654.9175-main.el8.x86_64                                                                2/4 
+  Installing       : intel-gmmlib-1:21.3.5949.9175-main.el8.x86_64                                                                    3/4 
+  Installing       : intel-opencl-1:21.37.020941.9175-main.el8.x86_64                                                                 4/4 
+  Running scriptlet: intel-opencl-1:21.37.020941.9175-main.el8.x86_64                                                                 4/4 
+  Verifying        : intel-gmmlib-1:21.3.5949.9175-main.el8.x86_64                                                                    1/4 
+  Verifying        : intel-igc-core-1:1.0.12654.9175-main.el8.x86_64                                                                  2/4 
+  Verifying        : intel-igc-opencl-1:1.0.12654.9175-main.el8.x86_64                                                                3/4 
+  Verifying        : intel-opencl-1:21.37.020941.9175-main.el8.x86_64                                                                 4/4 
+Installed products updated.
+
+Installed:
+  intel-gmmlib-1:21.3.5949.9175-main.el8.x86_64                        intel-igc-core-1:1.0.12654.9175-main.el8.x86_64                    
+  intel-igc-opencl-1:1.0.12654.9175-main.el8.x86_64                    intel-opencl-1:21.37.020941.9175-main.el8.x86_64                   
+
+Complete!
+-----
+
+==== Install Level Zero Packages
+
+https://www.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top/optimization-and-programming-guide/intel-oneapi-level-zero-introduction.html[`https://www.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top/optimization-and-programming-guide/intel-oneapi-level-zero-introduction.html`]
+
+=====
+The objective of the Intel® oneAPI Level Zero (Level Zero) Application Programming Interface (API) is to provide direct-to-metal interfaces to offload accelerator devices. 
+It is a programming interface that can be published at a cadence that better matches Intel® hardware releases and can be tailored to any device needs. It can be adapted to support broader set of languages features, such as function pointers, virtual functions, unified memory, and I/O capabilities.
+=====
+
+-----
+sudo dnf --nogpgcheck install -y intel-level-zero-gpu level-zero
+Updating Subscription Management repositories.
+Unable to read consumer identity
+
+This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+
+Last metadata expiration check: 0:08:20 ago on Mon 29 Nov 2021 02:08:39 PM CST.
+Dependencies resolved.
+==========================================================================================================================================
+ Package                            Architecture         Version                                 Repository                          Size
+==========================================================================================================================================
+Installing:
+ intel-level-zero-gpu               x86_64               1.2.020941.9175-main.el8                intel-graphics-local               1.8 M
+ level-zero                         x86_64               1.4.1.1-main.el8                        intel-graphics-local               131 k
+
+Transaction Summary
+==========================================================================================================================================
+Install  2 Packages
+
+Total size: 1.9 M
+Installed size: 9.6 M
+Downloading Packages:
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                  1/1 
+  Installing       : level-zero-1.4.1.1-main.el8.x86_64                                                                               1/2 
+  Installing       : intel-level-zero-gpu-1.2.020941.9175-main.el8.x86_64                                                             2/2 
+  Running scriptlet: intel-level-zero-gpu-1.2.020941.9175-main.el8.x86_64                                                             2/2 
+  Verifying        : intel-level-zero-gpu-1.2.020941.9175-main.el8.x86_64                                                             1/2 
+  Verifying        : level-zero-1.4.1.1-main.el8.x86_64                                                                               2/2 
+Installed products updated.
+
+Installed:
+  intel-level-zero-gpu-1.2.020941.9175-main.el8.x86_64                         level-zero-1.4.1.1-main.el8.x86_64                        
+
+Complete!
+-----
+
+==== Install Media and VPL Packages
+
+https://github.com/Intel-Media-SDK/MediaSDK[`https://github.com/Intel-Media-SDK/MediaSDK`]
+
+https://spec.oneapi.io/onevpl/2.3.0/index.html[`https://spec.oneapi.io/onevpl/2.3.0/index.html`]
+
+https://github.com/intel/libva[`https://github.com/intel/libva`]
+
+=====
+Intel Media SDK provides a plain C API to access hardware-accelerated video decode, encode and filtering on Intel Gen graphics hardware platforms. Implementation written in C++ 11 with parts in C-for-Media (CM).
+
+All future development is planned to happen within oneVPL library and its runtime implementations which are direct successors of Intel Media SDK.
+Intel Media SDK has forward compatibility with new VPL runtime (libmfx-gen.so.1.2) in the scope of API features supported by both 1.x and 2.x API series. As such, if application is built against Intel® Media SDK, it still can work on new platforms. 
+=====
+
+These packages are installed via the following command.
+
+-----
+sudo dnf --nogpgcheck install -y intel-media-driver* intel-mediasdk* libvpl2 libvpl-tools libvpl-devel libmfxgen1
+-----
+
+This command was modified from the instructions in the `README-dkms.md` to install all the `intel-mediasdk*` files due to
+the requirements of the `dGPU_script.sh` script later on in this document.
+Basically, that script calls for an example test that's contained within `intel-mediasdk-utils` which isn't installed via the
+`README-dkms.md` instructions.
+
+==== Rebooted the Server
+
+=== Verifications [[verify-card]]
+
+==== i915 Verification
+
+Verify that i915 is being used.
+
+-----
+sudo dmesg | grep -i i915
+[    2.483549] I915 COMPAT BACKPORTED INIT
+[    2.483550] Loading I915 modules backported from DII_4678_prerelease
+[    2.483550] I915 backport generated by backports.git RHEL_84_PVC_210916.0
+[    3.238841] [drm] I915 BACKPORTED INIT 
+[    3.239133] i915 0000:4d:00.0: enabling device (0140 -> 0142)
+[    3.239311] i915 0000:4d:00.0: [drm] Tile count: 2
+[    3.240037] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'0.0 to allow slow compute pre-emption
+[    3.240042] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'1.0 to allow slow compute pre-emption
+[    3.240044] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'2.0 to allow slow compute pre-emption
+[    3.240047] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'3.0 to allow slow compute pre-emption
+[    3.240767] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'0.1 to allow slow compute pre-emption
+[    3.240780] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'1.1 to allow slow compute pre-emption
+[    3.240781] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'2.1 to allow slow compute pre-emption
+[    3.240783] i915 0000:4d:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'3.1 to allow slow compute pre-emption
+[    3.241669] i915 0000:4d:00.0: [drm] Local memory available: 0x00000003fb000000
+[    3.241744] i915 0000:4d:00.0: [drm] Local memory available: 0x00000003fb000000
+[    3.241972] i915 0000:4d:00.0: Direct firmware load for i915/xehpsdv_guc_65.0.0.bin failed with error -2
+[    3.241973] i915 0000:4d:00.0: [drm] GuC firmware i915/xehpsdv_guc_65.0.0.bin: fetch failed with error -2
+[    3.241974] i915 0000:4d:00.0: [drm] GuC firmware(s) can be downloaded from https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/i915
+[    3.241980] i915 0000:4d:00.0: Direct firmware load for i915/xehpsdv_guc_65.0.0.bin failed with error -2
+[    3.241980] i915 0000:4d:00.0: [drm] GuC firmware i915/xehpsdv_guc_65.0.0.bin: fetch failed with error -2
+[    3.241981] i915 0000:4d:00.0: [drm] GuC firmware(s) can be downloaded from https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/i915
+[    3.243461] i915 0000:4d:00.0: [drm] GuC firmware i915/xehpsdv_guc_65.0.0.bin version 0.0
+[    3.243525] i915 0000:4d:00.0: GuC initialization failed -2
+[    3.243618] i915 0000:4d:00.0: Enabling uc failed (-5)
+[    3.243700] i915 0000:4d:00.0: Failed to initialize GPU, declaring it wedged!
+[    3.244501] i915 0000:4d:00.0: [drm:add_taint_for_CI [i915]] CI tainted:0x9 by intel_gt_init+0xbe/0x500 [i915]
+[    3.297021] [drm] Initialized i915 1.6.0 20201103 for 0000:4d:00.0 on minor 0
+[    3.297210] i915 0000:4d:00.0: [drm] Not initializing gsc for remote tiles
+[    3.297548] i915 0000:b3:00.0: enabling device (0140 -> 0142)
+[    3.297702] i915 0000:b3:00.0: [drm] Tile count: 2
+[    3.298398] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'0.0 to allow slow compute pre-emption
+[    3.298403] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'1.0 to allow slow compute pre-emption
+[    3.298404] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'2.0 to allow slow compute pre-emption
+[    3.298406] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'3.0 to allow slow compute pre-emption
+[    3.299141] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'0.1 to allow slow compute pre-emption
+[    3.299155] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'1.1 to allow slow compute pre-emption
+[    3.299157] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'2.1 to allow slow compute pre-emption
+[    3.299158] i915 0000:b3:00.0: [drm] Bumping pre-emption timeout from 640 to 7500 on ccs'3.1 to allow slow compute pre-emption
+[    3.300519] i915 0000:b3:00.0: [drm] Local memory available: 0x00000003fb000000
+[    3.300574] i915 0000:b3:00.0: [drm] Local memory available: 0x00000003fb000000
+[    3.300846] i915 0000:b3:00.0: Direct firmware load for i915/xehpsdv_guc_65.0.0.bin failed with error -2
+[    3.300849] i915 0000:b3:00.0: [drm] GuC firmware i915/xehpsdv_guc_65.0.0.bin: fetch failed with error -2
+[    3.300849] i915 0000:b3:00.0: [drm] GuC firmware(s) can be downloaded from https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/i915
+[    3.300855] i915 0000:b3:00.0: Direct firmware load for i915/xehpsdv_guc_65.0.0.bin failed with error -2
+[    3.300855] i915 0000:b3:00.0: [drm] GuC firmware i915/xehpsdv_guc_65.0.0.bin: fetch failed with error -2
+[    3.300856] i915 0000:b3:00.0: [drm] GuC firmware(s) can be downloaded from https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/tree/i915
+[    3.302392] i915 0000:b3:00.0: [drm] GuC firmware i915/xehpsdv_guc_65.0.0.bin version 0.0
+[    3.302456] i915 0000:b3:00.0: GuC initialization failed -2
+[    3.302545] i915 0000:b3:00.0: Enabling uc failed (-5)
+[    3.302634] i915 0000:b3:00.0: Failed to initialize GPU, declaring it wedged!
+[    3.303411] i915 0000:b3:00.0: [drm:add_taint_for_CI [i915]] CI tainted:0x9 by intel_gt_init+0xbe/0x500 [i915]
+[    3.344603] [drm] Initialized i915 1.6.0 20201103 for 0000:b3:00.0 on minor 1
+[    3.344810] i915 0000:b3:00.0: [drm] Not initializing gsc for remote tiles
+[    8.894014] Creating 3 MTD partitions on "i915-spi.2.auto":
+[    8.894016] 0x000000000000-0x000000001000 : "i915-spi.2.auto.DESCRIPTOR"
+[    8.894066] 0x000000001000-0x0000007f0000 : "i915-spi.2.auto.GSC"
+[    8.894096] 0x0000007f0000-0x000000800000 : "i915-spi.2.auto.DAM"
+[    8.895730] Creating 3 MTD partitions on "i915-spi.4.auto":
+[    8.895732] 0x000000000000-0x000000001000 : "i915-spi.4.auto.DESCRIPTOR"
+[    8.895764] 0x000000001000-0x0000007f0000 : "i915-spi.4.auto.GSC"
+[    8.895793] 0x0000007f0000-0x000000800000 : "i915-spi.4.auto.DAM"
+-----
+
+Verify the device is listed.
+
+-----
+sudo lspci -k | grep "Display controller: Intel Corporation Device"
+4d:00.0 Display controller: Intel Corporation Device 020a (rev 04)
+b3:00.0 Display controller: Intel Corporation Device 020a (rev 04)
+-----
+
+Verify the graphics platform name.
+
+-----
+sudo grep "platform:" `sudo find /sys/kernel/debug/dri -name i915_capabilities`
+/sys/kernel/debug/dri/1/i915_capabilities:platform: XEHPSDV
+/sys/kernel/debug/dri/0/i915_capabilities:platform: XEHPSDV
+-----
+
+==== Verify Access to Graphics Hardware
+
+Ensure access to graphics hardware.
+
+First, determine which groups are required.
+
+-----
+ls -l /dev/dri/renderD*
+crw-rw-rw- 1 root render 226, 128 Nov 29 14:27 /dev/dri/renderD128
+crw-rw-rw- 1 root render 226, 129 Nov 29 14:27 /dev/dri/renderD129
+-----
+
+Add the current user to the `render` group and log in to that group.
+
+-----
+sudo usermod -a -G render $(whoami)
+newgrp render
+-----
+
+==== clinfo Verification
+
+Verify OpenCL with clinfo.
+
+-----
+sudo dnf install clinfo
+-----
+
+The clinfo package could not be found via dnf.  It was snagged from:
+
+http://rpmfind.net/linux/rpm2html/search.php?query=clinfo
+
+as:
+
+`clinfo-2.1.17.02.09-1.el7.x86_64.rpm`
+
+and installed.  The command was:
+
+-----
+clinfo
+Number of platforms                               1
+  Platform Name                                   Intel(R) OpenCL HD Graphics
+  Platform Vendor                                 Intel(R) Corporation
+  Platform Version                                OpenCL 3.0 
+  Platform Profile                                FULL_PROFILE
+  Platform Extensions                             cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_icd cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_intel_command_queue_families cl_intel_subgroups cl_intel_required_subgroup_size cl_intel_subgroups_short cl_khr_spir cl_intel_accelerator cl_intel_driver_diagnostics cl_khr_priority_hints cl_khr_throttle_hints cl_khr_create_command_queue cl_intel_subgroups_char cl_intel_subgroups_long cl_khr_il_program cl_intel_mem_force_host_memory cl_khr_subgroup_extended_types cl_khr_subgroup_non_uniform_vote cl_khr_subgroup_ballot cl_khr_subgroup_non_uniform_arithmetic cl_khr_subgroup_shuffle cl_khr_subgroup_shuffle_relative cl_khr_subgroup_clustered_reduce cl_intel_device_attribute_query cl_khr_fp64 cl_intel_spirv_media_block_io cl_intel_spirv_subgroups cl_khr_spirv_no_integer_wrap_decoration cl_intel_unified_shared_memory_preview cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_intel_planar_yuv cl_intel_packed_yuv cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_image2d_from_buffer cl_khr_depth_images cl_khr_3d_image_writes cl_intel_media_block_io cl_khr_pci_bus_info cl_intel_dot_accumulate cl_intel_subgroup_local_block_io 
+  Platform Host timer resolution                  1ns
+  Platform Extensions function suffix             INTEL
+
+  Platform Name                                   Intel(R) OpenCL HD Graphics
+Number of devices                                 2
+  Device Name                                     Intel(R) Graphics [0x020a]
+  Device Vendor                                   Intel(R) Corporation
+  Device Vendor ID                                0x8086
+  Device Version                                  OpenCL 3.0 NEO 
+  Driver Version                                  21.37.020941
+  Device OpenCL C Version                         OpenCL C 1.2 
+  Device Type                                     GPU
+  Device Available                                Yes
+  Device Profile                                  FULL_PROFILE
+  Max compute units                               960
+  Max clock frequency                             1400MHz
+  Device Partition                                (core)
+    Max number of sub-devices                     2
+    Supported partition types                     by affinity domain, None
+    Supported affinity domains                    NUMA, next partitionable
+  Max work item dimensions                        3
+  Max work item sizes                             1024x1024x1024
+  Max work group size                             1024
+  Compiler Available                              Yes
+  Linker Available                                Yes
+  Preferred work group size multiple              64
+  Max sub-groups per work group                   128
+  Sub-group sizes (Intel)                         8x16x32
+  Preferred / native vector sizes                 
+    char                                                16 / 16      
+    short                                                8 / 8       
+    int                                                  4 / 4       
+    long                                                 1 / 1       
+    half                                                 8 / 8        (cl_khr_fp16)
+    float                                                1 / 1       
+    double                                               1 / 1        (cl_khr_fp64)
+  Half-precision Floating-point support           (cl_khr_fp16)
+    Denormals                                     Yes
+    Infinity and NANs                             Yes
+    Round to nearest                              Yes
+    Round to zero                                 Yes
+    Round to infinity                             Yes
+    IEEE754-2008 fused multiply-add               Yes
+    Support is emulated in software               No
+    Correctly-rounded divide and sqrt operations  No
+  Single-precision Floating-point support         (core)
+    Denormals                                     Yes
+    Infinity and NANs                             Yes
+    Round to nearest                              Yes
+    Round to zero                                 Yes
+    Round to infinity                             Yes
+    IEEE754-2008 fused multiply-add               Yes
+    Support is emulated in software               No
+    Correctly-rounded divide and sqrt operations  Yes
+  Double-precision Floating-point support         (cl_khr_fp64)
+    Denormals                                     Yes
+    Infinity and NANs                             Yes
+    Round to nearest                              Yes
+    Round to zero                                 Yes
+    Round to infinity                             Yes
+    IEEE754-2008 fused multiply-add               Yes
+    Support is emulated in software               No
+    Correctly-rounded divide and sqrt operations  No
+  Address bits                                    64, Little-Endian
+  Global memory size                              32482365440 (30.25GiB)
+  Error Correction support                        No
+  Max memory allocation                           4294959104 (4GiB)
+  Unified memory for Host and Device              No
+  Shared Virtual Memory (SVM) capabilities        (core)
+    Coarse-grained buffer sharing                 Yes
+    Fine-grained buffer sharing                   No
+    Fine-grained system sharing                   No
+    Atomics                                       No
+  Minimum alignment for any data type             128 bytes
+  Alignment of base address                       1024 bits (128 bytes)
+  Preferred alignment for atomics                 
+    SVM                                           64 bytes
+    Global                                        64 bytes
+    Local                                         64 bytes
+  Max size for global variable                    65536 (64KiB)
+  Preferred total size of global vars             4294959104 (4GiB)
+  Global Memory cache type                        Read/Write
+  Global Memory cache size                        4194304 (4MiB)
+  Global Memory cache line                        64 bytes
+  Image support                                   Yes
+    Max number of samplers per kernel             16
+    Max size for 1D images from buffer            268434944 pixels
+    Max 1D or 2D image array size                 2048 images
+    Base address alignment for 2D image buffers   4 bytes
+    Pitch alignment for 2D image buffers          4 bytes
+    Max 2D image size                             16384x16384 pixels
+    Max planar YUV image size                     16384x16128 pixels
+    Max 3D image size                             16384x16384x2048 pixels
+    Max number of read image args                 128
+    Max number of write image args                128
+    Max number of read/write image args           128
+  Max number of pipe args                         0
+  Max active pipe reservations                    0
+  Max pipe packet size                            0
+  Local memory type                               Local
+  Local memory size                               65536 (64KiB)
+  Max constant buffer size                        4294959104 (4GiB)
+  Max number of constant args                     8
+  Max size of kernel argument                     2048 (2KiB)
+  Queue properties (on host)                      
+    Out-of-order execution                        Yes
+    Profiling                                     Yes
+  Queue properties (on device)                    
+    Out-of-order execution                        No
+    Profiling                                     No
+    Preferred size                                0
+    Max size                                      0
+  Max queues on device                            0
+  Max events on device                            0
+  Prefer user sync for interop                    Yes
+  Profiling timer resolution                      80ns
+  Execution capabilities                          
+    Run OpenCL kernels                            Yes
+    Run native kernels                            No
+    Sub-group independent forward progress        No
+    IL version                                    SPIR-V_1.2 
+    SPIR versions                                 1.2 
+  printf() buffer size                            4194304 (4MiB)
+  Built-in kernels                                
+  Device Extensions                               cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_icd cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_intel_command_queue_families cl_intel_subgroups cl_intel_required_subgroup_size cl_intel_subgroups_short cl_khr_spir cl_intel_accelerator cl_intel_driver_diagnostics cl_khr_priority_hints cl_khr_throttle_hints cl_khr_create_command_queue cl_intel_subgroups_char cl_intel_subgroups_long cl_khr_il_program cl_intel_mem_force_host_memory cl_khr_subgroup_extended_types cl_khr_subgroup_non_uniform_vote cl_khr_subgroup_ballot cl_khr_subgroup_non_uniform_arithmetic cl_khr_subgroup_shuffle cl_khr_subgroup_shuffle_relative cl_khr_subgroup_clustered_reduce cl_intel_device_attribute_query cl_khr_fp64 cl_intel_spirv_media_block_io cl_intel_spirv_subgroups cl_khr_spirv_no_integer_wrap_decoration cl_intel_unified_shared_memory_preview cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_intel_planar_yuv cl_intel_packed_yuv cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_image2d_from_buffer cl_khr_depth_images cl_khr_3d_image_writes cl_intel_media_block_io cl_khr_pci_bus_info cl_intel_dot_accumulate cl_intel_subgroup_local_block_io 
+
+  Device Name                                     Intel(R) Graphics [0x020a]
+  Device Vendor                                   Intel(R) Corporation
+  Device Vendor ID                                0x8086
+  Device Version                                  OpenCL 3.0 NEO 
+  Driver Version                                  21.37.020941
+  Device OpenCL C Version                         OpenCL C 1.2 
+  Device Type                                     GPU
+  Device Available                                Yes
+  Device Profile                                  FULL_PROFILE
+  Max compute units                               960
+  Max clock frequency                             1400MHz
+  Device Partition                                (core)
+    Max number of sub-devices                     2
+    Supported partition types                     by affinity domain, None
+    Supported affinity domains                    NUMA, next partitionable
+  Max work item dimensions                        3
+  Max work item sizes                             1024x1024x1024
+  Max work group size                             1024
+  Compiler Available                              Yes
+  Linker Available                                Yes
+  Preferred work group size multiple              64
+  Max sub-groups per work group                   128
+  Sub-group sizes (Intel)                         8x16x32
+  Preferred / native vector sizes                 
+    char                                                16 / 16      
+    short                                                8 / 8       
+    int                                                  4 / 4       
+    long                                                 1 / 1       
+    half                                                 8 / 8        (cl_khr_fp16)
+    float                                                1 / 1       
+    double                                               1 / 1        (cl_khr_fp64)
+  Half-precision Floating-point support           (cl_khr_fp16)
+    Denormals                                     Yes
+    Infinity and NANs                             Yes
+    Round to nearest                              Yes
+    Round to zero                                 Yes
+    Round to infinity                             Yes
+    IEEE754-2008 fused multiply-add               Yes
+    Support is emulated in software               No
+    Correctly-rounded divide and sqrt operations  No
+  Single-precision Floating-point support         (core)
+    Denormals                                     Yes
+    Infinity and NANs                             Yes
+    Round to nearest                              Yes
+    Round to zero                                 Yes
+    Round to infinity                             Yes
+    IEEE754-2008 fused multiply-add               Yes
+    Support is emulated in software               No
+    Correctly-rounded divide and sqrt operations  Yes
+  Double-precision Floating-point support         (cl_khr_fp64)
+    Denormals                                     Yes
+    Infinity and NANs                             Yes
+    Round to nearest                              Yes
+    Round to zero                                 Yes
+    Round to infinity                             Yes
+    IEEE754-2008 fused multiply-add               Yes
+    Support is emulated in software               No
+    Correctly-rounded divide and sqrt operations  No
+  Address bits                                    64, Little-Endian
+  Global memory size                              32482365440 (30.25GiB)
+  Error Correction support                        No
+  Max memory allocation                           4294959104 (4GiB)
+  Unified memory for Host and Device              No
+  Shared Virtual Memory (SVM) capabilities        (core)
+    Coarse-grained buffer sharing                 Yes
+    Fine-grained buffer sharing                   No
+    Fine-grained system sharing                   No
+    Atomics                                       No
+  Minimum alignment for any data type             128 bytes
+  Alignment of base address                       1024 bits (128 bytes)
+  Preferred alignment for atomics                 
+    SVM                                           64 bytes
+    Global                                        64 bytes
+    Local                                         64 bytes
+  Max size for global variable                    65536 (64KiB)
+  Preferred total size of global vars             4294959104 (4GiB)
+  Global Memory cache type                        Read/Write
+  Global Memory cache size                        4194304 (4MiB)
+  Global Memory cache line                        64 bytes
+  Image support                                   Yes
+    Max number of samplers per kernel             16
+    Max size for 1D images from buffer            268434944 pixels
+    Max 1D or 2D image array size                 2048 images
+    Base address alignment for 2D image buffers   4 bytes
+    Pitch alignment for 2D image buffers          4 bytes
+    Max 2D image size                             16384x16384 pixels
+    Max planar YUV image size                     16384x16128 pixels
+    Max 3D image size                             16384x16384x2048 pixels
+    Max number of read image args                 128
+    Max number of write image args                128
+    Max number of read/write image args           128
+  Max number of pipe args                         0
+  Max active pipe reservations                    0
+  Max pipe packet size                            0
+  Local memory type                               Local
+  Local memory size                               65536 (64KiB)
+  Max constant buffer size                        4294959104 (4GiB)
+  Max number of constant args                     8
+  Max size of kernel argument                     2048 (2KiB)
+  Queue properties (on host)                      
+    Out-of-order execution                        Yes
+    Profiling                                     Yes
+  Queue properties (on device)                    
+    Out-of-order execution                        No
+    Profiling                                     No
+    Preferred size                                0
+    Max size                                      0
+  Max queues on device                            0
+  Max events on device                            0
+  Prefer user sync for interop                    Yes
+  Profiling timer resolution                      80ns
+  Execution capabilities                          
+    Run OpenCL kernels                            Yes
+    Run native kernels                            No
+    Sub-group independent forward progress        No
+    IL version                                    SPIR-V_1.2 
+    SPIR versions                                 1.2 
+  printf() buffer size                            4194304 (4MiB)
+  Built-in kernels                                
+  Device Extensions                               cl_khr_byte_addressable_store cl_khr_fp16 cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_icd cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_intel_command_queue_families cl_intel_subgroups cl_intel_required_subgroup_size cl_intel_subgroups_short cl_khr_spir cl_intel_accelerator cl_intel_driver_diagnostics cl_khr_priority_hints cl_khr_throttle_hints cl_khr_create_command_queue cl_intel_subgroups_char cl_intel_subgroups_long cl_khr_il_program cl_intel_mem_force_host_memory cl_khr_subgroup_extended_types cl_khr_subgroup_non_uniform_vote cl_khr_subgroup_ballot cl_khr_subgroup_non_uniform_arithmetic cl_khr_subgroup_shuffle cl_khr_subgroup_shuffle_relative cl_khr_subgroup_clustered_reduce cl_intel_device_attribute_query cl_khr_fp64 cl_intel_spirv_media_block_io cl_intel_spirv_subgroups cl_khr_spirv_no_integer_wrap_decoration cl_intel_unified_shared_memory_preview cl_khr_mipmap_image cl_khr_mipmap_image_writes cl_intel_planar_yuv cl_intel_packed_yuv cl_khr_int64_base_atomics cl_khr_int64_extended_atomics cl_khr_image2d_from_buffer cl_khr_depth_images cl_khr_3d_image_writes cl_intel_media_block_io cl_khr_pci_bus_info cl_intel_dot_accumulate cl_intel_subgroup_local_block_io 
+
+NULL platform behavior
+  clGetPlatformInfo(NULL, CL_PLATFORM_NAME, ...)  Intel(R) OpenCL HD Graphics
+  clGetDeviceIDs(NULL, CL_DEVICE_TYPE_ALL, ...)   Success [INTEL]
+  clCreateContext(NULL, ...) [default]            Success [INTEL]
+  clCreateContextFromType(NULL, CL_DEVICE_TYPE_CPU)  No devices found in platform
+  clCreateContextFromType(NULL, CL_DEVICE_TYPE_GPU)  Success (1)
+    Platform Name                                 Intel(R) OpenCL HD Graphics
+    Device Name                                   Intel(R) Graphics [0x020a]
+  clCreateContextFromType(NULL, CL_DEVICE_TYPE_ACCELERATOR)  No devices found in platform
+  clCreateContextFromType(NULL, CL_DEVICE_TYPE_CUSTOM)  No devices found in platform
+  clCreateContextFromType(NULL, CL_DEVICE_TYPE_ALL)  Success (1)
+    Platform Name                                 Intel(R) OpenCL HD Graphics
+    Device Name                                   Intel(R) Graphics [0x020a]
+
+ICD loader properties
+  ICD loader Name                                 OpenCL ICD Loader
+  ICD loader Vendor                               OCL Icd free software
+  ICD loader Version                              2.2.12
+  ICD loader Profile                              OpenCL 2.2
+        NOTE:   your OpenCL library declares to support OpenCL 2.2,
+                but it seems to support up to OpenCL 2.1 only.
+        NOTE:   your OpenCL library only supports OpenCL 2.1,
+                but some installed platforms support OpenCL 3.0.
+                Programs using 3.0 features may crash
+                or behave unexepectedly
+-----
+
+==== clpeak Verification
+
+Attempt to verify OpenCL with clpeak.
+Snag it and build it.
+
+-----
+git clone https://github.com/krrishnarraj/clpeak.git
+cd clpeak
+git submodule update --init --recursive --remote
+mkdir build
+cd build
+ccmake ..
+-----
+
+The CMake package had to be installed.
+
+The OpenCL headers had to be installed.
+
+Now run `clpeak` and see what happens.
+
+-----
+clpeak
+
+Platform: Intel(R) FPGA Emulation Platform for OpenCL(TM)
+  Device: Intel(R) FPGA Emulation Device
+    Driver version  : 2021.12.9.0.24_005321 (Linux x64)
+    Compute units   : 96
+    Clock frequency : 2400 MHz
+    Build Log: Compilation started
+Compilation done
+Linking started
+Linking done
+Device build started
+Options used by backend compiler:  -cl-mad-enable 
+Failed to build device program
+Error: unimplemented function(s) used:
+_Z3madDhDhDh is undefined 
+_Z3madDv2_DhS_S_ is undefined 
+_Z3madDv4_DhS_S_ is undefined 
+_Z3madDv8_DhS_S_ is undefined 
+_Z3madDv16_DhS_S_ is undefined 
+CompilerException Failed to parse IR
+
+
+
+Platform: Intel(R) OpenCL
+  Device: Intel(R) Xeon(R) Gold 6336Y CPU @ 2.40GHz
+    Driver version  : 2021.12.9.0.24_005321 (Linux x64)
+    Compute units   : 96
+    Clock frequency : 2400 MHz
+
+    Global memory bandwidth (GBPS)
+      float   : 97.75
+      float2  : 112.35
+      float4  : 121.25
+      float8  : 128.45
+      float16 : 131.05
+
+    Single-precision compute (GFLOPS)
+      float   : 2036.12
+      float2  : 285.28
+      float4  : 575.60
+      float8  : 1138.16
+      float16 : 2220.97
+
+    No half precision support! Skipped
+
+    Double-precision compute (GFLOPS)
+      double   : 2052.19
+      double2  : 285.84
+      double4  : 578.40
+      double8  : 1106.07
+      double16 : 2022.19
+
+    Integer compute (GIOPS)
+      int   : 683.36
+      int2  : 1276.03
+      int4  : 2067.19
+      int8  : 1859.64
+      int16 : 1241.54
+
+    Integer compute Fast 24bit (GIOPS)
+      int   : 511.22
+      int2  : 76.30
+      int4  : 153.33
+      int8  : 305.62
+      int16 : 1388.53
+
+    Transfer bandwidth (GBPS)
+      enqueueWriteBuffer              : 11.70
+      enqueueReadBuffer               : 12.75
+      enqueueWriteBuffer non-blocking : 12.55
+      enqueueReadBuffer non-blocking  : 12.86
+      enqueueMapBuffer(for read)      : 23241.16
+        memcpy from mapped ptr        : 11.77
+      enqueueUnmap(after write)       : 25687.60
+        memcpy to mapped ptr          : 11.34
+
+    Kernel launch latency : 3.75 us
+
+
+Platform: Intel(R) OpenCL HD Graphics
+  Device: Intel(R) Graphics [0x020a]
+    Driver version  : 21.37.020941 (Linux x64)
+    Compute units   : 960
+    Clock frequency : 1400 MHz
+
+    Global memory bandwidth (GBPS)
+      float   : 566.72
+      float2  : 601.75
+      float4  : 630.43
+      float8  : 651.10
+      float16 : 540.08
+
+    Single-precision compute (GFLOPS)
+      float   : 16664.82
+      float2  : 16647.97
+      float4  : 16642.38
+      float8  : 16544.85
+      float16 : 16311.51
+
+    Half-precision compute (GFLOPS)
+      half   : 33178.51
+      half2  : 32741.87
+      half4  : 32882.77
+      half8  : 32691.59
+      half16 : 32247.66
+
+    Double-precision compute (GFLOPS)
+      double   : 8273.45
+      double2  : 8247.80
+      double4  : 8262.96
+      double8  : 8170.11
+      double16 : 7947.88
+
+    Integer compute (GIOPS)
+      int   : 4309.44
+      int2  : 4340.69
+      int4  : 4333.38
+      int8  : 4781.93
+      int16 : 4456.28
+
+    Integer compute Fast 24bit (GIOPS)
+      int   : 4306.13
+      int2  : 4343.76
+      int4  : 4335.38
+      int8  : 4982.08
+      int16 : 4573.01
+
+    Transfer bandwidth (GBPS)
+      enqueueWriteBuffer              : 19.41
+      enqueueReadBuffer               : 19.89
+      enqueueWriteBuffer non-blocking : 20.26
+      enqueueReadBuffer non-blocking  : 20.82
+      enqueueMapBuffer(for read)      : 19.77
+        memcpy from mapped ptr        : 12.48
+      enqueueUnmap(after write)       : 20.70
+        memcpy to mapped ptr          : 12.00
+
+    Kernel launch latency : 22.52 us
+-----
+
+==== Verify PMT
+
+Verify PMT is in use.
+
+-----
+sudo lspci -k -d 8086:09A7
+00:02.1 System peripheral: Intel Corporation Device 09a7
+        Subsystem: Intel Corporation Device 0000
+        Kernel modules: intel_pmt
+4f:00.1 System peripheral: Intel Corporation Device 09a7
+        Subsystem: Intel Corporation Device 0000
+        Kernel driver in use: intel-pmt
+        Kernel modules: intel_pmt
+80:02.1 System peripheral: Intel Corporation Device 09a7
+        Subsystem: Intel Corporation Device 0000
+        Kernel modules: intel_pmt
+b5:00.1 System peripheral: Intel Corporation Device 09a7
+        Subsystem: Intel Corporation Device 0000
+        Kernel driver in use: intel-pmt
+        Kernel modules: intel_pmt
+-----
+
+Another PMT verification.
+
+-----
+ls -l /sys/class/intel_pmt/telem1/
+total 0
+lrwxrwxrwx 1 root root    0 Nov 29 14:56 device -> ../../../pmt_telemetry.0.auto
+-r--r--r-- 1 root root 4096 Nov 29 14:56 guid
+-r--r--r-- 1 root root 4096 Nov 29 14:56 offset
+drwxr-xr-x 2 root root    0 Nov 29 14:56 power
+-r--r--r-- 1 root root 4096 Nov 29 14:56 size
+lrwxrwxrwx 1 root root    0 Nov 29 14:27 subsystem -> ../../../../../../../../../class/intel_pmt
+-r--r----- 1 root root   60 Nov 29 14:56 telem
+-rw-r--r-- 1 root root 4096 Nov 29 14:27 uevent
+-----
+
+==== Verify CSE
+
+Verify CSE is in use.
+
+-----
+sudo lsmod | grep mei
+mei_gsc                16384  0
+mei_me                 49152  1 mei_gsc
+mei                   143360  2 mei_gsc,mei_me
+-----
+
+The `README-dkms.md` file says this should be:
+
+-----
+mei_iaf                20480  0
+mei_gsc                20480  1
+mei_me                 45056  1 mei_gsc
+mei                   135168  4 mei_iaf,mei_gsc,mei_me
+-----
+
+*PROBLEM*: The `mei_iaf` part is missing.
+
+==== dGPU Tool
+
+=====
+The dGPU tool is an automated script which collects the system HW and SW
+stack information.
+
+This tool also collects different logs to help debugging any issues quickly and
+efficiently.
+
+It runs the Sample Multi Transcode test on SG1 and clpeak on Arctic Sound-P
+to verify if the SW stack is installed correctly.
+
+Additionally, the tool also supports FW updates for both SG2 and Arctic Sound-P
+on certain OS.
+=====
+
+===== Preliminaries
+
+The Intel media SDK RPM packages supplied with the ATS distribution, i.e.
+
+-----
+/home/sysadmin/driver_firmware/intel-gpgpu-prerelease-rhel-8.4-eng205-20210927.1/packages/intel-mediasdk*
+-----
+
+are installed in `/usr` rather than in `/opt/intel/mediasdk`.  The latter
+configuration is expected in the `dGPU_script.sh` script.
+
+A binary distribution that installs the Intel media SDK packages in `/opt/intel/mediasdk` can be found at:
+
+-----
+https://github.com/Intel-Media-SDK/MediaSDK/releases/tag/intel-mediasdk-21.3.5
+-----
+
+The 'Mediastack.tar.gz` file expands into:
+
+-----
+etc
+install_media.sh
+LICENSE
+opt/intel/mediasdk/bin
+                   doc
+                   include
+                   lib64
+                   plugins -> lib64/mfx
+                   share
+-----
+
+Well, it was a good idea but installing these things in `/opt/intel` broke the bejesus out of `clinfo` and `clpeak`,
+so `/etc/ld.so.conf.d/intel-mediasdk.conf` was negated and `ldconf` run again to revert to
+the Intel Media SDK version installed in `/usr`.
+
+===== Script Usage
+
+The script to run dGPU is found at:
+
+-----
+/home/sysadmin/driver_firmware/dGPU_script.sh
+-----
+
+Let's run it.
+
+-----
+cd /home/sysadmin/driver_firmwave/dGPU_script.sh
+sudo dGPU_script.sh
+
+        ===========================================================================
+        Welcome to the dGPU Hardware,Software,Firmware and
+        BKC verification script version 1.0
+        ===========================================================================
+
+INFO:- File /home/sysadmin/driver_firmware/Logs/temp/_test_hwsw.log will be generated
+Thu Jan 13 11:19:40 CST 2022
+
+=================
+
+=== Checking for dGPU card on Xeon Host === 
+
+Found Intel dGPU
+         Detected 2 Arctic Sound-P card(s)
+
+=================
+
+./dGPU_script.sh: line 817: /var/crash: Is a directory
+         ========================================================
+         Please Select Option :
+          1  Collect System Information [Software/Hardware]
+          2  Run Basic Sanity Tests
+          3  Update the SW Stack  - Feature to be implemented
+          4  Show GFX FW Info and Update Firmware. Provide path to the bin file as well e.g: -b /home/<path to bin file.bin>
+          5  Collect Logs and Exit 
+          =======================================================
+1
+
+===== Collecting System information =====
+-----
+
+This creates the file:
+
+-----
+/home/sysadmin/driver_firmware/Logs/temp/_test_hwsw.log
+-----
+
+which looks like:
+
+-----
+===== CARD INFORMATION =====
+
+===========================
+Arctic Sound-P Card Tree Structure 
+ 
+ |           \-02.0-[b1-b5]----00.0-[b2-b5]--+-01.0-[b3-b4]----00.0  Intel Corporation Device 020a
+ |                                           \-02.0-[b5]--+-00.0  Intel Corporation Device 09a6
+ |                                                        +-00.1  Intel Corporation Device 09a7
+ |                                                        \-00.2  Intel Corporation Device 09a8
+ |           \-02.0-[4b-4f]----00.0-[4c-4f]--+-01.0-[4d-4e]----00.0  Intel Corporation Device 020a
+ |                                           \-02.0-[4f]--+-00.0  Intel Corporation Device 09a6
+ |                                                        +-00.1  Intel Corporation Device 09a7
+ |               
+...
+libmodman-2.0.1-17.el8.x86_64
+libmnl-1.0.4-6.el8.x86_64
+libmaxminddb-1.2.0-10.el8.x86_64
+libmfxgen1-21.3.4.9175-main.el8.x86_64
+libva-2.13.0.1.1-main.el8.x86_6
+-----
+
+=== Install OneAPI [[install-oneapi]]
+
+This is found in: *631277_Arctic-Sound-P-Product-Family-Software-Guide_Rev1p02.pdf*.
+
+==== Base Toolkit
+
+-----
+cd /home/sysadmin/toolkits/oneapi
+sudo sh ./l_BaseKit_2021.4.0.3424_prerelease_offline.sh
+Extract l_BaseKit_2021.4.0.3424_prerelease_offline to /home/sysadmin/toolkits/oneapi/l_BaseKit_2021.4.0.3424_prerelease_offline...
+...
+  Software Pre-requisite Check | Intel® oneAPI Base Toolkit
+--------------------------------------------------------------------------------
+  There are one or more unresolved issues based on your system configuration and
+   component selection
+
+  You can resolve all the issues without exiting the installer and re-check, or
+  you can exit, resolve the issues, and then run the Installation again.
+
+    Warnings
+    (It is recommended that you resolve these issues now, but you may continue
+     to Installation and resolve them later)
+      This machine uses operating system "Unknown". Compatibility issues may o
+      ccur.
+      Installation can continue; however, product functionality may not meet e
+      xpectations because this product is untested on this operating system. S
+      uggestion: Check the Release Notes for a list of supported operating sys
+      tems and install this product on a compliant system.
+-----
+
+*PROBLEM*: The operating system is not recognized.
+
+*SOLUTION*:  Ignore this message and proceed.
+
+We continue with the install procedure to see how much further we can get.
+The next screen is:
+
+-----
+ Welcome to Intel® Software Installer | Intel® oneAPI Base Toolkit
+--------------------------------------------------------------------------------
+  Develop accelerated C++ and DPC++ applications for CPUs, GPUs, and FPGAs.     
+  Toolkit includes compilers, pre-optimized libraries, and analysis tools for   
+  optimizing workloads including AI, HPC, and media.
+
+  Check the default configuration below.
+  It can be customized before installing or downloading.
+  WHAT'S INCLUDED:
+    - Intel® VTune(TM) Profiler (2021.8.0-nda)                                  |
+    - Intel® Distribution for Python* (2021.4.0-prerelease)                     |
+    - Intel® oneAPI Math Kernel Library (2021.4.0-prerelease)                   |
+    - Intel® Advisor (2021.4.0-prerelease)                                      |
+    - Intel® oneAPI Data Analytics Library (2021.4.0-prerelease)                |
+    - Intel® oneAPI Deep Neural Network Library (2021.4.0-prerelease)           X
+
+  INSTALLATION LOCATION: /opt/intel/oneapi
+  SPACE REQUIRED TO INSTALL: 30.2 GB      SPACE REQUIRED TO DOWNLOAD: 0 Bytes
+  CAN INTEGRATE WITH: Eclipse*.
+  Intel® Software Installer:  4.0.9.0-678
+
+  By continuing with this installation, you accept the terms and conditions of
+  Intel® End User License Agreement 
+  Accept & install  Accept & customize installation  Download Only  Decline & quit
+-----
+
+After selecting `Accept & Install` we get:
+
+-----
+...
+ There are one or more unresolved issues based on your system configuration and
+   component selection
+
+    Warnings                                                                    |
+    (It is recommended that you resolve these issues now, but you may continue  |
+     to Installation and resolve them later)                                    |
+      Intel® Graphics Compute Runtime for OpenCL™ not found.                    |
+      You have no relevant GPU driver. If you are going to develop and run GPU  |
+      -accelerated applications on this system, please check the <a href="http  |
+      s://software.intel.com/content/www/us/en/develop/documentation/installat  |
+      ion-guide-for-intel-oneapi-toolkits-linux/top/install-intel-gpu-drivers.  |
+      html">installation guide</a> for instructions on the GPU drivers.<br/>Ot  |
+      herwise, you can ignore the warning and continue the installation as is:  |
+       the product can still be used with CPU.
+-----
+
+*PROBLEM*:  Another sign that something is wrong with OpenCL.
+
+*SOLUTION*:  Ignore this message as well and install the package.
+
+==== Install HPC Toolkit
+
+-----
+sudo ./l_HPCKit_p_2021.4.0.3347_offline.sh 
+[sudo] password for baum: 
+Extract l_HPCKit_p_2021.4.0.3347_offline to /home/sysadmin/toolkits/oneapi/l_HPCKit_p_2021.4.0.3347_offline...
+[##################################################################################################################]
+Extract l_HPCKit_p_2021.4.0.3347_offline completed!
+Could not detect graphical display, installation will continue in console mode. If you aim to launch the installer graphical user interface under root try `xhost si:localuser:root` command and then restart the application.
+Checking system requirements...
+Done.
+Wait while the installer is preparing...
+Done.
+Launching the installer...
+Remove extracted files: /home/sysadmin/toolkits/oneapi/l_HPCKit_p_2021.4.0.3347_offline...
+-----
+
+==== Install AI Kit
+
+This includes:
+
+-----
+   - Intel® Low Precision Optimization Tool (1.5.1.0)                          X
+    - Intel® Distribution for Python* (2021.4.0-prerelease)                     |
+    - Intel® Optimization for TensorFlow* (2.5.0-prerelease)                    |
+    - PyTorch* (1.8.0-prerelease)                                               |
+    - Model Zoo (2.4.0-prerelease)                                              |
+    - Intel® Low Precision Optimization Tool (1.5.1.0)
+-----
+
+==== Initialize oneAPI Environment and Verify Compiler Version
+
+Set environment variables and verify the dpcpp version and update it for
+SLES.
+
+-----
+source /opt/intel/oneapi/setvars.sh
+
+:: initializing oneAPI environment ...
+   -bash: BASH_VERSION = 4.4.20(1)-release
+:: advisor -- latest
+:: ccl -- latest
+:: clck -- latest
+:: compiler -- latest
+:: dal -- latest
+:: debugger -- latest
+:: dev-utilities -- latest
+:: dnnl -- latest
+:: dpcpp-ct -- latest
+:: dpl -- latest
+:: inspector -- latest
+:: intelpython -- latest
+:: ipp -- latest
+:: ippcp -- latest
+:: ipp -- latest
+:: itac -- latest
+:: LPOT -- latest
+:: mkl -- latest
+:: modelzoo -- latest
+:: mpi -- latest
+:: pytorch -- latest
+:: tbb -- latest
+:: tensorflow -- latest
+:: vpl -- latest
+:: vtune -- latest
+:: oneAPI environment initialized ::
+-----
+
+Verify compiler version.
+
+-----
+dpcpp -v
+Intel(R) oneAPI DPC++/C++ Compiler 2021.4.0 (2021.4.0.20210924)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /opt/intel/oneapi/compiler/2021.4.0/linux/bin
+Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/8
+Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/8
+Candidate multilib: .;@m64
+Candidate multilib: 32;@m32
+Selected multilib: .;@m64
+-----
+
+
+
+==== OpenCL Runtime Component Check
+
+The packages that comprise the Intel Graphics Compute Runtime are explained at:
+
+https://dgpu-docs.intel.com/installation-guides/redhat/redhat-8.4.html[`https://dgpu-docs.intel.com/installation-guides/redhat/redhat-8.4.html`]
+
+and all are presently installed on `ats`.  The run-time packages are:
+
+-----
+intel-opencl
+intel-media
+intel-mediasdk
+level-zero
+intel-level-zero-gpu
+-----
+
+We check via:
+
+-----
+rpm -q intel-opencl
+intel-opencl-21.37.020941.9175-main.el8.x86_64
+rpm -q intel-media
+package intel-media is not installed
+rpm -q intel-mediasdk
+intel-mediasdk-21.3.1.9175-main.el8.x86_64
+rpm -q level-zero
+level-zero-1.4.1.1-main.el8.x86_64
+rpm -q intel-level-zero-gpu
+intel-level-zero-gpu-1.2.020941.9175-main.el8.x86_64
+-----
+
+There may be a misprint at that URL since while there is no `intel-media` package that I can
+find, there is an `intel-media-driver` package available in many places.
+This still doesn't answer why the oneAPI installer can't find the graphics run-time.
+
+==== Install GCC 9
+
+The installation manual instructs us to "Install GCC 9 version by your preferred method", although
+I'm not sure as to whether that means GCC 9 or at least GCC 9.
+
+Rocky Linux 8.4 has GCC 8.4.1 as the default compiler.
+
+Here is how you can add GCC 9 to Rocky Linux 8.4 without nuking the default system GCC 8.4.1.
+
+https://unix.stackexchange.com/questions/585154/how-to-install-gcc-9-x-on-rhel8[`https://unix.stackexchange.com/questions/585154/how-to-install-gcc-9-x-on-rhel8`]
+
+To add GCC 9 to Rocky Linux 8.4 you must:
+
+-----
+sudo dnf install gcc-toolset-9
+-----
+
+This puts `gcc-toolset-9` in `/opt/rh`, i.e.
+
+-----
+ls -l /opt/rh
+total 0
+dr-xr-xr-x 3 root root 32 Dec 22 13:29 gcc-toolset-9
+-----
+
+The environment can be reset to run GCC 9 via:
+
+-----
+scl enable gcc-toolset-9 bash
+:: WARNING: setvars.sh has already been run. Skipping re-execution.
+   To force a re-execution of setvars.sh, use the '--force' option.
+   Using '--force' can result in excessive use of your environment variables.
+-----
+
+The warning is due to having `setvars.sh` for the Intel Python environment in
+the `.bashrc` file.  The warning can be safely ignored until it can't.
+
+== Run oneAPI Samples [[run-samples]]
+
+=== oneAPI Samples Repository
+
+A repository of oneAPI sample programs exists on Github at:
+
+https://github.com/oneapi-src/oneAPI-samples[`https://github.com/oneapi-src/oneAPI-samples`]
+
+It is divided into four main sections with several subsections in each.
+
+* xref:ai-and-analytics[*AI and Analytics*]
+** xref:end-to-end[*End to end Workloads*]
+** xref:features-and-functionality[*Features and Functionality*]
+** xref:getting-started-samples[*Getting Started Samples*]
+*** xref:start-tensorflow[Tensorflow with AI Kit]
+** xref:jupyter[*Jupyter*] - Tutorial material via Jupyer notebooks.
+*** xref:machine-learning[*Introduction to Machine Learning*] - An 11 part introduction to machine learning.
+*** xref:numba-dpex[*Numba-dpex Essentials*] - A 6 part introduction to Numba/Numba-dpex for data parallel programming.
+*** xref:predictive-modeling[*Predictive Modeling*] - Introduction to predictive modeling using the Intel AI Kit.
+
+* *Direct Programming* - Examples of programming in C++, DPC++, DPC++ FPGA and Fortran.
+
+* *Libraries*
+
+* *Tools*
+
+For use on ATS, all of the examples described below must be run in an environment set up via:
+
+-----
+source /opt/intel/oneapi/setvars.sh
+scl enable gcc-toolset-9 bash
+-----
+
+=== Prerequisites
+
+==== Setting Up the oneAPI Environment
+
+First, set up Intel Python environment.  Add:
+
+-----
+source /opt/intel/oneapi/setvars.sh
+-----
+
+to `.bashrc`.
+
+==== Setting Up a GCC 9 Environment
+
+The documentation says that GCC 9 is needed.  Here's a quick way to do so.
+
+-----
+scl enable gcc-toolset-9 bash
+-----
+
+==== Launching a Jupyter Notebook Via a Remote Server
+
+Many of the examples are in the form of Jupyter notebooks.  Here's a brief
+overview of how to open one locally via a Jupyter server running on `ats.hprc.tamu.edu`.
+
+On `ats.hprc.tamu.edu` establish a TurboVNC password:
+
+-----
+/opt/TurboVNC/bin/vncpasswd
+-----
+
+Start the TurboVNC server.
+
+-----
+/opt/TurboVNC/bin/vncserver
+-----
+
+On `inquire.tamu.edu` set up an SSH tunnel to `ats.hprc.tamu.edu`.
+
+-----
+ssh -L 10000:localhost:5902 baum@ats.hprc.tamu.edu
+-----
+
+Then establish a VNC connection from `inquire` using the password you set up on `ats`.
+
+-----
+/opt/TurboVNC/bin/vncviewer
+-----
+
+This will open an XFCE desktop wherein you open an XFCE terminal and set up whatever environments
+you need.  Next, activate the appropriate Python environment.
+
+-----
+conda activate intel-aikit-modin
+-----
+
+Move to the directory containing your example, and then
+open the Chromium browser in the XFCE environment.
+
+-----
+cd /home/baum/oneAPI-samples/AI-and-Analytics/End-to-end-Workloads/Census
+jupyter notebook
+-----
+
+=== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics[AI and Analytics] [[ai-and-analytics]]
+
+==== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Getting-Started-Samples[Getting Started Samples] [[getting-started-samples]]
+
+===== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Getting-Started-Samples/INC-Sample-for-Tensorflow[Tensorflow] [[start-tensorflow]]
+
+=====
+Low-precision optimizations can speed up inference. You can achieve higher inference performance by converting the FP32 model to INT8 or BF16 model. Additionally, Intel® Deep Learning Boost technology in the Second Generation Intel® Xeon® Scalable processors and newer Xeon® processors provides hardware acceleration for INT8 and BF16 models.
+
+Intel® Neural Compressor simplifies the process of converting the FP32 model to INT8/BF16.
+
+At the same time, Intel® Neural Compressor tunes the quanization method to reduce the accuracy loss, which is a big blocker for low-precision inference.
+=====
+
+Install the Intel AI Analytics Toolkit.  This is installed as part of the oneAPI package distributed as part of the Arctic Sound-P software distribution.
+
+The Intel Neural Compressor library must be installed as root as it wont' install with `sudo`.  Become root.
+
+Activate the conda environment with Intel optimizations for TensorFlow.
+List the available environments via:
+
+`conda info -e`
+
+Activate the desired environmenti (as root) via:
+
+`conda activate tensorflow`
+
+Install the Intel Neural Compressor from the local channel via:
+
+`conda install -c /opt/intel/oneapi/conda_channel neural-compressor -y --offline`
+
+
+
+===== Intel Neural Compressor
+
+This sample will show a whole process to build up a CNN model to recognize handwriting
+numbers and speed it up with Intel Neural Compressor.
+We will learn how to train a CNN model based on Keras with TensorFlow, use Intel Neural Compressor
+to quantize the model and compare the performance to understand the benefit of the compressor technology.
+The steps are:
+
+
+==== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Features-and-Functionality[Features and Functionality][[features-and-functionality]]
+
+==== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/End-to-end-Workloads[End to end Workloads] [[end-to-end]]
+
+===== Census Sample
+
+https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/End-to-end-Workloads/Census[`https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/End-to-end-Workloads/Census`]
+
+=====
+This sample code illustrates how to use Intel® Distribution of Modin* for ETL operations and ridge regression algorithm from the Intel® extension of scikit-learn library to build and run an end to end machine learning workload. Both Intel Distribution of Modin* and Intel® Extension for Scikit-learn libraries are available together in Intel® oneAPI AI Analytics Toolkit. This sample code demonstrates how to seamlessly run the end-to-end census workload using the toolkit, without any external dependencies.
+=====
+
+Install the Intel distribution of the Modin Python environment.
+Modin is a drop-in replacement for pandas that scales the single-threaded pandas to become multi-threaded, using all of your cores and offering instant speedup to your workflows.
+The Intel distribution is described at:
+
+https://www.intel.com/content/www/us/en/developer/tools/oneapi/distribution-of-modin.html[https://www.intel.com/content/www/us/en/developer/tools/oneapi/distribution-of-modin.html]
+
+-----
+conda create -y -n intel-aikit-modin intel-aikit-modin -c intel
+-----
+
+This will download around 430 Mb worth of packages and install them.
+
+Activate the environment.
+
+-----
+conda activate intel-aikit-modin
+-----
+
+Install the Jupyter notebook in the environment.
+
+-----
+conda install jupyter nb_conda_kernels
+-----
+
+Install the `opencensus` package.
+
+-----
+pip install opencensus
+-----
+
+Launch Jupyter Notebook in the directory housing the code example.
+
+-----
+jupyter notebook
+-----
+
+The Jupyter notebook example works flawlessly for this until we reach the point where it needs to read the
+following IPUMS dataset:
+
+https://www.ipums.org/projects/ipums-usa/d010.v10.0[`https://www.ipums.org/projects/ipums-usa/d010.v10.0`]
+
+which is not available.
+
+===== Pointpillars Sample
+
+https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/End-to-end-Workloads/LidarObjectDetection-PointPillars[`https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/End-to-end-Workloads/LidarObjectDetection-PointPillars`]
+
+=====
+This sample performs 3D object detection and classification using data (point cloud) from a LIDAR sensor as input.
+It shows how DPCPP and SYCL kernels can be used in combination with the Intel® Distribution of OpenVINO™ toolkit, both part of Intel® oneAPI.
+
+PointPillars is an AI algorithm that uses LIDAR point clouds to detect and classify 3D objects in the sensor environment. For this purpose, the algorithm
+consists of the following steps:
+
+* Pre-processing of the LiDAR input point cloud is performed. This is realized with the help of kernels implemented using SYCL and DPCPP.
+* An anchor grid is generated. The anchors in the grid are later used in object detection to refine detected boxes by the RegionProposalNetwork (RPN). The anchor grid generation is also implemented using SYCL and DPCPP.
+* Afterward, the pre-processed data is used by a so-called Pillar Feature Extraction (PFE) CNN to create a 2D image-like representation of the sensor environment. For the inference, this sample uses the Intel® Distribution of OpenVINO™ toolkit. The output of this CNN is a list of dense tensors (learned pillar features).
+* To convert these dense tensors into an pseudo-image, a scatter operation is performed. This operation is again realized with SYCL and DPCPP.
+* This pseudo-image is consumed by the second CNN, the so-called Region Proposal Network (RPN). The inference is performed with the help of the Intel® Distribution of OpenVINO™ toolkit. The output is an unfiltered list of possible object detections, their position, dimensions and classifications.
+* Finally, this output data (object list) is post-processed with the help of the anchors created in the 2nd step. The anchors are used to decode the object position, dimension and class. Afterwards, a Non-Maximum-Suppression (NMS) is used to filter out redundant/clutter objects. Finally, the objects are sorted according to their likelihood, and then provided as output. All of these steps are implemented as SYCL and DPCPP kernels.
+
+By default, the application will use 'host' as the execution device for SYCL/DPCPP kernels and CPU (single-threaded) for Intel® Distribution of OpenVINO™ toolkit inferencing part. The execution device and the inferencing device are displayed in the output, along with the elapsed time of each of the five steps described above.
+=====
+
+====== Installing OpenVINO
+
+This requires that the Intel OpenVINO package be installed, and it is not included in the plethora of Intel
+packages already installed.
+Thus we now install it.
+Start by installing `yum-utils`.
+
+-----
+yum install yum-utils
+-----
+
+Add the repository and import the GPG public key.
+
+-----
+yum-config-manager --add-repo https://yum.repos.intel.com/openvino/2021/setup/intel-openvino-2021.repo
+rpm --import https://yum.repos.intel.com/openvino/2021/setup/RPM-GPG-KEY-INTEL-OPENVINO-2021
+-----
+
+Create the yum repo file and move it to the appropriate location.
+
+*Note*:  Upgraded to OpenVINO 2022.1 on 2022-08-25.
+
+-----
+tee > /tmp/openvino-2022.repo << EOF
+[OpenVINO]
+name=Intel(R) Distribution of OpenVINO 2022
+baseurl=https://yum.repos.intel.com/openvino/2022
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+EOF
+
+mv /tmp/openvino-2021.repo /etc/yum.repos.d
+-----
+
+Check to see if we have access to the repository.
+
+-----
+yum repolist | grep -i openvino
+intel-openvino-2022                                      Intel(R) Distribuition of OpenVINO 2021
+-----
+
+Find the most recent version of the OpenVINO packages via:
+
+-----
+yum list intel-openvino*
+-----
+
+which at this writing (2022/01) is `2021.4.752`, and then install all the available packages - because they're there, of course - via:
+
+-----
+dnf install intel-openvino*2021.4.752
+
+Installing:
+ intel-openvino-docs-2021.4.752                       noarch            2021.4-752             intel-openvino-2021            3.4 k
+ intel-openvino-eula-2021.4.752                       noarch            2021.4-752             intel-openvino-2021             62 k
+ intel-openvino-gstreamer-rt-2021.4.752               x86_64            2021.4-752             intel-openvino-2021             63 M
+ intel-openvino-gva-rt-2021.4.752                     x86_64            2021.4-752             intel-openvino-2021            1.1 M
+ intel-openvino-ie-rt-2021.4.752                      x86_64            2021.4-752             intel-openvino-2021            628 k
+ intel-openvino-ie-rt-core-2021.4.752                 x86_64            2021.4-752             intel-openvino-2021            5.4 M
+ intel-openvino-ie-rt-cpu-2021.4.752                  x86_64            2021.4-752             intel-openvino-2021            4.6 M
+ intel-openvino-ie-rt-gna-2021.4.752                  x86_64            2021.4-752             intel-openvino-2021            797 k
+ intel-openvino-ie-rt-gpu-2021.4.752                  x86_64            2021.4-752             intel-openvino-2021            2.5 M
+ intel-openvino-ie-rt-hddl-2021.4.752                 x86_64            2021.4-752             intel-openvino-2021            3.4 M
+ intel-openvino-ie-rt-vpu-2021.4.752                  x86_64            2021.4-752             intel-openvino-2021            2.6 M
+ intel-openvino-ie-sdk-2021.4.752                     x86_64            2021.4-752             intel-openvino-2021            1.5 M
+ intel-openvino-model-optimizer-2021.4.752            x86_64            2021.4-752             intel-openvino-2021            578 k
+ intel-openvino-omz-dev-2021.4.752                    x86_64            2021.4-752             intel-openvino-2021            142 M
+ intel-openvino-omz-tools-2021.4.752                  x86_64            2021.4-752             intel-openvino-2021            3.5 M
+ intel-openvino-opencv-generic-2021.4.752             noarch            2021.4-752             intel-openvino-2021            813 k
+ intel-openvino-opencv-lib-2021.4.752                 x86_64            2021.4-752             intel-openvino-2021             16 M
+ intel-openvino-runtime-centos7-2021.4.752            x86_64            2021.4-752             intel-openvino-2021            4.6 k
+ intel-openvino-setupvars-2021.4.752                  noarch            2021.4-752             intel-openvino-2021             14 k
+-----
+
+All of these packages are installed in the directory:
+
+-----
+/opt/intel/openvino_2021.4.752
+-----
+
+====== Installing Boost
+
+The Boost library must also be installed.
+
+-----
+dnf install boost boost-devel
+-----
+
+====== Configure and Build
+
+First, ensure that we have the correct Intel environments and that we have GCC 9:
+
+-----
+source /opt/intel/oneapi/setvars.sh
+source /opt/intel/openvino_2021/bin/setupvars.sh
+scl enable gcc-toolset-9 bash
+-----
+
+Check the GCC version:
+
+-----
+gcc --version
+gcc (GCC) 9.2.1 20191120 (Red Hat 9.2.1-2)
+-----
+
+Check that the OpenVINO environmenti has been properly set via:
+
+-----
+env | grep INTEL
+INTEL_CVSDK_DIR=/opt/intel/openvino_2021
+INTEL_OPENVINO_DIR=/opt/intel/openvino_2021
+-----
+
+Check the `/opt/intel` directory listing:
+
+-----
+rwxr-xr-x   7 root root   84 Jan 13 13:52 mediasdk
+drwxr-xr-x 32 root root 4096 Dec 14 11:50 oneapi
+lrwxrwxrwx  1 root root   19 Jan 14 15:44 openvino_2021 -> openvino_2021.4.752
+drwxr-xr-x 10 root root  182 Nov 12 05:38 openvino_2021.4.752
+drwxr-xr-x  3 root root   17 Dec  8 15:36 packagemanager
+-----
+
+Now we attempt to compile this example.
+
+-----
+cd /home/baum/oneAPI-samples/AI-and-Analytics/End-to-end-Workloads/LidarObjectDetection-PointPillars
+mkdir build
+cd build
+ccmake ..
+-----
+
+The `ccmake ..` step produces the following configuration options:
+
+-----
+ Boost_DIR                        Boost_DIR-NOTFOUND
+ Boost_FILESYSTEM_LIBRARY_DEBUG   /usr/lib64/libboost_filesystem.so
+ Boost_FILESYSTEM_LIBRARY_RELEA   /usr/lib64/libboost_filesystem.so         
+ Boost_INCLUDE_DIR                /usr/include
+ Boost_LIBRARY_DIR_DEBUG          /usr/lib64
+ Boost_LIBRARY_DIR_RELEASE        /usr/lib64
+ Boost_PROGRAM_OPTIONS_LIBRARY_   /usr/lib64/libboost_program_options.so
+ Boost_PROGRAM_OPTIONS_LIBRARY_   /usr/lib64/libboost_program_options.so
+ Boost_SYSTEM_LIBRARY_DEBUG       /usr/lib64/libboost_system.so
+ Boost_SYSTEM_LIBRARY_RELEASE     /usr/lib64/libboost_system.so
+ CMAKE_ADDR2LINE                  /opt/rh/gcc-toolset-9/root/usr/bin/addr2line
+ CMAKE_AR                         /opt/rh/gcc-toolset-9/root/usr/bin/ar
+...
+ CMAKE_CXX_COMPILER_AR            /opt/intel/oneapi/compiler/2021.4.0/linux/bin/llvm-ar
+ CMAKE_CXX_COMPILER_RANLIB        /opt/intel/oneapi/compiler/2021.4.0/linux/bin/llvm-ranlib
+...
+ CMAKE_C_COMPILER                 /opt/rh/gcc-toolset-9/root/usr/bin/cc
+ CMAKE_C_COMPILER_AR              /opt/rh/gcc-toolset-9/root/usr/bin/gcc-ar
+ CMAKE_C_COMPILER_RANLIB          /opt/rh/gcc-toolset-9/root/usr/bin/gcc-ranlib
+...
+ CMAKE_INSTALL_PREFIX             /usr/local
+ DPCPP_HEADERS                    /opt/intel/oneapi/dpl/latest/linux/include
+ InferenceEngine_DIR              /opt/intel/openvino_2021/deployment_tools/inference_engine/share
+ SYCL_HEADERS                     /opt/intel/oneapi/compiler/latest/linux/include/sycl
+ SYCL_LIB                         /opt/intel/oneapi/compiler/latest/linux/lib/libsycl.so
+ TBB_DIR                          /opt/intel/openvino_2021/deployment_tools/inference_engine/external/tbb/cmake
+ ngraph_DIR                       /opt/intel/openvino_2021/deployment_tools/ngraph/cmake 
+-----
+
+Now attempt to compile the package.
+
+-----
+make
+-----
+
+This produces the following errors in the final linking step.
+
+-----
+...
+[ 90%] Linking CXX executable example.exe
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::Core::SetConfig(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::Core::LoadNetwork(InferenceEngine::CNNNetwork const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > const&)'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::CNNNetwork::getInputsInfo[abi:cxx11]() const'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::Core::ReadNetwork(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::ExecutableNetwork::GetInputsInfo[abi:cxx11]() const'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::InferRequest::GetBlob(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::ExecutableNetwork::GetOutputsInfo[abi:cxx11]() const'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::CNNNetwork::reshape(std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::vector<unsigned long, std::allocator<unsigned long> >, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::vector<unsigned long, std::allocator<unsigned long> > > > > const&)'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::CNNNetwork::getInputShapes[abi:cxx11]() const'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::Core::Core(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)'
+/opt/rh/gcc-toolset-9/root/usr/bin/ld: libLidarObjectDetection-PointPillars.so: undefined reference to `InferenceEngine::CNNNetwork::getOutputsInfo[abi:cxx11]() const'
+dpcpp: error: linker command failed with exit code 1 (use -v to see invocation)
+make[2]: *** [CMakeFiles/example.exe.dir/build.make:110: example.exe] Error 1
+make[1]: *** [CMakeFiles/Makefile2:124: CMakeFiles/example.exe.dir/all] Error 2
+make: *** [Makefile:103: all] Error 2
+-----
+
+==== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Jupyter[Jupyter] [[jupyter]]
+
+===== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Jupyter/Introduction_to_Machine_Learning[Introduction to Machine Learning] [[machine-learning]]
+
+===== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Jupyter/Numba_dpex_Essentials_training[*Numba-dpex Essentials*] [[numba-dpex]]
+
+===== https://github.com/oneapi-src/oneAPI-samples/tree/master/AI-and-Analytics/Jupyter/Predictive_Modeling_Training[*Predictive Modeling*] [[predictive-modeling]]
+
+
+=== *Arctic Sound-P Engineering Extended SW Release Customer Letter*
+
+`TAMU_632006_Beta_Arctic-Sound-P_PCIe-Card-Samples-DCL.pdf`
+
+-----
+Summarizing the steps to get Arctic Sound-P cards up and running:
+
+a. Host BIOS Changes.
+
+b. Install Arctic Sound-P in Host system.
+        i. Appendix B in 631277_Arctic Sound-P Product Family Software Guide.
+
+c. Update Arctic Sound-P FW.
+        i. Download “ATS-P Firmware” from the previous link.
+        ii. Follow the steps in 633850_Arctic Sound-P Product Family Tools Guide.
+
+d. Install OS.
+        i. Follow the steps in either Appendix A or Appendix C of 631277_Arctic Sound-P
+           Product Family Software Guide.
+
+e. Install Arctic Sound-P graphics driver.
+        i. Choose the readme file corresponding to your OS and follow the instructions.
+            Readme_SLES_[BUILD]_[Release_Name].md,
+            Readme_Ubuntu_[BUILD]_[Release_Name].md or
+            Readme_RHEL_[BUILD]_[Release_Name].md.
+
+f. Verify Arctic Sound-P detection and Install oneAPI.
+        i. Follow the steps in the Arctic Sound-P Product Family Software Guide (Doc
+            #631277).
+
+g. Run sample applications to verify that the system is healthy, specified in the Arctic
+Sound-P Product Family Software Guide (Doc #631277).
+-----
+

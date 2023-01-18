@@ -1,0 +1,517 @@
+CTD Files on ERDDAP
+===================
+Steven K. Baum
+v0.1, 2015-08-03
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+Overview
+--------
+
+Goal and Problem
+~~~~~~~~~~~~~~~~
+
+The goal is to make CTD files available via an ERDDAP server such that temporal and spatial subsets can be identified and obtained via the elegant capabilities available on an ERDDAP server.
+The problem is choosing which data structures are best for accomplishing this goal.
+
+Overview of CTDs
+~~~~~~~~~~~~~~~~
+
+A CTD cast entails lowering a CTD sensor from the ocean surface to the bottom (or short of the bottom), during which passage the sensor measures conductivity, temperature and depth.  A vertical profile of temperature and salinity can be calculated from these measurements.  Measurements are typically taken at discrete vertical locations which are typically not at regular intervals.  
+If other sensors are present on the cast, information about other variables may be provided.  
+
+A CTD dataset is a file that typically contains some post-processed version of the raw measurements.
+An archetypal example would be a file containing columns of the post-processed
+temperature and salinity values at a discrete set of depths.  That is, there would be three 1-D arrays containing depth, temperature and salinity.
+
+CTD casts do not usually live alone in the wild, and as such they are mostly seen in groups identified by oceanographic cruises during which many casts are performed.  Thus there are larger datasets containing the data from many individual CTD casts.
+
+ERDDAP
+~~~~~~
+
+The ERDDAP server...
+
+Procedure
+---------
+
+This is the step-by-step procedure used to create the NetCDF meta-files for each CTD dataset for the ERDDAP data server.
+
+Location of Project
+~~~~~~~~~~~~~~~~~~~
+
+This work was performed on +barataria+ in the directory:
+
+-----
+/home/baum/CTD_ERDDAP/data
+-----
+
+The datasets were all initially placed in the subdirectory:
+
+-----
+/home/baum/CTD_ERDDAP/datasets
+-----
+
+Create a *.list File
+~~~~~~~~~~~~~~~~~~~~
+
+Each dataset is received as a set of NetCDF files.  A subdirectory is
+created for each set, e.g. +BE-1317+ While in the subdirectory for a given set,
+run the command:
+
+-----
+ls > BE-1317.list
+-----
+
+The +BE-1317.list+ file is edited to remove its own name from itself, and then
+moved to the +data+ directory via:
+
+-----
+mv *.list ../data
+-----
+
+Create a *.txt File
+~~~~~~~~~~~~~~~~~~~
+
+Moving to the +data+ directory, edit the +createtxt.py+ script.  Add another
++id =+ line at the end of the existing such lines near the top of the file.
+In this example, we would add:
+
+-----
+id = "BE-1317"
+-----
+
+Now exit the file and run it via:
+
+-----
+./createtxt.py
+-----
+
+to create the file:
+
+-----
+BE-1317.txt
+-----
+
+which contains a series of lines of the form (without the column headers shown here for informational purposes):
+
+-----
+
+Ignore   Date      Time     Lat       Lon               Filename                ID String
+
+N1 034 2012/5/26 03:06:31 29.21654 -87.59659 945.0 EN509_001_01_downcast.nc RV_Endeavor_EN509_001_01
+N1 034 2012/5/26 10:44:52 28.85456 -88.48834 880.0 EN509_002_01_downcast.nc RV_Endeavor_EN509_002_01
+N1 034 2012/5/26 15:30:31 28.85247 -88.47959 227.0 EN509_002_03_downcast.nc RV_Endeavor_EN509_002_03
+-----
+
+
+Copy the Dataset to the THREDDS Server Archive Location
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The files in each dataset must placed in a location reachable by the THREDDS server from which they will be made available.  In this case we're putting them on the RAID disk on +barataria+ in the subdirectory:
+
+-----
+/raid/data/ctd/hydro
+-----
+
+So for our example dataset, our files would reside in:
+
+-----
+/raid/data/ctd/hydro/BE-1317
+-----
+
+Create a THREDDS Configuration File Entry for the Dataset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This step must be performed before creating the meta-NetCDF file for the dataset.  That step requires a THREDDS URL which is created in this step.
+
+Edit the THREDDS server configuration file located, in this instance, at:
+
+-----
+/opt/tomcat6/content/thredds/catalog.xml
+-----
+
+and add:
+
+[source,xml]
+-----
+  <datasetScan name="BE-1317" ID="be1317" path="be1317/ctd" location="/raid/data/ctd/hydro/BE-1317">
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+      <dataType>Grid</dataType>
+    </metadata>
+    <filter>
+      <include wildcard="*.nc"/>
+    </filter>
+  </datasetScan>
+-----
+
+This will enter it in the list of TDS datafiles at the URL:
+
+http://barataria.tamu.edu:8080/thredds/catalog.html[+http://barataria.tamu.edu:8080/thredds/catalog.html+]
+
+The files for this specific example can be found at the URL:
+
+http://barataria.tamu.edu:8080/thredds/catalog/be1317/ctd/catalog.html[+http://barataria.tamu.edu:8080/thredds/catalog/be1317/ctd/catalog.html+]
+
+Note that in the XML +datasetScan+ configuration statement:
+
+* the +name+ string +BE-1317+ is the name that will be shown in the upper level THREDDS catalog listing;
+
+* the +path+ establishes the part of the URL string between +catalog+ and +catalog.html+, in this case +be1317/ctd+;
+
+* the +location+ string +/raid/data/ctd/hydro/BE-1317+ is the full path the the subdirectory of the dataset stored on a disk drive; and
+
+* the +ID+ string +be1317+ is a unique identifier for the dataset within THREDDS.
+
+
+Create a Meta *.nc File
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Now we will use our +BE-1317.txt+ file to create a separate NetCDF file that contains the date/time,
+lat, lon and filename information for all the files in each dataset.
+
+The Python Script
+^^^^^^^^^^^^^^^^^
+
+This is done with the +txt2cdf.py+ script whose functionality is to:
+
+* read the input text file containing the required information, e.g. +BE-1317.txt+;
+
+* create and open for writing a NetCDF file containing the appropriate global and variable attributes,
+dimensions, variables and data; and
+
+* loop over all the individual CTD casts in each dataset, create or munge the data needed for each cast, and write it to the meta-NetCDF file.
+
+The Required Dimensions, Variables and Attributes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The pieces required for the meta-NetCDF file for each dataset are:
+
+* a required *global attribute* for all the CTD datasets is a +featureType+ value of +point+, which is required by ERDDAP for faciliate various elegant internal machinations;
+
+* the required *global attributes* for each separate dataset (with the example for +BE-1317+ for each immediately following) are +principle_investigator+ (+Snyder, Richard+), +organization+ (+GOMRI+) , +consortia+ (+DEEP-C+), +griidc_udi+ (+R1.x138.079:0014+) and +dataset_id+ (+BE-1317_CTD+);
+
+* the required *dimension* is +station+, which is the number of different station casts in each dataset; and
+
+* the required *variables* are +station+, +dap_url+, +http_url+, +time+, +lon+ and +lat+.
+
+The Data
+^^^^^^^^
+
+The +station+ variable is a unique identifier for each individual CTD cast within a dataset - as well as among all datasets - and typically looks like:
+
+-----
+R/V_Bellows_P1_2013_4_6
+-----
+
+The +dap_url+ variable is the URL that is used to access the DAP server for a given CTD cast within the dataset on THREDDS.  An example is:
+
+
+http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P1b_downcast.nc.html[+http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P1b_downcast.nc.html+]
+
+
+This URL can be used to obtain subsets of a cast without having to download the entire file.
+
+The +http_url+ is the URL used to download the entire NetCDF file containing a single CTD cast from the THREDDS server.  
+An example is:
+
+http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P1b_downcast.nc[+http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P1b_downcast.nc+]
+
+Example Meta-NetCDF File
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The meta-NetCDF file for +BE=1317+ is:
+
+-----
+netcdf BE-1317 {
+dimensions:
+        station = UNLIMITED ; // (16 currently)
+variables:
+        string station(station) ;
+                station:name = "station identification number" ;
+        string dap_url(station) ;
+                dap_url:name = "THREDDS OpenDAP URL" ;
+        string http_url(station) ;
+                http_url:name = "THREDDS HTTP URL" ;
+        double time(station) ;
+                time:units = "hours since 1970-01-01 00:00:00" ;
+                time:standard_name = "time" ;
+                time:long_name = "time" ;
+                time:calendar = "Julian" ;
+        double lon(station) ;
+                lon:standard_name = "longitude" ;
+                lon:long_name = "longitude" ;
+                lon:units = "degrees_east" ;
+                lon:axis = "X" ;
+        double lat(station) ;
+                lat:standard_name = "latitude" ;
+                lat:long_name = "latitude" ;
+                lat:units = "degrees_north" ;
+                lat:axis = "Y" ;
+        double depth(station) ;
+                depth:long_name = "depth" ;
+                depth:standard_name = "depth" ;
+                depth:units = "m" ;
+                depth:postive = "down" ;
+                depth:axis = "Z" ;
+
+// global attributes:
+                :featureType = "point" ;
+                :originating_text_file_names = "BE-1317.txt" ;
+                    ...
+                :principle_investigator = "Snyder, Richard" ;
+                :organization = "GOMRI" ;
+                :consortia = "DEEP-C" ;
+                :griidc_udi = "R1.x138.079:0014" ;
+                :dataset_id = "BE-1317_CTD" ;
+
+data:
+
+ station = "R/V_Bellows_P1_2013_4_6", "R/V_Bellows_P1_2013_4_6", 
+    "R/V_Bellows_P1_2013_4_6", "R/V_Bellows_P1_2013_4_6", 
+    "R/V_Bellows_P4_2013_4_6", "R/V_Bellows_P5_2013_4_6", 
+    "R/V_Bellows_P8_2013_4_6", "R/V_Bellows_P9_2013_4_7", 
+    "R/V_Bellows_A2_2013_4_7", "R/V_Bellows_A3_2013_4_7", 
+    "R/V_Bellows_A4_2013_4_7", "R/V_Bellows_A5_2013_4_7", 
+    "R/V_Bellows_C1_2013_4_8", "R/V_Bellows_C2_2013_4_8", 
+    "R/V_Bellows_C3_2013_4_8", "R/V_Bellows_C9_2013_4_8" ;
+
+ dap_url = 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P1b_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P1_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P2_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P3_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P4_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P5_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P8_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130406_P9_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130407_A2_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130407_A3_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130407_A4_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130407_A5_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130408_C1_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130408_C2_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130408_C3_downcast.nc.html", 
+    "http://barataria.tamu.edu:8080/thredds/dodsC/be1317/ctd/20130408_C9_downcast.nc.html" ;
+
+ http_url = 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P1b_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P1_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P2_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P3_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P4_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P5_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P8_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130406_P9_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130407_A2_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130407_A3_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130407_A4_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130407_A5_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130408_C1_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130408_C2_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130408_C3_downcast.nc", 
+    "http://barataria.tamu.edu:8080/thredds/fileServer/be1317/ctd/20130408_C9_downcast.nc" ;
+
+ time = 379238.245833334, 379238.067499995, 379239.309166666, 
+    379240.100000001, 379241.217499997, 379242.034722224, 379246.434999995, 
+    379248.064444441, 379266.537500001, 379265.598333333, 379264.769166671, 
+    379263.670833327, 379287.363055553, 379286.646666661, 379285.677777775, 
+    379275.619722225 ;
+
+ lon = -87.2506, -87.2558, -87.252, -87.25, -87.25767, -87.25183, -87.2505, 
+    -87.2518, -85.8163333333, -85.8676666667, -85.9221666667, -85.9703333333, 
+    -86.667, -86.6708333333, -86.6693333333, -86.6688333333 ;
+
+ lat = 29.8338, 30.2423, 30.1658, 30.0833, 29.9998, 29.98417, 29.5835, 
+    29.4165, 30.0678333333, 29.994, 29.9171666667, 29.8563333333, 30.3335, 
+    30.2506666667, 30.1695, 29.5008333333 ;
+
+ depth = 17.513, 17.513, 21.158, 30.357, 30.704, 49.275, 286.642, 418.459, 
+    21.678, 25.323, 34.175, 34.869, 16.992, 26.191, 28.795, 155.134 ;
+-----
+
+ERDDAP Server
+-------------
+
+The meta-NetCDF files are now transferred to the machine running the ERDDAP
+(virtual) server, which is located at:
+
+http://104.131.75.101:8080/erddap/index.html[+http://104.131.75.101:8080/erddap/index.html+]
+
+These files are placed in the directory:
+
+-----
+/home/baum/CTD_ERDDAP/data
+-----
+
+and the configuration file for serving them is located at:
+
+-----
+/opt/tomcat7/content/erddap/datasets.xml
+-----
+
+An example configuration file for +BE-317+ is:
+
+[source,xml]
+-----
+<dataset type="EDDTableFromNcFiles" datasetID="BE-1317" active="true">
+    <reloadEveryNMinutes>10080</reloadEveryNMinutes>
+    <fileDir>/home/baum/CTD_ERDDAP/data/</fileDir>
+    <recursive>true</recursive>
+    <fileNameRegex>BE-1317.nc</fileNameRegex>
+    <metadataFrom>last</metadataFrom>
+    <preExtractRegex></preExtractRegex>
+    <postExtractRegex></postExtractRegex>
+    <extractRegex></extractRegex>
+    <columnNameForExtract></columnNameForExtract>
+    <sortedColumnSourceName>time</sortedColumnSourceName>
+    <sortFilesBySourceNames>time</sortFilesBySourceNames>
+    <fileTableInMemory>false</fileTableInMemory>
+    <!-- sourceAttributes>
+        <att name="summary">A NetCDF file containing a 1-D arrays of the date/time, lon, lat, depth and availability URL for a set of profile data NetCDF files.</att>
+        <att name="text_file_names">url_macdonald.txt</att>
+    </sourceAttributes -->
+    <addAttributes>
+        <att name="subsetVariables">HTTP, DAP, time, station, longitude, latitude, depth</att>
+        <att name="cdm_data_type">Point</att>
+        <att name="Conventions">COARDS, CF-1.6, Unidata Dataset Discovery v1.0</att>
+        <att name="infoUrl">???</att>
+        <att name="institution">???</att>
+        <att name="keywords">1-d, arrays, containing, date, depth, file, identifier, station, time, URL</att>
+        <att name="license">[standard]</att>
+        <att name="Metadata_Conventions">COARDS, CF-1.6, Unidata Dataset Discovery v1.0</att>
+        <att name="sourceUrl">(local files)</att>
+        <att name="standard_name_vocabulary">CF-12</att>
+        <att name="title">GOMRI - CTD - R1.x138.079:0014 - DEEP-C - Richard Snyder - BE-1317</att>
+    </addAttributes>
+    <dataVariable>
+        <sourceName>station</sourceName>
+        <destinationName>station</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="intList">1 8</att>
+            <att name="name">station identification number</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="ioos_category">Identifier</att>
+            <att name="long_name">Station</att>
+            <att name="name">station identification number</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>http_url</sourceName>
+        <destinationName>HTTP</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="intList">1 113</att>
+            <att name="name">profile dataset URL</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="ioos_category">Unknown</att>
+            <att name="long_name">URL of THREDDS HTTP server</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>dap_url</sourceName>
+        <destinationName>DAP</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="intList">1 113</att>
+            <att name="name">profile dataset URL</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="ioos_category">Unknown</att>
+            <att name="long_name">URL of THREDDS DAP/DODS server</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>time</sourceName>
+        <destinationName>time</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="int">1</att>
+            <att name="calendar">Julian</att>
+            <att name="long_name">time</att>
+            <att name="standard_name">time</att>
+            <att name="units">hours since 1970-01-01 00:00:00</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="ioos_category">Time</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>lon</sourceName>
+        <destinationName>longitude</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="int">1</att>
+            <att name="axis">X</att>
+            <att name="long_name">longitude</att>
+            <att name="standard_name">longitude</att>
+            <att name="units">degrees_east</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="colorBarMaximum" type="double">180.0</att>
+            <att name="colorBarMinimum" type="double">-180.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="long_name">Longitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>lat</sourceName>
+        <destinationName>latitude</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="int">1</att>
+            <att name="axis">Y</att>
+            <att name="long_name">latitude</att>
+            <att name="standard_name">latitude</att>
+            <att name="units">degrees_north</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="colorBarMaximum" type="double">90.0</att>
+            <att name="colorBarMinimum" type="double">-90.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="long_name">Latitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>depth</sourceName>
+        <destinationName>depth</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSize" type="int">1</att>
+            <att name="axis">Z</att>
+            <att name="long_name">depth</att>
+            <att name="postive">down</att>
+            <att name="standard_name">depth</att>
+            <att name="units">m</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSize">null</att>
+            <att name="colorBarMaximum" type="double">8000.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="colorBarPalette">OceanDepth</att>
+            <att name="ioos_category">Location</att>
+        </addAttributes>
+    </dataVariable>
+</dataset>
+-----
+
+
+
+
+
+

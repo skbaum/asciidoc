@@ -1,0 +1,457 @@
+Virtual Environments and Software Package Managers
+==================================================
+Steven K. Baum
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+Definitions
+-----------
+
+hypervisor
+~~~~~~~~~~
+
+https://en.wikipedia.org/wiki/Hypervisor[`https://en.wikipedia.org/wiki/Hypervisor`]
+
+"A hypervisor (or virtual machine monitor, VMM, virtualizer) is a kind of emulator; it is computer software, firmware or hardware that creates and runs virtual machines. A computer on which a hypervisor runs one or more virtual machines is called a host machine, and each virtual machine is called a guest machine. The hypervisor presents the guest operating systems with a virtual operating platform and manages the execution of the guest operating systems. Multiple instances of a variety of operating systems may share the virtualized hardware resources: for example, Linux, Windows, and macOS instances can all run on a single physical x86 machine. This contrasts with operating-system-level virtualization, where all instances (usually called containers) must share a single kernel, though the guest operating systems can differ in user space, such as different Linux distributions with the same kernel."
+
+
+Type 1
+~~~~~~
+
+KVM
+^^^
+
+https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine[`https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine`]
+
+XCP-ng
+^^^^^^
+
+https://xcp-ng.org/[`https://xcp-ng.org/`]
+
+Xen
+^^^
+
+https://en.wikipedia.org/wiki/Xen[`https://en.wikipedia.org/wiki/Xen`]
+
+Type 2
+~~~~~~
+
+QEMU
+^^^^
+
+https://en.wikipedia.org/wiki/QEMU[`https://en.wikipedia.org/wiki/QEMU`]
+
+VirtualBox
+^^^^^^^^^^
+
+https://en.wikipedia.org/wiki/VirtualBox[`https://en.wikipedia.org/wiki/VirtualBox`]
+
+VMware Workstation Player
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+https://en.wikipedia.org/wiki/VMware_Workstation_Player[`https://en.wikipedia.org/wiki/VMware_Workstation_Player`]
+
+
+
+OS-level virtualization
+~~~~~~~~~~~~~~~~~~~~~~~
+
+https://en.wikipedia.org/wiki/OS-level_virtualization[`https://en.wikipedia.org/wiki/OS-level_virtualization`]
+
+"OS-level virtualization is an operating system paradigm in which the kernel allows the existence of multiple isolated user space instances. Such instances, called containers (LXC, Solaris containers, Docker), Zones (Solaris containers), virtual private servers (OpenVZ), partitions, virtual environments (VEs), virtual kernels (DragonFly BSD), or jails (FreeBSD jail or chroot jail),[1] may look like real computers from the point of view of programs running in them. A computer program running on an ordinary operating system can see all resources (connected devices, files and folders, network shares, CPU power, quantifiable hardware capabilities) of that computer. However, programs running inside of a container can only see the container's contents and devices assigned to the container."
+
+Docker
+^^^^^^
+
+https://en.wikipedia.org/wiki/Docker_(software)[`https://en.wikipedia.org/wiki/Docker_(software)`]
+
+"Docker is a set of platform as a service (PaaS) products that use OS-level virtualization to deliver software in packages called containers.
+Containers are isolated from one another and bundle their own software, libraries and configuration files; they can communicate with each other through well-defined channels.
+Because all of the containers share the services of a single operating system kernel, they use fewer resources than virtual machines."
+
+LXC
+^^^
+
+https://en.wikipedia.org/wiki/LXC[`https://en.wikipedia.org/wiki/LXC`]
+
+"LXC (Linux Containers) is an operating-system-level virtualization method for running multiple isolated Linux systems (containers) on a control host using a single Linux kernel. 
+
+The Linux kernel provides the cgroups functionality that allows limitation and prioritization of resources (CPU, memory, block I/O, network, etc.) without the need for starting any virtual machines, and also the namespace isolation functionality that allows complete isolation of an application's view of the operating environment, including process trees, networking, user IDs and mounted file systems.
+LXC combines the kernel's cgroups and support for isolated namespaces to provide an isolated environment for applications."
+
+OpenVZ
+^^^^^^
+
+https://en.wikipedia.org/wiki/OpenVZ[`https://en.wikipedia.org/wiki/OpenVZ`]
+
+"OpenVZ (Open Virtuozzo) is an operating-system-level virtualization technology for Linux. It allows a physical server to run multiple isolated operating system instances, called containers, virtual private servers (VPSs), or virtual environments (VEs).
+
+While virtualization technologies such as VMware, Xen and KVM provide full virtualization and can run multiple operating systems and different kernel versions, OpenVZ uses a single Linux kernel and therefore can run only Linux. All OpenVZ containers share the same architecture and kernel version. This can be a disadvantage in situations where guests require different kernel versions than that of the host. However, as it does not have the overhead of a true hypervisor, it is very fast and efficient."
+
+unikernel
+~~~~~~~~~
+
+https://en.wikipedia.org/wiki/Unikernel[`https://en.wikipedia.org/wiki/Unikernel`]
+
+"A unikernel is a specialised, single address space machine image constructed by using library operating systems.[1][2] A developer selects, from a modular stack, the minimal set of libraries which correspond to the OS constructs required for the application to run. These libraries are then compiled with the application and configuration code to build sealed, fixed-purpose images (unikernels) which run directly on a hypervisor or hardware without an intervening OS such as Linux or Windows."
+
+OSv
+^^^
+
+https://github.com/cloudius-systems/osv[`https://github.com/cloudius-systems/osv`]
+
+virtual machine
+~~~~~~~~~~~~~~~
+
+https://en.wikipedia.org/wiki/Virtual_machine[`https://en.wikipedia.org/wiki/Virtual_machine`]
+
+"In computing, a virtual machine (VM) is the virtualization/emulation of a computer system. Virtual machines are based on computer architectures and provide functionality of a physical computer. Their implementations may involve specialized hardware, software, or a combination."
+
+Overview
+--------
+
+A listing of available virtual software environments such as conda, modules and software collections. A virtual environment is a tool that helps to keep dependencies required by different projects separate by creating isolated spaces for them that contain per-project dependencies for them. Also listed are package managers such as easybuild, spack and nix, which are collections of software tools that automates the process of installing, upgrading, configuring, and removing computer programs for a computer’s operating system in a consistent manner. There is some overlap between the two concepts.
+
+Virtual Environments
+--------------------
+
+A virtual environment is a tool that helps to keep dependencies required by different projects separate by creating isolated spaces for them that contain per-project dependencies for them.
+
+Conda Environments
+~~~~~~~~~~~~~~~~~~
+
+https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html[`https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html`]
+
+=====
+A conda environment is a directory that contains a specific collection of conda packages that you have installed. For example, you may have one environment with NumPy 1.7 and its dependencies, and another environment with NumPy 1.6 for legacy testing. If you change one environment, your other environments are not affected. You can easily activate or deactivate environments, which is how you switch between them. You can also share your environment with someone.
+=====
+
+Environment Modules
+~~~~~~~~~~~~~~~~~~~
+
+https://cea-hpc.github.io/modules/[`https://cea-hpc.github.io/modules/`]
+
+=====
+Typically users initialize their environment when they log in by setting environment information for every application they will reference during the session. The Environment Modules package is a tool that simplify shell initialization and lets users easily modify their environment during the session with modulefiles.
+
+Each modulefile contains the information needed to configure the shell for an application. Once the Modules package is initialized, the environment can be modified on a per-module basis using the module command which interprets modulefiles. Typically modulefiles instruct the module command to alter or set shell environment variables such as PATH, MANPATH, etc. modulefiles may be shared by many users on a system and users may have their own collection to supplement or replace the shared modulefiles.
+
+Modules can be loaded and unloaded dynamically and atomically, in an clean fashion. All popular shells are supported, including bash, ksh, zsh, sh, csh, tcsh, fish, as well as some scripting languages such as perl, ruby, tcl, python, cmake and R.
+
+Modules are useful in managing different versions of applications. Modules can also be bundled into metamodules that will load an entire suite of different applications. 
+=====
+
+Pipenv
+~~~~~~
+
+https://pypi.org/project/pipenv/[`https://pypi.org/project/pipenv/`]
+
+https://realpython.com/pipenv-guide/[`https://realpython.com/pipenv-guide/`]
+
+https://towardsdatascience.com/virtual-environments-104c62d48c54[`https://towardsdatascience.com/virtual-environments-104c62d48c54`]
+
+https://docs.python-guide.org/dev/virtualenvs/[`https://docs.python-guide.org/dev/virtualenvs/`]
+
+=====
+Pipenv is a tool that aims to bring the best of all packaging worlds (bundler, composer, npm, cargo, yarn, etc.) to the Python world. Windows is a first-class citizen, in our world.
+
+It automatically creates and manages a virtualenv for your projects, as well as adds/removes packages from your Pipfile as you install/uninstall packages. It also generates the ever-important Pipfile.lock, which is used to produce deterministic builds.
+
+Pipenv is primarily meant to provide users and developers of applications with an easy method to setup a working environment.
+
+The problems that Pipenv seeks to solve are multi-faceted:
+
+* You no longer need to use pip and virtualenv separately. They work together.
+* Managing a requirements.txt file can be problematic, so Pipenv uses Pipfile and Pipfile.lock to separate abstract dependency declarations from the last tested combination.
+* Hashes are used everywhere, always. Security. Automatically expose security vulnerabilities.
+* Strongly encourage the use of the latest versions of dependencies to minimize security risks arising from outdated components.
+* Give you insight into your dependency graph (e.g. $ pipenv graph).
+* Streamline development workflow by loading .env files.
+=====
+
+Poetry
+~~~~~~
+
+https://python-poetry.org/[`https://python-poetry.org/`]
+
+https://towardsdatascience.com/virtual-environments-104c62d48c54[`https://towardsdatascience.com/virtual-environments-104c62d48c54`]
+
+=====
+Poetry is a tool for dependency management and packaging in Python. It allows you to declare the libraries your project depends on and it will manage (install/update) them for you.
+=====
+
+Software Collections
+~~~~~~~~~~~~~~~~~~~~
+
+https://www.softwarecollections.org/en/[`https://www.softwarecollections.org/en/`]
+
+=====
+Software Collections give you the power to build and concurrently install multiple versions of the same components on your system, without affecting the system versions of the packages installed from your distribution.
+
+The intent of SoftwareCollections.org is to give projects and third parties the ability to:
+
+* Create and distribute multiple versions of software for major RPM-based Linux distributions.
+* Package software that may not be easy to distribute in upstream distributions.
+* Allow projects to move at a different pace than the upstream distribution release cycle.
+* Give users more flexibility and choice in software selection for their chosen distributions.
+* Provide a flexible format for admins and users to package their own software.
+=====
+
+Software Package Managers
+-------------------------
+
+asdf
+~~~~
+
+https://github.com/asdf-vm/asdf[`https://github.com/asdf-vm/asdf`]
+
+=====
+CLI tool that can manage multiple language runtime versions on a per-project basis. It is like gvm, nvm, rbenv & pyenv (and more) all in one! Simply install your language's plugin!
+=====
+
+Usage
+^^^^^
+
+The general procedure is:
+
+* Install the asdf package.
+* Configure the package for the shell.
+* Get a list of all available plugins.
+* Add a chosen plugin to the local list.
+* Choose a version of the chosen plugin.
+* Install the chosen version of the package.
+* Set the version of the package to be used locally/globally.
+
+The following commands enable all these procedural steps.
+
+Installation of latest branch:
+
+-----
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf
+cd ~/.asdf
+git checkout "$(git describe --abbrev=0 --tags)"
+-----
+
+Configure for bash shell by adding the following to `~/.bashrc`.  This will add the
+asdf repository to your binary path.
+
+-----
+. $HOME/.asdf/asdf.sh
+. $HOME/.asdf/completions/asdf.bash
+-----
+
+List the names of all available plugins registered in the asdf-plugins repository:
+
+-----
+asdf plugin list all
+-----
+
+Add an available plugin to the local list from the plugin repo:
+
+-----
+asdf plugin add [name]
+-----
+
+List locally installed plugins:
+
+-----
+asdf plugin list
+-----
+
+List all available versions of a locally installed plugin:
+
+-----
+asdf list all [name]
+-----
+
+List the latest stable version of a locally installed plugin:
+
+-----
+asdf latest [name]
+-----
+
+Install the specified version of a package corresponding to a locally installed plugin:
+
+-----
+asdf install [name] [version]
+-----
+
+Install the latest stable version of a locally installed plugin:
+
+-----
+asdf install [name] latest
+-----
+
+List the installed versions of a package:
+
+-----
+asdf list [name]
+-----
+
+Set the version number of a package to be used globally|locally:
+
+-----
+asdf global|local [name] [version]
+-----
+
+Easybuild
+~~~~~~~~~
+
+https://easybuilders.github.io/easybuild/[`https://easybuilders.github.io/easybuild/`]
+
+=====
+EasyBuild is a software build and installation framework that allows you to manage (scientific) software on High Performance Computing (HPC) systems in an efficient way.
+=====
+
+dnf/yum
+~~~~~~~
+
+A software package manager that installs, updates, and removes packages on RPM-based Linux distributions.
+
+https://fedoraproject.org/wiki/DNF[`https://fedoraproject.org/wiki/DNF`]
+
+Nix
+~~~
+
+https://nixos.org/[`https://nixos.org/`]
+
+https://en.wikipedia.org/wiki/Nix_package_manager[`https://en.wikipedia.org/wiki/Nix_package_manager`]
+
+=====
+Nix is a cross-platform package manager that utilizes a purely functional deployment model where software is installed into unique directories generated through cryptographic hashes, it is also the name of the programming language. A package's hash takes into account the dependencies, which is claimed to eliminate dependency hell. This package management model advertises more reliable, reproducible, and portable packages.
+
+Nix packages are defined through a lazy functional programming language specifically designed for package management. Dependencies are tracked directly in this language through an intermediate format called "derivations". A nix environment keeps track of references automatically, which allows unused packages to be garbage collected when no other package depends on them. At the cost of greater storage requirements, all upgrades in Nix are guaranteed to be both atomic and capable of efficient roll-back. This also enables multiple users to safely install software on the same system without administrator privileges.
+=====
+
+Guix
+^^^^
+
+https://en.wikipedia.org/wiki/GNU_Guix[`https://en.wikipedia.org/wiki/GNU_Guix`]
+
+https://guix.gnu.org/[`https://guix.gnu.org/`]
+
+=====
+A  cross-platform package manager and a tool to instantiate and manage Unix-like operating systems, based on the Nix package manager with Guile Scheme APIs and specializes in providing exclusively free software. GNU Guix is the default package manager of the GNU Guix System GNU/Linux distribution.
+=====
+
+Spack
+~~~~~
+
+https://spack.readthedocs.io/en/latest/[`https://spack.readthedocs.io/en/latest/`]
+
+=====
+Spack is a package management tool designed to support multiple versions and configurations of software on a wide variety of platforms and environments. It was designed for large supercomputing centers, where many users and application teams share common installations of software on clusters with exotic architectures, using libraries that do not have a standard ABI. Spack is non-destructive: installing a new version does not break existing installations, so many configurations can coexist on the same system.
+
+Most importantly, Spack is simple. It offers a simple spec syntax so that users can specify versions and configuration options concisely. Spack is also simple for package authors: package files are written in pure Python, and specs allow package authors to maintain a single file for many different builds of the same package.
+=====
+
+Usage
+^^^^^
+
+Installation:
+
+-----
+cd ~
+git clone https://github.com/spack/spack.git
+-----
+
+Set up shell support for bash by sourcing the appropriate script.
+Sourcing this script will put the spack command in your PATH, set up your MODULEPATH to use Spack’s packages, and add other useful shell integration for certain commands, environments, and modules. For bash, it also sets up tab completion.
+It is not required to use the shell support.
+
+-----
+~/spack/share/spack/setup-env.sh
+-----
+
+From here on, we'll assume you've sourced the shell file or otherwise have the `spack` binary in your path.
+
+To find a list of all available packages:
+
+-----
+spack list
+-----
+
+Find a list of all available packages containing the string `sql`:
+
+-----
+spack list sql
+-----
+
+Find more information about a specific package `mpich`:
+
+-----
+spack info mpich
+-----
+
+To install|uninstall a software package:
+
+-----
+spack install|uninstall software-package
+-----
+
+To find all packages that are installed and their versions, or optionally to
+find such info for just a single package.
+
+-----
+spack find [package]
+-----
+
+There are many more command-line options for `spack find`.
+
+Using Environments
+^^^^^^^^^^^^^^^^^^
+
+A Spack named environment can be created via:
+
+-----
+spack env create myenv
+-----
+
+This environment is created in the directory:
+
+-----
+~/spack/var/spack/environments/myenv
+-----
+
+whereas the default Spack environment is located at:
+
+-----
+/~spack/var/spack
+-----
+
+This environment is activated from without via:
+
+-----
+spack env activate myenv
+-----
+
+and deactivated from within via:
+
+-----
+spack env deactivate
+-----
+
+Spack commands are operative only within the environment from which they're used, be it
+the default or a named environment.
+
+Using Installed Packages
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If shell support is enabled you can use the `load` command to add a package to your `PATH`.
+
+-----
+spack load cmake
+which cmake
+~/SPACK/spack/opt/spack/linux-fedora30-nehalem/gcc-9.3.1/cmake-3.18.4-isy2kbws457kxjpwmmepvc7ksqeiys4s/bin/cmake
+spack unload cmake
+which cmake
+/usr/bin/cmake
+-----
+
+
+
+
+

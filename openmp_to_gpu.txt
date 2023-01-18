@@ -1,0 +1,350 @@
+OpenMP Offload to GPUs
+======================
+Steven K. Baum
+0.1, Oct.. 10, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+== Overview
+
+Codes that are already instrumented for OpenMP use via pragmas can also be offloaded to GPUs
+without further coding.
+
+*Introduction to OpenMP GPU Offloading* - https://www.olcf.ornl.gov/calendar/introduction-to-openmp-gpu-offloading/[`https://www.olcf.ornl.gov/calendar/introduction-to-openmp-gpu-offloading/`]
+
+*OpenMP Accelerator Support for GPUs* - https://www.openmp.org/updates/openmp-accelerator-support-gpus/[`https://www.openmp.org/updates/openmp-accelerator-support-gpus/`]
+
+*Analysis of OpenMP 4.5 Offloading in Implementations* - https://www.osti.gov/servlets/purl/1648853[`https://www.osti.gov/servlets/purl/1648853`]
+
+*OpenMP on GPUs, First Experiences and Best Practices* (2018) - https://on-demand.gputechconf.com/gtc/2018/presentation/s8344-openmp-on-gpus-first-experiences-and-best-practices.pdf[`https://on-demand.gputechconf.com/gtc/2018/presentation/s8344-openmp-on-gpus-first-experiences-and-best-practices.pdf`]
+
+=====
+Always use the teams and distribute directive to expose all available parallelism
+
+Aggressively collapse loops to increase available parallelism
+
+Use the target data directive and map clauses to reduce data movement between 
+CPU and GPU
+
+Use accelerated libraries whenever possible
+
+Use OpenMP tasks to go asynchronous and better utilize the whole system
+
+Use host fallback to generate host and device code
+=====
+
+*Best Practices for OpenMP on NVIDIA GPUs* - https://www.youtube.com/watch?v=9w_2tj2uD4M[`https://www.youtube.com/watch?v=9w_2tj2uD4M`]
+
+*Is OpenMP 4.5 Target Off-Load Read for Real Life?* - https://www.openmp.org/wp-content/uploads/SC18-BoothTalks-Jost.pdf[`https://www.openmp.org/wp-content/uploads/SC18-BoothTalks-Jost.pdf`]
+
+*Improved Automatic GPU Offloading Method* - https://www.tandfonline.com/doi/full/10.1080/17445760.2021.1941010[`https://www.tandfonline.com/doi/full/10.1080/17445760.2021.1941010`]
+
+*Writing A Portable GPU Runtime with OpenMP 5.1* - https://arxiv.org/abs/2106.03219[`https://arxiv.org/abs/2106.03219`]
+
+== GCC
+
+*Offloading Support in GPU* - https://gcc.gnu.org/wiki/Offloading[`https://gcc.gnu.org/wiki/Offloading`]
+
+*Gfortran GPU Offload with OpenMP* - https://fortran-lang.discourse.group/t/gfortran-gpu-offload-with-openmp/314[`https://fortran-lang.discourse.group/t/gfortran-gpu-offload-with-openmp/314`]
+
+GCC 11 supports OpenMP offloading to Intel MIC, Nvidia PTX and AMD GCN targets.
+
+=====
+The main option to control offloading is:
+
+* `foffload=<targets>=<options>`
+
+By default, GCC will build offload images for all offload targets specified in configure with non-target-specific options passed to host compiler. (However, in most Linux distributions: by default, offloading is disabled (executed on the host) and `-foffload=<targets>` is required to compile to enable the offloading to accelerators.) This option is used to control offload targets and options for them. It can be used in a few ways:
+
+* `-foffload=disable` - Tells GCC to disable offload support. Target regions will be run in host fallback mode.
+
+* `-foffload=<targets>` - Tells GCC to build offload images for `<targets>`. They will be built with non-target-specific options passed to host compiler.
+
+* `-foffload=<options>` - Tells GCC to build offload images for all targets specified in configure. They will be built with non-target-specific options passed to host compiler plus <options>.
+
+* `-foffload=<targets>=<options>` - Tells GCC to build offload images for `<targets>`. They will be built with non-target-specific options passed to host compiler plus <options>.
+
+`<targets>` are separated by commas. Several <options> can be specified by separating them by spaces. Options specified by `-foffload` are appended to the end of option set, so in case of option conflicts they have more priority. The `-foffload` flag can be specified several times, and you have to do that to specify different `<options>` for different `<targets>`.
+
+*Note*: You may need to specify `-foffload=-lm` and for Fortran `-foffload=-lgfortran`, if the offloaded code uses math functions or Fortran-library procedures.
+
+*Note*: If you use atomics directly or indirectly, you may need to specify `-foffload=-latomic` or, if only one target needs it, e.g., `-foffload=nvptx-none=-latomic`. 
+
+For AMD GCN devices, you have to specify additionally the GPU to be used: `-march=<name>` where name is either `carrizo` or `fiji` (both: third generation) – or the fifth-generation `VEGA` (gfx900 or gfx906). In order to apply this setting to the AMD GCN offloading target, only, and not to the host (`-march=…`) or all other offloading targets (as with `-foffload=-march=…`), use `-foffload=amdgcn-amdhsa=<options>`. For instance: `-foffload=amdgcn-amdhsa="-march=gfx906"`. [NOTE: the target-triplet can be set when building the compiler and might differ between vendors; it can also be, e.g., `amdgcn-unknown-amdhsa`.]
+=====
+
+== Intel
+
+*Get Started with OpenMP Offload to GPU* - https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html[`https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html`]
+
+=====
+The OpenMP* Offload to GPU feature of the Intel® oneAPI DPC++/C++ Compiler and the Intel® Fortran Compiler
+(Beta) compiles OpenMP source files for a wide range of accelerators. Only the icx
+and ifx compilers support the OpenMP Offload feature.
+...
+Intel supports two new options:
+
+* `-qopenmp`
+* `-fopenmp-targets=spir64`
+
+that support OpenMP and offloading execution on CPU and GPU. The `-qopenmp`
+option enables a middle-end that supports the transformation of OpenMP
+in LLVM* (but not in the Clang* front-end). The `-fopenmp-targets=spir64`
+option enables the compiler to generate a x86 + SPIR64
+fat binary for the GPU device binary generation.
+=====
+
+=== Compiling and Running an Example
+
+The following code is instrumented for OpenMP via various pragmas:
+
+-----
+// matmul.cpp: Matrix Multiplication Example using OpenMP Offloading 
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+#define MAX 128
+int A[MAX][MAX], B[MAX][MAX], C[MAX][MAX], C_SERIAL[MAX][MAX];
+
+typedef int BOOL;
+typedef int TYPE;
+
+BOOL check_result(TYPE *actual, TYPE *expected, unsigned n) {
+    for (unsigned i = 0; i < n; i++) {
+        if(actual[i] != expected[i]) {
+            printf("Value mismatch at index = %d. Expected: %d"
+                   ", Actual: %d.\n", i, expected[i], actual[i]);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void __attribute__ ((noinline)) Compute()
+{
+  #pragma omp target teams distribute parallel for map(to: A, B) map(tofrom: C) \
+                                                   thread_limit(128)
+  {
+    for (int i = 0; i < MAX; i++)
+    for (int j = 0; j < MAX; j++)
+    for (int k = 0; k < MAX; k++)
+         C[i][j] += A[i][k] * B[k][j];
+  }
+}
+
+int main() {
+  for (int i = 0; i < MAX; i++)
+    for (int j = 0; j < MAX; j++) {
+      A[i][j] = i + j - 1;
+      B[i][j] = i - j + 1;
+    }
+
+  for (int i = 0; i < MAX; i++)
+  for (int j = 0; j < MAX; j++)
+  for (int k = 0; k < MAX; k++)
+       C_SERIAL[i][j] += A[i][k] * B[k][j];
+
+  Compute();
+
+  if (!check_result((int*) &C[0][0], (int*) &C_SERIAL[0][0], MAX * MAX)) {
+    printf("FAILED\n");
+    return 1;
+  }
+
+  printf("PASSED\n");
+  return 0;
+}
+-----
+
+==== Compiling the Code
+
+This code `matmul_offload.cpp` is compiled for GPU offloading via:
+
+-----
+icpx -qopenmp -fopenmp-targets=spir64 matmul_offload.cpp -o matmul
+-----
+
+C codes are compiled for this using `icx`, Fortran codes with `ifx`, and Cpp codes with `ifx`.
+
+==== Set the Environment Variable
+
+The `OMP_TARGET_OFFLOAD` environment variable must be set to force offloading or fail via:
+
+-----
+export OMP_TARGET_OFFLOAD=MANDATORY
+-----
+
+==== Run the Compiled Code
+
+The compiled binary `matmul` is run via:
+
+-----
+./matmul
+PASSED
+-----
+
+and will produced the output `PASSED` if successful.
+
+=== Integration of GPU-Optimized LIBM Functions
+
+The compilers provide a way to choose some GPU-optimized math functions as an alternative
+to the standard math libraries.
+
+*OpenMP GPU Offload Introduction* (2021) - https://www.hlrn.de/doc/download/attachments/13730484/Steyer_OpenMP_GPU_Offload.pdf[`https://www.hlrn.de/doc/download/attachments/13730484/Steyer_OpenMP_GPU_Offload.pdf`]
+
+=====
+* OpenMP offload supported by the Intel® C++ Compiler and Intel® Fortran Compiler
+as part of the Intel® oneAPI HPC Toolkit
+* Use the target directive to offload
+* Use the map clause with target, target data, target enter/exit data
+directives to improve data transfer efficiency
+* Use the teams/distribute directives fully utilize multiple GPU subslices
+* Use the parallel/for/do directive to use the threads within a GPU subslice
+* Use the simd directive for optimal simd execution on GPU execution units
+=====
+
+*Three Quick, Practical Examples of OpenMP Offload to GPUs* - https://www.intel.com/content/www/us/en/developer/videos/three-quick-practical-examples-openmp-offload-gpus.html#gs.drs907[`https://www.intel.com/content/www/us/en/developer/videos/three-quick-practical-examples-openmp-offload-gpus.html#gs.drs907`]
+
+*Profiling an OpenMP* Offload Application running on a GPU* - https://www.intel.com/content/www/us/en/develop/documentation/vtune-cookbook/top/configuration-recipes/profiling-openmp-offload-application.html[`https://www.intel.com/content/www/us/en/develop/documentation/vtune-cookbook/top/configuration-recipes/profiling-openmp-offload-application.html`]
+
+== NVIDIA
+
+*HPC Compilers Users Guide: Using OpenMP* - https://docs.nvidia.com/hpc-sdk/compilers/hpc-compilers-user-guide/index.html#openmp-use[`https://docs.nvidia.com/hpc-sdk/compilers/hpc-compilers-user-guide/index.html#openmp-use`]
+
+*Thinking OpenMP with NVIDIA HPC Compilers* - https://www.nas.nasa.gov/assets/nas/pdf/ams/2021/AMS_20210504_Ozen.pdf[`https://www.nas.nasa.gov/assets/nas/pdf/ams/2021/AMS_20210504_Ozen.pdf`]
+
+The NVIDIA `nvc++`, `nvc` and `nvfortran` compilers can be enabled for OpenMP and target GPU and
+multicure via:
+
+-----
+nvc -mp=gpu -gpu=[target] -Minfo=mp
+-----
+
+An environmental variable must also be set:
+
+-----
+set NVCOMPILER_ACC_NOTIFY 1/2/3
+-----
+
+*NVIDIA HPC SDK for C/C++/Fortran* - https://www.alcf.anl.gov/support-center/theta-gpu-nodes/openmp-thetagpu[`https://www.alcf.anl.gov/support-center/theta-gpu-nodes/openmp-thetagpu`]
+
+-----
+module load nvhpc-sdk/nvhpc/21.3
+nvfortran -mp=gpu -gpu=cc80 your_source.f90
+-----
+
+*Easybuild Easyconfig* - https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/n/NVHPC[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/n/NVHPC`]
+
+== Clang/LLVM
+
+*LLVM/OpenMP Support and FAQ* - https://openmp.llvm.org//SupportAndFAQ.html[`https://openmp.llvm.org//SupportAndFAQ.html`]
+
+*Building LLVM/Clang with OpenMP Offloading to NVIDIA GPUs* - https://hpc-wiki.info/hpc/Building_LLVM/Clang_with_OpenMP_Offloading_to_NVIDIA_GPUs[`https://hpc-wiki.info/hpc/Building_LLVM/Clang_with_OpenMP_Offloading_to_NVIDIA_GPUs`]
+
+https://github.com/pc2/OMP-Offloading[`https://github.com/pc2/OMP-Offloading`]
+
+*Compiling CUDA with Clang* - https://llvm.org/docs/CompileCudaWithLLVM.html[`https://llvm.org/docs/CompileCudaWithLLVM.html`]
+
+*LLVM Clang for C/C++* - https://www.alcf.anl.gov/support-center/theta-gpu-nodes/openmp-thetagpu[`https://www.alcf.anl.gov/support-center/theta-gpu-nodes/openmp-thetagpu`]
+
+-----
+module load llvm/release-12.0.0
+clang++ -fopenmp -fopenmp-targets=nvptx64 your_source.cpp
+-----
+
+*SOLLVE: OpenMP for HPC and Exascale* - https://www.exascaleproject.org/highlight/sollve-openmp-for-hpc-and-exascale/[`https://www.exascaleproject.org/highlight/sollve-openmp-for-hpc-and-exascale/`]
+
+=====
+The SOLLVE project is deeply engaged in efforts to provide a high-quality and complete OpenMP implementation in the LLVM Compiler Infrastructure Project. LLVM, an open-source collection of compiler and toolchain technologies, serves as a test bed for proposed OpenMP extensions (e.g., the interop directive in OpenMP 5.1) and as a vehicle to provide production-quality implementations of OpenMP features that could be exploited in vendor compilers built with LLVM technology. 
+=====
+
+*FOTV: A Generic Device Offloading Framework for OpenMP* - https://link.springer.com/chapter/10.1007/978-3-030-85262-7_12[`https://link.springer.com/chapter/10.1007/978-3-030-85262-7_12`]
+
+=====
+We have extended the last development version (v13) of Clang to support the FOTV device.
+=====
+
+*DiscoPoP* - https://github.com/discopop-project/discopop[`https://github.com/discopop-project/discopop`]
+
+=====
+DiscoPoP is an open-source tool that helps software developers parallelize their programs with threads. It is a joint project of Technical University of Darmstadt and Iowa State University.
+
+In a nutshell, DiscoPoP performs the following steps:
+
+* detect parts of the code (computational units or CUs) with little to no internal parallelization potential,
+* find data dependences among them,
+* identify parallel patterns that can be used to parallelize a code region,
+* and finally suggest corresponding OpenMP parallelization constructs and clauses to programmers.
+
+DiscoPoP is built on top of LLVM. Therefore, DiscoPoP can perform the above-mentioned steps on any source code which can be transferred into the LLVM IR.
+=====
+
+*Easybuild Easyconfig* - https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/c/Clang[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/c/Clang`]
+
+== AOCC (AMD)
+
+https://developer.amd.com/amd-aocc/[`https://developer.amd.com/amd-aocc/`]
+
+=====
+The AOCC system is a high performance, production quality code generation tool. The AOCC environment provides various options to developers while building and optimizing C, C++, and Fortran applications targeting 32-bit and 64-bit Linux® platforms. It simplifies and accelerates the development and tuning for x86 applications.
+
+The features include:
+
+* Leveraging the robust LLVM Compiler Development Infrastructure
+* Optimized throughout for AMD EPYC™, Ryzen™, and Ryzen™ Threadripper™ processors
+* Offering Flang as the default Fortran front-end supporting F2008 and Real 128 features
+* Support of Spack for flexible package management, including use by AMD optimized application recipes
+=====
+
+*Install Guide* - https://developer.amd.com/wp-content/resources/AOCC_57223_Install_Guide_Rev_3.1.pdf[`https://developer.amd.com/wp-content/resources/AOCC_57223_Install_Guide_Rev_3.1.pdf`]
+
+*User Guide* - https://developer.amd.com/wp-content/resources/AOCC_57222_User_Guide_Rev_3.1.pdf[`https://developer.amd.com/wp-content/resources/AOCC_57222_User_Guide_Rev_3.1.pdf`]
+
+*AMD Clang Guide* - https://developer.amd.com/wp-content/resources/AOCC_57224_Clang_C_C++_Compiler_Rev_3.1.pdf[`https://developer.amd.com/wp-content/resources/AOCC_57224_Clang_C_C++_Compiler_Rev_3.1.pdf`]
+
+*AMD Flang Guide* - https://developer.amd.com/wp-content/resources/AOCC_57225_Flang_Fortran_Compiler_Rev_3.1.pdf[`https://developer.amd.com/wp-content/resources/AOCC_57225_Flang_Fortran_Compiler_Rev_3.1.pdf`]
+
+*Easybuild Easyconfig* - https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/a/AOCC[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/a/AOCC`]
+
+== AOMP (AMD)
+
+https://github.com/ROCm-Developer-Tools/aomp[`https://github.com/ROCm-Developer-Tools/aomp`]
+
+=====
+AOMP is a scripted build of LLVM and supporting software. It has support for OpenMP target offload on AMD GPUs. Since AOMP is a clang/llvm compiler, it also supports GPU offloading with HIP, CUDA, and OpenCL.
+=====
+
+*LLVM Support for GPU Offloading for AMD Radeon GPUs* - https://www.phoronix.com/scan.php?page=news_item&px=AMDGPU-LLVM-OpenMP-Merged[`https://www.phoronix.com/scan.php?page=news_item&px=AMDGPU-LLVM-OpenMP-Merged`]
+
+=====
+AMD has been maintaining AOMP as their downstream of LLVM Clang for supporting OpenMP offloading to Radeon hardware.
+...
+At the moment it looks like AOMP still has some patches not yet upstreamed into LLVM but great seeing definite progress in this area. We'll see though if AOMP is still going to be maintained moving forward for new/premature code for AMD support prior to it being mature enough for upstreaming or if AOMP will ultimately be phased out from their ROCm compute stack.
+...
+Similarly, since GCC 10 has been OpenMP and OpenACC offloading to AMD Radeon GPUs. However, in the case of the GNU Compiler Collection its support and compatible GPUs is not nearly as well off as AMDGPU LLVM.
+=====
+
+*Easybuild Easyconfig* - https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/a/AOMP[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs/a/AOMP`]
+
+=====
+The `AOMP-13.0-2-gcccuda-2020a.eb` easyconfig file was modified with the addition of:
+
+`cuda_compute_capabilities = ['7.5', '8.0', '8.6']`
+
+to account for the CUDA computing capabilities of the NVIDIA A100, RTX-6000 and T4 GPUS on grace which are,
+respectively, 8.0, 8.6 and  7.5.
+=====
+
+== Mercurium
+
+https://github.com/bsc-pm/mcxx[`https://github.com/bsc-pm/mcxx`]
+
+=====
+Mercurium is a C/C++/Fortran source-to-source compilation infrastructure aimed at fast prototyping developed by the Programming Models group at the Barcelona Supercomputing Center.
+
+Mercurium is used, together with the Nanos++ Runtime Library, to implement the OmpSs programming model. Both tools provide also an implementation of OpenMP 3.1. More recently, Mercurium has been also used to implement the OmpSs-2 programming model together with the Nanos6 Runtime Library.
+=====

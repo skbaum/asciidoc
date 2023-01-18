@@ -1,0 +1,251 @@
+
+= Geoscience Julia
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Agents.jl
+
+https://juliadynamics.github.io/Agents.jl/stable/[`https://juliadynamics.github.io/Agents.jl/stable/`]
+
+https://arxiv.org/abs/2101.10072[`https://arxiv.org/abs/2101.10072`]
+
+"Agents.jl is a pure Julia framework for agent-based modeling (ABM).
+Agent based modelling is a simulation method in which autonomous agents react to their environment, given a predefined set of rules. It is an integral method for modelling and simulating complex systems, such as socio-economic problems. Since agent based models are not described by simple and concise mathematical equations, code that generates them is typically complicated, large, and slow. Here we present Agents.jl, a Julia-based software that provides an ABM analysis platform with minimal code complexity. We compare our software with some of the most popular ABM packages in other programming languages. We find that Agents.jl is not only the most performant, but also the least complicated software, providing the same (and sometimes more) features as the competitors with less input required from the user. Agents.jl also integrates excellently with the entire Julia ecosystem, including interactive applications, differential equations, parameter optimization, and more. This removes any "extensions library" requirement from Agents.jl, which is paramount in many other tools."
+
+== ClimateMachine
+
+https://github.com/CliMA/ClimateMachine.jl[`https://github.com/CliMA/ClimateMachine.jl`]
+
+https://clima.github.io/ClimateMachine.jl/latest/[`https://clima.github.io/ClimateMachine.jl/latest/`]
+
+"The ClimateMachine is a software package that models the evolution of the Earth system over weeks to centuries. The ClimateMachine solves three-dimensional partial differential equations for the distributions of water, momentum, energy, and tracers such as carbon in the atmosphere, oceans, and on land.
+
+The ClimateMachine will harness a wide range of Earth observations and data generated computationally to predict the evolution of Earth’s climate and features such as droughts, rainfall extremes, and high-impact storms."
+
+== ClimateTools
+
+https://juliaclimate.github.io/ClimateTools.jl/stable/[`https://juliaclimate.github.io/ClimateTools.jl/stable/`]
+
+https://juliaobserver.com/packages/ClimateTools[`https://juliaobserver.com/packages/ClimateTools`]
+
+"ClimateTools.jl is a collection of commonly-used tools in Climate science. Basics of climate field analysis will be covered, with some forays into exploratory techniques. 
+
+The idea behind ClimateTools is that most, if not all, climate fields can be represented by a 2D (e.g. topography), 3D (e.g. air temperature) or 4D (e.g. winds at multiple levels) grids that are georeferenced. Those grids are named ClimGrid in ClimateTools. Every functions acts on such structure and returns a similar structure. The ClimGrid structure contains all elements needed to be manipulated: latitude, longitude, calendars, variable attributes, etc. that was either available in the original netCDF file or that was inferred by the metadata. Note that a ClimGrid is defined for a single variable."
+
+== DynamicGrids
+
+https://github.com/cesaraustralia/DynamicGrids.jl[`https://github.com/cesaraustralia/DynamicGrids.jl`]
+
+https://live.juliacon.org/talk/P8D3PF[`https://live.juliacon.org/talk/P8D3PF`]
+
+"DynamicGrids is a generalised framework for building high-performance grid-based spatial simulations, including cellular automata, but also allowing a wider range of behaviours like random jumps and interactions between multiple grids. It is extended by Dispersal.jl for modelling organism dispersal processes."
+
+=== Dispersal
+
+https://github.com/cesaraustralia/Dispersal.jl[`https://github.com/cesaraustralia/Dispersal.jl`]
+
+"Dispersal.jl extends DynamicGrids.jl to provide model components and tools for grid-based simulations of organism dispersal.
+
+Growth rates, dispersal kernels, Allee effects, and randomised jump and human assisted dispersal rules are provided. These components can be combined into complex dispersal models. Custom rules can easily added and combined with the provided set. See the documentation for examples and the lists of included rules."
+
+== Elefridge
+
+https://github.com/esowc/Elefridge.jl[`https://github.com/esowc/Elefridge.jl`]
+
+"Enormous amounts of data are produced at weather and climate forecast centres worldwide. Compressing large data sets is inevitable to reduce storage and and to facilitate data sharing. Current compression techniques in forecast centres do not exploit the spatio-temporal correlation of many atmospheric variables nor do they only compress the real information contained in 32 or 64-bit floating-point numbers. Here, we find alternatives to the default 24-bit linear quantisation compression in the Copernicus Atmospheric Monitoring Service (CAMS) data set and provide a perspective for climate data compression at large compression factors.
+
+This study provides evidence that climate and weather forecast data archives can be reduced by one to two orders of magnitude in size without losing valuable information."
+
+== ESDL
+
+https://esa-esdl.github.io/ESDL.jl/latest/[`https://esa-esdl.github.io/ESDL.jl/latest/`]
+
+https://github.com/esa-esdl/ESDL.jl[`https://github.com/esa-esdl/ESDL.jl`]
+
+https://live.juliacon.org/talk/GDCEYU[`https://live.juliacon.org/talk/GDCEYU`]
+
+"A package to explore and analyze the Earth System Data Cube.
+The Earth System data cube is a collection of land surface and atmospheric Earth observation data sets on a common spatial resolution of 0.833° x 0.833° and a common temporal resolution of 8 days in the time range from 2001 to 2011. See the Product Handbook for more information."
+
+== GMT
+
+https://github.com/GenericMappingTools/GMT.jl[`https://github.com/GenericMappingTools/GMT.jl`]
+
+"Julia wrapper for the Generic Mapping Tools GMT.
+The Generic Mapping Tools, GMT, is an open source collection of tools for manipulating geographic and Cartesian data sets (including filtering, trend fitting, gridding, projecting, etc.) and producing PostScript illustrations ranging from simple x–y plots via contour maps to artificially illuminated surfaces and 3D perspective views."
+
+== Gridap
+
+https://github.com/gridap/Gridap.jl[`https://github.com/gridap/Gridap.jl`]
+
+https://gridap.github.io/Gridap.jl/stable/[`https://gridap.github.io/Gridap.jl/stable/`]
+
+https://live.juliacon.org/talk/DVSD7Q[`https://live.juliacon.org/talk/DVSD7Q`]
+
+"Gridap provides a set of tools for the grid-based approximation of partial differential equations (PDEs) written in the Julia programming language. The library currently supports linear and nonlinear PDE systems for scalar and vector fields, single and multi-field problems, conforming and nonconforming finite element (FE) discretizations, on structured and unstructured meshes of simplices and n-cubes. Gridap is extensible and modular. One can implement new FE spaces, new reference elements, use external mesh generators, linear solvers, post-processing tools, etc. See, e.g., the list of available Gridap plugins.
+
+Gridap has a very expressive API allowing to solve complex PDEs with very few lines of code. The user can write the underlying weak form with a syntax almost 1:1 to the mathematical notation, and Gridap generates an efficient FE assembly loop automatically by leveraging the Julia JIT compiler."
+
+== ImplicitGlobalGrid
+
+https://github.com/eth-cscs/ImplicitGlobalGrid.jl[`https://github.com/eth-cscs/ImplicitGlobalGrid.jl`]
+
+https://ieeexplore.ieee.org/document/8471188[`https://ieeexplore.ieee.org/document/8471188`]
+
+"This renders the distributed parallelization of stencil-based GPU and CPU applications on a regular staggered grid almost trivial and enables close to ideal weak scaling of real-world applications on thousands of GPUs.
+ImplicitGlobalGrid relies on the Julia MPI wrapper (MPI.jl) to perform halo updates close to hardware limit and leverages CUDA-aware MPI for GPU-applications. The communication can straightforwardly be hidden behind computation.
+
+A particularity of ImplicitGlobalGrid is the automatic implicit creation of the global computational grid based on the number of processes the application is run with (and based on the process topology, which can be explicitly chosen by the user or automatically defined). As a consequence, the user only needs to write a code to solve his problem on one GPU/CPU (local grid); then, as little as three functions can be enough to transform a single GPU/CPU application into a massively scaling Multi-GPU/CPU application."
+
+== Lorenz96
+
+https://github.com/milankl/Lorenz96.jl[`https://github.com/milankl/Lorenz96.jl`]
+
+"Lorenz96.jl simulates the Lorenz 96 system with one level (two and three level version planned) for any given number type, as long as conversions (to and from Float64) and arithmetics (+,-,*) are defined - the scaled equations are written division-free. Output always in Float64.
+
+Also supports mixed precision: Different number types can be defined for prognostic variables and calculations on the right-hand side, with automatic conversion on every time step."
+
+== Merly.jl
+
+https://github.com/neomatrixcode/Merly.jl[`https://github.com/neomatrixcode/Merly.jl`]
+
+https://arxiv.org/abs/2102.10222[`https://arxiv.org/abs/2102.10222`]
+
+"Merly.jl is a package for creating web applications in Julia. It presents features such as the creation of endpoints with function notation and with macro notation, handling of static files, use of path parameters, processing of data sent by a web client in the body in a personalized way, handling of CORS and compatibility with the use of middleware. It presents a familiar syntax with the rest of the most popular web frameworks without neglecting the execution performance.
+
+ModelingToolkit.jl is a symbolic-numeric modeling package. Thus it combines some of the features from symbolic computing packages like SymPy or Mathematica with the ideas of equation-based modeling systems like the causal Simulink and the acausal Modelica. It bridges the gap between many different kinds of equations, allowing one to quickly and easily transform systems of DAEs into optimization problems, or vice-versa, and then simplify and parallelize the resulting expressions before generating code."
+
+== ModelingToolkit
+
+https://github.com/SciML/ModelingToolkit.jl[`https://github.com/SciML/ModelingToolkit.jl`]
+
+https://mtk.sciml.ai/stable/[`https://mtk.sciml.ai/stable/`]
+
+"ModelingToolkit.jl is a modeling framework for high-performance symbolic-numeric computation in scientific computing and scientific machine learning. It allows for users to give a high-level description of a model for symbolic preprocessing to analyze and enhance the model. ModelingToolkit can automatically generate fast functions for model components like Jacobians and Hessians, along with automatically sparsifying and parallelizing the computations. Automatic transformations, such as index reduction, can be applied to the model to make it easier for numerical solvers to handle."
+
+== NCDatasets
+
+https://github.com/Alexander-Barth/NCDatasets.jl[`https://github.com/Alexander-Barth/NCDatasets.jl`]
+
+"NCDatasets allows one to read and create netCDF files. NetCDF data set and attribute list behave like Julia dictionaries and variables like Julia arrays."
+
+== netCDF
+
+https://github.com/JuliaGeo/NetCDF.jl[`https://github.com/JuliaGeo/NetCDF.jl`]
+
+"NetCDF support for the Julia programming language, there is a high-level and a medium-level interface for writing and reading netCDF files."
+
+== NetworkDynamics
+
+https://github.com/FHell/NetworkDynamics.jl[`https://github.com/FHell/NetworkDynamics.jl`]
+
+https://fhell.github.io/NetworkDynamics.jl/dev/[`https://fhell.github.io/NetworkDynamics.jl/dev/`]
+
+https://arxiv.org/abs/2012.12696[`https://arxiv.org/abs/2012.12696`]
+
+"A package for working with dynamical systems on complex networks. NetworkDynamics.jl provides an interface between LightGraphs.jl and DifferentialEquations.jl. It allows to define several types of dynamic and static nodes and edges and to link them up in order to create complex network dynamics.
+
+The behavior of a node or an edge can be described by algebraic equations, by differential algebraic equation (DAEs) in mass matrix form, by ordinary differential equations (ODE) or by delay differential equations (DDE). Stochastic ordinary differential equations (SDE) can be implemented as a two-layer network."
+
+== NTFk
+
+https://github.com/TensorDecompositions/NTFk.jl[`https://github.com/TensorDecompositions/NTFk.jl`]
+
+"NTFk performs a novel unsupervised Machine Learning (ML) method based on Tensor Decomposition coupled with constraints (sparsity, nonnegativity, physical, mathematical).
+
+NTFk methodology allows for automatic identification of the optimal number of features (signals) present in multi-dimensional data arrays (tensors). The number of features (tensor rank / multi-rank) along different dimensions can be estimated jointly and independently.
+
+NTFk can be applied to perform various types of analyses of multi-dimensional data:
+
+* Feature extraction (FE)
+* Blind source separation (BSS)
+* Detection of disruptions / anomalies
+* Image recognition
+* Separation of (physics) processes
+* Discovery of unknown dependencies and phenomena
+* Development of reduced-order/surrogate models
+* Identification of dependencies between model inputs and outputs
+* Guiding development of physics models representing the ML analyzed data
+* Data classification
+* Blind predictions
+* Optimization of data acquisition (optimal experimental design)
+* Labeling of datasets for supervised ML analyses
+
+NTFk provides high-performance computing capabilities to solve problems with Shared and Distributed Arrays in parallel. The parallelization allows for utilization of multi-core / multi-processor environments. GPU and TPU accelerations are available through existing Julia packages."
+
+== ParallelStencil
+
+https://github.com/omlins/ParallelStencil.jl[`https://github.com/omlins/ParallelStencil.jl`]
+
+"ParallelStencil empowers domain scientists to write architecture-agnostic high-level code for parallel high-performance stencil computations on GPUs and CPUs. Performance similar to CUDA C can be achieved, which is typically a large improvement over the performance reached when using only CUDA.jl Array programming. For example, a 2-D shallow ice solver presented at JuliaCon 2020 [1] achieved a nearly 20 times better performance than a corresponding CUDA.jl Array programming implementation; in absolute terms, it reached 70% of the theoretical upper performance bound of the used Nvidia P100 GPU.
+
+ParallelStencil relies on the native kernel programming capabilities of CUDA.jl and on Base.Threads for high-performance computations on GPUs and CPUs, respectively. It is seamlessly interoperable with ImplicitGlobalGrid.jl, which renders the distributed parallelization of stencil-based GPU and CPU applications on a regular staggered grid almost trivial and enables close to ideal weak scaling of real-world applications on thousands of GPUs [1, 2, 3, 4]. Moreover, ParallelStencil enables hiding communication behind computation with a simple macro call and without any particular restrictions on the package used for communication. ParallelStencil has been designed in conjunction with ImplicitGlobalGrid.jl for simplest possible usage by domain-scientists, rendering fast and interactive development of massively scalable high performance multi-GPU applications readily accessible to them."
+
+== RRTMGP
+
+https://github.com/CliMA/RRTMGP.jl[`https://github.com/CliMA/RRTMGP.jl`]
+
+https://live.juliacon.org/talk/DTAFMF[`https://live.juliacon.org/talk/DTAFMF`]
+
+"Julia implementation of Rapid and accurate Radiative Transfer Model for General Circulation Models."
+
+=== rte-rrtmgp
+
+https://github.com/earth-system-radiation/rte-rrtmgp[`https://github.com/earth-system-radiation/rte-rrtmgp`]
+
+https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2019MS001621[`https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2019MS001621`]
+
+"A set of codes for computing radiative fluxes in planetary atmospheres."
+
+== ShallowWaters
+
+https://github.com/milankl/ShallowWaters.jl[`https://github.com/milankl/ShallowWaters.jl`]
+
+https://live.juliacon.org/talk/JPGZK3[`https://live.juliacon.org/talk/JPGZK3`]
+
+"A shallow water model with a focus on type-flexibility and 16-bit number formats. ShallowWaters allows for Float64/32/16, Posit32/16/8, BFloat16, LogFixPoint16, Sonum16, Float32/16 & BFloat16 with stochastic rounding and in general every number format with arithmetics and conversions implemented. ShallowWaters also allows for mixed-precision and reduced precision communication.
+
+ShallowWaters uses an energy and enstrophy conserving advection scheme and a Smagorinsky-like biharmonic diffusion operator. Tracer advection is implemented with a semi-Lagrangian advection scheme. Strong stability-preserving Runge-Kutta schemes of various orders and stages are used with a semi-implicit treatment of the continuity equation. Boundary conditions are either periodic (only in x direction) or non-periodic super-slip, free-slip, partial-slip, or no-slip. Output via NetCDF."
+
+== SuperFAB
+
+https://github.com/hsgg/SphericalFourierBesselDecompositions.jl[`https://github.com/hsgg/SphericalFourierBesselDecompositions.jl`]
+
+https://arxiv.org/abs/2102.10079[`https://arxiv.org/abs/2102.10079`]
+
+"The spherical Fourier-Bessel (SFB) decomposition is a natural choice for the radial/angular separation that allows optimal extraction of cosmological information from large volume galaxy surveys. In this paper we develop a SFB power spectrum estimator that allows the measurement of the largest angular and radial modes with the next generation of galaxy surveys. The code measures the pseudo-SFB power spectrum, and takes into account mask, selection function, pixel window, and shot noise.
+
+== Symbolics
+
+https://github.com/JuliaSymbolics/Symbolics.jl[`https://github.com/JuliaSymbolics/Symbolics.jl`]
+
+https://discourse.julialang.org/t/ann-symbolics-jl-a-modern-computer-algebra-system-for-a-modern-language/56251[`https://discourse.julialang.org/t/ann-symbolics-jl-a-modern-computer-algebra-system-for-a-modern-language/56251`]
+
+"Symbolics.jl is a fast and modern Computer Algebra System (CAS) for a fast and modern programming language (Julia). The goal is to have a high-performance and parallelized symbolic algebra system that is directly extendable in the same language as the users.
+
+Symbolics.jl is the answer. Symbolics.jl is a pure Julia CAS which uses the Julia core library to its fullest. It is built from the ground up with performance in mind. We use specialized structures
+for automatic simplification to match the performance of the most fully optimized C++ libraries. It exploits parallelism at every level; our symbolic simplification takes advantage of Julia’s task-based
+multithreading to transform symbolic equations into parallelized Julia code.
+
+This reconstruction of the idea of CAS in Julia’s type system is entirely extensible. New term types enable fast symbolic arithmetic on standard and non-standard algebras; add-on libraries like
+ModelingToolkit build a bridge from symbolics to numerics. Symbolics.jl and its ecosystem will be the common foundation on which the next generation of Domain-Specific Languages (DSLs) will be constructed, automatically updated and accelerated through with the growth of this system."
+
+== TSML
+
+https://github.com/IBM/TSML.jl[`https://github.com/IBM/TSML.jl`]
+
+"TSML is a package for time series data processing, classification, clustering, and prediction. It combines ML libraries from Python's ScikitLearn (thru its complementary AutoMLPipeline package) and Julia MLs using a common API and allows seamless ensembling and integration of heterogenous ML libraries to create complex models for robust time-series prediction."
+
+== UltraNest
+
+https://arxiv.org/abs/2101.09604[`https://arxiv.org/abs/2101.09604`]
+
+https://johannesbuchner.github.io/UltraNest/index.html[`https://johannesbuchner.github.io/UltraNest/index.html`]
+
+" UltraNest is a general-purpose Bayesian inference package for parameter estimation and model comparison. It allows fitting arbitrary models specified as likelihood functions written in Python, C, C++, Fortran, Julia or R. With a focus on correctness and speed (in that order), UltraNest is especially useful for multi-modal or non-Gaussian parameter spaces, computational expensive models, in robust pipelines. Parallelisation to computing clusters and resuming incomplete runs is available."
+

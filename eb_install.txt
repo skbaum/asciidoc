@@ -1,0 +1,1285 @@
+
+= EasyBuild Installation
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Introduction
+
+How to install and configure EasyBuild on faster4.
+A few of the steps - e.g. installing the lua packges and putting `hprc_profile.sh` into
+the `/etc/profile.d` directory - will have to also be performed on the other login nodes.
+
+== Prerequisites
+
+
+
+=== Lua
+
+
+The Lmod installation instructions are at:
+
+https://lmod.readthedocs.io/en/latest/030_installing.html[`https://lmod.readthedocs.io/en/latest/030_installing.html`]
+
+and start with the installation of Lua.
+This is done on RedHat/CentOS/etc. variants via:
+
+-----
+dnf install lua lua*-bitop lua*-devel lua*-json lua*-lpeg lua*-posix lua*-term
+-----
+
+
+=== Lmod
+
+*How to Transition to Lmod (or how too test Lmod without installing it for all)* - https://lmod.readthedocs.io/en/latest/045_transition.html[`https://lmod.readthedocs.io/en/latest/045_transition.html`]
+
+You download Lmod at the ever-changing and -annoying SourceForge at:
+
+https://sourceforge.net/projects/lmod/[`https://sourceforge.net/projects/lmod/`]
+
+After watching the fascinating countdown and perusing the ads you will obtain
+something like:
+
+-----
+Lmod-8.5.tar.bz2
+-----
+
+In this example we're going to be installing Lmod from a subdirectory in our home directory
+called `easybuild`.
+
+==== Quick Default Installation
+
+To perform a quick install of Lmod from `~/easybuild`
+to `/sw` with default configuration options:
+
+-----
+mkdir ~/easybuild
+mv Lmod-8.5.tar.bz2 ~/easybuild
+cd ~/easybuild
+tar xjvf Lmod-8.5.tar.bz2
+cd Lmod-8.5
+./configure --prefix=/sw
+[mkdir /sw]
+-----
+
+*Problem Interlude*
+
+===== 
+Got the following error message in the `configure` step while attempting this on
+`faster4.hprc.tamu.edu` running CentOS 8.4.2105.
+
+-----
+Error can not find lua.h which is needed to build lua-term.
+You can either install lua-term or the lua development package.
+-----
+
+The `dnf` program could find neither `lua-term` or 'lua-devel` to install.  The `lua*` packages installed were:
+
+-----
+Package lua-5.3.4-11.el8.x86_64 is already installed.
+Package lua-expat-1.3.0-12.el8.1.x86_64 is already installed.
+Package lua-filesystem-1.6.3-7.el8.x86_64 is already installed.
+Package lua-json-1.3.2-9.el8.noarch is already installed.
+Package lua-libs-5.3.4-11.el8.x86_64 is already installed.
+Package lua-lpeg-1.0.1-6.el8.x86_64 is already installed.
+Package lua-posix-33.3.1-9.el8.x86_64 is already installed.
+Package lua-socket-3.0-0.17.rc1.el8.x86_64 is already installed.
+-----
+
+This is a known issue explained herein:
+
+-----
+https://bugzilla.redhat.com/show_bug.cgi?id=1734218
+-----
+
+The explanation is: "The lua-devel package wasn't included in the distro because the RPM team doesn't want to support it.
+There is currently no business justification to release it."
+
+It can be found within a subscriber-only RedHat repository, but that costs big money.  Fortunately, it can also
+be found in the CentOS PowerTools repository which is enabled via:
+
+-----
+dnf --enablerepo=powertools install lua-devel
+-----
+
+although this didn't work, either.  Finally, the package was tracked down at:
+
+-----
+http://mirror.centos.org/centos/8-stream/PowerTools/x86_64/os/Packages/lua-devel-5.3.4-11.el8.x86_64.rpm
+-----
+
+and was snagged and installed via:
+
+-----
+wget http://mirror.centos.org/centos/8-stream/PowerTools/x86_64/os/Packages/lua-devel-5.3.4-11.el8.x86_64.rpm
+rpm -ivh lua-devel-5.3.4-11.el8.x86_64.rpm
+-----
+
+*NOTE*:  The packages must be separately installed on login nodes other than `faster4`.
+=====
+
+The configuration step will result in the usual tests scrolling by with a summary
+like the following at the end:
+
+-----
+----------------------------------- SUMMARY ----------------------------------
+
+Package version............................................. : Lmod-8.5
+Package version (git) ...................................... :
+
+LUA_INCLUDE................................................. : /usr/include
+Lua executable.............................................. : /usr/bin/lua
+Luac executable............................................. : /usr/bin/luac
+User Controlled Prefix...................................... : no
+Prefix...................................................... : /sw
+Actual Install dir.......................................... : /sw/lmod/8.5
+
+MODULEPATH_ROOT............................................. : /sw/modulefiles
+Wait (s) before rebuilding cache............................ : 86400
+Allow Duplicate Paths....................................... : no
+Do not save Cache if build time < .......................... : 2
+SPIDER_CACHE_DIRS........................................... :
+Prepending multiple dirs (NORMAL / REVERSED)................ : normal
+Colorized output supported.................................. : yes
+File that is touched when system is updated................. :
+Allow duplicate entry in PATHs.............................. : no
+Allow tcl modulefiles....................................... : yes
+ZSH Tab Completion Functions Site Directory................. :
+Use Dot files in ~/.lmod.d.................................. : yes
+Full Settarg support........................................ : no
+Have lua-term............................................... : yes
+Have luafilesystem.......................................... :
+Support Auto Swap when using families....................... : yes
+Export the module shell function in Bash.................... : yes
+Disable same name autoswapping.............................. : no
+Use Spider Cache on Loads................................... : no
+Pager used inside Lmod...................................... : /usr/bin/less
+System LD_PRELOAD........................................... :
+System LD_LIBRARY_PATH...................................... :
+Hashsum program used........................................ : /usr/bin/sha1sum
+Site Name................................................... : <empty>
+SYSHOST..................................................... : <empty>
+Site Message file........................................... : <empty>
+Override $LANG Language for error etc....................... : <empty>
+Which LuaFileSystem is being used........................... : Built-in
+Use italic instead of faint for hidden modules.............. : no
+If path entry is already there then don't prepend........... : no
+Use Tmod Find First rule instead of Find Best for defaults.. : no
+MODULEPATH Initial file..................................... : @PKG@/init/.modulespath
+Use built-in lua packages instead of system provided pkgs... : no
+Silence shell debugging output for bash/zsh................. : no
+Allow root to use Lmod...................................... : yes
+Support KSH................................................. : no
+Use the fast TCL interpreter................................ : yes
+Display Extensions w/ module avail.......................... : yes
+Allow for extended default.(ml intel/17 #-> intel/17.0.4)... : yes
+
+------------------------------------------------------------------------------
+
+******************************************************************************
+
+Lmod overwrites the env var BASH_ENV to make the module command available in
+bash scripts. If your site does not set BASH_ENV then you can ignore the
+comments below.
+
+If your site already uses BASH_ENV to point to a site specific script, please
+consider sourcing Lmod's init/bash from your site's file.
+
+BASH_ENV is defined both in:
+   /sw/lmod/8.5/init/profile
+   /sw/lmod/8.5/init/cshrc
+
+******************************************************************************
+
+
+******************************************************************************
+
+Lmod is exporting the module command for Bash users. Some sites may have some
+problems. First:
+
+   0.  Make sure that all your machines have shellshock bash patch.
+
+If that does not fix things then you have two choices:
+
+   1.  You configure Lmod not to export the module command.
+   2.  You can filter out the exported functions in the users environment
+       during job submission
+
+If there is a way to do step 2, please try to do so. Otherwise do step 1.
+The advantage of exporting the module command is that it is defined in
+/bin/sh scripts. Because Lmod defines BASH_ENV to point to init/bash,
+it will be defined for /bin/bash scripts.  The trouble is that users
+have to remember to put #!/bin/bash at the first line of their shell
+script to make that work. We used to see tickets where users would
+submit jobs as /bin/sh scripts and wonder why the module command did
+not work.
+
+******************************************************************************
+
+
+Configure complete, Now do:
+
+    $ make install       # -> A complete install
+or
+    $ make pre-install   # -> Install everything but the symbolic link
+-----
+
+The shellshock thing should only be a problem if you're still running an OS
+version from before 2015, in which case you've almost certainly got bigger problems
+to deal with right now.  Here's some further info about it:
+
+https://www.linode.com/docs/guides/patching-bash-for-the-shellshock-vulnerability/[`https://www.linode.com/docs/guides/patching-bash-for-the-shellshock-vulnerability/`]
+
+Now you can create a testing or full installation as is explained in that last part.
+If you do the full install the following directory structure is created:
+
+-----
+/sw/lmod/8.5
+            /lmod -> 8.5
+-----
+
+with the `lmod` or `8.5` directory containing:
+
+-----
+/sw/lmod/lmod/init
+                 /lib
+                 /libexec
+                 /messageDir
+                 /modulefiles
+                 /settarg
+                 /share
+                 /shells
+                 /tools
+-----
+
+==== Lmod Configuration
+
+===== Setting MODULEPATH
+
+We learn from:
+
+https://lmod.readthedocs.io/en/latest/030_installing.html#installing-lmod[`https://lmod.readthedocs.io/en/latest/030_installing.html#installing-lmod`]
+
+=====
+It is important to define $MODULEPATH before z00_lmod.* is run by either using .modulepath or setting $LMOD_SITE_MODULEPATH or $MODULEPATH. Do not use module use … statements in later /etc/profile.d/* files. This is because module reset returns $MODULEPATH to the value defined when lmod is first executed, which will be when z00_lmod.* is run.
+=====
+
+The `MODULEPATH` environment variable is used in the profile files dealt with in the next section, so
+it must be defined before they are run in `/etc/profile.d`.  On `grace` there is a `hprc_profile.sh` file in
+`/etc/profile.d` that contains:
+
+-----
+# read our profile stuff from central location on Lustre /sw
+# exclude root in case of unforeseen Lustre problems
+if [ "$USER" != "root" ]; then 
+  mount -t lustre | grep -q "on /sw type lustre"
+  if [ $? -eq 0 ] ; then 
+    for profile_file in /sw/hprc/local/etc/profile.d/*.sh ; do
+      if [ -r "$profile_file" ] ; then 
+        source $profile_file
+      fi 
+    done
+  fi
+fi
+-----
+
+This `hprc_profile.sh` file must be placed into the `/etc/profile.d` directory on `faster4`.
+
+*NOTE*:  This will have to be done separately for other login nodes.
+
+The directory `/sw/hprc/local/etc/profile.d` contains:
+
+-----
+-rw-rw-r-- 1 francis  staff    365 Oct 15 22:16 bashprompt.sh
+-rw-rw-r-- 1 francis  staff    434 Jan 25  2021 conda.sh
+-rw-rw-r-- 1 francis  staff    580 Mar 25  2021 env.sh
+-rw-rw-r-- 1 francis  staff    127 Dec 19  2020 forward.sh
+-rw-rw-r-- 1 francis  francis 1032 Mar 31  2021 hprc_modules.sh
+-rw-r--r-- 1 j-perdue staff    661 Jan 28  2021 hprc_ssh_keygen.sh
+-rw-rw-r-- 1 francis  staff    207 Dec 19  2020 motd.sh
+-rw-rw-r-- 1 francis  staff    221 Dec 19  2020 quota.sh
+-rw-rw-r-- 1 francis  staff   1111 Mar 30  2021 slurm.sh
+-rw-rw-r-- 1 francis  staff    413 Mar 25  2021 zsh_fix.sh
+-----
+
+The `hprc_modules.sh` script sets the following environment variables:
+
+* `MODULEPATH`
+* `LMOD_PACKAGE_PATH`
+* `LMOD_AVAIL_STYLE`
+* `MANPATH` - prepends the local HPRC man pages location
+
+Here is the script:
+
+-----
+# HPRC module setup
+if [ "${HOSTNAME:0:3}" != "dtn" ]; then
+# skip loading module on FTN nodes
+if [ "$USER" != "root" ]; then
+  . /sw/lmod/lmod/init/profile
+
+  # we don't use these
+  #MODULEPATH=`echo $MODULEPATH | sed 's,/sw/lmod/hprc/mods/Linux:,,'`
+  MODULEPATH=`echo $MODULEPATH | sed 's,/sw/lmod/hprc/mods/Core:,,'`
+  
+  # our usual modules
+  MODULEPATH="/sw/eb/mods/all/Core:$MODULEPATH"
+  # correct HMNS path? (Francis 01feb2021)
+  MODULEPATH="/sw/hprc/mods/all/Core:$MODULEPATH"
+
+  # load restricted module
+  for r in /sw/restricted /sw/group ; do
+    for g in `groups` ; do
+      if [ -d $r/$g/mods/all ]; then
+        MODULEPATH="$r/$g/mods/all/Core:$MODULEPATH"
+      fi
+    done
+  done
+
+  export LMOD_PACKAGE_PATH=/sw/lmod/hprc/mods/
+  export LMOD_AVAIL_STYLE="system:<en_grouped>:fr_grouped" # for MODULEPATH tags
+  export MANPATH=/sw/hprc/local/share/man:$MANPATH # prepend since MANPATH already had needed trailing colon from LSF
+fi
+fi
+# EOF
+-----
+
+Install this script on `faster4` in `/sw/hprc/local/etc/profile.d`.
+A temporary directory `/sw/hprc/local/etc/profile.d-grace` has been created to contain
+all the other scripts in the `/sw/hprc/local/etc/profile.d` directory on `grace`.
+They can be modified and moved over to `profile.d` as they are needed.
+
+After these changes have been made, a user logging in will have in his environment
+the `MODULEPATH`:
+
+-----
+env | grep MODULEPATH
+MODULEPATH=/sw/hprc/mods/all/Core:/sw/eb/mods/all/Core:/sw/lmod/hprc/mods/Linux:/sw/lmod/lmod/modulefiles/Core
+MODULEPATH_ROOT=/sw/lmod/hprc/mods
+-----
+
+===== Configure Profile Files and Create Soft Links
+
+The `init` directory contains a `profile` file that is the Lmod initialization
+script for the `bash` and `zsh` shells, and a `cshrc` file for the `tcsh` and `csh`
+shells.  These should be copied or linked to `/etc/profile.d`.  Linking them
+is done via:
+
+-----
+ln -s /sw/lmod/lmod/init/profile        /etc/profile.d/z00_lmod.sh
+ln -s /sw/lmod/lmod/init/cshrc          /etc/profile.d/z00_lmod.csh
+-----
+
+*NOTE*:  These symbolic links must separately be made on login nodes other than `faster4`.
+
+Edit `/sw/lmod/lmod/init/profile` and replace:
+
+-----
+export MODULEPATH_ROOT="/sw/modulefiles"
+-----
+
+with:
+
+-----
+export MODULEPATH_ROOT="/sw/lmod/hprc/mods"
+-----
+
+Do the same with `/sw/lmod/lmod/init/cshrc`.
+
+===== Copy and Modify the `/sw/lmod/hprc/mods` Files from Grace
+
+Now copy all the files in the `/sw/lmod/hprc/mods` directory on grace to the same directory on 
+faster.  While logged in on faster:
+
+-----
+cd /sw/lmod/hprc/mods
+rsync -avz baum@grace2.hprc.tamu.edu:/sw/lmod/hprc/mods/* ./
+-----
+
+The `/sw/lmod/hprc/mods` directory contains:
+
+-----
+drwxrwsr-x 2 tmarkhuang staff   4096 Aug  5 16:10 cacheDir
+-rw-r--r-- 1 j-perdue   staff   1203 Dec 10  2018 hprc_sp_log_modules.lua
+-rw-r--r-- 1 j-perdue   staff   1951 Jan 11  2021 hprc_sp_spider_seewiki.lua
+-rw-r--r-- 1 baum       staff   2711 Jan 21 13:52 hprc_sp_tag_modulepaths.lua
+drwxrwsr-x 2 j-perdue   staff   4096 Dec 24  2020 Linux
+-r--r--r-- 1 j-perdue   staff 104007 Dec 21  2016 LuaXML_101012.zip
+drwxr-sr-x 2 tmarkhuang staff   4096 Feb 26  2021 reverseMapD
+-rw-r--r-- 1 j-perdue   staff    336 Dec 24  2020 SitePackage.lua
+-----
+
+The `hprc_sp_tag_modulepaths.lua` file is where additional module paths are set.
+This file is listed and processed from within `SitePackage.lua`.
+This directory is defined as `MODULEPATH_ROOT` in the profile files processed in the previous section.
+
+
+
+
+==== Testing
+
+Once this is done you can test it by logging in as a user, or logging back in if you're
+already in.  After you do this you can test it via
+using the `module` command, i.e.
+
+-----
+module --help
+
+Modules Release 4.2.3 (2019-03-23)
+Usage: module [options] [command] [args ...]
+
+Loading / Unloading commands:
+  add | load      modulefile [...]  Load modulefile(s)
+...
+-----
+
+and also by checking to see if `MODULEPATH` has been set in your environment.
+
+-----
+env | grep MODULEPATH
+
+__LMOD_REF_COUNT_MODULEPATH=/etc/scl/modulefiles:3;/usr/share/Modules/modulefiles:1;/etc/modulefiles:1;/usr/share/modulefiles:1;/sw/modulefiles/Linux:1;/sw/modulefiles/Core:1;/sw/lmod/lmod/modulefiles/Core:1
+MODULEPATH_ROOT=/sw/modulefiles
+MODULEPATH_modshare=/usr/share/modulefiles:1:/usr/share/Modules/modulefiles:1:/etc/modulefiles:1
+MODULEPATH=/etc/scl/modulefiles:/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/share/modulefiles:/sw/modulefiles/Linux:/sw/modulefiles/Core:/sw/lmod/lmod/modulefiles/Core
+-----
+
+==== Logging Module Usage
+
+===== A Problem in Moving from Lmod 8.4.28 to 8.6
+
+The procedure for keeping logs of module usage changed significantly between Lmod versions 8.4.28 (the version used on grace as of 06/2022) and 8.6 (the version used on faster
+as of 06/2022).  As such, the version of the file used to set up logging for version 8.4.28 on grace, i.e.
+
+`/sw/lmod/hprc/mods/hprc_sp_log_modules.lua`
+
+will not work for version 8.6 on faster.  Attempting to use the former for the latter results in module loading crashing rather than any sort of graceful degradation where, say,
+the module still loads although it is not logged.
+
+===== Version 8.6 Logging
+
+The `/sw/lmod/hprc/mods/hprc_sp_log_modules.lua` file that is supposed to work for versions 8.6 and above - with 8.6 being the version installed when originally setting up
+Lmod on `faster` and 8.7 being the most recent version - is shown below.  As opposed to the 8.4.28 version, this uses `syslog` to tracks module usage and then collects
+all the data in a MySQL database.  Much simpler, of course, than dumping module usage entries to a flat ASCII file as in 8.4.28.
+
+-----
+-- load_hook(): Here we record the any modules loaded.
+
+local hook    = require("Hook")
+local uname   = require("posix").uname
+local cosmic  = require("Cosmic"):singleton()
+local syshost = cosmic:value("LMOD_SYSHOST")
+
+local s_msgT = {}
+
+local function load_hook(t)
+   -- the arg t is a table:
+   --     t.modFullName:  the module full name: (i.e: gcc/4.7.2)
+   --     t.fn:           The file name: (i.e /apps/modulefiles/Core/gcc/4.7.2.lua)
+
+
+   -- use syshost from configuration if set
+   -- otherwise extract 2nd name from hostname: i.e. login1.stampede2.tacc.utexas.edu
+   local host        = syshost
+   if (not host) then
+      local i,j, first
+      i,j, first, host = uname("%n"):find("([^.]*)%.([^.]*)%.")
+   end
+
+
+   if (mode() ~= "load") then return end
+   local msg         = string.format("user=%s module=%s path=%s host=%s time=%f",
+                                     os.getenv("USER"), t.modFullName, t.fn, uname("%n"),
+                                     epoch())
+   s_msgT[t.modFullName] = msg
+end
+
+hook.register("load", load_hook)
+
+local function report_loads()
+   for k,msg in pairs(s_msgT) do
+#
+#  'logger' is a program to enter messages in the system log
+#
+      lmod_system_execute("logger -t ModuleUsageTracking -p local0.info " .. msg)
+   end
+end
+
+ExitHookA.register(report_loads)
+-----
+
+===== Version 8.4.28 Logging
+
+The `/sw/lmod/hprc/mods/hprc_sp_log_modules.lua` file on `grace` that sets up logging is shown below.
+It simply dumps module usage information to flat ASCII files - with a new file for each day - into a specified
+directory.
+
+-----
+-- Authors:: Jack Perdue <j-perdue@tamu.edu> - TAMU HPRC - http://hprc.tamu.edu
+-- add logging to module load
+-- See the zip file for contrib/hook/SitePackage.lua
+
+local hook = require("Hook")
+local FrameStk = require("FrameStk")
+
+function un_load_hook(t, mode)
+  local logfile = "`dirname $MODULEPATH_ROOT`/logs/`date +%Y%m%d`"
+  local user  = os.getenv("USER")
+  local jobid = os.getenv("SLURM_JOBID") or "None"
+  local jobfile = os.getenv("SLURM_JOB_NAME") or "None"
+  local host  = os.getenv("HOSTNAME") or "None"
+  local pwd   = os.getenv("PWD") or "None"
+  local msg   = string.format("%s %s %s from %s:%s - \(Slurm: %s %s\) - %s", user, mode, t.modFullName, host, pwd, jobid, jobfile, t.fn)
+  local cmd
+  cmd = "echo `date +%H%M%S` '" .. msg .. "' >> "..logfile..""
+  os.execute(cmd)
+  cmd = "LOGFILE="..logfile.." ; if [ `stat -c %a $LOGFILE` -ne 666 ] ; then chmod -f 666 $LOGFILE ; fi"
+  os.execute(cmd)
+end
+
+function load_hook(t)
+  local frameStk = FrameStk:singleton()
+  local mode = (frameStk:atTop()) and "userload" or "depload"
+  un_load_hook(t, mode)
+end
+hook.register("load",load_hook)
+
+function unload_hook(t)
+  un_load_hook(t, "unload")
+end
+hook.register("unload",unload_hook)
+-- EOF
+-----
+
+This works on grace with lua 5.1.4, but not on faster with lua 5.3.4.
+The error message one gets is:
+
+-----
+lua hprc_sp_log_modules.lua
+lua: hprc_sp_log_modules.lua:15: invalid escape sequence near '"%s %s %s from %s:%s - \('
+-----
+
+Changing line 15 from:
+
+`local msg   = string.format("%s %s %s from %s:%s - \(Slurm: %s %s\) - %s", user, mode, t.modFullName, host, pwd, jobid, jobfile, t.fn)`
+
+to:
+
+`local msg   = string.format("%s %s %s from %s:%s - (Slurm: %s %s) - %s", user, mode, t.modFullName, host, pwd, jobid, jobfile, t.fn)`
+
+gets rid of that error and gets us to the next error:
+
+-----
+lua hprc_sp_log_modules.lua
+lua: hprc_sp_log_modules.lua:5: module 'Hook' not found:
+        no field package.preload['Hook']
+        no file '/usr/share/lua/5.3/Hook.lua'
+        no file '/usr/share/lua/5.3/Hook/init.lua'
+        no file '/usr/lib64/lua/5.3/Hook.lua'
+        no file '/usr/lib64/lua/5.3/Hook/init.lua'
+        no file './Hook.lua'
+        no file './Hook/init.lua'
+        no file '/usr/lib64/lua/5.3/Hook.so'
+        no file '/usr/lib64/lua/5.3/loadall.so'
+        no file './Hook.so'
+stack traceback:
+        [C]: in function 'require'
+        hprc_sp_log_modules.lua:5: in main chunk
+        [C]: in ?
+-----
+
+
+
+===== Possible Solutions
+
+There are two obvious ways to solve this problem.
+
+The first is to install Lmod 8.4.28 on `faster` and change the symbolic link in `/sw/lmod` from
+
+-----
+lmod -> 8.6
+-----
+
+to
+
+-----
+lmod -> 8.4.28
+-----
+
+The second is to change over to the `syslog` logging procedure, set up the MySQL database, and stride confidently into a
+blindingly bright future.  
+
+We will first attempt to simply change the symbolic link after installing 8.4.28 on `faster` or, more simply, just
+copying the 8.4.28 version from `grace` over to `faster`.
+
+
+== Installing Default EasyBuild
+
+We now install the default version of the latest EasyBuild distribution.
+After installation we will see what modifications need to be made to create
+an installation similar to that found on HPRC machines.
+
+https://docs.easybuild.io/en/latest/Installation.html#installing-easybuild-with-easybuild[`https://docs.easybuild.io/en/latest/Installation.html#installing-easybuild-with-easybuild`]
+
+The preferred way to install EasyBuild at HPRC is to use it to install itself.
+This is done in three steps.
+
+=== Install EasyBuild in a Temporary Location
+
+The first step is to install EasyBuild into a temporary location which
+will be `/tmp/baum/eb_tmp` in this example.
+Set the `EB_TMPDIR` environment variable and install EasyBuild into it.
+
+-----
+export EB_TMPDIR=/tmp/$USER/eb_tmp
+python3 -m pip install --ignore-installed --prefix $EB_TMPDIR easybuild
+-----
+
+Update the environment to use the temporary EasyBuild installation.
+
+-----
+export PATH=$EB_TMPDIR/bin:$PATH
+export PYTHONPATH=$(/bin/ls -rtd -1 $EB_TMPDIR/lib*/python*/site-packages | tail -1):$PYTHONPATH
+export EB_PYTHON=python3
+-----
+
+Check to see if the `eb` program in your path is the one in `EB_TMPDIR`.
+
+-----
+which eb
+/tmp/baum/eb_tmp/bin/eb
+-----
+
+=== Use Default Install EasyBuild to Install EasyBuild in a Permanent Location
+
+The second step will use EasyBuild to install EasyBuild.
+We'll install the latest reelease in `/sw/eb`.
+This will not work via either `su` or `sudo` so you have to make `/sw/eb` owned by
+someone other than root.
+
+-----
+su
+chown -R someone /sw/eb
+-----
+
+Now install:
+
+-----
+eb --install-latest-eb-release --prefix /sw/eb
+-----
+
+This will create:
+
+-----
+/sw/eb/build
+      /ebfiles_repo
+      /modules
+      /software
+      /sources
+-----
+
+As per local custom we will rename the `software` and `modules` subdirectories.
+We will also add the directories `hprc` and `ebfiles_repo_cleaned`.
+This will populate the `/sw/eb` directory with:
+
+-----
+/sw/eb/build
+      /ebfiles_repo
+      /ebfiles_repo_cleaned
+      /hprc
+      /mods
+      /sources
+      /sw
+-----
+
+==== Changing the Installed `/sw/eb/mods/all` Directory
+
+The procedure that installs EB into `/sw` creates the following `/sw/eb/mods/all` directory:
+
+-----
+/sw/eb/mods/all/EasyBuild
+-----
+
+while the same directory on `grace` looks like:
+
+-----
+/sw/eb/mods/all/Compiler
+               /Compiler
+               ...
+               /Core/EasyBuild
+               ...
+               /MPI
+-----
+
+This causes our default addition of `/sw/eb/mods/all/Core` to the `MODULEPATH` in
+
+-----
+/sw/hprc/local/etc/profile.d/hprc_modules.sh
+-----
+
+to miss the EasyBuild module at the default `/sw/eb/mods/all/EasyBuild` location.
+Thus we must modify the default `/sw/eb/mods/all` directory on `faster` to mirror the
+structure of the directory on `grace`.
+
+We must also edit the file `/sw/eb/mods/all/Core/EasyBuild/4.5.1.lua` to change the `local root` definition
+from `/sw/eb/software/EasyBuild/4.5.1` to `/sw/eb/sw/EasyBuild/4.5.1` to reflect our local choice for
+renaming the `/sw/eb/software` directory to `/sw/eb/sw`.
+
+=== Load the EasyBuild Module
+
+The third step is loading the EasyBuild module.  This is done by first
+making the module available by running the command:
+
+-----
+module use /sw/eb/mods/all
+-----
+
+Now check to see what modules are available:
+
+-----
+module avail
+
+------------------------------------- /sw/eb/modules/all -------------------------------------
+   tools/EasyBuild/4.4.1 (L)
+
+--------------------------------- /usr/share/Modules/modulefiles ---------------------------------
+   dot    module-git    module-info    modules    null    use.own
+...
+-----
+
+You can also search for the module:
+
+-----
+module spider EasyBuild
+
+----------------------------------------------------------------------------------------------
+  tools/EasyBuild: tools/EasyBuild/4.4.1
+----------------------------------------------------------------------------------------------
+    Description:
+      EasyBuild is a software build and installation framework written in Python that allows
+      you to install software in a structured, repeatable and robust way.
+
+
+    This module can be loaded directly: module load tools/EasyBuild/4.4.1
+...
+-----
+
+And now load EasyBuild:
+
+-----
+module load tools/EasyBuild/4.4.1
+-----
+
+and check to see that it's loaded:
+
+-----
+module list
+
+Currently Loaded Modules:
+  1) tools/EasyBuild/4.4.1
+-----
+
+== Configuring EasyBuild
+
+Here we will start with a simple example of the default behavior of EasyBuild
+with no configuration, and proceed to how it can be configured and customized
+for a site.
+
+=== Installing a Module With the Default EasyBuild Configuration
+
+Understanding how to configure an EB site starts with a simple example.
+Supposed we have installed EasyBuild and the `eb` binary is available at:
+
+-----
+/sw/eb/sw/EasyBuild/4.4.2/bin/eb
+-----
+
+Nothing has been configured for EB other than the `PYTHONPATH`, i.e.
+
+-----
+export PYTHONPATH=/sw/eb/sw/EasyBuild/4.4.2/lib/python2.7/site-packages
+-----
+
+Now attempt to install the `M4-1.4.19.eb` easyconfig module since it has
+no dependencies other than the `SYSTEM` toolchain.
+
+-----
+/sw/eb/sw/EasyBuild/4.4.2/bin/eb M4-1.4.19.eb
+
+== Temporary log file in case of crash /tmp/eb-AUCnHb/easybuild-ma5qsh.log
+== found valid index for /sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs, so using it...
+== processing EasyBuild easyconfig /sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs/m/M4/M4-1.4.19.eb
+== building and installing M4/1.4.19...
+== fetching files...
+== ... (took 1 secs)
+== creating build dir, resetting environment...
+== unpacking...
+== ... (took 2 secs)
+== patching...
+== preparing...
+== configuring...
+== ... (took 1 min 1 secs)
+== building...
+== ... (took 4 secs)
+== testing...
+== installing...
+== ... (took 2 secs)
+== taking care of extensions...
+== restore after iterating...
+== postprocessing...
+== sanity checking...
+== ... (took 1 secs)
+== cleaning up...
+== creating module...
+== ... (took 1 secs)
+== permissions...
+== packaging...
+== COMPLETED: Installation ended successfully (took 1 min 15 secs)
+== Results of the build can be found in the log file(s) /home/baum/.local/easybuild/software/M4/1.4.19/easybuild/easybuild-M4-1.4.19-20210916.110047.log
+== Build succeeded for 1 out of 1
+== Temporary log file(s) /tmp/eb-AUCnHb/easybuild-ma5qsh.log* have been removed.
+== Temporary directory /tmp/eb-AUCnHb has been removed.
+-----
+
+The installation was successful, and the default location was in `/home/baum/.local/`.
+The following directory structure was created:
+
+-----
+/home/baum/.local/easybuild/build
+                            ebfiles_repo
+                            modules
+                            software
+                            sources
+-----
+
+The EB configuration process entails specifying another, system-wide location
+for this EB directory hierarchy.
+
+=== The EasyBuild Environment Variables for Grace
+
+The standard environment variables for building system software in `/tmp` and
+installing them in `/sw/eb` on grace are set in:
+
+-----
+/sw/hprc/mods/all/Core/EasyBuild-grace/0.lua
+-----
+
+which is:
+
+-----
+whatis([==[Description: EasyBuild environment variables for building system software in /tmp and installing in /sw/eb on grace.hprc.tamu.edu]==])
+whatis([==[Homepage: http://easybuild.readthedocs.io/en/latest/Configuration.html?highlight=environment#environment-variables]==])
+
+if (mode() == "load") then
+  if ( not (isloaded("EasyBuild") ) ) then
+    load("EasyBuild")
+  end
+  LmodMessage("Preparing EasyBuild environment for grace.hprc.tamu.edu")
+end
+
+pushenv("EASYBUILD_PREFIX","/sw/eb")
+pushenv("EASYBUILD_BUILDPATH","/tmp/"..os.getenv("USER").."/easybuild/")
+pushenv("EASYBUILD_DEPRECATED","2.0")
+pushenv("EASYBUILD_INSTALLPATH_MODULES", "/sw/eb/mods")
+pushenv("EASYBUILD_INSTALLPATH_SOFTWARE", "/sw/eb/sw")
+pushenv("EASYBUILD_MINIMAL_TOOLCHAINS", "1")
+pushenv("EASYBUILD_MODULE_NAMING_SCHEME", "HierarchicalMNS")
+pushenv("EASYBUILD_MODULES_TOOL","Lmod")
+pushenv("EASYBUILD_READ_ONLY_INSTALLDIR", "1")
+pushenv("EASYBUILD_REPOSITORYPATH","/sw/eb/ebfiles_repo/grace")
+pushenv("EASYBUILD_ROBOT","/sw/eb/ebfiles_repo_cleaned/grace")
+pushenv("EASYBUILD_SOURCEPATH","/sw/eb/sources")
+pushenv("EASYBUILD_TMPDIR","/tmp/"..os.getenv("USER").."/tmp/")
+pushenv("EASYBUILD_TMP_LOGDIR","/tmp/"..os.getenv("USER").."/logs/")
+-- 09aug/2017/j-perdue - enable while doing ABI testing with Pythn
+-- pushenv("EASYBUILD_USE_EXISTING_MODULES", "1")
+pushenv("LMOD_IGNORE_CACHE","1")
+pushenv("INTEL_LICENSE_FILE","/sw/hprc/local/etc/licenses/intel")
+pushenv("EB_ANSYS_LICENSE_SERVER", "hprc-license.tamu.edu")
+pushenv("EB_ANSYS_LICENSE_SERVER_PORT", "2325:1055")
+pushenv("PGROUPD_LICENSE_FILE", "/sw/hprc/local/etc/licenses/PGI/license.dat")
+pushenv("G4DATADIR", "/scratch/data/Geant4/")
+help([[
+Easybuild environment for grace.hprc.tamu.edu
+]])
+-----
+
+Once this module has been loaded via:
+
+-----
+module load EasyBuild-grace
+-----
+
+you can see what your present EB environment is via:
+
+-----
+eb --show-config
+
+#
+# Current EasyBuild configuration
+# (C: command line argument, D: default value, E: environment variable, F: configuration file)
+#
+buildpath            (E) = /tmp/baum/easybuild/
+containerpath        (E) = /sw/eb/containers
+deprecated           (E) = 2.0
+installpath          (E) = /sw/eb
+installpath-modules  (E) = /sw/eb/mods
+installpath-software (E) = /sw/eb/sw
+minimal-toolchains   (E) = True
+module-naming-scheme (E) = HierarchicalMNS
+packagepath          (E) = /sw/eb/packages
+prefix               (E) = /sw/eb
+read-only-installdir (E) = True
+repositorypath       (E) = /sw/eb/ebfiles_repo/grace
+robot                (E) = /sw/eb/ebfiles_repo_cleaned/grace, /sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs
+robot-paths          (E) = /sw/eb/ebfiles_repo_cleaned/grace, /sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs
+sourcepath           (E) = /sw/eb/sources
+tmp-logdir           (E) = /tmp/baum/logs/
+tmpdir               (E) = /tmp/baum/tmp/
+-----
+
+where all the capitalized environment variables in `0.lua` have
+had the prepending `EASYBUILD_` removed, the underscores converted
+to dashes, and converted to lowercase.  An
+example is `EASYBUILD_INSTALLPATH_SOFTWARE` converted to `installpath-software`.
+
+If you were to purge the `EasyBuild-grace` module via:
+
+-----
+module purge
+-----
+
+then you would find the configuration to be - if you'd done the `M4` install
+in the previous step - the following:
+
+-----
+/sw/eb/sw/EasyBuild/4.4.2/bin/eb --show-config
+
+# Current EasyBuild configuration
+# (C: command line argument, D: default value, E: environment variable, F: configuration file)
+#
+buildpath      (D) = /home/baum/.local/easybuild/build
+containerpath  (D) = /home/baum/.local/easybuild/containers
+installpath    (D) = /home/baum/.local/easybuild
+repositorypath (D) = /home/baum/.local/easybuild/ebfiles_repo
+robot-paths    (D) = /sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs
+sourcepath     (D) = /home/baum/.local/easybuild/sources
+-----
+
+=== EasyBuild Environment Variables
+
+Some of the environment variables set in:
+
+-----
+/sw/hprc/mods/all/Core/EasyBuild-grace/0.lua
+-----
+
+will be explained here.
+
+==== `EASYBUILD_SOURCEPATH`
+
+https://docs.easybuild.io/en/latest/Configuration.html#sourcepath[`https://docs.easybuild.io/en/latest/Configuration.html#sourcepath`]
+
+This variable specifies the parent path of the directory that contains
+software source and install files.  If this isn't established EasyBuild will
+attempt to download the source and install files from their web URLs as
+specified in the easyconfig file. This is done in the module file via:
+
+-----
+pushenv("EASYBUILD_SOURCEPATH","/sw/eb/sources")
+-----
+
+==== `EASYBUILD_BUILDPATH`
+
+https://docs.easybuild.io/en/latest/Configuration.html#buildpath[`https://docs.easybuild.io/en/latest/Configuration.html#buildpath`]
+
+This specifies the parent directory of the temporary directories in which EasyBuild
+builds software packages.  This is typically a temporary or scratch space on a drive
+partition with sufficient space to compile large and complex software packages.
+This is set in the module file via:
+
+-----
+pushenv("EASYBUILD_BUILDPATH","/tmp/"..os.getenv("USER").."/easybuild/")
+-----
+
+which sets up a directory `/tmp/username/easybuild` in which the software packages
+will be built.
+
+==== `EASYBUILD_TMPDIR` and `EASYBUILD_TMP_LOGDIR`
+
+These are directories for, respectively, temporary storage and temporary storage of log
+files.  This is done in the module file via:
+
+-----
+pushenv("EASYBUILD_TMPDIR","/tmp/"..os.getenv("USER").."/tmp/")
+pushenv("EASYBUILD_TMP_LOGDIR","/tmp/"..os.getenv("USER").."/logs/")
+-----
+
+==== `EASYBUILD_REPOSITORYPATH`
+
+https://docs.easybuild.io/en/latest/Configuration.html#easyconfigs-repository-repository-repositorypath[`https://docs.easybuild.io/en/latest/Configuration.html#easyconfigs-repository-repository-repositorypath`]
+
+This is the location for archiving tested easyconfig `.eb` files.  After a 
+software package is successfully installed, the corresponding `.eb` file
+is uploaded to this location.  This is done in the module file via:
+
+-----
+pushenv("EASYBUILD_REPOSITORYPATH","/sw/eb/ebfiles_repo/grace")
+-----
+
+==== `EASYBUILD_ROBOT` and `EASYBUILD_ROBOT_PATHS`
+
+https://docs.easybuild.io/en/latest/Using_the_EasyBuild_command_line.html#controlling-the-robot-search-path[`https://docs.easybuild.io/en/latest/Using_the_EasyBuild_command_line.html#controlling-the-robot-search-path`]
+
+A default, unconfigured EB installation will only include and make
+available directories listed in the search path as specified by the `PYTHONPATH`
+environment variable, and then only directories that contain
+a subdirectory named `easybuild/easyconfigs`.
+The `PYTHONPATH` for grace before loading any modules is:
+
+-----
+PYTHONPATH=/sw/eb/sw/EasyBuild/4.4.2/lib/python2.7/site-packages
+-----
+
+So without additional configuration any attempts at installing a package via
+an easyconfig file will look in the subdirectories of:
+
+-----
+/sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs/
+-----
+
+for the appropriate easyconfig file.  That is, only this path will be part of the robot path.
+
+Additional directories can be added to the robot path via this variable, which is
+done in the module file via setting `EASYBUILD_ROBOT` to
+`/sw/eb/ebfiles_repo_cleaned/grace` via the line:
+
+-----
+pushenv("EASYBUILD_ROBOT","/sw/eb/ebfiles_repo_cleaned/grace")
+-----
+
+This enables the dependency resolution mechanism and allows a list of one or more
+paths to be specified, which are then included first in the robot search path.  This
+is reflected in the following line in the result of running `eb --show-config`:
+
+-----
+robot = /sw/eb/ebfiles_repo_cleaned/grace, /sw/eb/sw/EasyBuild/4.4.2/easybuild/easyconfigs
+-----
+
+Note that when this is done the `robot_paths` variable in the EB environment is
+defined identically to the `robot` variable.
+
+==== `EASYBUILD_INSTALLPATH_SOFTWARE` and `EASYBUILD_INSTALLPATH_MODULES`
+
+https://docs.easybuild.io/en/latest/Configuration.html#installpath[`https://docs.easybuild.io/en/latest/Configuration.html#installpath`]
+
+These variables specify the parent path of the directories where EasyBuild will install,
+respectively, the
+software packages (e.g. the bin and/or lib directories), and the corresponding module
+files that will set up a user's environment to correctly access the software when
+a module is loaded.
+
+This is done in the module file via:
+
+-----
+pushenv("EASYBUILD_INSTALLPATH_MODULES", "/sw/eb/mods")
+pushenv("EASYBUILD_INSTALLPATH_SOFTWARE", "/sw/eb/sw")
+-----
+
+== HPRC Modifications and Additions to Default EasyBuild Directory Structure
+
+=== The `/sw/hprc` Directory Hierarchy
+
+Separate from the `/sw/eb` directory hierarchy is a local `/sw/hprc` directory hierarchy.
+This contains:
+
+-----
+/sw/hprc/archive
+        /database
+        /galaxy
+        /local
+        /mods
+        /sw
+-----
+
+These directories contain:
+
+* `archive` - Various scripts used on `terra`
+* `database` - Top secret files available only to tenth-level or higher Freemasons
+* `galaxy` - Various files and scripts for `galaxy`
+* `local` - various files of local utility
+* `mods` - definitions for local modules and various software packages not install via EasyBuild
+* `sw` - 
+
+=== Additional Directories and Directory Name Changes
+
+Compare the structure of the `eb` directory of the default
+installation to that of the HPRC installation on grace.
+
+-----
+/sw/eb/build                       /sw/eb/ebfiles_repo
+      /ebfilees_repo                     /ebfiles_repo_cleaned
+      /modules                           /hprc
+      /software                          /mods
+      /sources                           /sources
+                                         /sw
+-----
+
+The immediately obvious changes are abbreviations for both the
+`software` and `modules` directories, the elimination of the `build` directory,
+and the addition of `ebfiles_repo_cleaned` and `hprc` directories.
+Make those changes to obtain:
+
+-----
+/sw/eb/ebfiles_repo
+      /ebfiles_repo_cleaned
+      /hprc
+      /mods
+      /sources
+      /sw
+-----
+
+==== The `/eb/hprc` Directory
+
+The `hprc` directory structure is:
+
+-----
+/eb/hprc/bin
+        /easybuild
+        /ec-dev
+        /etc
+        /graphmods
+        /HMNS
+        /tmp
+-----
+
+===== `bin`
+
+The `bin` directory contains scripts, templates and data files used for maintaining the
+local EasyBuild installation as well as for gathering statistics about it.
+The scripts include:
+
+* `install_lmod_EBMNS.sh` - a script to install a version of Lmod and keep a log of the process
+* `install_lmod_HMNS.sh` - identical to `install_lmod_EBMNS.sh`
+* `check_eb.sh` - a script calling other scripts to check various things in the local EB installation
+** `check_eb_software_has_module.sh` - checks that all installed software has a module
+** `check_eb_roots.sh` - checks that all `EBROOTS` defined still exist
+** `check_eb_rm_emptydirs.sh` - removes any empty module directories
+** `check_eb_symlinks.sh` - checks that all module symlinks are valid
+** `check_eb_modules_load.sh` - checks that all modules can load without error
+* `purge_unused_modules.sh` - purges unused modules based on years
+* `check_eb_changes.sh` - searches all packages to see if they've been built for a given search criteria, e.g. `2019b`, supplied as a command-line argument
+* `lmod2db.sh` - creates lists of software modules, versions and wikilinks for non-hierarchical EB structure
+** `lmod2desc.sh` - called by `lmod2db.sh`
+
+===== `easybuild`
+
+This was apparently superseded in 2015 as we learn in the
+`00_README.tamusc` file within.
+
+=====
+The files in this directory are meant to supplement or replace existing
+EasyBuild files.
+
+For the trees easyblock, tools and toolchains, these
+files are meant to be selectively symlinked from the
+EasyBuild-tamusc-`hostname` installation to override
+certain key components, based on the host/architecture.
+
+For the easyconfig tree, this should be a place to store
+patches and successfully built EasyConfigs (primarily
+the former) to be sym-linked into the the EasyBuild-tamusc-`hostname`
+tree.
+
+All easyconfig development from now on should take
+place in ../ec-dev
+
+-- j-perdue/24mar2015
+=====
+
+===== `ec-devel`
+
+This is the directory for easyconfig development.
+
+===== `etc`
+
+This holds a file containing a list of modules that have pages in the
+HPRC Wiki.
+
+===== `HMNS`
+
+The `HMNS` directory contains data and scripts needed to implement the
+EasyBuild Hierarchical Module Naming Scheme.
+
+https://easybuilders.github.io/easybuild-tutorial/2020-06-isc20/hmns/[`https://easybuilders.github.io/easybuild-tutorial/2020-06-isc20/hmns/`]
+
+A hierarchical module naming scheme consists of a hierarchy of module files.
+There are typically three levels:
+
+1. a `core` level where module files for software installed using the
+`system` toolchain are kept;
+2. a `compiler` level where module files for software installed using a compiler-only
+toolchain are kept; and
+3. an `MPI` level where files are kept that were installed using a toolchain that minimally
+includes a compiler and an MPI component.
+
+===== `tmp`
+
+A mystery thus far.
+
+==== The `/sw/eb` Directory
+
+===== `ebfiles_repo_cleaned`
+
+The `ebfiles_repo_cleaned` directory has the following structure:
+
+-----
+/eb/ebfiles_repo_cleaned/ada (03/2021)
+                        /bgsys (11/2015)
+                        /curie (08/2020)
+                        /eos (05/2016)
+                        /grace (09/2021)
+                        /KNL (04/2019)
+                        /neumann (08/2015)
+                        /sandy (02/2017)
+                        /terra (09/2021)
+                        /uploads (02/2017)
+                        /Westmere (12/2020)
+-----
+
+The time of last access has been added after each directory name. 
+
+===== `hprc`
+
+==== The `/sw/hprc` Directory
+
+===== `archive`
+
+This contains a set of module files developed for use on terra.
+
+===== `database`
+
+The contents are unavailable to this author.
+
+===== `galaxy`
+
+As yet undeciphered.
+
+===== `local`
+
+Various binaries and scripts for local use.
+
+===== `mods`
+
+Modules developed for programs that resist being built via EasyBuild.
+These are typically binaries compiled and their location made available via the module.
+
+===== `sw`
+
+Software that's resisted the EasyBuild treatment.
+
+
+
+

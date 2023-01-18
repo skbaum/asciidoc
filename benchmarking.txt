@@ -1,0 +1,1044 @@
+Benchmarking Notes
+==================
+Steven K. Baum
+0.1, Apr. 27, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+== likwid
+
+*Github* - https://github.com/RRZE-HPC/likwid[`https://github.com/RRZE-HPC/likwid`]
+
+*Wiki* - https://github.com/RRZE-HPC/likwid/wiki[`https://github.com/RRZE-HPC/likwid/wiki`]
+
+=== Overview
+
+=====
+Likwid is a simple to install and use toolsuite of command line applications and a library for performance oriented programmers. It works for Intel, AMD, ARMv8 and POWER9 processors on the Linux operating system. There is additional support for Nvidia GPUs.
+
+LIKWID includes the following tools:
+
+* xref:_likwid_topology[`likwid-topology`] : A tool to display the thread and cache topology on multicore/multisocket computers
+* xref:_likwid_perfctr[`likwid-perfctr`] : A tool to measure hardware performance counters on recent Intel and AMD processors. It can be used as wrapper application without modifying the profiled code or with a marker API to measure only parts of the code. An introduction can be found in here.
+* https://github.com/RRZE-HPC/likwid/wiki/likwid-perfctr[`likwid-pin`] : A tool to pin your threaded application without changing your code. Works for pthreads and OpenMP.
+* https://github.com/RRZE-HPC/likwid/wiki/Likwid-Bench[`likwid-bench`] : Benchmarking framework allowing rapid prototyping of threaded assembly kernels
+* https://github.com/RRZE-HPC/likwid/wiki/Likwid-Mpirun[`likwid-mpirun`] : Script enabling simple and flexible pinning of MPI and MPI/threaded hybrid applications. With integrated xref:_likwid_perfctr[`likwid-perfctr`] support.
+* https://github.com/RRZE-HPC/likwid/wiki/Likwid-Powermeter[`likwid-powermeter`] : Tool for accessing RAPL counters and query Turbo mode steps on Intel processor. RAPL counters are also available in xref:_likwid_perfctr[`likwid-perfctr`].
+* https://github.com/RRZE-HPC/likwid/wiki/Likwid-Memsweeper[`likwid-memsweeper`] : Tool to cleanup ccNUMA domains and last level caches.
+* https://github.com/RRZE-HPC/likwid/wiki/likwid-setFrequencies[`likwid-setFrequencies`] : Tool to set the clock frequency of hardware threads.
+* https://github.com/RRZE-HPC/likwid/wiki/likwid-setFrequencies[`likwid-agent`] : Monitoring agent for LIKWID with multiple output backends.
+* https://github.com/RRZE-HPC/likwid/wiki/likwid-genTopoCfg[`likwid-genTopoCfg`] : Config file writer that saves system topology to file for faster startup.
+* https://github.com/RRZE-HPC/likwid/wiki/likwid-perfscope[`likwid-perfscope`] : Tool to perform live plotting of performance data using gnuplot.
+=====
+
+=== HPRC Modules
+
+On FASTER, likwid is loaded via:
+
+-----
+module load GCC/11.2.0 likwid/5.2.1
+-----
+
+== Tools
+
+=== `likwid-topology`
+
+https://github.com/RRZE-HPC/likwid/wiki/likwid-topology[`https://github.com/RRZE-HPC/likwid/wiki/likwid-topology`]
+
+==== Overview
+
+=====
+Extracts topology information from the `hwloc` library or directly from procfs/sysfs.
+It reports on:
+
+* Thread topology: How processor IDs map on physical compute resources
+* Cache topology: How processors share the cache hierarchy
+* Cache properties: Detailed information about all cache levels
+* NUMA topology: NUMA domains and memory sizes
+* GPU topology: GPU information
+=====
+
+==== Command-Line Options
+
+-----
+likwid-topology -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+A tool to print the thread and cache topology on CPUs and GPUs.
+
+Options:
+-h, --help               Help message
+-v, --version            Version information
+-V, --verbose <level>    Set verbosity
+-c, --caches             List cache information
+-C, --clock              Measure processor clock
+-G, --gpus               List GPU information
+-O                       CSV output
+-o, --output <file>      Store output to file. (Optional: Apply text filter)
+-g                       Graphical output
+-----
+
+==== Examples
+
+Basic information about the topology on `faster2.hprc.tamu.edu` can be found via the
+following command wherein the following information is obtained:
+
+* the xref:thread_topology[hardware thread topology],
+* the xref:cache_topology[cache topology], and
+* the xref:numa_topology[NUMA topology].
+
+[[thread_topology]]
+The columns for the hardware thread topology are:
+
+* *HWThread* - the processors as they are numbered in the Linux OS
+* *Thread* - the SMT thread number inside a core
+* *Core* - the physical CPU core number
+* *Die* - the die IDs
+* *Socket* - the socket numbers of the hardware threads
+
+-----
+likwid-topology
+
+--------------------------------------------------------------------------------
+CPU name:       Intel(R) Xeon(R) Platinum 8352Y CPU @ 2.20GHz
+CPU type:       Intel Icelake SP processor
+CPU stepping:   6
+********************************************************************************
+Hardware Thread Topology
+********************************************************************************
+Sockets:                2
+Cores per socket:       32
+Threads per core:       1
+--------------------------------------------------------------------------------
+HWThread        Thread        Core        Die        Socket        Available
+0               0             0           0          0             *                
+1               0             1           0          0             *                
+2               0             2           0          0             *                
+3               0             3           0          0             *                
+4               0             4           0          0             *                
+5               0             5           0          0             *                
+6               0             6           0          0             *                
+7               0             7           0          0             *                
+8               0             8           0          0             *                
+9               0             9           0          0             *                
+10              0             10          0          0             *                
+11              0             11          0          0             *                
+12              0             12          0          0             *                
+13              0             13          0          0             *                
+14              0             14          0          0             *                
+15              0             15          0          0             *                
+16              0             16          0          0             *                
+17              0             17          0          0             *                
+18              0             18          0          0             *                
+19              0             19          0          0             *                
+20              0             20          0          0             *                
+21              0             21          0          0             *                
+22              0             22          0          0             *                
+23              0             23          0          0             *                
+24              0             24          0          0             *                
+25              0             25          0          0             *                
+26              0             26          0          0             *                
+27              0             27          0          0             *                
+28              0             28          0          0             *                
+29              0             29          0          0             *                
+30              0             30          0          0             *                
+31              0             31          0          0             *                
+32              0             32          0          1             *                
+33              0             33          0          1             *                
+34              0             34          0          1             *                
+35              0             35          0          1             *                
+36              0             36          0          1             *                
+37              0             37          0          1             *                
+38              0             38          0          1             *                
+39              0             39          0          1             *                
+40              0             40          0          1             *                
+41              0             41          0          1             *                
+42              0             42          0          1             *                
+43              0             43          0          1             *                
+44              0             44          0          1             *                
+45              0             45          0          1             *                
+46              0             46          0          1             *                
+47              0             47          0          1             *                
+48              0             48          0          1             *                
+49              0             49          0          1             *                
+50              0             50          0          1             *                
+51              0             51          0          1             *                
+52              0             52          0          1             *                
+53              0             53          0          1             *                
+54              0             54          0          1             *                
+55              0             55          0          1             *                
+56              0             56          0          1             *                
+57              0             57          0          1             *                
+58              0             58          0          1             *                
+59              0             59          0          1             *                
+60              0             60          0          1             *                
+61              0             61          0          1             *                
+62              0             62          0          1             *                
+63              0             63          0          1             *                
+--------------------------------------------------------------------------------
+Socket 0:               ( 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 )
+Socket 1:               ( 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 )
+--------------------------------------------------------------------------------
+-----
+
+[[cache_topology]]
+The cache topology section lists some basic information for every cache level. LIKWID lists only caches that handle data, thus data and unified caches. The cache groups cover the subset of hardware threads sharing a cache on that level.
+
+-----
+********************************************************************************
+Cache Topology
+********************************************************************************
+Level:                  1
+Size:                   48 kB
+Cache groups:           ( 0 ) ( 1 ) ( 2 ) ( 3 ) ( 4 ) ( 5 ) ( 6 ) ( 7 ) ( 8 ) ( 9 ) ( 10 ) ( 11 ) ( 12 ) ( 13 ) ( 14 ) ( 15 ) ( 16 ) ( 17 ) ( 18 ) ( 19 ) ( 20 ) ( 21 ) ( 22 ) ( 23 ) ( 24 ) ( 25 ) ( 26 ) ( 27 ) ( 28 ) ( 29 ) ( 30 ) ( 31 ) ( 32 ) ( 33 ) ( 34 ) ( 35 ) ( 36 ) ( 37 ) ( 38 ) ( 39 ) ( 40 ) ( 41 ) ( 42 ) ( 43 ) ( 44 ) ( 45 ) ( 46 ) ( 47 ) ( 48 ) ( 49 ) ( 50 ) ( 51 ) ( 52 ) ( 53 ) ( 54 ) ( 55 ) ( 56 ) ( 57 ) ( 58 ) ( 59 ) ( 60 ) ( 61 ) ( 62 ) ( 63 )
+--------------------------------------------------------------------------------
+Level:                  2
+Size:                   1.25 MB
+Cache groups:           ( 0 ) ( 1 ) ( 2 ) ( 3 ) ( 4 ) ( 5 ) ( 6 ) ( 7 ) ( 8 ) ( 9 ) ( 10 ) ( 11 ) ( 12 ) ( 13 ) ( 14 ) ( 15 ) ( 16 ) ( 17 ) ( 18 ) ( 19 ) ( 20 ) ( 21 ) ( 22 ) ( 23 ) ( 24 ) ( 25 ) ( 26 ) ( 27 ) ( 28 ) ( 29 ) ( 30 ) ( 31 ) ( 32 ) ( 33 ) ( 34 ) ( 35 ) ( 36 ) ( 37 ) ( 38 ) ( 39 ) ( 40 ) ( 41 ) ( 42 ) ( 43 ) ( 44 ) ( 45 ) ( 46 ) ( 47 ) ( 48 ) ( 49 ) ( 50 ) ( 51 ) ( 52 ) ( 53 ) ( 54 ) ( 55 ) ( 56 ) ( 57 ) ( 58 ) ( 59 ) ( 60 ) ( 61 ) ( 62 ) ( 63 )
+--------------------------------------------------------------------------------
+Level:                  3
+Size:                   48 MB
+Cache groups:           ( 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 ) ( 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 )
+--------------------------------------------------------------------------------
+-----
+
+[[numa_topology]]
+The last part of the output is the NUMA topology. For each NUMA domain the covered hardware threads, the memory status and the distances to other NUMA domains is listed. The distances list prints the distances from the current NUMA domain to all others including itself.
+
+-----
+********************************************************************************
+NUMA Topology
+********************************************************************************
+NUMA domains:           2
+--------------------------------------------------------------------------------
+Domain:                 0
+Processors:             ( 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 )
+Distances:              10 20
+Free memory:            105019 MB
+Total memory:           128117 MB
+--------------------------------------------------------------------------------
+Domain:                 1
+Processors:             ( 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 )
+Distances:              20 10
+Free memory:            115906 MB
+Total memory:           129015 MB
+--------------------------------------------------------------------------------
+-----
+
+=== `likwid-perfctr`
+
+https://github.com/RRZE-HPC/likwid/wiki/likwid-perfctr[`https://github.com/RRZE-HPC/likwid/wiki/likwid-perfctr`]
+
+==== Overview
+
+=====
+While there are already a bunch of tools around to measure hardware performance counters, a lightweight command line tool for simple end-to-end measurements was still missing. The Linux MSR module, providing an interface to access model specific registers from user space, allows us to read out hardware performance counters with an unmodified Linux kernel. Moreover, recent Intel systems provide Uncore hardware counter through PCI interfaces.
+
+`likwid-perfctr` supports the following modes:
+
+* *wrapper mode*: Use likwid-perfctr as a wrapper to your application. You can measure without altering your code.
+* *stethoscope mode*: Measure performance counters for a variable time duration independent of any code running.
+* *timeline mode*: Output performance metric in specified frequency (can be ms or s)
+* *marker API*: Only measure regions in your code, still `likwid-perfctr` controls what to measure.
+
+There are pre-configured event sets, called performance groups, with useful pre-selected event sets and derived metrics. Alternatively, you can specify a custom event set. In a single event set, you can measure as many events as there are physical counters on a given CPU respectively socket. See in the architecture specific pages for more details. `likwid-perfctr` will validate at startup if an event can be measured on a configured counter.
+
+Because `likwid-perfctr` performs simple end-to-end measurements and does not know anything about the code which gets executed, it is crucial to pin your application. The relation between the measurement and your code is solely through pinning. As LIKWID works in user-space there is no possibility to measure only a single process, LIKWID always measures CPUs or sockets. `likwid-perfctr` has all pinning functionality of `likwid-pin` builtin. You need no additional tool for the pinning. Still you can control affinity yourself if you prefer.
+=====
+
+==== Command-Line Options
+
+-----
+likwid-perfctr --help
+likwid-perfctr -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+A tool to read out performance counter registers on x86, ARM and POWER processors
+
+Options:
+-h, --help               Help message
+-v, --version            Version information
+-V, --verbose <level>    Verbose output, 0 (only errors), 1 (info), 2 (details), 3 (developer)
+-c <list>                Processor ids to measure (required), e.g. 1,2-4,8
+-C <list>                Processor ids to pin threads and measure, e.g. 1,2-4,8
+                         For information about the <list> syntax, see likwid-pin
+-g, --group <string>     Performance group or custom event set string for CPU monitoring
+-H                       Get group help (together with -g switch)
+-s, --skip <hex>         Bitmask with threads to skip
+-M <0|1>                 Set how MSR registers are accessed, 0=direct, 1=accessDaemon
+-a                       List available performance groups
+-e                       List available events and counter registers
+-E <string>              List available events and corresponding counters that match <string>
+-i, --info               Print CPU info
+-T <time>                Switch eventsets with given frequency
+-f, --force              Force overwrite of registers if they are in use
+Modes:
+-S <time>                Stethoscope mode with duration in s, ms or us, e.g 20ms
+-t <time>                Timeline mode with frequency in s, ms or us, e.g. 300ms
+                         The output format (to stderr) is:
+                         <groupID> <nrEvents> <nrThreads> <Timestamp> <Event1_Thread1> <Event1_Thread2> ... <EventN_ThreadN>
+                         or
+                         <groupID> <nrEvents> <nrThreads> <Timestamp> <Metric1_Thread1> <Metric1_Thread2> ... <MetricN_ThreadN>
+-m, --marker             Use Marker API inside code
+Output options:
+-o, --output <file>      Store output to file. (Optional: Apply text filter according to filename suffix)
+-O                       Output easily parseable CSV instead of fancy tables
+--stats                  Always print statistics table
+
+Examples:
+List all performance groups:
+likwid-perfctr -a
+List all events and counters:
+likwid-perfctr -e
+List all events and suitable counters for events with 'L2' in them:
+likwid-perfctr -E L2
+Run command on CPU 2 and measure performance group CLOCK:
+likwid-perfctr -C 2 -g CLOCK ./a.out
+-----
+
+==== Examples
+
+The `likwid-perfctr` tool is used for anything regarding hardware performance counters. It also provides lists of available events, a list of available counter registers and a list of available performance groups.
+The list of counters and events for `faster2.hprc.tamu.edu` is:
+
+-----
+likwid-perfctr -e
+
+This architecture has 12 counters.
+Counter tags(name, type<, options>):
+FIXC0, Fixed counters, KERNEL|ANYTHREAD
+FIXC1, Fixed counters, KERNEL|ANYTHREAD
+FIXC2, Fixed counters, KERNEL|ANYTHREAD
+FIXC3, Fixed counters, KERNEL|ANYTHREAD
+PMC0, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION
+PMC1, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION
+PMC2, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION|IN_TRANSACTION_ABORTED
+PMC3, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION
+PMC4, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION
+PMC5, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION
+PMC6, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION|IN_TRANSACTION_ABORTED
+PMC7, Core-local general purpose counters, EDGEDETECT|THRESHOLD|INVERT|KERNEL|ANYTHREAD|IN_TRANSACTION
+
+This architecture has 262 events.
+Event tags (tag, id, umask, counters<, options>):
+INSTR_RETIRED_ANY, 0x0, 0x0, FIXC0
+CPU_CLK_UNHALTED_CORE, 0x0, 0x0, FIXC1
+...
+L2_LINES_OUT_USELESS_HWPF, 0xF2, 0x4, PMC
+SQ_MISC, 0xF4, 0x4, PMC
+IDI_MISC_WB_UPGRADE, 0xFE, 0x2, PMC
+IDI_MISC_WB_DOWNGRADE, 0xFE, 0x4, PMC
+OFFCORE_RESPONSE_0_OPTIONS, 0xB7, 0x1, PMC
+OFFCORE_RESPONSE_1_OPTIONS, 0xBB, 0x1, PMC
+GENERIC_EVENT, 0x0, 0x0, PWR0|PWR1|PWR2|PWR3|PWR4|FIXC0|FIXC1|FIXC2|FIXC3|PMC|M2M|SBOX|MBOX|MBOX0FIX|MBOX1FIX|MBOX2FIX|MBOX3FIX|MBOX4FIX|MBOX5FIX|MBOX7FIX|SBOX0C0|SBOX0C1|SBOX0C2|SBOX1C0|SBOX1C1|SBOX1C2|SBOX2C0|SBOX2C1|SBOX2C2|UBOXFIX|QBOX|WBOX, CONFIG=0x0|UMASK=0x0
+-----
+
+
+=== `likwid-pin`
+
+https://github.com/RRZE-HPC/likwid/wiki/Likwid-Pin[`https://github.com/RRZE-HPC/likwid/wiki/Likwid-Pin`]
+
+==== Overview
+
+=====
+For threaded applications on modern multi-core platforms it is crucial to pin threads to dedicated cores. While the Linux kernel offers an API to pin your threads, it is tedious and involves some coding to implement a flexible solution to address affinity. Intel includes an sophisticated pinning mechanism for their OpenMP implementation. While this already works quite well out of the box, it can be further controlled with environment variables.
+
+Still there are occasions where a simple platform and compiler independent solution is required. Because all common OpenMP implementations rely on the pthread API it is possible for `likwid-pin` to preload a wrapper library to the pthread_create call. In this wrapper, the threads are pinned using the Linux OS API. `likwid-pin` can also be used to pin serial applications as a replacement for taskset. `likwid-pin` explicitly supports pthread and the OpenMP implementations of Intel and GNU gcc. Other OpenMP implementations are also supported by allowing to specify a skip mask. In this mask, it is specified which threads shall be skipped during pinning because they are used as shepard threads and do no actual work.
+
+`likwid-pin` offers three different syntax flavors to specify how to pin threads to processors:
+
+* Using a thread list
+* Specify a expression based thread list
+* Use scatter policy
+
+Usually processors are numbered within the Linux kernel, we refer to this ordering as physical numbering. LIKWID introduces thread groups throughout all tools to enable logical pinning. A *thread group* are processors sharing a topological entity on a node or chip. This may be the socket, or a ccNUMA domain or a shared cache. `likwid-pin` supports four different ways of numbering the cores when using the thread group syntax:
+
+* physical numbering: processors are numbered according to the numbering in the OS
+* logical numbering in node: processors are logical numbered over whole node (N prefix)
+* logical numbering in socket: processors are logical numbered in every socket (S# prefix, e.g., S0)
+* logical numbering in cache group: processors are logical numbered in last level cache group (C# prefix, e.g., C1)
+* logical numbering in memory domain: processors are logical numbered in NUMA domain (M# prefix, e.g., M2)
+* logical numbering within cpuset: processors are logical numbered inside Linux cpuset (L prefix)
+
+For all numberings apart from one and six physical cores come first. If you have two sockets with 4 cores each and every core has 2 SMT threads with -c N:0-7 you get all physical cores. To also use SMT threads use N:0-15.
+=====
+
+==== Command-Line Options
+
+-----
+likwid-pin -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+An application to pin a program including threads.
+
+Options:
+-h, --help               Help message
+-v, --version            Version information
+-V, --verbose <level>    Verbose output, 0 (only errors), 1 (info), 2 (details), 3 (developer)
+-i                       Set numa interleave policy with all involved numa nodes
+-m                       Set numa membind policy with all involved numa nodes
+-S, --sweep              Sweep memory and LLC of involved NUMA nodes
+-c/-C <list>             Comma separated processor IDs or expression
+-s, --skip <hex>         Bitmask with threads to skip
+-p                       Print available domains with mapping on physical IDs
+                         If used together with -c option outputs the list of physical processor IDs.
+-d <string>              Delimiter used for using -p to output physical processor list, default is comma.
+-q, --quiet              Silent without output
+
+
+Examples:
+There are three possibilities to provide a thread to processor list:
+1. Thread list with physical thread IDs
+Example: likwid-pin.lua -c 0,4-6 ./myApp
+Pins the application to hardware threads 0,4,5 and 6
+2. Thread list with logical thread numberings in physical cores first sorted list.
+Example usage thread list: likwid-pin.lua -c N:0,4-6 ./myApp
+You can pin with the following numberings:
+        2. Logical numbering inside node.
+           e.g. -c N:0,1,2,3 for the first 4 physical cores of the node
+        3. Logical numbering inside socket.
+           e.g. -c S0:0-1 for the first 2 physical cores of the socket
+        4. Logical numbering inside last level cache group.
+           e.g. -c C0:0-3  for the first 4 physical cores in the first LLC
+        5. Logical numbering inside NUMA domain.
+           e.g. -c M0:0-3 for the first 4 physical cores in the first NUMA domain
+        You can also mix domains separated by  @,
+        e.g. -c S0:0-3@S1:0-3 for the 4 first physical cores on both sockets.
+3. Expressions based thread list generation with compact processor numbering.
+Example usage expression: likwid-pin.lua -c E:N:8 ./myApp
+This will generate a compact list of thread to processor mapping for the node domain
+with eight threads.
+The following syntax variants are available:
+        1. -c E:<thread domain>:<number of threads>
+        2. -c E:<thread domain>:<number of threads>:<chunk size>:<stride>
+        For two hardware threads per core on a SMT4 machine use e.g. -c E:N:122:2:4
+4. Scatter policy among thread domain type.
+Example usage scatter: likwid-pin.lua -c M:scatter ./myApp
+This will generate a thread to processor mapping scattered among all memory domains
+with physical hardware threads first.
+
+likwid-pin sets OMP_NUM_THREADS with as many threads as specified
+in your pin expression if OMP_NUM_THREADS is not present in your environment.
+-----
+
+=== `likwid-bench`
+
+https://github.com/RRZE-HPC/likwid/wiki/Likwid-Bench[`https://github.com/RRZE-HPC/likwid/wiki/Likwid-Bench`]
+
+==== Overview
+
+=====
+A  benchmarking application together with a framework to enable rapid prototyping of multi-threaded assembly kernels. Adding a new benchmark amounts to creating a simple text file and recompiling. The framework takes care of threaded execution and pinning, data allocation and placement, time measurement and result presentation.
+
+`likwid-bench` comes with a bunch of kernels included. You can use it as a basic bandwidth benchmarking tool.
+
+You have to specify a benchmark kernel you want to use. This kernel will operate on a number of streams. Streams are one dimensional arrays (or vectors). Let's assume you only use one workgroup (thread group), then all threads of a workgroup will divide the stream in portions and every thread will update its part of the total vector.
+
+Each assembly kernel has a number of properties. These are:
+
+* Number of streams
+* The data type (DOUBLE, SINGLE, INT)
+* number of flops it performs in one update
+* number of bytes it transfers in one update
+* the stride of one loop iteration
+
+When running a benchmark, you have to specify how many threads you want to use, where these threads should be placed and how large the total data set should be. Per default the memory is allocated in the same domain as the threads are running in; optionally you can place the memory in another domain. All vectors are page aligned by default.
+=====
+
+==== Command-Line Options
+
+-----
+likwid-bench
+Threaded Memory Hierarchy Benchmark --  Version  5.2 
+
+Supported Options:
+-h               Help message
+-a               List available benchmarks 
+-d               Delimiter used for physical hwthread list (default ,) 
+-p               List available thread domains
+                 or the physical ids of the hwthreads selected by the -c expression 
+-s <TIME>        Seconds to run the test minimally (default 1)
+                 If resulting iteration count is below 10, it is normalized to 10.
+-i <ITERS>       Specify the number of iterations per thread manually. 
+-l <TEST>        list properties of benchmark 
+-t <TEST>        type of test 
+-w               <thread_domain>:<size>[:<num_threads>[:<chunk size>:<stride>]-<streamId>:<domain_id>[:<offset>]
+-W               <thread_domain>:<size>[:<num_threads>[:<chunk size>:<stride>]]
+                 <size> in kB, MB or GB (mandatory)
+For dynamically loaded benchmarks
+-f <PATH>        Specify a folder for the temporary files. default: /tmp
+-o <FILE>        Save generated assembly to file
+
+Difference between -w and -W :
+-w allocates the streams in the thread_domain with one thread and support placement of streams
+-W allocates the streams chunk-wise by each thread in the thread_domain
+
+Usage: 
+# Run the store benchmark on all CPUs of the system with a vector size of 1 GB
+likwid-bench -t store -w S0:1GB
+# Run the copy benchmark on one CPU at CPU socket 0 with a vector size of 100kB
+likwid-bench -t copy -w S0:100kB:1
+# Run the copy benchmark on one CPU at CPU socket 0 with a vector size of 100MB but place one stream on CPU socket 1
+likwid-bench -t copy -w S0:100MB:1-0:S0,1:S1
+-----
+
+==== Available Benchmarks
+
+-----
+likwid-bench -a
+clcopy - Double-precision cache line copy, only touches first element of each cache line.
+clload - Double-precision cache line load, only loads first element of each cache line.
+clstore - Double-precision cache line store, only stores first element of each cache line.
+copy - Double-precision vector copy, only scalar operations
+copy_avx - Double-precision vector copy, optimized for AVX
+copy_avx512 - Double-precision vector copy, optimized for AVX-
+copy_mem - Double-precision vector copy, only scalar operations but with non-temporal stores
+copy_mem_avx - Double-precision vector copy, uses AVX and non-temporal stores
+copy_mem_avx512 - Double-precision vector copy, uses AVX-
+copy_mem_sse - Double-precision vector copy, uses SSE and non-temporal stores
+copy_sse - Double-precision vector copy, optimized for SSE
+daxpy - Double-precision linear combination of two vectors, only scalar operations
+daxpy_avx - Double-precision linear combination of two vectors, optimized for AVX
+daxpy_avx512 - Double-precision linear combination of two vectors, optimized for AVX-
+daxpy_avx512_fma - Double-precision linear combination of two vectors, optimized for AVX-
+daxpy_avx_fma - Double-precision linear combination of two vectors, optimized for AVX FMAs
+daxpy_mem_avx - Double-precision linear combination of two vectors, optimized for AVX and non-temporal stores (Just for architectural research)
+daxpy_mem_avx512 - Double-precision linear combination of two vectors, optimized for AVX-
+daxpy_mem_avx512_fma - Double-precision linear combination of two vectors, optimized for AVX-
+daxpy_mem_avx_fma - Double-precision linear combination of two vectors, optimized for AVX FMAs and non-temporal stores (Just for architectural research)
+daxpy_mem_sse - Double-precision linear combination of two vectors, optimized for SSE and non-temporal stores (Just for architectural research)
+daxpy_mem_sse_fma - Double-precision linear combination of two vectors, optimized for SSE FMAs and non temporal stores (Just for architectural research)
+daxpy_sp - Single-precision linear combination of two vectors, only scalar operations
+daxpy_sp_avx - Single-precision linear combination of two vectors, optimized for AVX
+daxpy_sp_avx512 - Single-precision linear combination of two vectors, optimized for AVX-
+daxpy_sp_avx512_fma - Single-precision linear combination of two vectors, optimized for AVX-
+daxpy_sp_avx_fma - Single-precision linear combination of two vectors, optimized for AVX FMAs
+daxpy_sp_mem_avx - Single-precision linear combination of two vectors, optimized for AVX and non-temporal stores (Just for architectural research)
+daxpy_sp_mem_avx512 - Single-precision linear combination of two vectors, optimized for AVX-
+daxpy_sp_mem_avx512_fma - Single-precision linear combination of two vectors, optimized for AVX-
+daxpy_sp_mem_avx_fma - Single-precision linear combination of two vectors, optimized for AVX FMAs and non-temporal stores (Just for architectural research)
+daxpy_sp_mem_sse - Single-precision linear combination of two vectors, optimized for SSE and non-temporal stores (Just for architectural research)
+daxpy_sp_mem_sse_fma - Single-precision linear combination of two vectors, optimized for SSE FMAs and non-temporal stores (Just for architectural research)
+daxpy_sp_sse - Single-precision linear combination of two vectors, optimized for SSE
+daxpy_sp_sse_fma - Single-precision linear combination of two vectors, optimized for SSE FMAs
+daxpy_sse - Double-precision linear combination of two vectors, optimized for SSE
+daxpy_sse_fma - Double-precision linear combination of two vectors, optimized for SSE FMAs
+ddot - Double-precision dot product of two vectors, only scalar operations
+ddot_avx - Double-precision dot product of two vectors, optimized for AVX
+ddot_avx512 - Double-precision dot product of two vectors, optimized for AVX-
+ddot_sp - Single-precision dot product of two vectors, only scalar operations
+ddot_sp_avx - Single-precision dot product of two vectors, optimized for AVX
+ddot_sp_avx512 - Single-precision dot product of two vectors, optimized for AVX-
+ddot_sp_sse - Single-precision dot product of two vectors, optimized for SSE
+ddot_sse - Double-precision dot product of two vectors, optimized for SSE
+divide - Double-precision vector update, only scalar operations
+load - Double-precision load, only scalar operations
+load_avx - Double-precision load, optimized for AVX
+load_avx512 - Double-precision load, optimized for AVX-
+load_mem - Double-precision load, using non-temporal loads
+load_sse - Double-precision load, optimized for SSE
+peakflops - Double-precision multiplications and additions with a single load, only scalar operations
+peakflops_avx - Double-precision multiplications and additions with a single load, optimized for AVX
+peakflops_avx512 - Double-precision multiplications and additions with a single load, optimized for AVX-
+peakflops_avx512_fma - Double-precision multiplications and additions with a single load, optimized for AVX-
+peakflops_avx_fma - Double-precision multiplications and additions with a single load, optimized for AVX FMAs
+peakflops_sp - Single-precision multiplications and additions with a single load, only scalar operations
+peakflops_sp_avx - Single-precision multiplications and additions with a single load, optimized for AVX
+peakflops_sp_avx512 - Single-precision multiplications and additions with a single load, optimized for AVX-
+peakflops_sp_avx512_fma - Single-precision multiplications and additions with a single load, optimized for AVX-
+peakflops_sp_avx_fma - Single-precision multiplications and additions with a single load, optimized for AVX FMAs
+peakflops_sp_sse - Single-precision multiplications and additions with a single load, optimised for SSE
+peakflops_sse - Double-precision multiplications and additions with a single load, optimised for SSE
+store - Double-precision store, only scalar operations
+store_avx - Double-precision store, optimized for AVX
+store_avx512 - Double-precision store, optimized for AVX-
+store_mem - Double-precision store, uses non-temporal stores
+store_mem_avx - Double-precision store, uses AVX and non-temporal stores
+store_mem_avx512 - Double-precision store, uses AVX-
+store_mem_sse - Double-precision store, uses SSE and non-temporal stores
+store_sse - Double-precision store, optimized for SSE
+stream - Double-precision stream triad A(i) = B(i)*c + C(i), only scalar operations
+stream_avx - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX
+stream_avx512 - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX-
+stream_avx512_fma - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX-
+stream_avx_fma - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX FMAs
+stream_mem - Double-precision stream triad A(i) = B(i)*c + C(i), uses SSE and non-temporal stores
+stream_mem_avx - Double-precision stream triad A(i) = B(i)*c + C(i), uses AVX and non-temporal stores
+stream_mem_avx512 - Double-precision stream triad A(i) = B(i)*c + C(i), uses AVX-
+stream_mem_avx_fma - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX FMAs and non-temporal stores
+stream_mem_sse - Double-precision stream triad A(i) = B(i)*c + C(i), uses SSE and non-temporal stores
+stream_mem_sse_fma - Double-precision stream triad A(i) = B(i)*c + C(i), uses SSE FMAs and non-temporal stores
+stream_sp - Single-precision stream triad A(i) = B(i)*c + C(i), only scalar operations
+stream_sp_avx - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX
+stream_sp_avx512 - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX-
+stream_sp_avx512_fma - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX-
+stream_sp_avx_fma - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX FMAs
+stream_sp_mem_avx - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX and non-temporal stores
+stream_sp_mem_avx512 - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX-
+stream_sp_mem_avx512_fma - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX-
+stream_sp_mem_avx_fma - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for AVX FMAs and non-temporal stores
+stream_sp_mem_sse - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for SSE and non-temporal stores
+stream_sp_mem_sse_fma - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for SSE FMAs and non-temporal stores
+stream_sp_sse - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for SSE
+stream_sp_sse_fma - Single-precision stream triad A(i) = B(i)*c + C(i), optimized for SSE FMAs
+stream_sse - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for SSE
+stream_sse_fma - Double-precision stream triad A(i) = B(i)*c + C(i), optimized for SSE FMAs
+sum - Double-precision sum of a vector, only scalar operations
+sum_avx - Double-precision sum of a vector, optimized for AVX
+sum_avx512 - Double-precision sum of a vector, optimized for AVX-
+sum_sp - Single-precision sum of a vector, only scalar operations
+sum_sp_avx - Single-precision sum of a vector, optimized for AVX
+sum_sp_avx512 - Single-precision sum of a vector, optimized for AVX-
+sum_sp_sse - Single-precision sum of a vector, optimized for SSE
+sum_sse - Double-precision sum of a vector, optimized for SSE
+triad - Double-precision triad A(i) = B(i) * C(i) + D(i), only scalar operations
+triad_avx - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX
+triad_avx512 - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_avx512_fma - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_avx_fma - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX FMAs
+triad_mem_avx - Double-precision triad A(i) = B(i) * C(i) + D(i), uses AVX and non-temporal stores
+triad_mem_avx512 - Double-precision triad A(i) = B(i) * C(i) + D(i), uses AVX-
+triad_mem_avx512_fma - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_mem_avx_fma - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX FMAs and non-temporal stores
+triad_mem_sse - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE and non-temporal stores
+triad_mem_sse_fma - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE FMAs and non-temporal stores
+triad_sp - Single-precision triad A(i) = B(i) * C(i) + D(i), only scalar operations
+triad_sp_avx - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX
+triad_sp_avx512 - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_sp_avx512_fma - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_sp_avx_fma - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX FMAs
+triad_sp_mem_avx - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX and non-temporal stores
+triad_sp_mem_avx512 - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_sp_mem_avx512_fma - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX-
+triad_sp_mem_avx_fma - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for AVX FMAs and non-temporal stores
+triad_sp_mem_sse - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE and non-temporal stores
+triad_sp_mem_sse_fma - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE FMAs and non-temporal stores
+triad_sp_sse - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE
+triad_sp_sse_fma - Single-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE FMAs
+triad_sse - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE
+triad_sse_fma - Double-precision triad A(i) = B(i) * C(i) + D(i), optimized for SSE FMAs
+update - Double-precision vector update, only scalar operations
+update_avx - Double-precision vector update, optimized for AVX
+update_avx512 - Double-precision vector update, optimized for AVX-
+update_sp - Single-precision vector update, only scalar operations
+update_sp_avx - Single-precision vector update, optimized for AVX
+update_sp_avx512 - Single-precision vector update, optimized for AVX-
+update_sp_sse - Single-precision vector update, optimized for SSE
+update_sse - Double-precision vector update, optimized for SSE
+-----
+
+==== Examples
+
+A list of thread domains for `faster2.hprc.tamu.edu` is found via `likwid-bench -p`.
+In the result below the tags are:
+
+* `N` - node
+* `S*` - socket groups
+* `D*` - ?
+* `C*` - last level shared cache
+* `M*` - NUMA domains
+
+-----
+likwid-bench -p
+
+Number of Domains 9
+Domain 0:
+        Tag N: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+Domain 1:
+        Tag S0: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+Domain 2:
+        Tag S1: 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+Domain 3:
+        Tag D0: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+Domain 4:
+        Tag D1: 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+Domain 5:
+        Tag C0: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+Domain 6:
+        Tag C1: 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+Domain 7:
+        Tag M0: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+Domain 8:
+        Tag M1: 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+-----
+
+-----
+       copy -w *:100kB   stream -w *:20kB
+
+Domain
+Tag        Time              Time
+
+N         2.004843         4.82-5.47
+S0        1.941749         2.18-2.22
+S1        1.942057
+D0        1.937922
+D1        1.942944
+C0        1.940617
+C1        1.940356
+M0        1.940680
+M1        1.940505         2.21-2.23
+-----
+
+=== `likwid-mpirun`
+
+https://github.com/RRZE-HPC/likwid/wiki/Likwid-Mpirun[`https://github.com/RRZE-HPC/likwid/wiki/Likwid-Mpirun`]
+
+==== Overview
+
+=====
+Pinning to dedicated compute resources is important for pure MPI and even more for hybrid MPI/threaded applications. While all major MPI implementations include their mechanism for pinning, `likwid-mpirun` provides a simple and portable solution based on the powerful capabilities of `likwid-pin`. This is still experimental at the moment. Still it can be adapted to any MPI and OpenMP combination with the help of a tuning application in the test directory of LIKWID. `likwid-mpirun` works in conjunction with PBS, LoadLeveler and SLURM. The tested MPI and compilers are Intel C/C++ compiler, GCC, Intel MPI and OpenMPI.
+=====
+
+==== Command-Line Parameters
+
+-----
+likwid-mpirun
+
+likwid-mpirun -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+A wrapper script to pin threads spawned by MPI processes and measure hardware performance counters.
+
+Options:
+-h, --help               Help message
+-v, --version            Version information
+-d, --debug              Debugging output
+-n/-np <count>           Set the number of processes
+-nperdomain <domain>     Set the number of processes per node by giving an affinity domain and count
+-pin <list>              Specify pinning of threads. CPU expressions like likwid-pin separated with '_'
+-t/-tpp <count>          Set the number of threads per MPI process
+--dist <d>(:order)       Specify the CPU distance between MPI processes. Possible orders are close and spread.
+-s, --skip <hex>         Bitmask with threads to skip
+-mpi <id>                Specify which MPI should be used. Possible values: openmpi, intelmpi, mvapich2 or slurm
+                         If not set, module system is checked
+-omp <id>                Specify which OpenMP should be used. Possible values: gnu and intel
+                         Only required for statically linked executables.
+-hostfile                Use custom hostfile instead of searching the environment
+-g/-group <perf>         Set a likwid-perfctr conform event set for measuring on nodes
+-m/-marker               Activate marker API mode
+-O                       Output easily parseable CSV instead of fancy tables
+-o/--output <file>       Write output to a file. The file is reformatted according to the suffix.
+-f                       Force execution (and measurements). You can also use environment variable LIKWID_FORCE
+-e, --env <key>=<value>  Set environment variables for MPI processes
+--mpiopts <str>  Hand over options to underlying MPI. Please use proper quoting.
+
+Processes are pinned to physical hardware threads first. For syntax questions see likwid-pin
+
+For CPU selection and which MPI rank measures Uncore counters the system topology
+of the current system is used. There is currently no possibility to overcome this
+limitation by providing a topology file or similar.
+
+Examples:
+Run 32 processes on hosts in hostlist
+likwid-mpirun -np 32 ./a.out
+
+Run 1 MPI process on each socket
+likwid-mpirun -nperdomain S:1 ./a.out
+Total amount of MPI processes is calculated using the number of hosts in the hostfile
+
+For hybrid MPI/OpenMP jobs you need to set the -pin option
+Starts 2 MPI processes on each host, one on socket 0 and one on socket 1
+Each MPI processes may start 2 OpenMP threads pinned to the first two CPUs on each socket
+likwid-mpirun -pin S0:0-1_S1:0-1 ./a.out
+
+Run 2 processes on each socket and measure the MEM performance group
+likwid-mpirun -nperdomain S:2 -g MEM ./a.out
+Only one process on a socket measures the Uncore/RAPL counters, the other one(s) only HWThread-local counters
+-----
+
+==== Examples
+
+===== SLURM
+
+=====
+`likwid-mpirun` is able to run applications through SLURM, e.g.
+
+-----
+salloc -N 2
+likwid-mpirun -np 2 ./a.out
+-----
+
+`likwid-mpirun` recognizes the SLURM environment and calls `srun` instead of `mpiexec` or `mpirun`. You can see
+the `srun` command when using the `-d` command line switch.
+
+Some MPI implementations require special parameters and there is currently no way to add custom options to `srun`. One common switch is `--mpi=pmi2` (at least on our cluster). You can either change the Lua code (`likwid-4.3.3: cp $(which likwid-mpirun) .; vi -n 592 likwid-mpirun; ./likwid-mpirun ...`) or you set the environment variable `SLURM_MPI_TYPE=pmi2` before running `likwid-mpirun`.
+
+In some rare cases it might be required to use the MPI implementation specific way of starting applications (`mpiexec`, `mpirun`, ...). You can force using this way by using the `--mpi` command line switch.
+=====
+
+=== `likwid-powermeter`
+
+https://github.com/RRZE-HPC/likwid/wiki/Likwid-Powermeter[`https://github.com/RRZE-HPC/likwid/wiki/Likwid-Powermeter`]
+
+==== Overview
+
+=====
+Intel introduced with the SandyBridge architecture an interface to configure and readout energy consumption of processors and memory. This so called RAPL interface is controlled through MSR registers. `likwid-powermeter` is a small tool which allows you to query the energy consumed within a package for a given time period and computes the resulting power consumption.
+
+Additionally you can query the supported Turbo Mode steps of all Turbo mode equipped processors (except the EX variants). This information is also queried from MSR registers.
+
+The RAPL counters are also available as events in `likwid-perfctr`. There is a ENERGY group on recent Intel systems to measure common metrics.
+
+You have to setup access to the `msr` device files to use `likwid-powermeter`.
+=====
+
+The `msr` device files are found at `/dev/cpu/CPUNUM/msr`, where in the case of `faster2.hprc.tamu.edu`
+the `CPUNUM` ranges from 0 to 63.
+According to the MSR man page at:
+
+https://man7.org/linux/man-pages/man4/msr.4.html[`https://man7.org/linux/man-pages/man4/msr.4.html`]
+
+=====
+`/dev/cpu/CPUNUM/msr` provides an interface to read and write the
+model-specific registers (MSRs) of an x86 CPU.  `CPUNUM` is the
+number of the CPU to access as listed in `/proc/cpuinfo`.
+
+The register access is done by opening the file and seeking to
+the MSR number as offset in the file, and then reading or writing
+in chunks of 8 bytes.  An I/O transfer of more than 8 bytes means
+multiple reads or writes of the same register.
+
+This file is protected so that it can be read and written only by
+the user `root`, or members of the group `root`.
+
+The msr driver is not auto-loaded.  On modular kernels you might
+need to use the following command to load it explicitly before
+use:
+
+`modprobe msr`
+=====
+
+==== Command-Line Options
+
+-----
+likwid-powermeter --help
+
+likwid-powermeter -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+A tool to print power and clocking information on x86 CPUs.
+
+Options:
+-h, --help       Help message
+-v, --version    Version information
+-V, --verbose <level>    Verbose output, 0 (only errors), 1 (info), 2 (details), 3 (developer)
+-M <0|1>                 Set how MSR registers are accessed, 0=direct, 1=accessDaemon
+-c <list>                Specify sockets to measure
+-i, --info       Print information from MSR_PKG_POWER_INFO register and Turbo mode
+-s <duration>    Set measure duration in us, ms or s. (default 2s)
+-p               Print dynamic clocking and CPI values, uses likwid-perfctr
+-t               Print current temperatures of all hardware threads
+-f               Print current temperatures in Fahrenheit
+
+Examples:
+Measure the power consumption for 4 seconds on socket 1
+likwid-powermeter -s 4 -c 1
+
+Use it as wrapper for an application to measure the energy for the whole execution
+likwid-powermeter -c 1 ./a.out
+-----
+
+==== Examples
+
+===== Installing and Using `likwid-accessD`
+
+Get info for RAPL and Turbo Mode via:
+
+-----
+likwid-powermeter -i
+
+ERROR - [./src/access_client.c:access_client_startDaemon:138] No such file or directory.
+Failed to find the daemon '/sw/eb/sw/likwid/5.2.1-GCC-11.2.0/sbin/likwid-accessD'
+-----
+
+This is not working because it is looking for a daemon program located in the EB likwid
+module `sbin` directory, with the program and the directory presently non-existent.
+Information about `likwid-accessD` is found at:
+
+https://github.com/RRZE-HPC/likwid/blob/master/doc/applications/likwid-accessD.md[`https://github.com/RRZE-HPC/likwid/blob/master/doc/applications/likwid-accessD.md`]
+
+where we discover that it is not built by default, how to build it, and how to use it.
+
+=====
+`likwid-accessD` is a command line application that opens a UNIX file socket and waits for access operations
+from LIKWID tools that require access to the MSR and PCI device files. The MSR and PCI device files are commonly
+only accessible for users with root privileges, therefore `likwid-accessD` requires the `suid`-bit set or a suitable
+`libcap` setting. Depending on the current system architecture, `likwid-accessD` permits only access to registers defined for the architecture.
+
+The building of `likwid-accessD` can be controlled through the `config.mk` file. Depending on the variable `BUILDDAEMON`
+the daemon code is built or not. The path to `likwid-accessD` is compiled into the LIKWID library, so if you want to use
+the access daemon from an uncommon path, you have to set the `ACCESSDAEMON` variable. 
+
+In order to allow `likwid-accessD` to run with elevated priviledges, there are three ways:
+
+* SUID Method:
+
+-----
+chown root:root likwid-accessD
+chmod u+s likwid-accessD
+-----
+* GUID Method: (PCI devices cannot be accessed with this method but we are working on it)
+
+-----
+groupadd likwid
+chown root:likwid likwid-accessD
+chmod g+s likwid-accessD
+-----
+
+* Libcap Method:
+
+-----
+setcap cap_sys_rawio+ep likwid-accessD
+-----
+
+There are Linux distributions where settings the suid permission on `likwid-accessD` is not enough.
+Try also to set the capabilities for `likwid-accessD`.
+
+Every likwid instance will start its own daemon. This client-server pair will communicate with a
+socket file in `/tmp` named `likwid-$PID`. The daemon only accepts one connection. As soon as the connect is successful the socket file will be deleted.
+
+From there the communication consists of write read pairs issued from the client. The daemon will
+ensure allowed register ranges relevant for the likwid applications. Other register access will be silently dropped and logged to syslog.
+
+On shutdown the client will terminate the daemon with a exit message. 
+=====
+
+=== `likwid-memsweeper`
+
+https://github.com/RRZE-HPC/likwid/wiki/Likwid-Memsweeper[`https://github.com/RRZE-HPC/likwid/wiki/Likwid-Memsweeper`]
+
+==== Overview
+
+=====
+To utilize the parallel memory bandwidth available on ccNUMA systems it is necessary to load data mainly from local memory seen from the threads point of view. While the operating system usually decides where a page is placed on Linux the default page placement policy is first touch. This means that a memory page is placed in the NUMA memory domain the thread which writes first to the page runs in. By this software has explicit control where the data is placed.
+
+Still first touch is only a hint where you want the page to be placed, the operating system still can decide to place it elsewhere. This can for example happen if the local NUMA domain is already full and there is space free in a remote domain. This frequently happens if you or another user has accessed a large file. To speed up subsequent access to files Linux maintains a so called file buffer cache, which can consume a large part of the available memory. This may cause your data to be placed in a remote domain even if you have employed correct first touch placement.
+
+There are multiple solutions to this problem. Root can execute a command to drop the file buffer cache. You can use numactl tools or the belonging library to enforce page placement. Still there is some danger here if you use no swap. You can also allocate almost all of the physical memory and write to it which will also cause the file buffer cache to be dropped. This is exactly what `likwid-memsweeper` is doing. It allows you to clean up all or some of the ccNUMA domains on a compute node in a safe and convenient way. This functionality is also available as an option (`-S`) to `likwid-pin`.
+
+An advantage of `likwid-memsweeper` compared to numactl or other tools is the cleaning of the last level cache. This reduces the number of cache misses caused by cache lines loaded by other applications.
+=====
+
+==== Command-Line Options
+
+-----
+likwid-memsweeper --help
+
+likwid-memsweeper -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+A tool clean up NUMA memory domains.
+
+Options:
+-h               Help message
+-v               Version information
+-c <list>        Specify NUMA domain ID to clean up
+
+Examples:
+To clean specific domain:
+likwid-memsweeper -c 2
+To clean a range of domains:
+likwid-memsweeper -c 1-2
+To clean specific domains:
+likwid-memsweeper -c 0,1-2
+-----
+
+=== `likwid-setFrequences`
+
+https://github.com/RRZE-HPC/likwid/wiki/likwid-setFrequencies[`https://github.com/RRZE-HPC/likwid/wiki/likwid-setFrequencies`]
+
+==== Overview
+
+*NOTE*:  The `intel_pstate` kernel model must be replaced with the `acpi-cpufreq` kernel module for this tool to work.
+
+=====
+Often systems are configured to use as little power as needed and therefore reduce the clock frequency of single cores. For benchmarking purpose, it is important to have a defined environment where all CPU cores work at the same speed. The operation is commonly only allowed to privileged users since it may interfere with the needs of other users.
+
+Starting with LIKWID version 3.1.2 we included a daemon and control script to change the frequency and scaling governor of affinity regions. All operations that require only readable access to the control files in sysfs are implemented in the script. Only the writeable access is forbidden for normal users and requires a more privileged daemon.
+
+`likwid-setFrequencies` can only be used in conjunction with the `acpi-cpufreq` kernel module. The `intel_pstate` kernel module,
+introduced with Linux kernel 3.10, does not allow to fix the clock frequency of cores. In order to deactivate the `intel_pstate` module,
+add `intel_pstate=disable` to the kernel command line in GRUB or your used boot loader.
+=====
+
+We discover at:
+
+https://wiki.archlinux.org/title/CPU_frequency_scaling[`https://wiki.archlinux.org/title/CPU_frequency_scaling`]
+
+that `intel_pstate` is installed for Sandy Bridge and newer CPUs.
+
+=====
+The `intel_pstate` CPU power scaling driver is used automatically for modern Intel CPUs instead of the other drivers below. This driver takes priority over other drivers and is built-in as opposed to being a module. This driver is currently automatically used for Sandy Bridge and newer CPUs. The `intel_pstate` may ignore the BIOS P-State settings. `intel_pstate` may run in "passive mode" via the `intel_cpufreq` driver for older CPUs. If you encounter a problem while using this driver, add `intel_pstate=disable` to your kernel line in order to revert to using the `acpi-cpufreq` driver.
+=====
+
+This also mentions that if `intel_pstate` is disabled the kernel will revert to using the `acpi-cpufreq` driver, while elsewhere it is
+stated that the `acpi-cpufreq` driver must be separately installed.
+
+==== Command-Line Options
+
+-----
+
+-----
+
+=== `likwid-agent`
+
+https://github.com/RRZE-HPC/likwid/wiki/likwid-agent[`https://github.com/RRZE-HPC/likwid/wiki/likwid-agent`]
+
+==== Overview
+
+=====
+`likwid-agent` is a daemon application that uses `likwid-perfctr` to measure hardware performance counters and write
+them to various output back-ends. The basic configuration is in a global configuration file that must be given on
+command line. The configuration of the hardware event sets is done with extra files suitable for each architecture.
+Besides the hardware event configuration, the raw data can be transformed using formulas to interested metrics.
+In order to output not too much data, the data can be further filtered or aggregated. `likwid-agent` provides multiple
+store back-ends like logfiles, RRD (Round Robin Database) or gmetric (Ganglia Monitoring System).
+=====
+
+=== `likwid-genTopoCfg`
+
+https://github.com/RRZE-HPC/likwid/wiki/likwid-genTopoCfg[`https://github.com/RRZE-HPC/likwid/wiki/likwid-genTopoCfg`]
+
+=== `likwid-perfscope`
+
+https://github.com/RRZE-HPC/likwid/wiki/likwid-perfscope[`https://github.com/RRZE-HPC/likwid/wiki/likwid-perfscope`]
+
+==== Overview
+
+=====
+`likwid-perfscope` is a command line application written in Lua that uses the timeline mode of `likwid-perfctr`
+to create on-the-fly pictures with the current measurements. It uses the `feedGnuplot` Perl script to send the
+current data to `gnuplot`. In order to make it more convenient for users, preconfigured plots of interesting metrics are
+embedded into `likwid-perfscope`. Since the plot windows are normally closed directly after the execution
+of the monitored applications, `likwid-perfscope` waits until Ctrl+c is pressed.
+=====
+
+==== Command-Line Options
+
+-----
+likwid-perfscope --help
+
+likwid-perfscope -- Version 5.2.1 (commit: 233ab943543480cd46058b34616c174198ba0459)
+A tool to generate pictures on-the-fly from likwid-perfctr measurements
+
+Options:
+-h, --help               Help message
+-v, --version            Version information
+-V, --verbose <level>    Verbose output, 0 (only errors), 1 (info), 2 (details), 3 (developer)
+-a                       Print all preconfigured plot configurations for the current system.
+-c <list>                Processor ids to measure, e.g. 1,2-4,8
+-C <list>                Processor ids to pin threads and measure, e.g. 1,2-4,8
+-g, --group <string>     Preconfigured plot group or custom event set string with plot config. See man page for information.
+-t, --time <time>        Frequency in s, ms or us, e.g. 300ms, for the timeline mode of likwid-perfctr
+-f, --force              Overwrite counter configuration although already in use
+-d, --dump               Print output as it is send to feedGnuplot.
+-p, --plotdump           Use dump functionality of feedGnuplot. Plots out plot configurations plus data to directly submit to gnuplot
+--host <host>            Run likwid-perfctr on the selected host using SSH. Evaluation and plotting is done locally.
+                         This can be used for machines that have no gnuplot installed. All paths must be similar to the local machine.
+
+Examples:
+Run command on CPU 2 and measure performance group TEST:
+likwid-perfscope -C 2 -g TEST -f 1s ./a.out
+-----
+
+
+
+
+
+
+
+
+
+
+

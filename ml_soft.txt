@@ -1,0 +1,890 @@
+= Machine Learning Software
+:doctype: book
+:toc:
+:icons:
+:source-highlighter: coderay
+:numbered!:
+
+[preface]
+
+== Overview
+
+=== Machine Learning
+
+What is *machine learning*?
+The https://en.wikipedia.org/wiki/Machine_learning[Wikipedia] article tells us:
+
+=====
+Machine learning (ML) is the study of computer algorithms that improve automatically through experience and by the use of data. It is seen as a part of artificial intelligence. Machine learning algorithms build a model based on sample data, known as "training data", in order to make predictions or decisions without being explicitly programmed to do so.
+
+...
+
+As a scientific endeavor, machine learning grew out of the quest for artificial intelligence. In the early days of AI as an academic discipline, some researchers were interested in having machines learn from data. They attempted to approach the problem with various symbolic methods, as well as what was then termed "neural networks"; these were mostly perceptrons and other models that were later found to be reinventions of the generalized linear models of statistics. Probabilistic reasoning was also employed, especially in automated medical diagnosis.
+
+However, an increasing emphasis on the logical, knowledge-based approach caused a rift between AI and machine learning. Probabilistic systems were plagued by theoretical and practical problems of data acquisition and representation.  By 1980, expert systems had come to dominate AI, and statistics was out of favor.
+
+...
+
+Machine learning (ML), reorganized as a separate field, started to flourish in the 1990s. The field changed its goal from achieving artificial intelligence to tackling solvable problems of a practical nature. It shifted focus away from the symbolic approaches it had inherited from AI, and toward methods and models borrowed from statistics and probability theory.
+
+...
+
+The question to what is the difference between ML and AI is answered by Judea Pearl in The Book of Why. Accordingly ML learns and predicts based on passive observations, whereas AI implies an agent interacting with the environment to learn and take actions that maximize its chance of successfully achieving its goals.
+=====
+
+Now that that's all cleared up, what are the general divisions of machine learning?  Once again,
+Wikipedia comes to the rescue:
+
+=====
+Machine learning approaches are traditionally divided into three broad categories, depending on the nature of the "signal" or "feedback" available to the learning system:
+
+* *Supervised learning*: The computer is presented with example inputs and their desired outputs, given by a "teacher", and the goal is to learn a general rule that maps inputs to outputs.
+* *Unsupervised learning*: No labels are given to the learning algorithm, leaving it on its own to find structure in its input. Unsupervised learning can be a goal in itself (discovering hidden patterns in data) or a means towards an end (feature learning).
+* *Reinforcement learning*: A computer program interacts with a dynamic environment in which it must perform a certain goal (such as driving a vehicle or playing a game against an opponent). As it navigates its problem space, the program is provided feedback that's analogous to rewards, which it tries to maximize.
+=====
+
+only to dash our hopes of simple and universal categorization to the ground:
+
+=====
+Other approaches have been developed which don't fit neatly into this three-fold categorisation, and sometimes more than one is used by the same machine learning system. For example topic modeling, meta learning.
+As of 2020, *deep learning* has become the dominant approach for much ongoing work in the field of machine learning.
+=====
+
+=== Deep Learning
+
+Assuming that deep learning has taken over the machine learning field, let's take a look at what
+the https://en.wikipedia.org/wiki/Deep_learning[Wikipedia] article for that has to say.
+
+=====
+Deep learning (also known as deep structured learning) is part of a broader family of machine learning methods based on artificial neural networks (ANN) with representation learning. Learning can be supervised, semi-supervised or unsupervised.
+=====
+
+Well, not entirely based on ANNs although most of the work and PR concerns ANNs.
+
+=====
+Most modern deep learning models are based on artificial neural networks, specifically convolutional neural networks (CNN)s, although they can also include propositional formulas or latent variables organized layer-wise in deep generative models such as the nodes in deep belief networks and deep Boltzmann machines.
+=====
+
+Also, the artificial neural network zoo includes more than just convolutional NNs
+
+=====
+Deep-learning architectures such as deep neural networks, deep belief networks, deep reinforcement learning, recurrent neural networks and convolutional neural networks have been applied to fields including computer vision, speech recognition, natural language processing, machine translation, bioinformatics, drug design, medical image analysis, material inspection and board game programs, where they have produced results comparable to and in some cases surpassing human expert performance.
+=====
+
+ANNs originated from where one might suspect they would.
+
+=====
+Artificial neural networks (ANNs) were inspired by information processing and distributed communication nodes in biological systems. ANNs have various differences from biological brains. Specifically, neural networks tend to be static and symbolic, while the biological brain of most living organisms is dynamic (plastic) and analogue.
+=====
+
+And what exactly does the "deep" part of deep learning mean?
+
+=====
+The adjective "deep" in deep learning refers to the use of multiple layers in the network. Early work showed that a linear perceptron cannot be a universal classifier, but that a network with a nonpolynomial activation function with one hidden layer of unbounded width can. Deep learning is a modern variation which is concerned with an unbounded number of layers of bounded size, which permits practical application and optimized implementation, while retaining theoretical universality under mild conditions. In deep learning the layers are also permitted to be heterogeneous and to deviate widely from biologically informed connectionist models, for the sake of efficiency, trainability and understandability, whence the "structured" part. 
+
+...
+
+The word "deep" in "deep learning" refers to the number of layers through which the data is transformed. More precisely, deep learning systems have a substantial credit assignment path (CAP) depth. The CAP is the chain of transformations from input to output. CAPs describe potentially causal connections between input and output. For a feedforward neural network, the depth of the CAPs is that of the network and is the number of hidden layers plus one (as the output layer is also parameterized). For recurrent neural networks, in which a signal may propagate through a layer more than once, the CAP depth is potentially unlimited. No universally agreed-upon threshold of depth divides shallow learning from deep learning, but most researchers agree that deep learning involves CAP depth higher than 2. CAP of depth 2 has been shown to be a universal approximator in the sense that it can emulate any function.[15] Beyond that, more layers do not add to the function approximator ability of the network. Deep models (CAP > 2) are able to extract better features than shallow models and hence, extra layers help in learning the features effectively. 
+=====
+
+== Meta
+
+*Deep Learning in Neural Networks* - https://arxiv.org/abs/1404.7828[`https://arxiv.org/abs/1404.7828`]
+
+*Machine Learning* - https://en.wikipedia.org/wiki/Machine_learning[`https://en.wikipedia.org/wiki/Machine_learning`]
+
+*Deep Learning* - https://en.wikipedia.org/wiki/Deep_learning[`https://en.wikipedia.org/wiki/Deep_learning`]
+
+*Artificial Neural Networks* - https://en.wikipedia.org/wiki/Artificial_neural_network[`https://en.wikipedia.org/wiki/Artificial_neural_network`]
+
+** *Types of Artificial Neural Networks* - https://en.wikipedia.org/wiki/Types_of_artificial_neural_networks[`https://en.wikipedia.org/wiki/Types_of_artificial_neural_networks`]
+
+** *Complete Guide to Types of Neural Networks* - https://www.digitalvidya.com/blog/types-of-neural-networks/[`https://www.digitalvidya.com/blog/types-of-neural-networks/`]
+
+*** *Autoencoder* - https://en.wikipedia.org/wiki/Autoencoder[`https://en.wikipedia.org/wiki/Autoencoder`]
+
+*** *Boltzmann Machine* - https://en.wikipedia.org/wiki/Boltzmann_machine[`https://en.wikipedia.org/wiki/Boltzmann_machine`]
+
+*** *Deep Belief Network* - https://en.wikipedia.org/wiki/Deep_belief_network[`https://en.wikipedia.org/wiki/Deep_belief_network`]
+
+*** *Convolutional Neural Network* - https://en.wikipedia.org/wiki/Convolutional_neural_network[`https://en.wikipedia.org/wiki/Convolutional_neural_network`]
+
+*** *Deep Convolutional Inverse Graphics Network* - https://arxiv.org/abs/1503.03167[`https://arxiv.org/abs/1503.03167`]
+
+**** Github - https://github.com/willwhitney/dc-ign[`https://github.com/willwhitney/dc-ign`]
+
+*** *Deep Residual Network* - https://en.wikipedia.org/wiki/Residual_neural_network[`https://en.wikipedia.org/wiki/Residual_neural_network`]
+
+*** *Deconvolutional Layers* - https://datascience.stackexchange.com/questions/6107/what-are-deconvolutional-layers[`https://datascience.stackexchange.com/questions/6107/what-are-deconvolutional-layers`]
+
+*** *Echo State Network* - https://en.wikipedia.org/wiki/Echo_state_network[`https://en.wikipedia.org/wiki/Echo_state_network`]
+
+*** *Extreme Learning Machine* - https://en.wikipedia.org/wiki/Extreme_learning_machine[`https://en.wikipedia.org/wiki/Extreme_learning_machine`]
+
+*** *Feedforward Network* - https://en.wikipedia.org/wiki/Feedforward_neural_network[`https://en.wikipedia.org/wiki/Feedforward_neural_network`]
+
+*** *Generative Adversarial Network* - https://en.wikipedia.org/wiki/Generative_adversarial_network[`https://en.wikipedia.org/wiki/Generative_adversarial_network`]
+
+*** *Hopfield Network* - https://en.wikipedia.org/wiki/Hopfield_network[`https://en.wikipedia.org/wiki/Hopfield_network`]
+
+*** *Kohonen Network (Self-Organizing Map)* - https://en.wikipedia.org/wiki/Self-organizing_map[`https://en.wikipedia.org/wiki/Self-organizing_map`]
+
+*** *Liquid State Machine* - https://bitbucket.org/Hananel/liquid-state-machine/src/master/[`https://bitbucket.org/Hananel/liquid-state-machine/src/master/`]
+
+*** *Markov Chain* - https://en.wikipedia.org/wiki/Markov_chain[`https://en.wikipedia.org/wiki/Markov_chain`]
+
+*** *Neural Turing Machine* - https://en.wikipedia.org/wiki/Neural_Turing_machine[`https://en.wikipedia.org/wiki/Neural_Turing_machine`]
+
+*** *Perceptron* - https://en.wikipedia.org/wiki/Perceptron[`https://en.wikipedia.org/wiki/Perceptron`]
+
+*** *Radial Basis Function Network* - https://en.wikipedia.org/wiki/Radial_basis_function_network[`https://en.wikipedia.org/wiki/Radial_basis_function_network`]
+
+*** *Recurrent Neural Network* - https://en.wikipedia.org/wiki/Recurrent_neural_network[`https://en.wikipedia.org/wiki/Recurrent_neural_network`]
+
+**** *Gated Recurrent Unit* - https://en.wikipedia.org/wiki/Gated_recurrent_unit[`https://en.wikipedia.org/wiki/Gated_recurrent_unit`]
+
+**** *Long Short-Term Memory (LSTM)* - https://en.wikipedia.org/wiki/Long_short-term_memory[`https://en.wikipedia.org/wiki/Long_short-term_memory`]
+
+*** *Support Vector Machine* - https://en.wikipedia.org/wiki/Support-vector_machine[`https://en.wikipedia.org/wiki/Support-vector_machine`]
+
+*Comparison of Deep Learning Software* - https://en.wikipedia.org/wiki/Comparison_of_deep-learning_software[`https://en.wikipedia.org/wiki/Comparison_of_deep-learning_software`]
+
+*List of Datasets for Machine-Learning Research* - https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research[`https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research`]
+
+*Artificial Intelligence* - https://en.wikipedia.org/wiki/Artificial_intelligence[`https://en.wikipedia.org/wiki/Artificial_intelligence`]
+
+== ML Platforms/Systems
+
+=== Caffe
+
+https://caffe.berkeleyvision.org/[`https://caffe.berkeleyvision.org/`]
+
+https://github.com/BVLC/caffe[`https://github.com/BVLC/caffe`]
+
+https://en.wikipedia.org/wiki/Caffe_(software)[`https://en.wikipedia.org/wiki/Caffe_(software)`]
+
+=====
+Caffe is a deep learning framework made with expression, speed, and modularity in mind. 
+Caffe supports many different types of deep learning architectures geared towards image classification and image segmentation. It supports CNN, RCNN, LSTM and fully connected neural network designs. Caffe supports GPU- and CPU-based acceleration computational kernel libraries such as NVIDIA cuDNN and Intel MKL.
+=====
+
+=== Chainer
+
+https://chainer.org/[`https://chainer.org/`]
+
+https://en.wikipedia.org/wiki/Chainer[`https://en.wikipedia.org/wiki/Chainer`]
+
+=====
+Chainer is an open source deep learning framework written purely in Python on top of NumPy and CuPy Python libraries. The development is led by Japanese venture company Preferred Networks in partnership with IBM, Intel, Microsoft, and Nvidia.
+
+Chainer was the first deep learning framework to introduce the define-by-run approach. The traditional procedure to train a network was in two phases: define the fixed connections between mathematical operations (such as matrix multiplication and nonlinear activations) in the network, and then run the actual training calculation. This is called the define-and-run or static-graph approach.
+In contrast, in the define-by-run or dynamic-graph approach, the connection in a network is not determined when the training is started. The network is determined during the training as the actual calculation is performed. 
+
+Chainer has four extension libraries, ChainerMN, ChainerRL, ChainerCV and ChainerUI. ChainerMN enables Chainer to be used on multiple GPUs with performance significantly faster than other deep learning frameworks.  ChainerRL adds state of art deep reinforcement learning algorithms, and ChainerUI is a management and visualization tool. 
+=====
+
+=== clai
+
+https://github.com/IBM/clai[`https://github.com/IBM/clai`]
+
+=====
+Command Line Artificial Intelligence CLAI is an open-sourced project aimed to bring the power of AI to the command line. Using CLAI, users of Bash can access a wide range of skills that will enhance their command line experience. 
+=====
+
+=== DarkNet
+
+https://github.com/pjreddie/darknet[`https://github.com/pjreddie/darknet`]
+
+=====
+Darknet is an open source neural network framework written in C and CUDA. It is fast, easy to install, and supports CPU and GPU computation.
+=====
+
+
+=== DeepXDE
+
+https://github.com/lululxvi/deepxde[`https://github.com/lululxvi/deepxde`]
+
+https://deepxde.readthedocs.io/en/latest/[`https://deepxde.readthedocs.io/en/latest/`]
+
+https://arxiv.org/abs/1907.04502[`https://arxiv.org/abs/1907.04502`]
+
+https://arxiv.org/abs/2210.00518[`https://arxiv.org/abs/2210.00518`]
+
+=====
+DeepXDE is a library for scientific machine learning and physics-informed learning.
+
+DeepXDE supports five tensor libraries as backends: TensorFlow 1.x, TensorFlow 2.x, PyTorch, JAX, and PaddlePaddle.
+=====
+
+=== Flux
+
+https://fluxml.ai/Flux.jl/stable/[`https://fluxml.ai/Flux.jl/stable/`]
+
+https://github.com/FluxML/Flux.jl[`https://github.com/FluxML/Flux.jl`]
+
+https://en.wikipedia.org/wiki/Flux_(machine-learning_framework)[`https://en.wikipedia.org/wiki/Flux_(machine-learning_framework)`]
+
+=====
+Flux is an open-source machine-learning software library and ecosystem written in Julia.
+It has a layer-stacking-based interface for simpler models, and has a strong support on interoperability with other Julia packages instead of a monolithic design.
+For example, GPU support is implemented transparently by CuArrays.jl This is in contrast to some other machine learning frameworks which are implemented in other languages with Julia bindings, such as TensorFlow.jl, and thus are more limited by the functionality present in the underlying implementation, which is often in C or C++.
+
+Flux's focus on interoperability has enabled, for example, support for Neural Differential Equations, by fusing Flux.jl and DifferentialEquations.jl into DiffEqFlux.jl.
+Flux supports recurrent and convolutional networks. It is also capable of differentiable programming[12][13][14] through its source-to-source automatic differentiation package, Zygote.jl.
+=====
+
+=== MindSpore
+
+https://github.com/mindspore-ai/mindspore[`https://github.com/mindspore-ai/mindspore`]
+
+=====
+MindSpore is a new open source deep learning training/inference framework that could be used for mobile, edge and cloud scenarios. MindSpore is designed to provide development experience with friendly design and efficient execution for the data scientists and algorithmic engineers, native support for Ascend AI processor, and software hardware co-optimization. At the meantime MindSpore as a global AI open source community, aims to further advance the development and enrichment of the AI software/hardware application ecosystem.
+=====
+
+=== MXNet
+
+https://github.com/apache/incubator-mxnet[`https://github.com/apache/incubator-mxnet`]
+
+=====
+Apache MXNet is a deep learning framework designed for both efficiency and flexibility. It allows you to mix symbolic and imperative programming to maximize efficiency and productivity. At its core, MXNet contains a dynamic dependency scheduler that automatically parallelizes both symbolic and imperative operations on the fly. A graph optimization layer on top of that makes symbolic execution fast and memory efficient. MXNet is portable and lightweight, scalable to many GPUs and machines.
+=====
+
+==== Gluon
+
+https://gluon.mxnet.io/[`https://gluon.mxnet.io/`]
+
+=====
+This repo contains an incremental sequence of notebooks designed to teach deep learning, Apache MXNet (incubating), and the gluon interface. Our goal is to leverage the strengths of Jupyter notebooks to present prose, graphics, equations, and code together in one place. If we’re successful, the result will be a resource that could be simultaneously a book, course material, a prop for live tutorials, and a resource for plagiarising (with our blessing) useful code. 
+=====
+
+=== ONNX
+
+https://github.com/onnx/onnx[`https://github.com/onnx/onnx`]
+
+=====
+Open Neural Network Exchange (ONNX) is an open ecosystem that empowers AI developers to choose the right tools as their project evolves. ONNX provides an open source format for AI models, both deep learning and traditional ML. It defines an extensible computation graph model, as well as definitions of built-in operators and standard data types. Currently we focus on the capabilities needed for inferencing (scoring).
+=====
+
+=== OpenVINO Toolkit
+
+https://github.com/openvinotoolkit/openvino[`https://github.com/openvinotoolkit/openvino`]
+
+=====
+This toolkit allows developers to deploy pre-trained deep learning models through a high-level C++ Inference Engine API integrated with application logic.
+
+This open source version includes several components: namely Model Optimizer, nGraph and Inference Engine, as well as CPU, GPU, MYRIAD, multi device and heterogeneous plugins to accelerate deep learning inferencing on Intel® CPUs and Intel® Processor Graphics. It supports pre-trained models from the Open Model Zoo, along with 100+ open source and public models in popular formats such as Caffe, TensorFlow, MXNet and ONNX.
+=====
+
+==== Inference Engine
+
+https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html[`https://docs.openvinotoolkit.org/latest/openvino_docs_IE_DG_Deep_Learning_Inference_Engine_DevGuide.html`]
+
+=====
+Inference Engine is a set of C++ libraries providing a common API to deliver inference solutions on the platform of your choice: CPU, GPU, or VPU. Use the Inference Engine API to read the Intermediate Representation, set the input and output formats, and execute the model on devices. While the C++ libraries is the primary implementation, C libraries and Python bindings are also available.
+=====
+
+==== nGraph
+
+https://www.intel.com/content/www/us/en/artificial-intelligence/ngraph.html[`https://www.intel.com/content/www/us/en/artificial-intelligence/ngraph.html`]
+
+=====
+An open-source C++ library and runtime / compiler suite for Deep Learning ecosystems. With nGraph Library, data scientists can use their preferred deep learning framework on any number of hardware architectures, for both training and inference. 
+=====
+
+==== Model Optimizer
+
+https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html[`https://docs.openvinotoolkit.org/latest/openvino_docs_MO_DG_Deep_Learning_Model_Optimizer_DevGuide.html`]
+
+=====
+A cross-platform command-line tool that facilitates the transition between the training and deployment environment, performs static model analysis, and adjusts deep learning models for optimal execution on end-point target devices.
+
+Model Optimizer process assumes you have a network model trained using supported deep learning frameworks: Caffe, TensorFlow, Kaldi, MXNet or converted to the ONNX format. Model Optimizer produces an Intermediate Representation (IR) of the network, which can be inferred with the Inference Engine.
+=====
+
+=== PaddlePaddle
+
+https://github.com/PaddlePaddle/Paddle[`https://github.com/PaddlePaddle/Paddle`]
+
+=====
+PaddlePaddle, as the only independent R&D deep learning platform in China, has been officially open-sourced to professional communities since 2016. It is an industrial platform with advanced technologies and rich features that cover core deep learning frameworks, basic model libraries, end-to-end development kits, tools & components as well as service platforms.
+=====
+
+=== PyTorch
+
+https://pytorch.org/[`https://pytorch.org/`]
+
+https://en.wikipedia.org/wiki/PyTorch[`https://en.wikipedia.org/wiki/PyTorch`]
+
+https://github.com/bharathgs/Awesome-pytorch-list[`https://github.com/bharathgs/Awesome-pytorch-list`]
+
+=====
+PyTorch is an open source machine learning library based on the Torch library, used for applications such as computer vision and natural language processing, primarily developed by Facebook's AI Research lab (FAIR). It is free and open-source software released under the Modified BSD license. Although the Python interface is more polished and the primary focus of development, PyTorch also has a C++ interface.
+=====
+
+==== AllenNLP
+
+https://allennlp.org/[`https://allennlp.org/`]
+
+=====
+AllenNLP is an open source library for building deep learning models for natural language processing, developed by the Allen Institute for Artificial Intelligence. It is built on top of PyTorch and is designed to support researchers, engineers, students, etc., who wish to build high quality deep NLP models with ease. It provides high-level abstractions and APIs for common components and models in modern NLP. It also provides an extensible framework that makes it easy to run and manage NLP experiments.
+=====
+
+==== Catalyst
+
+https://github.com/catalyst-team/catalyst[`https://github.com/catalyst-team/catalyst`]
+
+=====
+Catalyst is a PyTorch framework for Deep Learning Research and Development. It focuses on reproducibility, rapid experimentation, and codebase reuse so you can create something new rather than write yet another train loop. 
+=====
+
+==== DeepSpeed
+
+https://www.deepspeed.ai/[`https://www.deepspeed.ai/`]
+
+=====
+DeepSpeed is a deep learning optimization library that makes distributed training easy, efficient, and effective.
+DeepSpeed delivers extreme-scale model training for everyone, from data scientists training on massive supercomputers to those training on low-end clusters or even on a single GPU.
+=====
+
+==== FairScale
+
+https://github.com/facebookresearch/fairscale[`https://github.com/facebookresearch/fairscale`]
+
+https://engineering.fb.com/2021/07/15/open-source/fsdp/[`https://engineering.fb.com/2021/07/15/open-source/fsdp/`]
+
+=====
+FairScale is a PyTorch extension library for high performance and large scale training. This library extends basic PyTorch capabilities while adding new SOTA scaling techniques. FairScale makes available the latest distributed training techniques in the form of composable modules and easy to use APIs. These APIs are a fundamental part of a researcher's toolbox as they attempt to scale models with limited resources.
+=====
+
+==== fastai
+
+https://docs.fast.ai/[`https://docs.fast.ai/`]
+
+=====
+A deep learning library which provides practitioners with high-level components that can quickly and easily provide state-of-the-art results in standard deep learning domains, and provides researchers with low-level components that can be mixed and matched to build new approaches. It aims to do both things without substantial compromises in ease of use, flexibility, or performance. This is possible thanks to a carefully layered architecture, which expresses common underlying patterns of many deep learning and data processing techniques in terms of decoupled abstractions. These abstractions can be expressed concisely and clearly by leveraging the dynamism of the underlying Python language and the flexibility of the PyTorch library. 
+=====
+
+==== Ignite
+
+https://github.com/pytorch/ignite[`https://github.com/pytorch/ignite`]
+
+=====
+A high-level library to help with training and evaluating neural networks in PyTorch flexibly and transparently.
+=====
+
+==== OpenAI-Gym
+
+https://github.com/openai/gym[`https://github.com/openai/gym`]
+
+https://github.com/Farama-Foundation/Gymnasium[`https://github.com/Farama-Foundation/Gymnasium`]
+
+https://towardsdatascience.com/getting-started-with-openai-gym-d2ac911f5cbc[`https://towardsdatascience.com/getting-started-with-openai-gym-d2ac911f5cbc`]
+
+https://www.gymlibrary.dev/[`https://www.gymlibrary.dev/`]
+
+=====
+Gym is an open source Python library for developing and comparing reinforcement learning algorithms by providing a standard API to communicate between learning algorithms and environments, as well as a standard set of environments compliant with that API. Since its release, Gym's API has become the field standard for doing this.
+=====
+
+===== pyRDDLGym
+
+https://arxiv.org/abs/2211.05939[`https://arxiv.org/abs/2211.05939`]
+
+https://github.com/thiagopbueno/rddlgym[`https://github.com/thiagopbueno/rddlgym`]
+
+=====
+A Python framework for auto-generation of OpenAI Gym environments from RDDL declerative description. The discrete time step evolution of variables in RDDL is described by conditional probability functions, which fits naturally into the Gym step scheme. Furthermore, since RDDL is a lifted description, the modification and scaling up of environments to support multiple entities and different configurations becomes trivial rather than a tedious process prone to errors. We hope that pyRDDLGym will serve as a new wind in the reinforcement learning community by enabling easy and rapid development of benchmarks due to the unique expressive power of RDDL.
+=====
+
+==== OpenMMLab
+
+https://openmmlab.com/[`https://openmmlab.com/`]
+
+=====
+Open source projects for academic research and industrial applications. OpenMMLab covers a wide range of research topics of computer vision, e.g., classification, detection, segmentation and super-resolution.
+OpenMMLab includes 10+ codbases with 130+ algorithms and 1000+ models.
+=====
+
+==== Points 3D
+
+https://torch-points3d.readthedocs.io/en/latest/[`https://torch-points3d.readthedocs.io/en/latest/`]
+
+=====
+Torch Points 3D is a framework for developing and testing common deep learning models to solve tasks related to unstructured 3D spatial data i.e. Point Clouds. The framework currently integrates some of the best published architectures and it integrates the most common public datasests for ease of reproducibility. It heavily relies on Pytorch Geometric and Facebook Hydra library.
+=====
+
+==== PyGSL
+
+https://github.com/maxwass/pyGSL[`https://github.com/maxwass/pyGSL`]
+
+https://arxiv.org/abs/2211.03583[`https://arxiv.org/abs/2211.03583`]
+
+=====
+pyGSL houses state-of-the-art implementations of graph structure learning (also called 'network topology inference' or simply 'graph learning') models, as well as synthetic and real datasets across a variety of domains.
+
+pyGSL houses 4 types of models: ad-hoc, model-based, unrolling-based, and deep-learning-based. Model-based formulations often admit iterative solution methods, and are implemented in GPU friendly ways when feasible. The unrolling-based methods leverage the concept of algorithm unrolling to learn the values of the optimization parameters in the model-based methods using a dataset. We build such models using Pytorch-Lightning making it easy to scale models to (multi-)GPU training environments when needed.
+
+Synthetic datasets include a wide range of network classes and many signal constructions (e.g. smooth, diffusion, etc). Real datasets include neuroimaging data (HCP-YA structural/functional connectivity graphs), social network co-location data, and more.
+=====
+
+==== Pyro
+
+http://pyro.ai/[`http://pyro.ai/`]
+
+=====
+Pyro is a universal probabilistic programming language (PPL) written in Python and supported by PyTorch on the backend. Pyro enables flexible and expressive deep probabilistic modeling, unifying the best of modern deep learning and Bayesian modeling.
+=====
+
+===== NumPyro
+
+https://github.com/pyro-ppl/numpyro[`https://github.com/pyro-ppl/numpyro`]
+
+=====
+Probabilistic programming with NumPy powered by JAX for autograd and JIT compilation to GPU/TPU/CPU.
+=====
+
+==== pytorch3d
+
+https://github.com/facebookresearch/pytorch3d[`https://github.com/facebookresearch/pytorch3d`]
+
+=====
+PyTorch3D provides efficient, reusable components for 3D Computer Vision research with PyTorch.
+The features include:
+
+* Data structure for storing and manipulating triangle meshes
+* Efficient operations on triangle meshes (projective transformations, graph convolution, sampling, loss functions)
+* A differentiable mesh renderer
+=====
+
+==== PyTorch Geometric (PyG)
+
+https://github.com/rusty1s/pytorch_geometric[`https://github.com/rusty1s/pytorch_geometric`]
+
+=====
+PyTorch Geometric (PyG) is a geometric deep learning extension library for PyTorch.
+
+It consists of various methods for deep learning on graphs and other irregular structures, also known as geometric deep learning, from a variety of published papers. In addition, it consists of an easy-to-use mini-batch loader for many small and single giant graphs, multi gpu-support, a large number of common benchmark datasets (based on simple interfaces to create your own), and helpful transforms, both for learning on arbitrary graphs as well as on 3D meshes or point clouds.
+=====
+
+==== pytorch-seq2seq
+
+https://github.com/IBM/pytorch-seq2seq[`https://github.com/IBM/pytorch-seq2seq`]
+
+=====
+This is a framework for sequence-to-sequence (seq2seq) models implemented in PyTorch. The framework has modularized and extensible components for seq2seq models, training and inference, checkpoints, etc.
+
+Seq2seq is a fast evolving field with new techniques and architectures being published frequently. The goal of this library is facilitating the development of such techniques and applications. 
+=====
+
+==== PyTorch Lightning
+
+https://github.com/PyTorchLightning/pytorch-lightning[`https://github.com/PyTorchLightning/pytorch-lightning`]
+
+=====
+The lightweight PyTorch wrapper for high-performance AI research. Scale your models, not the boilerplate.
+=====
+
+==== Raster Vision
+
+https://docs.rastervision.io/en/0.13/[`https://docs.rastervision.io/en/0.13/`]
+
+=====
+Raster Vision is an open source framework for Python developers building computer vision models on satellite, aerial, and other large imagery sets (including oblique drone imagery). There is built-in support for chip classification, object detection, and semantic segmentation using PyTorch.
+
+Raster Vision allows engineers to quickly and repeatably configure pipelines that go through core components of a machine learning workflow: analyzing training data, creating training chips, training models, creating predictions, evaluating models, and bundling the model files and configuration for easy deployment.
+=====
+
+==== Stable Baselines
+
+https://github.com/DLR-RM/stable-baselines3[`https://github.com/DLR-RM/stable-baselines3`]
+
+=====
+Stable Baselines3 (SB3) is a set of reliable implementations of reinforcement learning algorithms in PyTorch.
+These algorithms will make it easier for the research community and industry to replicate, refine, and identify new ideas, and will create good baselines to build projects on top of. We expect these tools will be used as a base around which new ideas can be added, and as a tool for comparing a new approach against existing ones. We also hope that the simplicity of these tools will allow beginners to experiment with a more advanced toolset, without being buried in implementation details.
+=====
+
+=== scikit-learn
+
+==== GPry
+
+https://github.com/jonaselgammal/GPry[`https://github.com/jonaselgammal/GPry`]
+
+https://arxiv.org/abs/2211.02045[`https://arxiv.org/abs/2211.02045`]
+
+=====
+A Python package containing an algorithm for fast Bayesian inference of general (non-Gaussian) posteriors with a moderate number of parameters. GPry does not need any pre-training, special hardware such as GPUs, and is intended as a drop-in replacement for traditional Monte Carlo methods for Bayesian inference. Our algorithm is based on generating a Gaussian Process surrogate model of the log-posterior, aided by a Support Vector Machine classifier that excludes extreme or non-finite values. An active learning scheme allows us to reduce the number of required posterior evaluations by two orders of magnitude compared to traditional Monte Carlo inference. Our algorithm allows for parallel evaluations of the posterior at optimal locations, further reducing wall-clock times. We significantly improve performance using properties of the posterior in our active learning scheme and for the definition of the GP prior. In particular we account for the expected dynamical range of the posterior in different dimensionalities. We test our model against a number of synthetic and cosmological examples. GPry outperforms traditional Monte Carlo methods when the evaluation time of the likelihood (or the calculation of theoretical observables) is of the order of seconds; for evaluation times of over a minute it can perform inference in days that would take months using traditional methods.
+=====
+
+==== scikit-fda
+
+https://fda.readthedocs.io/en/latest/[`https://fda.readthedocs.io/en/latest/`]
+
+https://github.com/GAA-UAM/scikit-fda[`https://github.com/GAA-UAM/scikit-fda`]
+
+https://arxiv.org/abs/2211.02566[`https://arxiv.org/abs/2211.02566`]
+
+=====
+The library scikit-fda is a Python package for Functional Data Analysis (FDA). It provides a comprehensive set of tools for representation, preprocessing, and exploratory analysis of functional data. The library is built upon and integrated in Python's scientific ecosystem. In particular, it conforms to the scikit-learn application programming interface so as to take advantage of the functionality for machine learning provided by this package: pipelines, model selection, and hyperparameter tuning, among others.
+=====
+
+=== Shogun
+
+https://github.com/shogun-toolbox/shogun[`https://github.com/shogun-toolbox/shogun`]
+
+https://en.wikipedia.org/wiki/Shogun_(toolbox)[`https://en.wikipedia.org/wiki/Shogun_(toolbox)`]
+
+=====
+Shogun is an open-source machine learning library that offers a wide range of efficient and unified machine learning methods.
+It supports many languages (Python, Octave, R, Java/Scala, Lua, C#, Ruby, etc) and platforms (Linux/Unix, macOS, and Windows) and integrates with their scientific computing environments.
+
+The focus of Shogun is on kernel machines such as support vector machines for regression and classification problems. Shogun also offers a full implementation of Hidden Markov models.
+=====
+
+=== SimulAI
+
+https://github.com/IBM/simulai#references[`https://github.com/IBM/simulai#references`]
+
+=====
+A Python package with data-driven pipelines for physics-informed machine learning.
+
+The SimulAI toolkit provides easy access to state-of-the-art models and algorithms for physics-informed machine learning. Currently, it includes the following methods described in the literature:
+
+* Physics-Informed Neural Networks (PINNs)
+* Deep Operator Networks (DeepONets)
+* Variational Encoder-Decoders (VED)
+* Operator Inference (OpInf)
+* Koopman Autoencoders (experimental)
+* Echo State Networks (experimental GPU support)
+
+In addition to the methods above, many more techniques for model reduction and regularization are included in SimulAI.
+=====
+
+=== TensorFlow
+
+https://www.tensorflow.org/[`https://www.tensorflow.org/`]
+
+https://github.com/tensorflow/tensorflow[`https://github.com/tensorflow/tensorflow`]
+
+https://blog.tensorflow.org/[`https://blog.tensorflow.org/`]
+
+https://en.wikipedia.org/wiki/TensorFlow[`https://en.wikipedia.org/wiki/TensorFlow`]
+
+https://github.com/jtoy/awesome-tensorflow[`https://github.com/jtoy/awesome-tensorflow`]
+
+=====
+TensorFlow is a free and open-source software library for machine learning. It can be used across a range of tasks but has a particular focus on training and inference of deep neural networks.
+Tensorflow is a symbolic math library based on dataflow and differentiable programming. It is used for both research and production at Google.
+
+TensorFlow provides stable Python and C++ APIs, as well as non-guaranteed backward compatible API for other languages.
+=====
+
+==== Edward
+
+http://edwardlib.org/[`http://edwardlib.org/`]
+
+=====
+Edward is a Python library for probabilistic modeling, inference, and criticism. It is a testbed for fast experimentation and research with probabilistic models, ranging from classical hierarchical models on small data sets to complex deep probabilistic models on large data sets. Edward fuses three fields: Bayesian statistics and machine learning, deep learning, and probabilistic programming.
+
+Edward is built on TensorFlow. It enables features such as computational graphs, distributed training, CPU/GPU integration, automatic differentiation, and visualization with TensorBoard.
+=====
+
+==== Keras
+
+https://keras.io/[`https://keras.io/`]
+https://github.com/keras-team/keras[`https://github.com/keras-team/keras`]
+
+=====
+Keras is a deep learning API written in Python, running on top of the machine learning platform TensorFlow. It was developed with a focus on enabling fast experimentation.
+
+Keras is an API designed for human beings, not machines. Keras follows best practices for reducing cognitive load: it offers consistent & simple APIs, it minimizes the number of user actions required for common use cases, and it provides clear & actionable error messages. It also has extensive documentation and developer guides. 
+=====
+
+===== Elephas
+
+https://github.com/maxpumperla/elephas[`https://github.com/maxpumperla/elephas`]
+
+=====
+Elephas is an extension of Keras, which allows you to run distributed deep learning models at scale with Spark.
+=====
+
+==== Tensorforce
+
+https://github.com/tensorforce/tensorforce[`https://github.com/tensorforce/tensorforce`]
+
+=====
+Tensorforce is an open-source deep reinforcement learning framework, with an emphasis on modularized flexible library design and straightforward usability for applications in research and practice. Tensorforce is built on top of Google's TensorFlow framework and requires Python 3.
+=====
+
+==== TensorLayer
+
+https://github.com/tensorlayer/tensorlayer[`https://github.com/tensorlayer/tensorlayer`]
+
+=====
+TensorLayer is a novel TensorFlow-based deep learning and reinforcement learning library designed for researchers and engineers. It provides an extensive collection of customizable neural layers to build advanced AI models quickly, based on this, the community open-sourced mass tutorials and applications. 
+
+TensorLayer stands at a unique spot in the TensorFlow wrappers. Other wrappers like Keras and TFLearn hide many powerful features of TensorFlow and provide little support for writing custom AI models. Inspired by PyTorch, TensorLayer APIs are simple, flexible and Pythonic, making it easy to learn while being flexible enough to cope with complex AI tasks.
+=====
+
+== Multi-Platform Libraries
+
+=== Deep Graph Library (DGL)
+
+https://www.dgl.ai/[`https://www.dgl.ai/`]
+
+=====
+Easy deep learning on graphs.
+Build your models with PyTorch, TensorFlow or Apache MXNet.
+=====
+
+=== einops
+
+https://github.com/arogozhnikov/einops[`https://github.com/arogozhnikov/einops`]
+
+=====
+Flexible and powerful tensor operations for readable and reliable code. Supports numpy, pytorch, tensorflow, and others.
+=====
+
+=== Horovod
+
+https://github.com/horovod/horovod[`https://github.com/horovod/horovod`]
+
+=====
+Horovod is a distributed deep learning training framework for TensorFlow, Keras, PyTorch, and Apache MXNet. The goal of Horovod is to make distributed deep learning fast and easy to use.
+=====
+
+=== PlaidML
+
+https://github.com/plaidml/plaidml[`https://github.com/plaidml/plaidml`]
+
+=====
+PlaidML is an advanced and portable tensor compiler for enabling deep learning on laptops, embedded devices, or other devices where the available computing hardware is not well supported or the available software stack contains unpalatable license restrictions.
+
+PlaidML sits underneath common machine learning frameworks, enabling users to access any hardware supported by PlaidML. PlaidML supports Keras, ONNX, and nGraph.
+=====
+
+=== TensorLY
+
+http://tensorly.org/stable/index.html[`http://tensorly.org/stable/index.html`]
+
+=====
+TensorLy provides all the utilities to easily use tensor methods, whether you are an advanced user or just getting started, from core tensor operations and tensor algebra to tensor decomposition and regression. 
+
+TensorLy's backend system lets you write your code once and execute in using any of the supported frameworks, enabling tensor learning on GPU, multi-machines, and deep tensorized learning. 
+=====
+
+=== TensorRT
+
+https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html[`https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html`]
+
+=====
+The core of NVIDIA® TensorRT™ is a C++ library that facilitates high-performance inference on NVIDIA graphics processing units (GPUs). It is designed to work in a complementary fashion with training frameworks such as TensorFlow, PyTorch, MXNet, and so on. It focuses specifically on running an already-trained network quickly and efficiently on a GPU. 
+=====
+
+=== Transformers
+
+https://github.com/huggingface/transformers[`https://github.com/huggingface/transformers`]
+
+=====
+Transformers provides thousands of pretrained models to perform tasks on texts such as classification, information extraction, question answering, summarization, translation, text generation and more in over 100 languages. Its aim is to make cutting-edge NLP easier to use for everyone.
+
+Transformers provides APIs to quickly download and use those pretrained models on a given text, fine-tune them on your own datasets and then share them with the community on our model hub. At the same time, each python module defining an architecture is fully standalone and can be modified to enable quick research experiments.
+
+hugs Transformers is backed by the three most popular deep learning libraries — Jax, PyTorch and TensorFlow — with a seamless integration between them. It's straightforward to train your models with one before loading them for inference with the other.
+=====
+
+=== TVM
+
+https://tvm.apache.org/[`https://tvm.apache.org/`]
+
+=====
+Apache TVM is an open source machine learning compiler framework for CPUs, GPUs, and machine learning accelerators. It aims to enable machine learning engineers to optimize and run computations efficiently on any hardware backend. The purpose of this tutorial is to take a guided tour through all of the major features of TVM by defining and demonstrating key concepts. A new user should be able to work through the tutorial from start to finish and be able to operate TVM for automatic model optimization, while having a basic understanding of the TVM architecture and how it works.
+
+The features include:
+
+* NumPy-like programming interface, and is integrated with the new, easy-to-use Gluon 2.0 interface. NumPy users can easily adopt MXNet and start in deep learning.
+* Automatic hybridization provides imperative programming with the performance of traditional symbolic programming.
+* Lightweight, memory-efficient, and portable to smart devices through native cross-compilation support on ARM, and through ecosystem projects such as TVM, TensorRT, OpenVINO.
+* Compilation of deep learning models in Keras, MXNet, PyTorch, Tensorflow, CoreML, DarkNet and more.
+* Scales up to multi GPUs and distributed setting with auto parallelism through ps-lite, Horovod, and BytePS.
+* Extensible backend that supports full customization, allowing integration with custom accelerator libraries and in-house hardware without the need to maintain a fork.
+* Support for Python, Java, C++, R, Scala, Clojure, Go, Javascript, Perl, and Julia.
+* Cloud-friendly and directly compatible with AWS and Azure.
+=====
+
+== Tensor Optimization Frameworks
+
+* *Awesome Tensor Compilers* - https://github.com/merrymercy/awesome-tensor-compilers[`https://github.com/merrymercy/awesome-tensor-compilers`]
+
+=== COMET
+
+https://github.com/pnnl/COMET[`https://github.com/pnnl/COMET`]
+
+https://arxiv.org/abs/2102.05187[`https://arxiv.org/abs/2102.05187`]
+
+=====
+The COMET compiler consists of a Domain Specific Language (DSL) for sparse and dense tensor algebra computations, a progressive lowering process to map high-level operations to low-level architectural resources, a series of optimizations performed in the lowering process, and various IR dialects to represent key concepts, operations, and types at each level of the multi-level IR. At each level of the IR stack, COMET performs different optimizations and code transformations. Domain-specific, hardware- agnostic optimizations that rely on high-level semantic information are applied at high-level IRs. These include reformulation of high-level operations in a form that is amenable for execution on heterogeneous devices (e.g., rewriting Tensor contraction operations as Transpose-Transpose-GEMM-Transpose) and automatic parallelization of high-level primitives (e.g., tiling for thread- and task-level parallelism).
+=====
+
+=== DaCe
+
+https://github.com/spcl/dace[`https://github.com/spcl/dace`]
+
+=====
+DaCe is a fast parallel programming framework that takes code in Python/NumPy and other programming languages, and maps it to high-performance CPU, GPU, and FPGA programs, which can be optimized to achieve state-of-the-art. Internally, DaCe uses the Stateful DataFlow multiGraph (SDFG) data-centric intermediate representation: A transformable, interactive representation of code based on data movement. Since the input code and the SDFG are separate, it is possible to optimize a program without changing its source, so that it stays readable. On the other hand, transformations are customizable and user-extensible, so they can be written once and reused in many applications. With data-centric parallel programming, we enable direct knowledge transfer of performance optimization, regardless of the application or the target processor.
+
+DaCe generates high-performance programs for:
+
+* Multi-core CPUs (tested on Intel, IBM POWER9, and ARM with SVE)
+* NVIDIA GPUs and AMD GPUs (with HIP)
+* Xilinx and Intel FPGAs
+=====
+
+==== DaCeML
+
+https://github.com/spcl/daceml[`https://github.com/spcl/daceml`]
+
+=====
+This project adds PyTorch and ONNX model loading support to DaCe, and adds ONNX operator library nodes to the SDFG IR. With access to DaCe's rich transformation library and productive development environment, DaCeML can generate highly efficient implementations that can be executed on CPUs, GPUs and FPGAs.
+=====
+
+=== Deinsum
+
+https://arxiv.org/abs/2206.08301[`https://arxiv.org/abs/2206.08301`]
+
+https://arxiv.org/abs/2205.04148[`https://arxiv.org/abs/2205.04148`]
+
+https://arxiv.org/abs/2207.07433[`https://arxiv.org/abs/2207.07433`]
+
+=====
+Multilinear algebra kernel performance on modern massively-parallel systems is determined mainly by data movement. However, deriving data movement-optimal distributed schedules for programs with many high-dimensional inputs is a notoriously hard problem. State-of-the-art libraries rely on heuristics and often fall back to suboptimal tensor folding and BLAS calls. We present Deinsum, an automated framework for distributed multilinear algebra computations expressed in Einstein notation, based on rigorous mathematical tools to address this problem. Our framework automatically derives data movement-optimal tiling and generates corresponding distributed schedules, further optimizing the performance of local computations by increasing their arithmetic intensity.
+=====
+
+* `opt_einsum` Github - https://github.com/dgasmith/opt_einsum[`https://github.com/dgasmith/opt_einsum`]
+
+* *opt_einsum` Docs - https://optimized-einsum.readthedocs.io/en/stable/[`https://optimized-einsum.readthedocs.io/en/stable/`]
+
+=====
+Optimized einsum can significantly reduce the overall execution time of einsum-like expression
+by optimizing the expression's contraction order and dispatching many operations to canonical BLAS, cuBLAS, or other specialized routines.
+
+Optimized einsum is agnostic to the backend and can handle NumPy, Dask, PyTorch, Tensorflow, CuPy, Sparse, Theano, JAX, and Autograd arrays as well as potentially any library which conforms to a standard API.
+=====
+
+* *Basic Introduction to Numpy's einsum* - https://ajcr.net/Basic-guide-to-einsum/[`https://ajcr.net/Basic-guide-to-einsum/`]
+
+* *torch.einsum* - https://pytorch.org/docs/stable/generated/torch.einsum.html[`https://pytorch.org/docs/stable/generated/torch.einsum.html`]
+
+* *Einsum is all you need* - https://rockt.github.io/2018/04/30/einsum[`https://rockt.github.io/2018/04/30/einsum`]
+
+* *Einsum is all you need* - https://www.youtube.com/watch?v=pkVwUVEHmfI[`https://www.youtube.com/watch?v=pkVwUVEHmfI`]
+
+* *Einsum Decomposition* - http://www.xavierdupre.fr/app/mlprodict/helpsphinx/notebooks/einsum_decomposition.html[`http://www.xavierdupre.fr/app/mlprodict/helpsphinx/notebooks/einsum_decomposition.html`]
+
+=== dgSPARSE
+
+https://github.com/dgSPARSE/dgSPARSE-Library[`https://github.com/dgSPARSE/dgSPARSE-Library`]
+
+https://arxiv.org/abs/2209.02882[`https://arxiv.org/abs/2209.02882`]
+
+=====
+The dgSPARSE Library (Deep Graph Sparse Library) is a high performance library for sparse kernel acceleration on GPUs based on CUDA.
+=====
+
+=== Taco
+
+http://tensor-compiler.org/[`http://tensor-compiler.org/`]
+
+https://github.com/tensor-compiler/taco[`https://github.com/tensor-compiler/taco`]
+
+https://github.com/tensor-compiler/taco-jupyter-notebooks[`https://github.com/tensor-compiler/taco-jupyter-notebooks`]
+
+=====
+The Tensor Algebra Compiler (taco) is a C++ library that computes tensor algebra expressions on sparse and dense tensors. It uses novel compiler techniques to get performance competitive with hand-optimized kernels in widely used libraries for both sparse tensor algebra and sparse linear algebra.
+
+You can use taco as a C++ library that lets you load tensors, read tensors from files, and compute tensor expressions. You can also use taco as a code generator that generates C functions that compute tensor expressions.
+=====
+
+==== SparseLNR
+
+https://github.com/adhithadias/SparseLNR[`https://github.com/adhithadias/SparseLNR`]
+
+https://arxiv.org/abs/2205.11622[`https://arxiv.org/abs/2205.11622`]
+
+=====
+This paper extends TACO's scheduling space to support kernel distribution/loop fusion in order to reduce asymptotic time complexity and improve locality of complex tensor algebra computations. We develop an intermediate representation (IR) for tensor operations called branched iteration graph which specifies breakdown of the computation into smaller ones (kernel distribution) and then fuse (loop fusion) outermost dimensions of the loop nests, while the innermost dimensions are distributed, to increase data locality. We describe exchanges of intermediate results between space iteration spaces, transformation in the IR, and its programmatic invocation. Finally, we show that the transformation can be used to optimize sparse tensor kernels. Our results show that this new transformation significantly improves the performance of several real-world tensor algebra computations compared to TACO-generated code. 
+=====
+
+==== Stardust
+
+* *Stardust: Compiling Sparse Tensor Algebra to a Reconfigurable Dataflow Architecture* - https://arxiv.org/abs/2211.03251[`https://arxiv.org/abs/2211.03251`]
+
+=====
+A compiler that compiles sparse tensor algebra to reconfigurable dataflow architectures (RDAs). Stardust introduces new user-provided data representation and scheduling language constructs for mapping to resource-constrained accelerated architectures. Stardust uses the information provided by these constructs to determine on-chip memory placement and to lower to the Capstan RDA through a parallel-patterns rewrite system that targets the Spatial programming model. The Stardust compiler is implemented as a new compilation path inside the TACO open-source system.
+=====
+
+== Parallel Applications
+
+=== Cylon
+
+https://github.com/cylondata/cylon[`https://github.com/cylondata/cylon`]
+
+https://cylondata.org/[`https://cylondata.org/`]
+
+https://arxiv.org/abs/2209.06146[`https://arxiv.org/abs/2209.06146`]
+
+=====
+Cylon is a fast, scalable distributed memory data parallel library for processing structured data. Cylon implements a set of relational operators to process data. While ”Core Cylon” is implemented using system level C/C++, multiple language interfaces (Python and Java ) are provided to seamlessly integrate with existing applications, enabling both data and AI/ML engineers to invoke data processing operators in a familiar programming language. By default it works with MPI for distributing the applications.
+
+Internally Cylon uses Apache Arrow to represent the data in a column format.
+=====
+
+=== Magicube
+
+https://github.com/Shigangli/Magicube[`https://github.com/Shigangli/Magicube`]
+
+https://arxiv.org/abs/2209.06979[`https://arxiv.org/abs/2209.06979`]
+
+=====
+Magicube is a high-performance library for quantized sparse matrix operations (SpMM and SDDMM) of deep learning on Tensor Cores.
+
+It is very challenging to gain practical speedups from sparse, low-precision matrix operations on Tensor cores, because of the strict requirements for data layout and lack of support for efficiently manipulating the low-precision integers. We propose Magicube, a high-performance sparse-matrix library for low-precision integers on Tensor cores. Magicube supports SpMM and SDDMM, two major sparse operations in deep learning with mixed precision. Experimental results on an NVIDIA A100 GPU show that Magicube achieves on average 1.44x (up to 2.37x) speedup over the vendor-optimized library for sparse kernels, and 1.43x speedup over the state-of-the-art with a comparable accuracy for end-to-end sparse Transformer inference. 
+=====
+
+== FPGA
+
+=== tapa
+
+https://github.com/UCLA-VAST/tapa[`https://github.com/UCLA-VAST/tapa`]
+
+https://arxiv.org/abs/2209.02663[`https://arxiv.org/abs/2209.02663`]
+
+=====
+TAPA is a dataflow HLS framework that features fast compilation, expressive programming model and generates high-frequency FPGA accelerators.
+=====
+
+== Storage
+
+=== DAOS
+
+https://docs.daos.io/[`https://docs.daos.io/`]
+
+https://github.com/daos-stack/daos[`https://github.com/daos-stack/daos`]
+
+https://www.nextplatform.com/2022/02/14/intel-targets-daos-object-storage-at-more-than-hpc/[`https://www.nextplatform.com/2022/02/14/intel-targets-daos-object-storage-at-more-than-hpc/`]
+
+https://www.hpcwire.com/2022/10/17/daos-performance-expands-beyond-intel-optane-and-into-the-google-cloud/[`https://www.hpcwire.com/2022/10/17/daos-performance-expands-beyond-intel-optane-and-into-the-google-cloud/`]
+
+https://arxiv.org/abs/2208.06752[`https://arxiv.org/abs/2208.06752`]
+
+https://arxiv.org/abs/2211.09162[`https://arxiv.org/abs/2211.09162`]
+
+=====
+DAOS is an open-source software-defined scale-out object store that provides high bandwidth and high IOPS storage containers to applications and enables next-generation data-centric workflows combining simulation, data analytics, and machine learning.
+
+Unlike the traditional storage stacks that were primarily designed for rotating media, DAOS is architected from the ground up to exploit new NVM technologies and is extremely lightweight since it operates End-to-End (E2E) in user space with full OS bypass. DAOS offers a shift away from an I/O model designed for block-based and high-latency storage to one that inherently supports fine-grained data access and unlocks the performance of the next-generation storage technologies.
+
+DAOS relies on Open Fabric Interface (OFI) for low-latency communications and stores data on both storage-class memory (SCM) and NVMe storage. DAOS presents a native key-array-value storage interface that offers a unified storage model over which domain-specific data models are ported, such as HDF5, MPI-IO, and Apache Hadoop. A POSIX I/O emulation layer implementing files and directories over the native DAOS API is also available.
+=====
+
+
+

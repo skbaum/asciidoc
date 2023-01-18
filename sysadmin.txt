@@ -1,0 +1,327 @@
+
+= Sysadmin Procedures
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Updating Users in a Group
+
+This assumes the group has already been created.
+See the next section for how to create a group.
+
+=== Grace
+
+To modify a group on grace, log on to the management node:
+
+-----
+grace-mgt2.hprc.tamu.edu
+-----
+
+Become root via:
+
+-----
+sudo su -
+-----
+
+Go to the directory:
+
+-----
+cd /sw/hprc/local/etc/groups
+-----
+
+There is a brief explanation of the procedures in `00_README_HPRC`.  Here is an
+expanded version of that file.
+
+The information for each group is kept in a separate subdirectory in:
+
+-----
+/sw/hprc/local/etc/groups
+-----
+
+where the directory name is the net ID of the group's PI.
+The group name is typically not the same as the net ID of the PI.
+We will use the directory `pmorley` as an example, wherein we
+find information about the `morley` group.
+
+-----
+/sw/hprc/local/etc/groups/pmorley
+-----
+
+This directory contains the following files:
+
+-----
+gline.morley_group
+morley_group
+morley_group.NetID_to_FullName
+RT30618
+-----
+
+*NOTE*:  If the ticket number is going to be supplied inside the group file, then
+it's probably not necessary to repeat that information in another file like with
+`RT30618` here.  I assume, however that the `@RT30618` line in the `morley_group` file
+is an old way to do it that's been superseded by the `RT:` line found in 
+the example in `00_README_HPRC`.
+
+==== Modify the Group File
+
+The `morley_group` file is the one to edit when adding and/or subtracting users.
+After this file is initially created - in a process that differs from adding or subtracting
+users - it looks like:
+
+-----
+# GID: 21922
+# PI: pmorley (Paul Scott Morley)
+# Note: group dir on Terra
+pmorley
+@RT30618
+
+# begin RT44604 -- Mark 12/02/2022
+ljpinnell
+enriquedoster
+mmmurphy
+mcclurgmc
+sctamm
+jdyoung
+sal
+# end RT44603
+-----
+
+If we want to add a user, we edit this file and append, for example, the following
+for user `anewuser`.
+
+-----
+# start RTNNNN, 12/04/2022 francis
+anewuser
+# end RTNNNN, 12/04/2022 francis
+-----
+
+where:
+
+* `NNNNN` is the number of the ticket making the change request,
+* `anewuser` is the NetID of the new user,
+* `12/04/2022` is the date of the addition or removal of the user (in some understandable format), and
+* `francis` is the name of whoever's making the changes
+
+In the case of deleting an existing user, for instance the user we just added, we would edit the
+previously appended section to look like:
+
+-----
+# start RTNNNN, 12/04/2022 francis
+# anewuser - removed RTNNNN, 12/05/2022 steve
+# end RTNNNN, 12/04/2022 francis
+-----
+
+where we place an `#` in front of the appropriate net ID and add the ticket number, date
+and person performing the modification.
+
+*NOTE*:  This is a suggested method for doing this.  The examples in `/sw/hprc/local/etc/groups` are all
+over the place when it comes to deleting users.
+
+The script that reads these configuration files only looks at the lines not starting with `#` to
+decide which users are presently in the group after additions and/or substractions.
+
+==== Update the `gline` File
+
+Now create the `*.gline` file from the group file via:
+
+-----
+cd /sw/hprc/local/etc/groups/pmorley
+/sw/hprc/local/etc/groups/mkglines.sh
+-----
+
+In our example this will create the file `gline.morley_group` from the file `morley_group`.
+
+==== Update the Distribution Group File
+
+Then use the created `*.gline` file to update the distribution group file
+`group.login`.
+
+-----
+/sw/local/sbin/update_group.sh gline.morley_group /adm/AMS/grace/distfiles/group.login
+-----
+
+=== Terra
+
+These actions must be performed on the first terra management node.
+
+-----
+terra-mgt1.tamu.edu
+-----
+
+==== Copy the `gline` File to Terra
+
+For terra the `*.gline` file created above must be (inconveniently) copied from grace to terra.
+Using the previous example, we copy the `gline` file to the `/sw/hprc/local/etc/groups`
+directory on `terra-mgt1` (for the sake of symmetry if nothing else).
+This directory contains nothing other than a `README` file,
+and can be purged of `gline` files after they've been processed.
+
+-----
+scp /sw/hprc/local/etc/groups/pmorley/gline.morley_group root@terra-mgt1.tamu.edu:/sw/hprc/local/etc/groups
+-----
+
+==== Update the Distribution Group File
+
+Once it has been copied, run the following:
+
+-----
+cd /sw/hprc/local/etc/groups
+/sw/local/sbin/update_group.sh gline.morley_group /general/adm/AMS/terra/distfiles/group.login
+-----
+
+Note that the absolute path of the `group.login` file on terra starts with a different
+root level directory - i.e. `general` - than it does on grace.
+
+=== FASTER
+
+The processing on FASTER is done on the login node:
+
+-----
+faster-mgt1.hprc.tamu.edu
+-----
+
+==== ACCESS Accounts
+
+For the XSEDE modifications, once the appropriate upstream processing has been completed the
+following script is executed.
+
+-----
+/adm/AMS/bin/update_xsede_user_group_files.sh
+-----
+
+After this, the following script is executed:
+
+-----
+/adm/AMS/bin/syncaccts.cluster.briefly_tested_by_francis faster
+-----
+
+==== Group Accounts
+
+The *gline* file must be copied from grace as with terra.
+Running this will update the group accounts, and also the XSEDE accounts if the
+previous script has been run.  This will update the group accounts, the XSEDE
+accounts, or both, depending on what other scripts have been previously run.
+
+-----
+/adm/AMS/bin/syncaccts.cluster.briefly_tested_by_francis faster
+-----
+
+== Creating a Group
+
+=== Creating a New Group ID Using a Net ID
+
+A group must be added to a MySQL database on sandia to obtain a group ID number.
+
+After logging on to sandia, become root via:
+
+-----
+sudo su -
+-----
+
+Next, bring up the MySQL command-line interface via:
+
+-----
+mysql --defaults-extra-file=~/.my.cnf.ams -Dams
+-----
+
+Once in, do the following to add the new group `mynewgroup` - where `mynewgroup` is
+usually the net ID of the PI, although it can also be the name of a software package or
+a name that's not a net ID - and then
+to check that it has been created.  In this example
+the new group ID number is `12345`.
+
+-----
+mysql> Insert into unix_logins (NetId) values ('mynewgroup');
+Query OK, 1 row affected (0.05 sec)
+mysql> select last_insert_id();
++------------------+
+| last_insert_id() |
++------------------+
+|            12345 | 
++------------------+
+1 row in set (0.00 sec)
+-----
+
+You can also check the correspondence between the group name/net ID and 
+the group ID via:
+
+-----
+mysql> select * from unix_logins where NetId = 'mynewgroup';
++-------+----------+-----------+------------+
+| Id    | PersonId | LoginName | NetId      |
++-------+----------+-----------+------------+
+| 12345 |     NULL | NULL      | mynewgroup | 
++-------+----------+-----------+------------+
+-----
+
+=== Create a New Group Subdirectory and Initialization File
+
+The group information is stored on grace in one of the following directories:
+
+* `/sw/hprc/local/etc/groups/PI_netid` - the preferred location if the PI will request multiple groups, with PI's net ID becoming
+the directory name
+* `/sw/hprc/local/etc/groups/groupname`
+* `/sw/hprc/local/etc/groups/softwarename` - a location for groups based on limiting access to commercial software packages
+
+Once you have created the appropriate directory, create a new group `new_group` in that directory.
+This file name can be the net ID or something other than that.
+The general strategy is that once you create that file you will run a script to create two other files from it, with
+the three files looking like this:
+
+-----
+new_group
+gline.new_group
+new_group.NetID_to_FullName
+-----
+
+The `new_group` file will have the following format:
+
+-----
+# GID: 23073
+# PI: raymundo.arroyave (Raymundo Arroyave)
+# RT: N/A.  direct emails with Francis in Sep/Oct 2021.
+# delegate: none yet
+
+# start initial members (08oct2021 francis)
+raymundo.arroyave
+peter.morcos
+xueq13
+dehao.liu
+# end start initial members (08oct2021 francis)
+
+# EOF
+-----
+
+where the contents of the first section are the following:
+
+* `GID` is the group ID number you created on sandia
+* `PI` is the netID of the PI
+* `RT` is the number of the ticket that requested the creation of a new group, or a brief explanation if it was not prompted by a ticket
+* `delegate` - someone other than the PI who's been delegated to request group modifications
+
+The next section is a list of the net IDs of those who will be the initial members of this group.
+This is enclosed with `start` and `end` lines that include the date the group was created and the
+person who created it.
+
+=== Create the `gline` File from the Group File
+
+A `gline.new_group` file is now created via:
+
+-----
+cd /sw/hprc/local/etc/groups/PI_netid
+/sw/hprc/local/etc/groups/mkglines.sh
+-----
+
+=== Update the Distribution Group File
+
+Once the `gline` file has been created, it is used to update the
+distribution group file via:
+
+-----
+cd /sw/hprc/local/etc/groups/PI_netid
+/sw/local/sbin/update_group.sh gline.new_group /adm/AMS/grace/distfiles/group.login
+-----
+
+

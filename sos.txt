@@ -1,0 +1,93 @@
+SOS, SensorThings and Related Topics
+====================================
+Steven K. Baum
+v0.2, 2016-06-29
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+SOS
+---
+
+*OGC SOS* - http://www.opengeospatial.org/standards/sos[+http://www.opengeospatial.org/standards/sos+]
+
+=====
+The SOS standard is applicable to use cases in which sensor data needs to be managed in an interoperable way. This standard defines a Web service interface which allows querying observations, sensor metadata, as well as representations of observed features. Further, this standard defines means to register new sensors and to remove existing ones. Also, it defines operations to insert new sensor observations. This standard defines this functionality in a binding independent way; two bindings are specified in this document: a KVP binding and a SOAP binding.
+=====
+
+Software
+~~~~~~~~
+
+*52nSOS* - http://52north.org/communities/sensorweb/sos/[+http://52north.org/communities/sensorweb/sos/+]
+
+=====
+The 52°North SOS is a reference implementation of the OGC Sensor Observation Service specification (version 2.0). It was implemented during the OGC Web Services Testbed, Phase 9 (OWS-9) and tested to be compliant to this specification within the OGC CITE testing in December of 2012.
+=====
+
+*i52n-SOS* - http://ioos.github.io/i52n-sos/[+http://ioos.github.io/i52n-sos/+]
+
+=====
+This is the project page for the IOOS customized build of the 52°North Sensor Observation Service (SOS).
+
+i52n-SOS extends the stock upstream 52°North (52n) SOS with IOOS specific encoding formats, test data, and more.
+=====
+
+*ncSOS* - https://github.com/asascience-open/ncSOS[+https://github.com/asascience-open/ncSOS+]
+
+=====
+NcSOS adds an OGC SOS service to datasets in your existing THREDDS server. It complies with the IOOS SWE Milestone 1.0 templates and requires your datasets be in any of the CF 1.6 Discrete Sampling Geometries.
+
+NcSOS acts like other THREDDS services (such an OPeNDAP and WMS) where as there are individual service endpoints for each dataset. It is best to aggregate your files and enable the NcSOS service on top of the aggregation. i.e. The NcML aggregate of hourly files from an individual station would be a good candidate to serve with NcSOS. Serving the individual hourly files with NcSOS would not be as beneficial.
+=====
+
+*istSOS* - http://istsos.org/[+http://istsos.org/+]
+
+=====
+IstSOS is an OGC SOS server implementation written in Python. istSOS allows for managing and dispatch observations from monitoring sensors according to the Sensor Observation Service standard.
+
+The project provides also a Graphical user Interface that allows for easing the daily operations and a RESTFull Web api for automatizing administration procedures.
+=====
+
+*OWSLib* - https://geopython.github.io/OWSLib/[+https://geopython.github.io/OWSLib/+]
+
+=====
+OWSLib is a Python package for client programming with Open Geospatial Consortium (OGC) web service (hence OWS) interface standards, and their related content models.
+=====
+
+*python-simplesos* - https://github.com/jcu-eresearch/python-simplesos[+https://github.com/jcu-eresearch/python-simplesos+]
+
+=====
+Simple Sensor Web Enablement Sensor Observation Service client for python.
+=====
+
+*Proteus* - https://github.com/intelligentautomation/proteus[+https://github.com/intelligentautomation/proteus+]
+
+=====
+Proteus is a desktop client for sensor discovery and management developed by Intelligent Automation Inc.
+=====
+
+SensorThings
+------------
+
+GC SensorThings API* - https://github.com/opengeospatial/sensorthings[+https://github.com/opengeospatial/sensorthings+]
+
+=====
+The official web site of the OGC SensorThings API standard specification.
+
+The OGC SensorThings API is an OGC standard specification for providing an open and unified way to interconnect IoT devices, data, and applications over the Web. The SensorThings API is an open standard, builds on Web protocols and the OGC Sensor Web Enablement standards, and applies an easy-to-use REST-like style. The result is to provide a uniform way to expose the full potential of the Internet of Things.
+=====
+
+*SensorUp* - http://www.sensorup.com/[+http://www.sensorup.com/+]
+
+=====
+SensorUp makes information from all different kinds of sensors accessible in a single platform, by using open standards to connect the sensors. Our IoT Platform is the world’s first, most complete, compliant implementation of the OGC SensorThings API.
+
+SensorThings API was purpose-built for IoT, and manages low power, low bandwidth, and intermittent connectivity situations. The standard is REST-based and JSON encoded, so it’s developer friendly. Our easy-to-use APIs and SDKs can be understood and worked with in very little time.
+=====
+
+* *SensorThings API Python Web SDK* - http://www.sensorup.com/docs/?python#things[+http://www.sensorup.com/docs/?python#things+]
+
+* *SensorThings Playground* - https://pg.sensorup.com/playground.html[+https://pg.sensorup.com/playground.html+]
+

@@ -1,0 +1,67 @@
+Raised Bed Examples
+===================
+:doctype: article
+
+:imagesdir: https://barataria.geos.tamu.edu/~baum/GARDEN/
+
+// Macros to shorten table entries.
+
+:size: 280
+:im: https://barataria.geos.tamu.edu/~baum/GARDEN
+
+[width="100%"]
+|====================================================
+a| image::rb001.jpg[image,{size},{size},link="GARDEN/rb001.jpg"] a| image::rb002.png[image,{size},{size},link="GARDEN/rb002.png"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb003.jpg[image,{size},{size},link="GARDEN/rb003.jpg"] a| image::rb004.jpg[image,{size},{size},link="GARDEN/rb004.jpg"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb005.jpg[image,{size},{size},link="GARDEN/rb005.jpg"] a| image::rb006.jpg[image,{size},{size},link="GARDEN/rb006.jpg"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb007.jpg[image,{size},{size},link="GARDEN/rb007.jpg"] a| image::rb008.jpg[image,{size},{size},link="GARDEN/rb008.jpg"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb009.jpg[image,{size},{size},link="GARDEN/rb009.jpg"] a| image::rb010.png[image,{size},{size},link="GARDEN/rb010.png"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb011.png[image,{size},{size},link="GARDEN/rb011.png"] a| image::rb012.png[image,{size},{size},link="GARDEN/rb012.png"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb013.jpg[image,{size},{size},link="GARDEN/rb013.jpg"] a| image::rb014.jpg[image,{size},{size},link="GARDEN/rb014.jpg"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb015.jpg[image,{size},{size},link="GARDEN/rb015.jpg"] a| image::rb016.jpg[image,{size},{size},link="GARDEN/rb016.jpg"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb017.jpg[image,{size},{size},link="GARDEN/rb017.jpg"] a| image::rb018.jpg[image,{size},{size},link="GARDEN/rb018.jpg"]
+|====================================================
+
+[width="100%"]
+|====================================================
+a| image::rb019.jpg[image,{size},{size},link="GARDEN/rb019.jpg"] a| image::rb020.jpg[image,{size},{size},link="GARDEN/rb020.jpg"]
+|====================================================
+
+
+//a| image::rb004.jpg[image,{size},{size},link="GARDEN/rb004.jpg"] a| image::rb003.jpg[image,{size},{size},link="GARDEN/rb003.jpg"]
+//a| image::rb005.jpg[image,{size},{size},link="GARDEN/rb005.jpg"] a| image::rb006.jpg[image,{size},{size},link="GARDEN/rb006.jpg"]
+//|====================================================
+
+

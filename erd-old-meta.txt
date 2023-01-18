@@ -1,0 +1,928 @@
+The Care and Feeding of ERDDAP
+==============================
+Steven K. Baum
+v0.1, 2018-04-30
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+Overview
+--------
+
+The basic steps for setting up ERDDAP and preparing and serving files from it are described herein.
+The latter part focuses on what is needed to prepare and serve files for the GRIIDC project, but is
+somewhat general and thus useful for other types of files.
+
+The process consists of three major steps:
+
+* Obtaining, installing and setting up Java, Tomcat and ERDDAP.
+* Preparing the files - in this case netCDF files containing historical Gulf of Mexico datasets - such that
+they can be properly processed and displayed by ERDDAP.
+* Creating an XML configuration fragment for each netCDF file containing all the meta-data needed by
+ERDDAP to properly serve it.
+
+*Note:* This document document explains how to do these things on a Linux operating system, in this case the
+CentOS distribution.  ERDDAP can be installed on OSX and Windows machines, but that is not covered here.
+
+Initial Installation
+--------------------
+
+The procedure for obtaining and installing ERDDAP is present is great detail by its author Bob Simons at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html[+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html+]
+
+It's a good idea to at least skim through the first part of this document about how to install the chain of
+Java, Tomcat and ERDDAP needed to achieve proper ERDDAP functionality.
+Familiarization with the steps of the entire procedure can prevent annoying stumbles and backtracking.
+Herein we'll focus on those things specific to the present GRIIDC ERDDAP server set-up.
+
+Java
+~~~~
+
+The GRIIDC ERDDAP server is presently on a machine that runs the Linux CentOS operating system, which is a
+freely available downstream variant of the RedHat Enterprise distribution.
+CentOS contains its own Java and Tomcat packages, but the GRIIDC ERDDAP server is presently
+run on Java and Tomcat packages that are external to the official CentOS distribution.
+This is due to CentOS being historically a bit slow in updating the Java and Tomcat packages in
+their official distribution, as well as more recently because Bob Simons recommends a very specific
+Java distribution on which to run Tomcat and ERDDAP.
+
+The Java, Tomcat and ERDDAP packages are all installed in +/opt+ because they are all external to CentOS,
+and because it's a useful thing to keep them all in one centralized
+location.  The official CentOS Java and Tomcat packages are
+scattered all over the filesystem, and it is more trouble than it is worth to attempt to shoehorn non-standard
+packages into the various niches into which the standard packages are presently stashed.  There is a procedure for
+taking source code packages and configuring and compiling them into standard CentOS binary packages, although one
+might call it attempting to lower the river rather than raising the bridge.  Steadily increasing security
+demands will probably force future installations to use the standard Java and Tomcat packages in the CentOS
+distribution, but that is beyond the scope of this document.
+
+The Java distribution Bob Simons nicely asks you to use can be found at:
+
+https://adoptopenjdk.net/[+https://adoptopenjdk.net/+]
+
+This is not the official distribution available from java.com nor the CentOS distribution package.
+The AdoptOpenJDK project was started because of "the general lack of an open and reproducible build & test system for OpenJDK source across multiple platforms."
+The general goals are to provide a reliable source of OpenJDK binaries for all platforms for the long run,
+and to provide an open, common, audited, build infrastructure.
+If the creator of ERDDAP recommends it - "it is the main, community-supported, free (as in beer and speech) version of Java 8 that offers Long Term Support (free upgrades until at least September 2023)" - then we'll use it.
+An additional bonus to using AdoptOpenJDK is that is contains the DejaVu fonts that Bob Simons
+strongly recommends using instead of the standard Java fonts, so you can skip the step of downloading them
+and installing them in another Java distribution.
+
+There are Java versions - 9, 10 and 11 - beyond the recommended version 8, but ERDDAP has not yet been
+tested with them.  Check the official installation document for further developments in this area.
+
+Installing the recommended Java is as easy as downloading it into +/opt+, unpacking it.  Bob recommends
+installing it in +/usr/local+, but that is the standard place into which most open source packages are installed 
+by default and can get crowded.  Using +/opt+ allows you to limit the neighborhood to just the essentials of Java,
+Tomcat and ERDDAP.
+
+Tomcat
+~~~~~~
+
+While the Java installation is easy, Tomcat is more complicated, requiring additional steps beyond
+downloading and unpacking.
+Tomcat is a Java Application Server (JAS), a piece of software - sometimes called middleware - that exists
+between the network services of the operating system and Java applications like ERDDAP.
+There are other freely available and commercial JAS packages, but ERDDAP is only supported under Tomcat.
+The recommended Tomcat distribution is the latest version of Tomcat 8, and can be found at:
+
+*Note:*  If you are already running a Tomcat server it is recommended that you install a second
+one that will run only ERDDAP.
+
+https://tomcat.apache.org/download-80.cgi[+https://tomcat.apache.org/download-80.cgi+]
+
+Download it and unpack it into +/opt+.
+This will create a directory such as +apache-tomcat-8.5.57+ (the latest release as of 2020-08-18).
+It is useful to change the directory name to something like +tomcat8+, and also to create a file
+in +/opt+ called +000-tomcat-8.5.57+ as a reminder.
+You Tomcat distribution is now installed in +/opt/tomcat8+.
+
+Configuration File Changes
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The official documentation recommends making changes to three configuration files:
+
+-----
+/opt/tomcat8/conf/server.xml
+/opt/tomcat8/conf/context.xml
+/etc/httpd/conf/httpd.conf
+-----
+
+See that document for the details.
+
+Security Procedures
+^^^^^^^^^^^^^^^^^^^
+
+The official documentation has many suggestions about securing your Tomcat server, as
+well as links to other resources.
+The THREDDS documentation at:
+
+https://www.unidata.ucar.edu/software/tds/current/reference/index.html[+https://www.unidata.ucar.edu/software/tds/current/reference/index.html+]
+
+also contains many useful Tomcat security suggestions and links.
+If you search for "tomcat security" you can find many, many more suggestions.
+It would be a good idea to consult your local security people about this, or
+just wait for them to contact you.
+
+A very important recommendation is to run Tomcat under the user +tomcat+ rather than as +root+.
+There are instructions as to how to create this separate user with limited permissions
+and with no password, thus enabling only the superuser or those with +sudo+ privileges to
+become user +tomcat+ and make changes to the installation.
+There are also recommendations on changing file permissions to increase security.
+Follow them all.
+
+Environment Variables
+^^^^^^^^^^^^^^^^^^^^^
+
+Variables specifying the environment in which Tomcat will run need to be created in a file called:
+
++/opt/tomcat9/bin/setenv.sh+
+
+An example of this for this specific set-up is:
+
+-----
+export JAVA_HOME=/opt/jre
+export JAVA_OPTS='-server -Djava.awt.headless=true -Xmx8000M -Xms8000M'
+export TOMCAT_HOME=/opt/tomcat8
+export CATALINA_HOME=/opt/tomcat8
+-----
+
+Follow the instructions about how to set the +-Xmx+ and +-Xms+ memory
+settings.  It will depend on both your available RAM and the size and number
+of files you're attempting to serve with ERDDAP.
+The example contains the recommended minimum setting for a 64-bit machine,
+although it is further recommended to set these to 1/2 of your available RAM
+memory.
+These recommendations tell you that you should have at least 16GB of RAM to
+run an ERDDAP server, although experience has shown that 32GB is a better choice for a minimum.
+
+Testing Tomcat
+^^^^^^^^^^^^^^
+
+After all the configuring and securing, try to start Tomcat with:
+
++/opt/tomcat8/bin/startup.sh+
+
+*Note:*  If you're not going to attempt to install ERDDAP on a Windows machine, go ahead
+and delete all the +*.bat+ files in +/opt/tomcat8/bin+.
+
+After you start it, use your browser to go to:
+
++https://yourmachine.org:8080+
+
+If you don't get the Tomcat welcome page, then go through the debugging section in
+the official documentation.
+A very important log file for this is:
+
++/opt/tomcat8/logs/catalina.out+
+
+which will typically supply details about the problem if it is a Tomcat rather than
+an external network problem.
+
+A good thing to do right after you've successfully tested Tomcat is to go into
+the directory:
+
++/opt/tomcat8/webapps+
+
+and delete everything therein, unless you're planning to manage the server remotely
+rather than from the command line.  Remote management can be and usually is a big security hole,
+so you're better off just removing everything from that directory.
+You might consider keeping the +ROOT+ directory which supplies the initial Tomcat
+splash page, and there are suggestions on web as to how to edit the contents of +ROOT+
+to remove the splash page and provide minimal information rather than the error message
+you'll get in your browser if you remove it.
+
+ERDDAP
+~~~~~~
+
+Initial Configuration
+^^^^^^^^^^^^^^^^^^^^^
+
+Now we can do the initial ERDDAP installation.
+First, download the configuration files from:
+
+https://github.com/BobSimons/erddap/releases/download/v2.02/erddapContent.zip[+https://github.com/BobSimons/erddap/releases/download/v2.02/erddapContent.zip+]
+
+This address will change whenever a new version becomes available, so check the official documentation to be sure.
+
+Download this file into +/opt/tomcat8+ and unzip it to create the directory:
+
++/opt/tomcat8/content/erddap+
+
+in which the configuration files for both the server and the datasets it will serve will reside.
+
+Edit the file +/opt/tomcat8/content/erddap/setup.xml+ and make all the suggested changes therein.
+The changes that are *mandatory* are:
+
+-----
+<bigParentDirectory>
+<emailEverythingTo>
+<baseUrl>
+<baseHttpsUrl>
+<email.*>
+<admin.*>
+-----
+
+Additonally, +<fontFamily>+ will have to be changed if you're not using the DejaVu fonts
+that come with the AdoptOpenJDK distribution.
+There are many non-mandatory configuration options, which you may need to come back to
+as you gain experience in running your server.
+
+*Note:*  It is easy enough to make changes to +setup.xml+ that are not considered well-formed
+by the very finicky XML parser.  You can either use an XML validator to check the file
+or check the contents of a log file that will soon enough become your intimate friend:
+
++/opt/erddap/logs/log.txt+
+
+for information as to the nature of your XML problem.  This file will also be the go-to
+place to track down the inevitable problems your dataset configuration files will have.
+
+The +<bigParentDirectory>+ is a very important directory to create.
+It will contain all the internal netCDF and Java database files ERDDAP creates from
+the netCDF and other files you configure in +datasets.xml+ for inclusion.
+ERDDAP creates several new internal files for each file it ingests, including those
+with summary information data for each dataset in a format more quickly and readily available
+than the original file.
+On the GRIIDC ERDDAP server, this directory is specified as +/opt/erddap+.
+*DO NOT* in any circumstances put this directory inside the +/opt/tomcat8+ directory hierarchy.
+You might even want to put it on a separate data disk.
+
+It is also very important to make user +tomcat+ the owner of the +/opt/erddap+ hierarchy and
+change the permissions as indicated.
+
+Starting ERDDAP
+^^^^^^^^^^^^^^^
+
+The ERDDAP server can now be downloaded from:
+
+https://github.com/BobSimons/erddap/releases/download/v2.02/erddap.war[+https://github.com/BobSimons/erddap/releases/download/v2.02/erddap.war+]
+
+the location of which, as with the configuration files, will change with the version number.
+
+*Note*:  The full ERDDAP distribution is half a gigabyte in size, so it might take a while to download.
+
+Once ERDDAP has been downloaded into +/opt/tomcat8+, copy or move it into:
+
++/opt/tomcat8/webapps+
+
+At this point you can edit the Apache/HTTPD configuration file to use ProxyPass so users won't have 
+to specify the port number +:8080+ in the URL for the server.  The official documentation provides the
+details for this, and don't forget to restart the Apache server if you do this.
+
+Now we start the ERDDAP server.  If the Tomcat server is still running from your initial
+test shut it down via:
+
++/opt/tomcat8/bin/shutdown.sh+
+
+and then start it up again via:
+
++/opt/tomcat8/bin/startup.sh+
+
+*Note:*  You can check the up or down status of your Tomcat server via the command:
+
++ps -ef | grep tomcat+
+
+After you've started or restarted Tomcat, check the status of ERDDAP by browsing to:
+
++https://yourmachine.org:8080/erddap/status.html+
+
+You can also check to see if your ProxyPass set-up is working by trying this URL
+without the port number +:8080+.
+
+If ERDDAP does not successfully start it could be a problem with the Apache server, the
+Tomcat server, or ERDDAP itself.  Check the appropriate logs for error messages.  If your
+Tomcat server started without any problems, you can probably skip checking Apache and just
+look in either:
+
+-----
+/opt/tomcat8/logs/catalina.out
+/opt/erddap/logs/log.txt
+-----
+
+The official documentation has much more information about this.
+
+Configuring Datasets
+--------------------
+
+The initial installation and configuration of ERDDAP is the easy part.
+Configuring datasets such that they can be correctly ingested by ERDDAP
+is both harder and more tedious, but is straightforward enough given some practice.
+
+With many geoscience data servers such as THREDDS and OpenDAP the configuration
+process is to simply specify the directory path or the URL of the dataset and the
+server does the rest.  With ERDDAP you have to write a large chunk of XML that
+describes the dataset.
+
+The basic process by which this is done is:
+
+* prepare a dataset - in the case of GRIIDC netCDF files - for ingestion into ERDDAP
+* run an ERDDAP script that reads the dataset and creates 99% of the XML boilerplate required
+* place that chunk of XML into the +datasets.xml+ file
+* restart ERDDAP
+* if the chunk works and ERDDAP has processed and is displaying your dataset, rejoice
+* if your dataset doesn't appear in the ERDDAP listing, search the +/opt/erddap/logs/log.txt+ 
+file for your dataset and hopefully find a message that tells you what you need to fix
+* go back to the restart ERDDAP step, and cycle through as needed
+
+Bob Simons has done a very good job of supplying useful error messages that typically
+tell you exactly what's missing or otherwise wrong.  There are also occasional less than helpful
+Java error messages like +EOFException+, but that's usually not the case.
+As was mentioned earlier, you will be spending a lot of time perusing
+the +/opt/erddap/logs/log.txt+ file, so you might want to create a short macro that
+will take your editor directly there.
+
+
+
+
+[appendix]
+ERDDAP Input Data Formats
+-------------------------
+
+ERDDAP can ingest datasets from:
+
+* comma-, tab-, semicolon- or space-separated tabular ASCII files;
+* some NOAA NOS web services;
+* groups of local audio files;
+* Automatic Weather Station (AWS) XML files;
+* Cassandra tables;
+* tabular ASCII files with fixed-width data columns;
+* DAP sequence servers;
+* database (MySQL, PostgreSQL, etc.) tables;
+* other ERDDAP servers;
+* Hyrax OpenDAP servers;
+* netCDF 3 or 4 files;
+* netCDF 3 or 4 files formatted using any of the CF discrete sampling geometries;
+* NCCSV ASCII csv files;
+* NOS XML servers;
+* OBIS servers;
+* SOS servers; and
+* THREDDS servers.
+
+Once ingested, the data can be extracted from ERDDAP in over 30 different ways, including as NetCDF files.
+
+NetCDF and Discrete Sampling Geometries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For the purposes of GRIIDC, the most import dataset file format is netCDF files formatted
+using the CF *Discrete Sampling Geometries* (DSG).  Examples of DSGs are time series, vertical profiles and
+trajectories.  A DSG dataset is characterized by a dimensionality lower than that of the region being
+sampled.  They can be thought of as limited paths through 4-D spacetime, e.g. a time series dataset is one
+fixed in all three spatial variables and variable in time.
+
+The CF conventions are commonly used for specifying dataset metadata designed to promote the processing
+and sharing of netCDF files.  For instance, the `standard_name` variable attribute enables a person or machine
+processing a netCDF file to know which variable contains, say, the sea water salinity via the use of the defined
+standard name `sea_water_salinity`.  If the appropriate `standard_name` and units are used in the file, then someone
+looking for the sea water salinity can easily find and use it without having to spend altogether too much time
+attempting to ascertain if a variable called `sws` or `sal` or `saltyschtoff` is really what they're looking for.
+
+The DSGs do the same for how the spatio-temporal structure of the dataset is represented within
+the netCDF file.  For instance, if a netCDF file containing a time series dataset contains a global
+attribute `featureType` with the value `timeSeries`, and variable `station_name` with an attribute
+`cf_role` with value `timeseries_id`, and the spatial, temporal and data variables have the appropriate
+structures, anybody or any program that can identify the various DSGs can process it easily and
+immediately without having to waste time attempting just to identify what kind of dataset is contained
+within a file.  ERDDAP is a program that recognizes datasets in netCDF files that
+follow the recommended conventions, and takes advantage of this for further subsetting or graphing tasks.
+
+Each type of DSG is defined by the relationships among its spatiotemporal coordinates, with each type known as a
+*featureType*.
+The CF conventions describe standard methods for storing and describing each featureType within
+a netCDF file.  These conventions are designed to enable maximum efficiency and clarity for storing
+specific featureTypes within netCDF files.
+Each featureType will now be briefly described.
+
+point
+^^^^^
+
+The *point* featureType is a single data point with no implied coordinate relationship to other
+points.  The form of a data variable containing values for a point featureType is `data(i)`, and
+the mandatory space-time coordinates for a collection of these features is `x(i)`, `y(i)` and `t(i)`. 
+Both the data and coordinates must share the same dimension.  An example of the header of a netCDF file
+containing point data follows.  It shows the data structure and minimum information required for the
+file to be readily identified as containing a point featureType.
+
+----
+dimensions:
+      obs = 1234 ;
+
+   variables:
+      double time(obs) ;
+          time:standard_name = “time”;
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float lon(obs) ;
+          lon:standard_name = "longitude";
+          lon:long_name = "longitude of the observation";
+          lon:units = "degrees_east";
+      float lat(obs) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "latitude of the observation" ;
+          lat:units = "degrees_north" ;
+      float alt(obs) ;
+          alt:long_name = "vertical distance above the surface" ;
+          alt:standard_name = "height" ;
+          alt:units = "m";
+          alt:positive = "up";
+          alt:axis = "Z";
+
+      float humidity(obs) ;
+          humidity:standard_name = "specific_humidity" ;
+          humidity:coordinates = "time lat lon alt" ;
+      float temp(obs) ;
+          temp:standard_name = "air_temperature" ;
+          temp:units = "Celsius" ;
+          temp:coordinates = "time lat lon alt" ;
+
+   attributes:
+      :featureType = "point";
+----
+
+timeSeries
+^^^^^^^^^^
+
+The *timeSeries* featureType is a series of data points at the same spatial location with
+monotonically increasing times.  The form of a data variable is `data(i,o)`, and the mandatory space-time
+coordinates are `x(i)`, `y(i)` and `t(i,o)`.
+Data are taken over periods of time at a single or set of discrete point spatial locations
+called stations.  The instance or station dimension specifies the number of time series
+in the collection.
+An example of the header of a netCDF file
+containing timeSeries data a single spatial location or station follows.  It shows the data structure
+and minimum information required for the
+file to be readily identified as containing a timeSeries featureType. There are extensions to this
+for the case of datasets containing multiple time series.
+
+-----
+dimensions:
+      time = 100233 ;
+      name_strlen = 23 ;
+
+   variables:
+      float lon ;
+          lon:standard_name = "longitude";
+          lon:long_name = "station longitude";
+          lon:units = "degrees_east";
+      float lat ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+      float alt ;
+          alt:long_name = "vertical distance above the surface" ;
+          alt:standard_name = "height" ;
+          alt:units = "m";
+          alt:positive = "up";
+          alt:axis = "Z";
+      char station_name(name_strlen) ;
+          station_name:long_name = "station name" ;
+          station_name:cf_role = "timeseries_id";
+
+      double time(time) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+      float humidity(time) ;
+          humidity:standard_name = “specific_humidity” ;
+          humidity:coordinates = "time lat lon alt station_name" ;
+          humidity:_FillValue = -999.9f;
+      float temp(time) ;
+          temp:standard_name = “air_temperature” ;
+          temp:units = "Celsius" ;
+          temp:coordinates = "time lat lon alt station_name" ;
+          temp:_FillValue = -999.9f;
+
+   attributes:
+          :featureType = "timeSeries";
+-----
+
+trajectory
+^^^^^^^^^^
+
+A *trajectory* featureType is a series of data points along a path through space with
+monotonically increasing times.  The form of a data variable is `data(i,o)`, and the
+mandatory space-time coordinates are `x(i,o)`, `y(i,o)` and `t(i,o)`.
+A flight path or a cruise track are examples of trajectories.
+The instance or trajectory dimension specifies the number of trajectories in a collection.
+The instance or trajectory variables have this dimension.
+An example of a netCDF header for a trajectory featureType follows.  This is for a single
+trajectory.  Other CF examples are available for multiple trajectory collections.
+
+-----
+dimensions:
+      time = 42;
+
+   variables:
+      char trajectory(name_strlen) ;
+          trajectory:cf_role = "trajectory_id";
+
+      double time(time) ;
+          time:standard_name = "time";
+          time:long_name = "time" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float lon(time) ;
+          lon:standard_name = "longitude";
+          lon:long_name = "longitude" ;
+          lon:units = "degrees_east" ;
+      float lat(time) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "latitude" ;
+          lat:units = "degrees_north" ;
+      float z(time) ;
+          z:standard_name = “altitude”;
+          z:long_name = "height above mean sea level" ;
+          z:units = "km" ;
+          z:positive = "up" ;
+           z:axis = "Z" ;
+
+      float O3(time) ;
+          O3:standard_name = “mass_fraction_of_ozone_in_air”;
+          O3:long_name = "ozone concentration" ;
+          O3:units = "1e-9" ;
+          O3:coordinates = "time lon lat z" ;
+
+      float NO3(time) ;
+          NO3:standard_name = “mass_fraction_of_nitrate_radical_in_air”;
+          NO3:long_name = "NO3 concentration" ;
+          NO3:units = "1e-9" ;
+          NO3:coordinates = "time lon lat z" ;
+
+   attributes:
+      :featureType = "trajectory";
+-----
+
+profile
+^^^^^^^
+
+A *profile* featureType is an ordered set of data points along a vertical line at a fixed horizontal
+position and time.
+The form of a data variable is `data(i,o)` and the mandatory space-time
+coordinates are `x(i)`, `y(i)`, `z(i,o)` and `t(i)`.
+An example of a profile is an ocean sounding or an XBT measurement.
+The instance or profile dimension specifies the number of profiles in the collection.
+The instance or profile variables contain information about the profiles.
+An example of a netCDF file header for a single profile collection follows.  It shows the 
+data structure and minimum information required for the
+file to be readily identified as containing a profile featureType. There
+are more complex examples for multiple profile collections.
+
+-----
+dimensions:
+      z = 42 ;
+
+   variables:
+      int profile ;
+          profile:cf_role = "profile_id";
+
+      double time;
+          time:standard_name = "time";
+          time:long_name = "time" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float lon;
+          lon:standard_name = "longitude";
+          lon:long_name = "longitude" ;
+          lon:units = "degrees_east" ;
+      float lat;
+          lat:standard_name = "latitude";
+          lat:long_name = "latitude" ;
+          lat:units = "degrees_north" ;
+
+      float z(z) ;
+          z:standard_name = “altitude”;
+          z:long_name = "height above mean sea level" ;
+          z:units = "km" ;
+          z:positive = "up" ;
+          z:axis = "Z" ;  
+
+      float pressure(z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat z" ;
+
+      float temperature(z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat z" ;
+
+      float humidity(z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat z" ;
+
+   attributes:
+      :featureType = "profile";
+-----
+
+timeSeriesProfile
+^^^^^^^^^^^^^^^^^
+
+A *timeSeriesProfile* featureType is a series of profile features at the same horizontal
+position with monotonically increasing times.
+The form of a data variable is `data(i,p,o)` and the mandatory
+space-time coordinates are `x(i)`, `y(i)`, `z(i,p,o)` and `t(i,p)`.
+This featureType occurs when profiles are taken repeatedly at a station. The
+instance or station dimension specifies the number of profiles.
+The instance or station variables contain information describing the stations.
+An example of a netCDF header for a timeSeriesProfile dataset with a single station follows.
+It shows the
+data structure and minimum information required for the
+file to be readily identified as containing a timeSeriesProfile featureType.
+Examples of headers for datasets with multiple stations are available in the CF standard document.
+
+-----
+dimensions:
+      profile = 30 ;
+      z = 42 ;
+
+   variables:
+      float lon ;
+          lon:standard_name = "longitude";
+          lon:long_name = "station longitude";
+          lon:units = "degrees_east";
+      float lat ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+      char station_name(name_strlen) ;
+          station_name:cf_role = "timeseries_id" ;
+          station_name:long_name = "station name" ;
+      int station_info;
+          station_info:long_name = "some kind of station info" ;
+
+      float alt(profile , z) ;
+          alt:standard_name = “altitude”;
+          alt:long_name = "height above mean sea level" ;
+          alt:units = "km" ;
+          alt:axis = "Z" ;  
+          alt:positive = "up" ;
+
+      double time(profile ) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+
+      float pressure(profile , z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat alt station_name" ;
+
+      float temperature(profile , z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat alt station_name" ;
+
+      float humidity(profile , z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat alt station_name" ;
+
+   attributes:
+    :featureType = "timeSeriesProfile";
+-----
+
+trajectoryProfile
+^^^^^^^^^^^^^^^^^
+
+A *trajectoryProfile* featureType is a series of profile features located at points
+ordered along a trajectory.
+A data variable has the form `data(i,p,o)` and the
+mandatory space-time coordinates are `x(i,p)`, `y(i,p)`, `z(i,p,o)` and `t(i,p)`.
+The data collected from a horizontally moving ADCP would create
+a trajectoryProfile dataset.
+The instance or trajectory dimension species the number of trajectories.
+The instance or trajectory variables contain information describing the trajectories.
+Each trajectory has a number of profiles as its elements, and each profile has
+a number of data from various levels as its elements.
+A netCDF header for a trajectoryProfile dataset containing just a single trajectory
+follows.  
+It shows the
+data structure and minimum information required for the
+file to be readily identified as containing a trajectoryProfile featureType.
+More complex examples involving multiple trajectories can be found in the
+CF standard document.
+
+-----
+dimensions:
+      profile = 33;
+      z = 42 ;
+
+   variables:
+      int trajectory;
+          trajectory:cf_role = "trajectory_id" ;
+
+      float lon(profile) ;
+          lon:standard_name = "longitude";
+          lon:units = "degrees_east";
+      float lat(profile) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+
+      float alt(profile, z) ;
+          alt:standard_name = “altitude”;
+          alt:long_name = "height above mean sea level" ;
+          alt:units = "km" ;
+          alt:positive = "up" ;
+           alt:axis = "Z" ;  
+
+      double time(profile ) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+
+      float pressure(profile, z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat alt" ;
+
+      float temperature(profile, z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat alt" ;
+
+      float humidity(profile, z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat alt" ;
+
+   attributes:
+    :featureType = "trajectoryProfile";
+-----
+
+Creating a meta-netCDF File for Each Dataset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Most datasets contain more than one netCDF file.  Typically there a many, with each file
+containing, for example, the results of one CTD or XBT cast.
+As such, the netCDF files making up each dataset, i.e. each separate UDI, are
+interrogated for what is deemed essential information, and this information is summarized
+for all the files in what we will call a meta-netCDF file that will be served on
+ERDDAP.  The original files within each dataset are not being (presently) served by
+ERDDAP, but a summary of them that allows spatial and temporal subsets to be obtained
+is being served, with the original files downloadable by a single click from a THREDDS
+server.
+
+Example meta-netCDF File
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The essential data from each set of files in a dataset is extracted and
+summarized in what we'll call a meta-netCDF file for all the netCDF files that make up the dataset.
+We'll now use the dataset from UDI R1.x132.134:0084 as an example.
+The meta-netCDF file for this UDI is created from the UDI
+and is `R1.x132.134.0084.nc`.  It contains
+a summary of the essential spatial, temporal and other data found in the two files that make up
+the dataset:
+`PE14_14_Highsmith_GC600_1.nc` and
+`PE14_14_Highsmith_MC118_1.nc`.
+
+The data deemed essential for the profile dataset are:
+
+* `station` - the ID of the station for each file, i.e. essentially the file name;
+* `dap_url` - the URL of the DAP interface to this file in the THREDDS server, i.e. click on this to explore
+the contents of this file via OpenDAP methods;
+* `http_url` - the URL of the HTTP interface to this file on the THREDDS server, i.e. click on this to
+directly download the file;
+* `time` - the time at which each CTD was begun;
+* `lon` - the longitude at which the CTD was dropped;
+* `lat` - the latitude at which the CTD was dropped;
+* `depth` - the maximum or bottom depth of the CTD cast; and
+* `vertical_points` - the number of data points taken in the vertical.
+
+This summarized data allows subsets of the results of UDI R1.x132.134:0084 to be extracted
+in terms of time, horizonal location, depth and even vertical resolution.
+And the files that remain after subsetting can be easily downloaded via a single
+click apiece.
+
+The data that is considered essential varies with each featureType.  For example, in trajectory
+datasets more than a single longitude and latitude value are extracted.  The minimum and maximum of each
+are extracted along with the first and last of each since they  might differ from the minimum
+and maximum.
+
+The entire netCDF file `R1.x132.134.0084.nc` - as produced in readable form
+via `ncdump R1.x132.134.0084.nc` - follows:
+
+------
+netcdf R1.x132.134.0084 {
+dimensions:
+        station = 2 ;
+variables:
+        string station(station) ;
+                station:long_name = "station identification number" ;
+        string dap_url(station) ;
+                dap_url:long_name = "THREDDS OpenDAP URL" ;
+        string http_url(station) ;
+                http_url:long_name = "THREDDS HTTP URL" ;
+        double time(station) ;
+                time:standard_name = "time" ;
+                time:long_name = "time" ;
+                time:calendar = "Julian" ;
+                time:units = "Seconds since 1970-01-01 00:00:00" ;
+        double lon(station) ;
+                lon:standard_name = "longitude" ;
+                lon:long_name = "longitude" ;
+                lon:units = "degrees_east" ;
+                lon:axis = "X" ;
+        double lat(station) ;
+                lat:standard_name = "latitude" ;
+                lat:long_name = "latitude" ;
+                lat:units = "degrees_north" ;
+                lat:axis = "Y" ;
+        double depth(station) ;
+                depth:_FillValue = -999. ;
+                depth:long_name = "depth" ;
+                depth:standard_name = "depth" ;
+                depth:units = "m" ;
+                depth:positive = "down" ;
+                depth:axis = "Z" ;
+        int vertical_points(station) ;
+                vertical_points:long_name = "number of vertical points" ;
+                vertical_points:standard_name = "vertical_points" ;
+                vertical_points:units = "1" ;
+
+// global attributes:
+                :dataset_id = "R1.x132.134:0084" ;
+                :griidc_udi = "R1.x132.134:0084" ;
+                :consortia = "Consortium for Advanced Research on Transport of Hydrocarbon in the Environment (CARTHE)" ;
+                :organization = "GRIIDC" ;
+                :title = "R/V Pelican: PE14-14 Hydrographic (CTD) Data, Gulf of Mexico, March 6-13, 2014." ;
+                :summary = "R/V Pelican: PE14-14 Hydrographic (CTD) Data, Gulf of Mexico (GC600, MC118), March 6-13, 2014. Three conductivity, temperatu
+re and depth (CTD) casts made from the RV Pelican in the northern Gulf of Mexico in lease block GC600 and MC118 in conjunction with and support of ongoi
+ng  deep sea lander experiments." ;
+                :platform = "ship" ;
+                :instrument = "Seabird SBE9" ;
+                :sea_name = "northern Gulf of Mexico" ;
+                :publisher_name = "Gulf of Mexico Research Initiative Information and Data (GRIIDC)" ;
+                :publisher_url = "https://data.gulfresearchinitiative.org" ;
+                :dataset_variables = "profile,time,lat,lon,pres,dep,temp1,temp2,cond,cond2,sal,sal2,oxy1,oxy2,svcm1,svcm2" ;
+                :variable_units = "NA,Seconds since 1970-01-01 00:00:00,degrees_north,degrees_east,dbar,m,degrees Celsius,degrees Celsius,S/m,S/m,psu,ps
+u,ml/l,ml/l,m/s,m/s" ;
+                :variable_standard_names = "NA,time,latitude,longitude,sea_water_pressure,sea_water_depth,sea_water_temperature,sea_water_temperature,se
+a_water_electrical_conductivity,sea_water_electrical_conductivity,sea_water_practical_salinity,sea_water_practical_salinity,mass_concentration_of_dissol
+ved_oxygen_in_sea_water,volume_fraction_of_oxygen_in_sea_water,average_speed_of_sound_in_sea_water ,average_speed_of_sound_in_sea_water " ;
+data:
+
+ station = "PE14_14_Highsmith_GC600_1", "PE14_14_Highsmith_MC118_1" ;
+
+ dap_url = 
+    "http://138.197.0.26:8080/thredds/dodsC/profile/R1.x132.134.0084/PE14_14_Highsmith_GC600_1.nc.html", 
+    "http://138.197.0.26:8080/thredds/dodsC/profile/R1.x132.134.0084/PE14_14_Highsmith_MC118_1.nc.html" ;
+
+ http_url = 
+    "http://138.197.0.26:8080/thredds/fileServer/profile/R1.x132.134.0084/PE14_14_Highsmith_GC600_1.nc", 
+    "http://138.197.0.26:8080/thredds/fileServer/profile/R1.x132.134.0084/PE14_14_Highsmith_MC118_1.nc" ;
+
+ time = 1394497945, 1394497945 ;
+
+ lon = -88.5046666666667, -88.5046666666667 ;
+
+ lat = 28.86, 28.86 ;
+
+ depth = 841.582, 841.582 ;
+
+ vertical_points = 849, 849 ;
+}
+------
+
+
+Creating the ERDDAP Configuration Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+Creating the THREDDS Configuration Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

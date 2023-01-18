@@ -1,0 +1,2710 @@
+WAF
+===
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+What is WAF?
+
+According to
+https://geo-ide.noaa.gov/wiki/index.php?title=Web_Accessible_Folder[+https://geo-ide.noaa.gov/wiki/index.php?title=Web_Accessible_Folder+]:
+
+A *Web Accessible Folder (WAF)* is a simple directory of files on a web server
+that can be:
+
+* accessed by users with a web browser;
+* indexed by Google and other search engines; and
+* harvested by metadata discovery portals or other freely available utilities.
+
+How does one create a WAF?
+
+The basic procedure for creating a WAF is:
+
+* run a program to crawl through a THREDDS server and produce metadata files;
+* convert these files in an HTML file that can be viewed via a web browser.
+
+How does one create a useful WAF?
+
+* peruse the Attribute Conventions Dataset Discovery recommendations;
+* add some or all of these recommended metadata as attributes to your
+THREDDS dataset either by adding the attributes to the original
+NetCDF/HDF/etc. files or adding them via NcML statements in a
+THREDDS configuration file.
+
+Present questions to answer:
+
+*  Why does the ncISO crawler only create directories for some rather
+than all of the subdirectories within the THREDDS server?
+
+Creating the WAF for the NCEP NAM Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This can be done directory via the +ncISO.jar+ file or via the Python script
+that runs that file.  The first way is:
+
+-----
+java -Xms4096m -Xmx4096m -jar ncISO.jar -ts http://barataria.tamu.edu:6060/thredds/catalog/grib/NCEP/NAM/CONUS_12km/2012/catalog.xml -classpath ./ -num 3 -depth 20 -iso true -waf /home/baum/WAF/barataria_ncep
+
+java -Xms4096m -Xmx4096m -jar ncISO.jar -ts http://barataria.tamu.edu:6060/thredds/catalog/grib/NCEP/NAM/CONUS_12km/2013/catalog.xml -classpath ./ -num 3 -depth 20 -iso true -waf /home/baum/WAF/barataria_ncep
+-----
+
+These commmands will create a subdirectory +barataria_ncep+ which contains an +iso+ directory
+wherein the required WAF files will reside.
+
+
+How to Create a WAF
+-------------------
+
+*Python Scripts for Creating WAFs* -
+https://github.com/ioos/registry/wiki/Python-Scripts-for-creating-WAFs[+https://github.com/ioos/registry/wiki/Python-Scripts-for-creating-WAFs+]
+
+*Hosting Your Own WAF* -
+https://github.com/ioos/registry/wiki/Hosting-Your-Own-WAF[+https://github.com/ioos/registry/wiki/Hosting-Your-Own-WAF+]
+
+The steps are:
+
+* Use +ncISO+ or +thredds_crawler/metadown+ to create crawl through a THREDDS server and produce
+ISO 19115-2 metadata files.
+
+* Use these files to create a WAF.
+
+
+Basically, a command line program called +ncISO+ is used along with and XSL
+file called +UnidataDD2MI.xsl+ and the URL of a THREDDS server to create a
+standalone WAF page.
+
+The following command-line option is used with +ncISO+ to create a flat WAF
+file structure:
+
++-waf ROOT_WAF_FOLDER+
+
+The XSLT File
+~~~~~~~~~~~~~
+
+The XSL file can be obtained at:
+
+http://ngdc.noaa.gov/metadata/published/xsl/nciso2.0/UnidataDD2MI.xsl[+http://ngdc.noaa.gov/metadata/published/xsl/nciso2.0/UnidataDD2MI.xsl+]
+
+ncISO vs. run_nciso
+-------------------
+
+The +run_nciso.py+ script basically runs ncISO and renames some files after they're
+downloaded.  The basical form of ncISO used is:
+
+-----
+/usr/bin/java', '-Xms4024m', '-Xmx4024m', '-jar', 'ncISO-2.3.jar', '-ts', tds_url, '-num',  nciso_num, '-depth',  '20', '-iso', 'true', '-waf', waf_dir
+-----
+
+If we run:
+
+-----
+java -Xms4096m -Xmx4096m -jar ncISO.jar -ts http://barataria.tamu.edu:8080/thredds/catalog/fmrc/roms/out/catalog.xml -num 1 -depth 20 -iso true -waf /home/baum/WAF/barataria
+-----
+
+then we get:
+
+-----
+barataria/iso:
+total 356
+-rw-rw-r--. 1 baum baum 115722 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml
+-rw-rw-r--. 1 baum baum 121070 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+-rw-rw-r--. 1 baum baum 122513 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+
+barataria/ncml:
+total 116
+-rw-rw-r--. 1 baum baum 35178 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml
+-rw-rw-r--. 1 baum baum 37923 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+-rw-rw-r--. 1 baum baum 38470 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+
+barataria/score:
+total 132
+-rw-rw-r--. 1 baum baum 41545 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.html
+-rw-rw-r--. 1 baum baum 42159 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.html
+-rw-rw-r--. 1 baum baum 42141 Oct 28 14:33 thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.html
+-----
+
+If we run the ostensible equivalent via the Python script, i.e.
+
+-----
+./run_nciso.py -v /home/baum/WAF/bp http://barataria.tamu.edu:8080/thredds/catalog/fmrc/roms/out/catalog.xml
+-----
+
+we get:
+
+-----
+barataria/iso:
+total 356
+-rw-rw-r--. 1 baum baum 115722 Oct 29 11:50 files_ocean_his_07262012_01.nc.xml
+-rw-rw-r--. 1 baum baum 121070 Oct 29 11:50 ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+-rw-rw-r--. 1 baum baum 122513 Oct 29 11:50 runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+
+barataria/ncml:
+total 116
+-rw-rw-r--. 1 baum baum 35178 Oct 29 11:50 thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml
+-rw-rw-r--. 1 baum baum 37923 Oct 29 11:50 thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+-rw-rw-r--. 1 baum baum 38470 Oct 29 11:50 thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+
+barataria/score:
+total 132
+-rw-rw-r--. 1 baum baum 41545 Oct 29 11:50 files_ocean_his_07262012_01.nc.html
+-rw-rw-r--. 1 baum baum 42159 Oct 29 11:50 ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.html
+-rw-rw-r--. 1 baum baum 42141 Oct 29 11:50 runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.html
+-----
+
+The files created by both methods are the same size since they're created
+by the ncISO component.  The Python script simply removes the boilerplate
+prefix from the +iso+ and +score+ subdirectories.
+
+If we change the value of +num+ to +2+, we get:
+
+-----
+barataria/iso:
+total 716
+-rw-rw-r--. 1 baum baum 115722 Oct 29 11:57 files_ocean_his_07262012_01.nc.xml
+-rw-rw-r--. 1 baum baum 115606 Oct 29 11:57 files_ocean_his_07262012_02.nc.xml
+-rw-rw-r--. 1 baum baum 124663 Oct 29 11:57 ROMS_Output_Feature_Collection_Aggregation_best.ncd.xml
+-rw-rw-r--. 1 baum baum 121074 Oct 29 11:57 ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+-rw-rw-r--. 1 baum baum 122518 Oct 29 11:57 runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T06:00:00Z.xml
+-rw-rw-r--. 1 baum baum 122517 Oct 29 11:57 runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+
+barataria/ncml:
+total 232
+-rw-rw-r--. 1 baum baum 35178 Oct 29 11:57 thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml
+-rw-rw-r--. 1 baum baum 35058 Oct 29 11:57 thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_02.nc.xml
+-rw-rw-r--. 1 baum baum 39131 Oct 29 11:57 thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_best.ncd.xml
+-rw-rw-r--. 1 baum baum 37923 Oct 29 11:57 thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+-rw-rw-r--. 1 baum baum 38473 Oct 29 11:57 thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T06:00:00Z.xml
+-rw-rw-r--. 1 baum baum 38470 Oct 29 11:57 thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+
+barataria/score:
+total 264
+-rw-rw-r--. 1 baum baum 41545 Oct 29 11:57 files_ocean_his_07262012_01.nc.html
+-rw-rw-r--. 1 baum baum 41545 Oct 29 11:57 files_ocean_his_07262012_02.nc.html
+-rw-rw-r--. 1 baum baum 42146 Oct 29 11:57 ROMS_Output_Feature_Collection_Aggregation_best.ncd.html
+-rw-rw-r--. 1 baum baum 42159 Oct 29 11:57 ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.html
+-rw-rw-r--. 1 baum baum 42143 Oct 29 11:57 runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T06:00:00Z.html
+-rw-rw-r--. 1 baum baum 42141 Oct 29 11:57 runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.html
+-----
+
+thredds_crawler
+---------------
+
+https://github.com/kwilcox/thredds_crawler[+https://github.com/kwilcox/thredds_crawler+]
+
+This is a simple crawler and parser for THREDDS catalogs.  It can be easily
+installed via:
+
++/opt/python2.7/bin/pip install thredds_crawler+
+
+Here is a script that uses +thredds_crawler+ to harvest a
+THREDDS catalog and save the ISO meta data files to
+a local directory.
+
+-----
+import os
+import urllib
+from thredds_crawler.crawl import Crawl
+
+import logging
+import logging.handlers
+logger = logging.getLogger('thredds_crawler')
+fh = logging.handlers.RotatingFileHandler('/var/log/iso_harvest/iso_harvest.log', maxBytes=1024*1024*10, backupCount=5)
+fh.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+logger.addHandler(fh)
+logger.addHandler(ch)
+logger.setLevel(logging.DEBUG)
+
+SAVE_DIR="/srv/http/iso"
+
+THREDDS_SERVERS = {
+    "aoos":      "http://thredds.axiomalaska.com/thredds/catalogs/aoos.html",
+    "cencoos":   "http://thredds.axiomalaska.com/thredds/catalogs/cencoos.html",
+    "maracoos" : "http://tds.maracoos.org/thredds/catalog.html",
+    "glos":      "http://tds.glos.us/thredds/catalog.html"
+}
+
+for subfolder, thredds_url in THREDDS_SERVERS.items():
+  logger.info("Crawling %s (%s)" % (subfolder, thredds_url))
+  crawler = Crawl(thredds_url, debug=True)
+  isos = [(d.id, s.get("url")) for d in catalog.datasets for s in d.services if s.get("service").lower() == "iso"]
+  filefolder = os.path.join(SAVE_DIR, subfolder)
+  if not os.path.exists(filefolder)
+    os.makedirs(filefolder)
+  for iso in isos:
+    try:
+      filename = iso[0].replace("/", "_") + ".iso.xml"
+      filepath = os.path.join(filefolder, filename)
+      logger.info("Downloading/Saving %s" % filepath)
+      urllib.urlretrieve(iso[1], filepath)
+    except BaseException:
+      logger.exception("Error!")
+-----
+
+Usage Attempts
+~~~~~~~~~~~~~~
+
+The program was placed into the file +thredds_crawler.py+ and the following
+changes were made:
+
+-----
+SAV_DIR="/home/baum/waf/crawler"
+
+THREDDS_SERVERS = {
+    "megara":      "http://megara.tamu.edu:8080/thredds/catalog.html"
+}
+-----
+
+Upon running this via:
+
++python2.7 thredds_crawler.py+
+
+this error message was obtained:
+
+-----
+Traceback (most recent call last):
+  File "thredds_crawler.py", line 3, in <module>
+    from thredds_crawler.crawl import Crawl
+  File "/home/baum/WAF/thredds_crawler.py", line 3, in <module>
+    from thredds_crawler.crawl import Crawl
+ImportError: No module named crawl
+-----
+
+This means that the module hasn't been installed, which we will
+attempt via:
+
++pip install thredds_crawler+
+
+to obtain the error message:
+
+-----
+Traceback (most recent call last):
+  File "/opt/anaconda/bin/pip", line 4, in <module>
+    from pip import main
+  File
+"/opt/python2.7/lib/python2.7/site-packages/pip-1.5.4-py2.7.egg/pip/__init__.py",
+line 9, in <module>
+    from pip.log import logger
+  File
+"/opt/python2.7/lib/python2.7/site-packages/pip-1.5.4-py2.7.egg/pip/log.py",
+line 8, in <module>
+    from pip import backwardcompat
+  File
+"/opt/python2.7/lib/python2.7/site-packages/pip-1.5.4-py2.7.egg/pip/backwardcompat/__init__.py",
+line 66, in <module>
+    from urllib2 import URLError, HTTPError
+  File "/opt/python2.7/lib/python2.7/urllib2.py", line 94, in <module>
+    import httplib
+  File "/opt/python2.7/lib/python2.7/httplib.py", line 69, in <module>
+    from array import array
+ImportError: /opt/python2.7/lib/python2.7/lib-dynload/array.so: undefined
+symbol: PyUnicodeUCS2_FromUnicode
+-----
+
+Python is compiled for either UCS2 or UCS4 via:
+
++./configure --enable-unicode=ucs[2|4]+
+
+
+
+metadown
+--------
+
+https://github.com/asascience-open/metadown[+https://github.com/asascience-open/metadown+]
+
+This is a programmatic collector/downloader for IOOS-like ISO 19115-2 metadata
+that supports THREDDS and GeoNetwork.
+
+It is installed via:
+
++pip install metadown+
+
+and requires +thredds_crawler+, which will be automatically installed if
+not already present.
+
+Further usage information is available at the above URL.
+
+
+ncISO
+-----
+
+http://www.ngdc.noaa.gov/eds/tds/[+http://www.ngdc.noaa.gov/eds/tds/+]
+
+https://geo-ide.noaa.gov/wiki/index.php?title=NcISO[+https://geo-ide.noaa.gov/wiki/index.php?title=NcISO+]
+
+https://geo-ide.noaa.gov/wiki/index.php?title=NetCDF_Attribute_Convention_for_Dataset_Discovery[+https://geo-ide.noaa.gov/wiki/index.php?title=NetCDF_Attribute_Convention_for_Dataset_Discovery+]
+
+http://www.ngdc.noaa.gov/eds/tds/[+http://www.ngdc.noaa.gov/eds/tds/+]
+
+What is ncISO?
+~~~~~~~~~~~~~~
+
+ncISO is a package of tools that facilitates the generation of ISO 19115-2
+metadata from NetCDF data sources stored in a THREDDS data server (TDS)
+catalog. There are currently two tools available, first a command line utility
+that can be run on your local desktop or workstation, and second a THREDDS
+server extension library.
+
+Command Line Utility
+^^^^^^^^^^^^^^^^^^^^
+
+The command line utility traverses a THREDDS catalog and creates a local
+directory structure containing NCML, a metadata rubric, and ISO metadata. NCML
+is a markup language for NetCDF files and is the most common way in which
+NetCDF files are documented. This utility evaluates a dataset's NCML based on
+its conformance to Unidata Data Discovery Conventions, and using an Extensible
+Stylesheet Language Transformation (XSLT), a graphical report (rubric) of
+existing documentation is made. Users can improve the quality of their
+metadata by using the rubric and following a spiral process for enhancing
+dataset documentation. As the documentation is improved users will see an
+improvement in their rubric scores as well as in the quality of their ISO
+metadata. All of the metadata outputs from the command line utility are
+available as an html report.
+
+After the utility has completed running, a thredds directory will be created
+storing NCML, a metadata report and ISO xml for each NetCDF dataset that was
+located. In addition a thredds.json file is generated that allows a tree based
+display in your browser. In order to view these results in the browser copy
+the nciso.html, thredds.json and directory structure into a web accessible
+location. Now open nciso.html to visualize and access the results in your
+browser, for example: http://localhost/yourpath/nciso.html.
+
+TDS Extension
+^^^^^^^^^^^^^
+
+The THREDDS server extension library integrates these metadata tools directly
+into THREDDS as services. Using the same XSLTs as the command line utility and
+leveraging THREDDS service oriented architecture, three new services are made
+available namely an NCML service, a metadata rubric service called UDDC, and
+an ISO service.
+
+Command Line Arguments
+~~~~~~~~~~~~~~~~~~~~~~
+
+The options for +ncISO+ include:
+
+* +-Xms1024m+ and +--Xmx1024m+ - specify the amount of memory to allocated to
+the utility for initial and maximum memory
+
+* +-ts THREDDS_CATALOG_URL+ - specifies the URL of the THREDDS catalog that
+is to be processed
+
+* +-num N+ - specifies the number of datasets to be processed per branch
+
+* +-depth 20+ - limits the depth the crawler will descend into the catalog
+
+* +-iso+ - tells the crawler to generate ISO
+
+* +-waf ROOT_WAF_FOLDER+ - tells the crawler where to dump files to a flat
+WAF structure
+
+* +-custom+ - tells the crawler to translate the NCML using a custom
+stylesheet
+
+* +-xslt XSLT_FILENAME+ - provides the directory location of the XSLT file
+
+Canonical Example
+~~~~~~~~~~~~~~~~~
+
+An example from:
+
+http://www.ngdc.noaa.gov/eds/tds/[+http://www.ngdc.noaa.gov/eds/tds/+]
+
+is:
+
++java -Xms4096m -Xmx4096m -jar ncISO.jar -ts http://www.ngdc.noaa.gov/thredds/catalog.xml -num 1 -depth 20 -iso true -custom true -waf /home/baum/WAF/ncar+
+
+which produces the following screen output:
+
+-----
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+-----
+
+This error is explained at:
+
+http://www.slf4j.org/codes.html#StaticLoggerBinder[+http://www.slf4j.org/codes.html#StaticLoggerBinder+]
+
+This error is reported when the +org.slf4j.impl.StaticLoggerBinder+ class could not be loaded into memory. This happens when no appropriate SLF4J binding could be found on the class path. Placing one (and only one) of +slf4j-nop.jar+, +slf4j-simple.jar+, +slf4j-log4j12.jar+, +slf4j-jdk14.jar+ or +logback-classic.jar+ on the class path should solve the problem. 
+
+One way to 
+
+-----
+INFO  [main] controller.ServiceController.[] Oct/24 14:15:15 - Running createWafTds in service controller: http://www.ngdc.noaa.gov/thredds/catalog.xml
+INFO  [main] controller.ServiceController.[] Oct/24 14:17:24 - Running createWaf in service controller...
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:25 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:26 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:26 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:28 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:29 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:30 - FeatureType is null or a GRID getting extent from axes: GRID
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:30 - numTimeElems=99
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:30 - axisName=Time
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:30 - Total Memory: 3925
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:30 - Free Memory: 2672
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:30 - udunits string = 346101.0 hours since 1970-01-01
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:31 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:31 - numTimeElems=1
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:31 - axisName=Time
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:31 - Total Memory: 3925
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:31 - Free Memory: 2672
+...
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:38 - udunits string = 2.1923925E7 minutes since 1970-01-01 00:00:00 UTC
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:39 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:39 - numTimeElems=672
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:39 - axisName=Time
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:39 - Total Memory: 3925
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:39 - Free Memory: 2610
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 14:17:39 - udunits string = 2.191386E7 minutes since 1970-01-01 00:00:00 UTC
+-----
+
+It also creates the subdirectories +iso+, +nciso+, +ncml+ and +score+.
+
+Local megara Example
+~~~~~~~~~~~~~~~~~~~~
+
+An example for the THREDDS server on megara:
+
+http://megara.tamu.edu:8080/thredds/catalog.html[+http://megara.tamu.edu:8080/thredds/catalog.html+]
+
+is:
+
++java -Xms4096m -Xmx4096m -jar ncISO.jar -ts http://megara.tamu.edu:8080/thredds/catalog.xml -num 1 -depth 20 -iso true -waf /home/baum/WAF/megara+
+
+This creates the same subdirectories, each with the following
+files.  I have no idea why it's creating metafiles for just these.
+
+-----
+thredds_dodsC_adcp_42387b2010-4d.nc.xml
+thredds_dodsC_gcoos_seadas_sst.xml
+thredds_dodsC_GNAM-fore-reg-72_GNAM-fore-reg-14-10-24-06-72.nc.xml
+thredds_dodsC_GNAM-hind-reg-24_GNAM-hind-reg-13-01-02-00-24.nc.xml
+thredds_dodsC_GROM-fore-reg-sfc-72_GROM-fore-reg-14-10-24-06-72.nc.xml
+thredds_dodsC_GROM-hind-crv-all-24_GROM-hind-crv-all-14-03-01-00-24.nc.xml
+thredds_dodsC_GROM-hind-crv-bot-24_GROM-hind-crv-bot-13-01-01-00-24.nc.xml
+thredds_dodsC_GROM-hind-crv-sfc-24_GROM-hind-crv-13-01-01-00-24.nc.xml
+thredds_dodsC_GROM-hind-reg-sfc-24_GROM-hind-reg-13-01-01-00-24.nc.xml
+thredds_dodsC_roms_history_TGLO-his-08-07-07-00-06.nc.xml
+-----
+
+Local barataria Example
+~~~~~~~~~~~~~~~~~~~~~~~
+
++java -Xms4096m -Xmx4096m -jar ncISO.jar -ts http://barataria.tamu.edu:8080/thredds/catalog.xml -num 1 -depth 20 -iso true -waf /home/baum/WAF/barataria+
+
+The list of files processed for each subdirectory follows.  Again,
+I have no idea why just these were processed.
+
+-----
+thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml
+thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml
+thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml
+thredds_dodsC_gom_katrina_3km_ncom_relo_gom3km_katrina_2005091800.nc.xml
+thredds_dodsC_narr_tglo_roms_NARR-UV-tglo_grd-201012.nc.xml
+thredds_dodsC_NcML_txla_nesting6.nc.xml
+thredds_dodsC_ROMS_Daily_07262012_ocean_his_07262012_01.nc.xml
+thredds_dodsC_ROMS_Daily_07262012_ocean_ocean_his_07262012_01.nc.xml
+thredds_dodsC_ROMS_Daily_07272012_ocean_his_07272012_01.nc.xml
+thredds_dodsC_ROMS_Daily_07282012_ocean_his_07282012_01.nc.xml
+thredds_dodsC_ROMS_Daily_07302012_ocean_his_07302012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08012012_ocean_his_08012012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08032012_ocean_his_08032012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08052012_ocean_his_08052012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08062012_ocean_his_08062012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08072012_ocean_his_08072012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08082012_ocean_his_08082012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08092012_ocean_his_08092012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08102012_ocean_his_08102012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08122012_ocean_his_08122012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08142012_ocean_his_08142012_01.nc.xml
+thredds_dodsC_ROMS_Daily_08162012_ocean_his_08162012_01.nc.xml
+thredds_dodsC_txla_oof_latest_txla_forecast_20140419.nc.xml
+thredds_dodsC_west_files_west_grd.nc.xml
+-----
+
+The +nciso/metadata_log.txt+ file for this is:
+
+-----
+---- Metadata Harvest Log: 2014-10-24T15:32:35-0500 ----
+---- Start metadata pull from THREDDS ----
+SUCCESS: thredds_dodsC_GNAM-hind-reg-24_GNAM-hind-reg-13-01-02-00-24.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_GROM-hind-reg-sfc-24_GROM-hind-reg-13-01-01-00-24.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_GROM-hind-crv-sfc-24_GROM-hind-crv-13-01-01-00-24.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_GROM-hind-crv-bot-24_GROM-hind-crv-bot-13-01-01-00-24.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_GROM-hind-crv-all-24_GROM-hind-crv-all-14-03-01-00-24.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_GNAM-fore-reg-72_GNAM-fore-reg-14-10-24-06-72.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_GROM-fore-reg-sfc-72_GROM-fore-reg-14-10-24-06-72.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_roms_history_TGLO-his-08-07-07-00-06.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_gcoos_seadas_sst.xml NCML generated.
+SUCCESS: thredds_dodsC_adcp_42387b2010-4d.nc.xml NCML generated.
+---- Start ISO transforms ----
+SUCCESS: thredds_dodsC_GNAM-hind-reg-24_GNAM-hind-reg-13-01-02-00-24.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_GROM-hind-reg-sfc-24_GROM-hind-reg-13-01-01-00-24.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_GROM-hind-crv-sfc-24_GROM-hind-crv-13-01-01-00-24.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_GROM-hind-crv-bot-24_GROM-hind-crv-bot-13-01-01-00-24.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_GROM-hind-crv-all-24_GROM-hind-crv-all-14-03-01-00-24.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_GNAM-fore-reg-72_GNAM-fore-reg-14-10-24-06-72.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_GROM-fore-reg-sfc-72_GROM-fore-reg-14-10-24-06-72.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_roms_history_TGLO-his-08-07-07-00-06.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_gcoos_seadas_sst.xml ISO generated.
+SUCCESS: thredds_dodsC_adcp_42387b2010-4d.nc.xml ISO generated.
+---- Metadata Harvest Log: 2014-10-24T15:34:43-0500 ----
+---- Start metadata pull from THREDDS ----
+SUCCESS: thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml NCML generated.
+SUCCESS: thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml NCML generated.
+SUCCESS: thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07262012_ocean_ocean_his_07262012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07262012_ocean_his_07262012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07272012_ocean_his_07272012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07282012_ocean_his_07282012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07302012_ocean_his_07302012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08012012_ocean_his_08012012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08032012_ocean_his_08032012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08052012_ocean_his_08052012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08062012_ocean_his_08062012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08072012_ocean_his_08072012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08082012_ocean_his_08082012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08092012_ocean_his_08092012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08102012_ocean_his_08102012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08122012_ocean_his_08122012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08142012_ocean_his_08142012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08162012_ocean_his_08162012_01.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_NcML_txla_nesting6.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_west_files_west_grd.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_txla_oof_latest_txla_forecast_20140419.nc.xml NCML generated.
+FAILURE: thredds_dodsC_data2North_aggregated.nc.xml NCML not generated.
+SUCCESS: thredds_dodsC_narr_tglo_roms_NARR-UV-tglo_grd-201012.nc.xml NCML generated.
+SUCCESS: thredds_dodsC_gom_katrina_3km_ncom_relo_gom3km_katrina_2005091800.nc.xml NCML generated.
+---- Start ISO transforms ----
+SUCCESS: thredds_dodsC_fmrc_roms_out_ROMS_Output_Feature_Collection_Aggregation_fmrc.ncd.xml ISO generated.
+SUCCESS: thredds_dodsC_fmrc_roms_out_runs_ROMS_Output_Feature_Collection_Aggregation_RUN_2012-01-04T07:00:00Z.xml ISO generated.
+SUCCESS: thredds_dodsC_fmrc_roms_out_files_ocean_his_07262012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07262012_ocean_ocean_his_07262012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07262012_ocean_his_07262012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07272012_ocean_his_07272012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07282012_ocean_his_07282012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_07302012_ocean_his_07302012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08012012_ocean_his_08012012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08032012_ocean_his_08032012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08052012_ocean_his_08052012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08062012_ocean_his_08062012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08072012_ocean_his_08072012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08082012_ocean_his_08082012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08092012_ocean_his_08092012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08102012_ocean_his_08102012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08122012_ocean_his_08122012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08142012_ocean_his_08142012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_ROMS_Daily_08162012_ocean_his_08162012_01.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_NcML_txla_nesting6.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_west_files_west_grd.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_txla_oof_latest_txla_forecast_20140419.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_narr_tglo_roms_NARR-UV-tglo_grd-201012.nc.xml ISO generated.
+SUCCESS: thredds_dodsC_gom_katrina_3km_ncom_relo_gom3km_katrina_2005091800.nc.xml ISO generated.
+-----
+
+The +ncISO.log+ file for this is:
+
+-----
+INFO  [main] controller.ServiceController.[] Oct/24 15:34:41 - Running createWafTds in service controller: http://barataria.tamu.edu:8080/thredds/catalog.xml
+INFO  [main] controller.ServiceController.[] Oct/24 15:34:43 - Running createWaf in service controller...
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:44 - FeatureType is null or a GRID getting extent from axes: GRID
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:45 - numTimeElems=2133
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:45 - axisName=time
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:45 - Total Memory: 3925
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:45 - Free Memory: 3561
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:45 - udunits string = 4967.0 hours since 2012-01-01T01:00:00Z
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:47 - FeatureType is null or a GRID getting extent from axes: GRID
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:48 - numTimeElems=2
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:48 - axisName=time
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:48 - Total Memory: 3925
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:48 - Free Memory: 3485
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:48 - udunits string = 5789.0 hours since 2012-01-01T01:00:00Z
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:49 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:49 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:50 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:50 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:51 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:52 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:52 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:53 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:53 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:54 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:55 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:55 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:56 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:57 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:57 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:58 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:34:58 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:29 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:29 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:29 - FeatureType is null or a GRID getting extent from axes: null
+ERROR [main] service.WafService.[] Oct/24 15:37:30 - Caught ioe: 
+java.io.IOException: java.io.IOException: opendap.dap.DAP2Exception: opendap.dap.DAP2Exception: Method failed:HTTP/1.1 500 Internal Server Error on URL= http://barataria.tamu.edu:8080/thredds/dodsC/data2North_aggregated.nc.dds
+	at ucar.nc2.dataset.NetcdfDataset.openDodsByReflection(NetcdfDataset.java:1035)
+	at ucar.nc2.dataset.NetcdfDataset.acquireDODS(NetcdfDataset.java:980)
+	at ucar.nc2.dataset.NetcdfDataset.openOrAcquireFile(NetcdfDataset.java:664)
+	at ucar.nc2.dataset.NetcdfDataset.openDataset(NetcdfDataset.java:421)
+	at ucar.nc2.dataset.NetcdfDataset.openDataset(NetcdfDataset.java:404)
+	at ucar.nc2.dataset.NetcdfDataset.openDataset(NetcdfDataset.java:389)
+	at ucar.nc2.dataset.NetcdfDataset.openDataset(NetcdfDataset.java:376)
+	at thredds.server.metadata.util.ThreddsTranslatorUtil.doGetNcml(ThreddsTranslatorUtil.java:109)
+	at thredds.server.metadata.util.ThreddsTranslatorUtil.getNcml(ThreddsTranslatorUtil.java:103)
+	at gov.noaa.eds.service.WafService.generateNcml(WafService.java:73)
+	at gov.noaa.eds.controller.ServiceController.createWaf(ServiceController.java:47)
+	at gov.noaa.eds.controller.ServiceController.createWafTds(ServiceController.java:76)
+	at gov.noaa.eds.controller.ServiceController.main(ServiceController.java:187)
+Caused by: java.io.IOException: opendap.dap.DAP2Exception: opendap.dap.DAP2Exception: Method failed:HTTP/1.1 500 Internal Server Error on URL= http://barataria.tamu.edu:8080/thredds/dodsC/data2North_aggregated.nc.dds
+	at ucar.nc2.dods.DODSNetcdfFile.<init>(DODSNetcdfFile.java:283)
+	at sun.reflect.GeneratedConstructorAccessor8.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:525)
+	at ucar.nc2.dataset.NetcdfDataset.openDodsByReflection(NetcdfDataset.java:1031)
+	... 12 more
+Caused by: opendap.dap.DAP2Exception: opendap.dap.DAP2Exception: Method failed:HTTP/1.1 500 Internal Server Error on URL= http://barataria.tamu.edu:8080/thredds/dodsC/data2North_aggregated.nc.dds
+	at opendap.dap.DConnect2.openConnection(DConnect2.java:308)
+	at opendap.dap.DConnect2.getDDS(DConnect2.java:563)
+	at opendap.dap.DConnect2.getDDS(DConnect2.java:537)
+	at ucar.nc2.dods.DODSNetcdfFile.<init>(DODSNetcdfFile.java:240)
+	... 16 more
+Caused by: opendap.dap.DAP2Exception: Method failed:HTTP/1.1 500 Internal Server Error on URL= http://barataria.tamu.edu:8080/thredds/dodsC/data2North_aggregated.nc.dds
+	at opendap.dap.DConnect2.openConnection(DConnect2.java:271)
+	... 19 more
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - FeatureType is null or a GRID getting extent from axes: null
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - axisName=depth
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - numTimeElems=13
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - axisName=time
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - Total Memory: 3925
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - Free Memory: 3685
+INFO  [main] util.ThreddsExtentUtil.[] Oct/24 15:37:30 - udunits string = 50088.0 hour since 2000-01-01 00:00 UTC
+-----
+
+Attribute Conventions Dataset Discovery (ACDD)
+----------------------------------------------
+
+http://wiki.esipfed.org/index.php/Category:Attribute_Conventions_Dataset_Discovery[+http://wiki.esipfed.org/index.php/Category:Attribute_Conventions_Dataset_Discovery+]
+
+The ncISO utility evaluates a dataset's NCML based on its conformance to the
+ACDD conventions.  These conventions
+identify and define a list of NetCDF global attributes recommended for
+describing a NetCDF dataset to discovery systems such as Digital Libraries.
+These attributes are separated into *Highly Recommended*,
+*Recommended* and *Suggested* categories.  A listing of the
+currently official version 1.1 attributes is at:
+
+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_1-1[+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_1-1+]
+
+while the upcoming versino 1.3 list is at:
+
+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_1-3[+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_1-3+]
+
+
+Adding ACDD Metadata with NCML
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The attributes recommended by the ACDD standard can be added to datasets
+served by THREDDS via NcML.  An example template of adding the highly
+recommended and recommended attributes is:
+
+-----
+    <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+      <attribute name="title" value="TBA"/>
+      <attribute name="summary" value="TBA"/>
+      <attribute name="keywords" value="TBA"/>
+      <attribute name="id" value="TBA"/>
+      <attribute name="naming_authority" value="TBA"/>
+      <attribute name="keywords_vocabulary" value="TBA"/>
+      <attribute name="cdm_data_type" value="TBA"/>
+      <attribute name="history" value="TBA"/>
+      <attribute name="comment" value="TBA"/>
+      <attribute name="date_created" value="TBA"/>
+      <attribute name="creator_name" value="TBA"/>
+      <attribute name="creator_url" value="TBA"/>
+      <attribute name="creator_email" value="TBA"/>
+      <attribute name="institution" value="TBA"/>
+      <attribute name="project" value="TBA"/>
+      <attribute name="processing_level" value="TBA"/>
+      <attribute name="acknowledgment" value="TBA"/>
+      <attribute name="geospatial_bounds" value="TBA"/>
+      <attribute name="geospatial_lat_min" value="TBA"/>
+      <attribute name="geospatial_lat_max" value="TBA"/>
+      <attribute name="geospatial_lon_min" value="TBA"/>
+      <attribute name="geospatial_lon_max" value="TBA"/>
+      <attribute name="geospatial_vertical_min" value="TBA"/>
+      <attribute name="geospatial_vertical_max" value="TBA"/>
+      <attribute name="time_coverage_start" value="TBA"/>
+      <attribute name="time_coverage_end" value="TBA"/>
+      <attribute name="time_coverage_duration" value="TBA"/>
+      <attribute name="time_coverage_resolution" value="TBA"/>
+      <attribute name="standard_name_vocabulary" value="TBA"/>
+      <attribute name="license" value="TBA"/>
+    </netcdf>
+-----
+
+Adding Via a datasetScan Element
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The above block of attributes can be added to a
++datasetScan+ NcML element in the following way:
+
+-----
+<datasetScan name="blah" ID="bleh" path="blah/bleh" location="/blah/bleh/here/">
+...
+  <netcdf ... >
+   ...the desire attributes...
+  </netcdf>
+...
+</datasetScan>
+-----
+
+
+The +UnidataDD2MI.xsl+ File
+---------------------------
+
+This can be obtained at:
+
+http://ngdc.noaa.gov/metadata/published/xsl/nciso2.0/[+http://ngdc.noaa.gov/metadata/published/xsl/nciso2.0/+]
+
+[source,xml]
+-----
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:nc="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" exclude-result-prefixes="nc">
+  <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" scope="stylesheet">
+    <xd:desc>
+      <xd:p><xd:b>Last Modified on:</xd:b> July 23, 2014</xd:p>
+      <xd:p><xd:b>Modified on:</xd:b> March 19, 2014</xd:p>
+      <xd:p><xd:b>Fixed: </xd:b>added normalize-space dimensionResolution param to fix vertical units error. </xd:p>
+      <xd:p><xd:b>Modified on:</xd:b> May 10, 2012</xd:p>
+      <xd:p><xd:b>Version:</xd:b>2.3</xd:p>
+      <xd:p><xd:b>Author:</xd:b>ted.habermann@noaa.gov</xd:p>
+      <xd:p/>
+    </xd:desc>
+  </xd:doc>
+  <xsl:variable name="stylesheetVersion" select="'2.3'"/>
+  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+  <xsl:strip-space elements="*"/>
+  <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'"/>
+  <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+  <xsl:key name="coverageTypes" match="nc:variable" use="nc:attribute[@name='coverage_content_type']/@value"/>
+  <xsl:variable name="globalAttributeCnt" select="count(/nc:netcdf/nc:attribute)"/>
+  <xsl:variable name="variableAttributeCnt" select="count(/nc:netcdf/nc:variable/nc:attribute)"/>
+  <xsl:variable name="standardNameCnt" select="count(/nc:netcdf/nc:variable/nc:attribute[@name='standard_name'])"/>
+  <xsl:variable name="dimensionCnt" select="count(/nc:netcdf/nc:dimension)"/>
+  <!-- Identifier Fields: 4 possible -->
+  <xsl:variable name="id" as="xs:string*" select="(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='id']/@value,
+      /nc:netcdf/nc:attribute[@name='id']/@value)"/>
+  <xsl:variable name="identifierNameSpace" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='naming_authority']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='authority']/@value)"/>
+  <xsl:variable name="metadataConvention" as="xs:string*" select="/nc:netcdf/nc:attribute[@name='Metadata_Conventions']/@value"/>
+  <xsl:variable name="metadataLink" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='Metadata_Link']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:group[@name='document']/nc:attribute[@name='xlink']/@value)"/>
+  <!-- Service Fields: 4 possible -->
+  <xsl:variable name="thredds_netcdfsubsetCnt" select="count(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='nccs_service'])"/>
+  <xsl:variable name="thredds_opendapCnt" select="count(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='opendap_service'])"/>
+  <xsl:variable name="thredds_wcsCnt" select="count(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='wcs_service'])"/>
+  <xsl:variable name="thredds_wmsCnt" select="count(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='wms_service'])"/>
+  <xsl:variable name="thredds_sosCnt" select="count(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='sos_service'])"/>
+  <xsl:variable name="thredds_httpCnt" select="count(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='httpserver_service'])"/>
+  <xsl:variable name="serviceTotal" select="$thredds_netcdfsubsetCnt + $thredds_opendapCnt + $thredds_wcsCnt + $thredds_wmsCnt + $thredds_sosCnt + $thredds_httpCnt"/>
+  <xsl:variable name="serviceMax">5</xsl:variable>
+  <!-- Text Search Fields: 7 possible -->
+  <xsl:variable name="title" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='title']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='full_name']/@value)"/>
+  <xsl:variable name="summary" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='summary']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:group[@name='document']/nc:attribute[@type='Summary']/@value)"/>
+  <xsl:variable name="keywords" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='keywords']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='keywords']/@value)"/>
+  <xsl:variable name="keywordsVocabulary" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='keywords_vocabulary']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='keywords']/nc:attribute[@name='vocab']/@value)"/>
+  <xsl:variable name="stdNameVocabulary" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='standard_name_vocabulary']/@value)"/>
+  <xsl:variable name="comment" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='comment']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:document/nc:attribute[@type='comment']/@value)"/>
+  <xsl:variable name="history" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='history']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:document/nc:attribute[@type='history']/@value)"/>
+  <!-- Extent Search Fields: 17 possible -->
+  <xsl:variable name="geospatial_lat_min" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lat_min']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='geospatial_lat_min']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_lat_min']/@value)"/>
+  <xsl:variable name="geospatial_lat_max" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lat_max']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='geospatial_lat_max']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_lat_max']/@value)"/>
+  <xsl:variable name="geospatial_lon_min" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lon_min']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='geospatial_lon_min']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_lon_min']/@value)"/>
+  <xsl:variable name="geospatial_lon_max" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lon_max']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='geospatial_lon_max']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_lon_max']/@value)"/>
+  <xsl:variable name="timeStart" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='time_coverage_start']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='time_coverage_start']/@value,
+    /nc:netcdf/nc:attribute[@name='time_coverage_start']/@value)"/>
+  <xsl:variable name="timeEnd" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='time_coverage_end']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='time_coverage_end']/@value,
+    /nc:netcdf/nc:attribute[@name='time_coverage_end']/@value)"/>
+  <xsl:variable name="timeStartCnt" select="count($timeStart)"/>
+  <xsl:variable name="timeEndCnt" select="count($timeEnd)"/>
+  <xsl:variable name="verticalMin" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_vertical_min']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='geospatial_vertical_min']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_vertical_min']/@value)"/>
+  <xsl:variable name="verticalMax" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_vertical_max']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='geospatial_vertical_max']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_vertical_max']/@value)"/>
+  <xsl:variable name="geospatial_lat_units" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lat_units']/@value,//nc:variable[@name=$latitudeVariableName]/nc:attribute[@name='units']/@value, /nc:netcdf/nc:attribute[@name='geospatial_lat_units']/@value)"/>
+  <xsl:variable name="geospatial_lon_units" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lon_units']/@value, //nc:variable[@name=$longitudeVariableName]/nc:attribute[@name='units']/@value,  
+    //nc:attribute[@name='geospatial_lon_units']/@value)"/>
+  <xsl:variable name="temporalUnits" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='time_coverage_units']/@value, //nc:variable[@name=$timeVariableName]/nc:attribute[@name='units']/@value,
+    //nc:attribute[@name='time_coverage_units']/@value)"/>
+  <xsl:variable name="verticalUnits" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_vertical_units']/@value, //nc:variable[@name=$verticalVariableName]/nc:attribute[@name='units']/@value,  //nc:attribute[@name='geospatial_vertical_units']/@value)"/>
+  <xsl:variable name="geospatial_lat_resolution" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lat_resolution']/@value,
+    //nc:attribute[@name='geospatial_lat_resolution']/@value)"/>
+  <xsl:variable name="geospatial_lon_resolution" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_lon_resolution']/@value,
+    //nc:attribute[@name='geospatial_lon_resolution']/@value)"/>
+  <xsl:variable name="timeResolution" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='time_coverage_resolution']/@value,
+    //nc:attribute[@name='time_coverage_resolution']/@value)"/>
+  <xsl:variable name="timeDuration" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='time_coverage_duration']/@value,
+    //nc:attribute[@name='time_coverage_duration']/@value)"/>
+  <xsl:variable name="verticalResolution" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_vertical_resolution']/@value,
+    //nc:attribute[@name='geospatial_vertical_resolution']/@value)"/>
+  <xsl:variable name="verticalPositive" as="xs:string*" select="(/nc:netcdf/nc:group[@name='CFMetadata']/nc:attribute[@name='geospatial_vertical_positive']/@value,
+    /nc:netcdf/nc:attribute[@name='geospatial_vertical_positive']/@value)"/>
+  <!-- dimension variables -->
+  <xsl:variable name="longitudeVariableName" select="//nc:variable[nc:attribute[@name='units' and @value='degrees_east']]/@name"/>
+  <xsl:variable name="latitudeVariableName" select="//nc:variable[nc:attribute[@name='units' and @value='degrees_north']]/@name"/>
+  <xsl:variable name="verticalVariableName" select="//nc:variable[nc:attribute[@name='positive' and (@value='up' or @value='down')]]/@name"/>
+  <xsl:variable name="timeVariableName" select="//nc:variable[nc:attribute[@name='standard_name' and lower-case(@value)='time']]/@name"/>
+  <!--  Extent Totals -->
+  <xsl:variable name="extentTotal" select="count($geospatial_lat_min) + count($geospatial_lat_max) + count($geospatial_lon_min) + count($geospatial_lon_max) + count($timeStart) + count($timeEnd) + count($verticalMin) + count($verticalMax)"/>
+  <xsl:variable name="extentMax">8</xsl:variable>
+  <xsl:variable name="otherExtentTotal" select="count($geospatial_lat_resolution) + count($geospatial_lat_units) + count($geospatial_lon_resolution) + count($geospatial_lon_units) + count($timeResolution) + count($timeDuration) + count($verticalUnits) + count($verticalResolution) + count($verticalPositive)"/>
+  <xsl:variable name="otherExtentMax">9</xsl:variable>
+  <!-- Responsible Party Fields: 14 possible -->
+  <xsl:variable name="creatorName" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='creator_name']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='creators']/nc:group[@name='creator']/nc:attribute[@name='name']/@value)"/>
+  <xsl:variable name="creatorURL" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='creator_url']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='creators']/nc:group[@name='creator']/nc:attribute[@name='url']/@value)"/>
+  <xsl:variable name="creatorEmail" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='creator_email']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='creators']/nc:group[@name='creator']/nc:attribute[@name='email']/@value)"/>
+  <xsl:variable name="creatorDate" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='date_created']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='dates']/nc:attribute[@type='created']/@value)"/>
+  <xsl:variable name="modifiedDate" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='date_modified']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='dates']/nc:attribute[@type='modified']/@value)"/>
+  <xsl:variable name="issuedDate" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='date_issued']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='dates']/nc:attribute[@type='issued']/@value)"/>
+  <xsl:variable name="institution" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='institution']/@value)"/>
+  <xsl:variable name="project" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='project']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='projects']/@value)"/>
+  <xsl:variable name="acknowledgment" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='acknowledgment']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:group[@name='document']/nc:attribute[@type='funding']/@value)"/>
+  <xsl:variable name="dateCnt" select="count($creatorDate) + count($modifiedDate) + count($issuedDate)"/>
+  <xsl:variable name="creatorTotal" select="count($creatorName) + count($creatorURL) + count($creatorEmail) + count($creatorDate) + count($modifiedDate) + count($issuedDate) + count($institution) + count($project) + count($acknowledgment)"/>
+  <xsl:variable name="creatorMax">9</xsl:variable>
+  <!--  -->
+  <xsl:variable name="contributorName" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='contributor_name']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='contributors']/nc:group[@name='contributor']/nc:attribute[@name='name']/@value)"/>
+  <xsl:variable name="contributorRole" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='contributor_role']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='contributors']/nc:group[@name='contributor']/nc:attribute[@name='role']/@value)"/>
+  <xsl:variable name="contributorTotal" select="count($contributorName) + count($contributorRole)"/>
+  <xsl:variable name="contributorMax">2</xsl:variable>
+  <!--  -->
+  <xsl:variable name="publisherName" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='publisher_name']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='publishers']/nc:group[@name='publisher']/nc:attribute[@name='name']/@value)"/>
+  <xsl:variable name="publisherURL" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='publisher_url']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='publishers']/nc:group[@name='publisher']/nc:attribute[@name='url']/@value)"/>
+  <xsl:variable name="publisherEmail" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='publisher_email']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='publishers']/nc:group[@name='publisher']/nc:attribute[@name='email']/@value)"/>
+  <xsl:variable name="publisherTotal" select="count($publisherName) + count($publisherURL) + count($publisherEmail)"/>
+  <xsl:variable name="publisherMax">3</xsl:variable>
+  <!--  -->
+  <xsl:variable name="responsiblePartyCnt" select="count($creatorName) + count($contributorName) + count($publisherName)"/>
+  <xsl:variable name="responsiblePartyTotal" select="$creatorTotal + $contributorTotal + $publisherTotal"/>
+  <xsl:variable name="responsiblePartyMax">14</xsl:variable>
+  <!-- Other Fields: 2 possible -->
+  <xsl:variable name="cdmType" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='cdm_data_type']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='data_type']/@value)"/>
+  <xsl:variable name="processingLevel" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='processing_level']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:group[@name='document']/nc:attribute[@type='processing_level']/@value)"/>
+  <xsl:variable name="license" as="xs:string*" select="(/nc:netcdf/nc:attribute[@name='license']/@value,
+    /nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:group[@name='document']/nc:attribute[@type='rights']/@value)"/>
+  <xsl:variable name="otherTotal" select="count($cdmType) + count($processingLevel) + count($license)"/>
+  <xsl:variable name="otherMax">3</xsl:variable>
+  <xsl:variable name="spiralTotal" select="$extentTotal + $otherExtentTotal + $otherTotal + $responsiblePartyTotal"/>
+  <xsl:variable name="spiralMax" select="$otherMax + $creatorMax + $extentMax + $responsiblePartyMax"/>
+  <!--                        -->
+  <!--    Write ISO Metadata  -->
+  <!--                        -->
+  <xsl:template match="/">
+    <gmi:MI_Metadata>
+      <xsl:attribute name="xsi:schemaLocation">
+        <xsl:value-of select="'http://www.isotc211.org/2005/gmi http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd'"/>
+      </xsl:attribute>
+      <gmd:fileIdentifier>
+        <xsl:call-template name="writeCharacterString">
+          <xsl:with-param name="stringToWrite" select="$id[1]"/>
+        </xsl:call-template>
+      </gmd:fileIdentifier>
+      <gmd:language>
+        <xsl:call-template name="writeCodelist">
+          <xsl:with-param name="codeListName" select="'gmd:LanguageCode'"/>
+          <xsl:with-param name="codeListValue" select="'eng'"/>
+        </xsl:call-template>
+      </gmd:language>
+      <gmd:characterSet>
+        <xsl:call-template name="writeCodelist">
+          <xsl:with-param name="codeListName" select="'gmd:MD_CharacterSetCode'"/>
+          <xsl:with-param name="codeListValue" select="'UTF8'"/>
+        </xsl:call-template>
+      </gmd:characterSet>
+      <gmd:hierarchyLevel>
+        <xsl:call-template name="writeCodelist">
+          <xsl:with-param name="codeListName" select="'gmd:MD_ScopeCode'"/>
+          <xsl:with-param name="codeListValue" select="'dataset'"/>
+        </xsl:call-template>
+      </gmd:hierarchyLevel>
+      <xsl:if test="$serviceTotal">
+        <gmd:hierarchyLevel>
+          <xsl:call-template name="writeCodelist">
+            <xsl:with-param name="codeListName" select="'gmd:MD_ScopeCode'"/>
+            <xsl:with-param name="codeListValue" select="'service'"/>
+          </xsl:call-template>
+        </gmd:hierarchyLevel>
+      </xsl:if>
+      <!-- metadata contact is creator -->
+      <xsl:call-template name="writeResponsibleParty">
+        <xsl:with-param name="tagName" select="'gmd:contact'"/>
+        <xsl:with-param name="testValue" select="$creatorTotal"/>
+        <xsl:with-param name="individualName" select="$creatorName[1]"/>
+        <xsl:with-param name="organisationName" select="$institution[1]"/>
+        <xsl:with-param name="email" select="$creatorEmail[1]"/>
+        <xsl:with-param name="url" select="$creatorURL[1]"/>
+        <xsl:with-param name="roleCode" select="'pointOfContact'"/>
+      </xsl:call-template>
+      <gmd:dateStamp>
+        <gco:Date>
+          <xsl:value-of select="/nc:netcdf/nc:group[@name='NCISOMetadata']/nc:attribute[@name='metadata_creation']/@value"/>
+        </gco:Date>
+      </gmd:dateStamp>
+      <gmd:metadataStandardName>
+        <gco:CharacterString>ISO 19115-2 Geographic Information - Metadata Part 2 Extensions for imagery and gridded data</gco:CharacterString>
+      </gmd:metadataStandardName>
+      <gmd:metadataStandardVersion>
+        <gco:CharacterString>ISO 19115-2:2009(E)</gco:CharacterString>
+      </gmd:metadataStandardVersion>
+      <gmd:spatialRepresentationInfo>
+        <xsl:choose>
+          <xsl:when test="count($longitudeVariableName) + count($latitudeVariableName) + count($verticalVariableName) + count($timeVariableName)">
+            <gmd:MD_GridSpatialRepresentation>
+              <gmd:numberOfDimensions>
+                <gco:Integer>
+                  <xsl:value-of select="(count($longitudeVariableName) > 0) + (count($latitudeVariableName) > 0) + (count($verticalVariableName) > 0) + (count($timeVariableName) > 0)"/>
+                </gco:Integer>
+              </gmd:numberOfDimensions>
+              <xsl:if test="count($longitudeVariableName)">
+                <xsl:call-template name="writeDimension">
+                  <xsl:with-param name="dimensionType" select="'column'"/>
+                  <xsl:with-param name="dimensionUnits" select="$geospatial_lon_units[1]"/>
+                  <xsl:with-param name="dimensionResolution" select="$geospatial_lon_resolution[1]"/>
+                  <xsl:with-param name="dimensionSize" select="/nc:netcdf/nc:dimension[contains(@name,$longitudeVariableName)]/@length"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test="count($latitudeVariableName)">
+                <xsl:call-template name="writeDimension">
+                  <xsl:with-param name="dimensionType" select="'row'"/>
+                  <xsl:with-param name="dimensionUnits" select="$geospatial_lat_units[1]"/>
+                  <xsl:with-param name="dimensionResolution" select="$geospatial_lat_resolution[1]"/>
+                  <xsl:with-param name="dimensionSize" select="/nc:netcdf/nc:dimension[contains(@name,$latitudeVariableName)]/@length"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test="count($verticalVariableName)">
+                <xsl:call-template name="writeDimension">
+                  <xsl:with-param name="dimensionType" select="'vertical'"/>
+                  <xsl:with-param name="dimensionUnits" select="$verticalUnits[1]"/>
+                  <xsl:with-param name="dimensionResolution" select="normalize-space($verticalResolution[1])"/>
+                  <xsl:with-param name="dimensionSize" select="/nc:netcdf/nc:dimension[contains(@name,$verticalVariableName)]/@length"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test="count($timeVariableName)">
+                <xsl:call-template name="writeDimension">
+                  <xsl:with-param name="dimensionType" select="'temporal'"/>
+                  <xsl:with-param name="dimensionUnits" select="$temporalUnits[1]"/>
+                  <xsl:with-param name="dimensionResolution" select="$timeResolution[1]"/>
+                  <xsl:with-param name="dimensionSize" select="/nc:netcdf/nc:dimension[contains(@name,$timeVariableName)]/@length"/>
+                </xsl:call-template>
+              </xsl:if>
+              <gmd:cellGeometry>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:MD_CellGeometryCode'"/>
+                  <xsl:with-param name="codeListValue" select="'area'"/>
+                </xsl:call-template>
+              </gmd:cellGeometry>
+              <gmd:transformationParameterAvailability gco:nilReason="unknown"/>
+            </gmd:MD_GridSpatialRepresentation>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="gco:nilReason">
+              <xsl:value-of select="'missing'"/>
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </gmd:spatialRepresentationInfo>
+      <gmd:identificationInfo>
+        <gmd:MD_DataIdentification id="DataIdentification">
+          <gmd:citation>
+            <gmd:CI_Citation>
+              <gmd:title>
+                <xsl:call-template name="writeCharacterString">
+                  <xsl:with-param name="stringToWrite" select="$title[1]"/>
+                </xsl:call-template>
+              </gmd:title>
+              <xsl:choose>
+                <xsl:when test="$dateCnt">
+                  <xsl:if test="count($creatorDate)">
+                    <xsl:call-template name="writeDate">
+                      <xsl:with-param name="testValue" select="count($creatorDate)"/>
+                      <xsl:with-param name="dateToWrite" select="$creatorDate[1]"/>
+                      <xsl:with-param name="dateType" select="'creation'"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                  <xsl:if test="count($issuedDate)">
+                    <xsl:call-template name="writeDate">
+                      <xsl:with-param name="testValue" select="count($issuedDate)"/>
+                      <xsl:with-param name="dateToWrite" select="$issuedDate[1]"/>
+                      <xsl:with-param name="dateType" select="'issued'"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                  <xsl:if test="count($modifiedDate)">
+                    <xsl:call-template name="writeDate">
+                      <xsl:with-param name="testValue" select="count($modifiedDate)"/>
+                      <xsl:with-param name="dateToWrite" select="$modifiedDate[1]"/>
+                      <xsl:with-param name="dateType" select="'revision'"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </xsl:when>
+                <xsl:otherwise>
+                  <gmd:date>
+                    <xsl:attribute name="gco:nilReason">
+                      <xsl:value-of select="'missing'"/>
+                    </xsl:attribute>
+                  </gmd:date>
+                </xsl:otherwise>
+              </xsl:choose>
+              <gmd:identifier>
+                <xsl:choose>
+                  <xsl:when test="count($id)">
+                    <gmd:MD_Identifier>
+                      <xsl:if test="$identifierNameSpace[1]">
+                        <gmd:authority>
+                          <gmd:CI_Citation>
+                            <gmd:title>
+                              <gco:CharacterString>
+                                <xsl:value-of select="$identifierNameSpace[1]"/>
+                              </gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date>
+                              <xsl:attribute name="gco:nilReason">
+                                <xsl:value-of select="'inapplicable'"/>
+                              </xsl:attribute>
+                            </gmd:date>
+                          </gmd:CI_Citation>
+                        </gmd:authority>
+                      </xsl:if>
+                      <gmd:code>
+                        <!--  Just use THREDDs id as it's guaranteed to be unique -->
+                        <gco:CharacterString>
+                          <xsl:value-of select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:attribute[@name='id']/@value"/>
+                        </gco:CharacterString>
+                      </gmd:code>
+                    </gmd:MD_Identifier>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:attribute name="gco:nilReason">
+                      <xsl:value-of select="'missing'"/>
+                    </xsl:attribute>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </gmd:identifier>
+              <xsl:if test="$creatorTotal">
+                <xsl:call-template name="writeResponsibleParty">
+                  <xsl:with-param name="tagName" select="'gmd:citedResponsibleParty'"/>
+                  <xsl:with-param name="testValue" select="$creatorTotal"/>
+                  <xsl:with-param name="individualName" select="$creatorName[1]"/>
+                  <xsl:with-param name="organisationName" select="$institution[1]"/>
+                  <xsl:with-param name="email" select="$creatorEmail[1]"/>
+                  <xsl:with-param name="url" select="$creatorURL[1]"/>
+                  <xsl:with-param name="roleCode" select="'originator'"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test="$contributorTotal">
+                <xsl:call-template name="writeResponsibleParty">
+                  <xsl:with-param name="tagName" select="'gmd:citedResponsibleParty'"/>
+                  <xsl:with-param name="testValue" select="$contributorTotal"/>
+                  <xsl:with-param name="individualName" select="$contributorName[1]"/>
+                  <xsl:with-param name="organisationName"/>
+                  <xsl:with-param name="email"/>
+                  <xsl:with-param name="url"/>
+                  <xsl:with-param name="roleCode" select="/nc:netcdf/nc:attribute[@name='contributor_role']/@value"/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test="$comment">
+                <gmd:otherCitationDetails>
+                  <xsl:call-template name="writeCharacterString">
+                    <xsl:with-param name="stringToWrite" select="$comment[1]"/>
+                  </xsl:call-template>
+                </gmd:otherCitationDetails>
+              </xsl:if>
+            </gmd:CI_Citation>
+          </gmd:citation>
+          <gmd:abstract>
+            <xsl:call-template name="writeCharacterString">
+              <xsl:with-param name="stringToWrite" select="$summary[1]"/>
+            </xsl:call-template>
+          </gmd:abstract>
+          <xsl:if test="count($acknowledgment)">
+            <gmd:credit>
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="stringToWrite" select="$acknowledgment[1]"/>
+              </xsl:call-template>
+            </gmd:credit>
+          </xsl:if>
+          <!-- point of contact is creator -->
+          <xsl:call-template name="writeResponsibleParty">
+            <xsl:with-param name="tagName" select="'gmd:pointOfContact'"/>
+            <xsl:with-param name="testValue" select="$creatorTotal"/>
+            <xsl:with-param name="individualName" select="$creatorName[1]"/>
+            <xsl:with-param name="organisationName" select="$institution[1]"/>
+            <xsl:with-param name="email" select="$creatorEmail[1]"/>
+            <xsl:with-param name="url" select="$creatorURL[1]"/>
+            <xsl:with-param name="roleCode" select="'pointOfContact'"/>
+          </xsl:call-template>
+          <xsl:if test="count($keywords)">
+            <gmd:descriptiveKeywords>
+              <gmd:MD_Keywords>
+                <xsl:variable name="keywordDelimiter">
+                  <xsl:choose>
+                    <xsl:when test="(contains($keywords[1],',') or contains($keywords[1],'&gt;'))">
+                      <xsl:value-of select="','"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="' '"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:variable>
+                <xsl:for-each select="tokenize($keywords[1],$keywordDelimiter)">
+                  <gmd:keyword>
+                    <gco:CharacterString>
+                      <xsl:value-of select="."/>
+                    </gco:CharacterString>
+                  </gmd:keyword>
+                </xsl:for-each>
+                <gmd:type>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:MD_KeywordTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'theme'"/>
+                  </xsl:call-template>
+                </gmd:type>
+                <gmd:thesaurusName>
+                  <gmd:CI_Citation>
+                    <gmd:title>
+                      <xsl:call-template name="writeCharacterString">
+                        <xsl:with-param name="stringToWrite" select="$keywordsVocabulary[1]"/>
+                      </xsl:call-template>
+                    </gmd:title>
+                    <gmd:date>
+                      <xsl:attribute name="gco:nilReason">
+                        <xsl:value-of select="'unknown'"/>
+                      </xsl:attribute>
+                    </gmd:date>
+                  </gmd:CI_Citation>
+                </gmd:thesaurusName>
+              </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+          </xsl:if>
+          <xsl:if test="count($project)">
+            <gmd:descriptiveKeywords>
+              <gmd:MD_Keywords>
+                <gmd:keyword>
+                  <gco:CharacterString>
+                    <xsl:value-of select="$project[1]"/>
+                  </gco:CharacterString>
+                </gmd:keyword>
+                <gmd:type>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:MD_KeywordTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'project'"/>
+                  </xsl:call-template>
+                </gmd:type>
+                <gmd:thesaurusName>
+                  <xsl:attribute name="gco:nilReason">
+                    <xsl:value-of select="'unknown'"/>
+                  </xsl:attribute>
+                </gmd:thesaurusName>
+              </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+          </xsl:if>
+          <xsl:if test="count($publisherName)">
+            <gmd:descriptiveKeywords>
+              <gmd:MD_Keywords>
+                <gmd:keyword>
+                  <gco:CharacterString>
+                    <xsl:value-of select="$publisherName[1]"/>
+                  </gco:CharacterString>
+                </gmd:keyword>
+                <gmd:type>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:MD_KeywordTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'dataCenter'"/>
+                  </xsl:call-template>
+                </gmd:type>
+                <gmd:thesaurusName>
+                  <xsl:attribute name="gco:nilReason">
+                    <xsl:value-of select="'unknown'"/>
+                  </xsl:attribute>
+                </gmd:thesaurusName>
+              </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+          </xsl:if>
+          <xsl:if test="$standardNameCnt">
+            <gmd:descriptiveKeywords>
+              <gmd:MD_Keywords>
+                <xsl:for-each select="/nc:netcdf/nc:variable/nc:attribute[@name='standard_name']">
+                  <gmd:keyword>
+                    <gco:CharacterString>
+                      <xsl:value-of select="./@value"/>
+                    </gco:CharacterString>
+                  </gmd:keyword>
+                </xsl:for-each>
+                <gmd:type>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:MD_KeywordTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'theme'"/>
+                  </xsl:call-template>
+                </gmd:type>
+                <gmd:thesaurusName>
+                  <gmd:CI_Citation>
+                    <gmd:title>
+                      <xsl:call-template name="writeCharacterString">
+                        <xsl:with-param name="stringToWrite" select="$stdNameVocabulary[1]"/>
+                      </xsl:call-template>
+                    </gmd:title>
+                    <gmd:date gco:nilReason="unknown"/>
+                  </gmd:CI_Citation>
+                </gmd:thesaurusName>
+              </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+          </xsl:if>
+          <xsl:if test="count($license)">
+            <gmd:resourceConstraints>
+              <gmd:MD_LegalConstraints>
+                <gmd:useLimitation>
+                  <gco:CharacterString>
+                    <xsl:value-of select="$license[1]"/>
+                  </gco:CharacterString>
+                </gmd:useLimitation>
+              </gmd:MD_LegalConstraints>
+            </gmd:resourceConstraints>
+          </xsl:if>
+          <xsl:if test="count($project)">
+            <gmd:aggregationInfo>
+              <gmd:MD_AggregateInformation>
+                <gmd:aggregateDataSetName>
+                  <gmd:CI_Citation>
+                    <gmd:title>
+                      <gco:CharacterString>
+                        <xsl:value-of select="$project[1]"/>
+                      </gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date gco:nilReason="inapplicable"/>
+                  </gmd:CI_Citation>
+                </gmd:aggregateDataSetName>
+                <gmd:associationType>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:DS_AssociationTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'largerWorkCitation'"/>
+                  </xsl:call-template>
+                </gmd:associationType>
+                <gmd:initiativeType>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:DS_InitiativeTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'project'"/>
+                  </xsl:call-template>
+                </gmd:initiativeType>
+              </gmd:MD_AggregateInformation>
+            </gmd:aggregationInfo>
+          </xsl:if>
+          <xsl:if test="count($cdmType)">
+            <gmd:aggregationInfo>
+              <gmd:MD_AggregateInformation>
+                <gmd:aggregateDataSetIdentifier>
+                  <gmd:MD_Identifier>
+                    <gmd:authority>
+                      <gmd:CI_Citation>
+                        <gmd:title>
+                          <gco:CharacterString>Unidata Common Data Model</gco:CharacterString>
+                        </gmd:title>
+                        <gmd:date gco:nilReason="inapplicable"/>
+                      </gmd:CI_Citation>
+                    </gmd:authority>
+                    <gmd:code>
+                      <gco:CharacterString>
+                        <xsl:value-of select="$cdmType[1]"/>
+                      </gco:CharacterString>
+                    </gmd:code>
+                  </gmd:MD_Identifier>
+                </gmd:aggregateDataSetIdentifier>
+                <gmd:associationType>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:DS_AssociationTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'largerWorkCitation'"/>
+                  </xsl:call-template>
+                </gmd:associationType>
+                <gmd:initiativeType>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:DS_InitiativeTypeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'project'"/>
+                  </xsl:call-template>
+                </gmd:initiativeType>
+              </gmd:MD_AggregateInformation>
+            </gmd:aggregationInfo>
+          </xsl:if>
+          <gmd:language>
+            <gco:CharacterString>eng</gco:CharacterString>
+          </gmd:language>
+          <gmd:topicCategory>
+            <gmd:MD_TopicCategoryCode>climatologyMeteorologyAtmosphere</gmd:MD_TopicCategoryCode>
+          </gmd:topicCategory>
+          <gmd:extent>
+            <xsl:choose>
+              <xsl:when test="$extentTotal">
+                <gmd:EX_Extent>
+                  <xsl:attribute name="id">
+                    <xsl:value-of select="'boundingExtent'"/>
+                  </xsl:attribute>
+                  <xsl:if test="count($geospatial_lat_min) + count($geospatial_lon_min) + count($geospatial_lat_max) + count($geospatial_lon_max)">
+                    <gmd:geographicElement>
+                      <gmd:EX_GeographicBoundingBox id="boundingGeographicBoundingBox">
+                        <gmd:extentTypeCode>
+                          <gco:Boolean>1</gco:Boolean>
+                        </gmd:extentTypeCode>
+                        <gmd:westBoundLongitude>
+                          <gco:Decimal>
+                            <xsl:value-of select="$geospatial_lon_min[1]"/>
+                          </gco:Decimal>
+                        </gmd:westBoundLongitude>
+                        <gmd:eastBoundLongitude>
+                          <gco:Decimal>
+                            <xsl:value-of select="$geospatial_lon_max[1]"/>
+                          </gco:Decimal>
+                        </gmd:eastBoundLongitude>
+                        <gmd:southBoundLatitude>
+                          <gco:Decimal>
+                            <xsl:value-of select="$geospatial_lat_min[1]"/>
+                          </gco:Decimal>
+                        </gmd:southBoundLatitude>
+                        <gmd:northBoundLatitude>
+                          <gco:Decimal>
+                            <xsl:value-of select="$geospatial_lat_max[1]"/>
+                          </gco:Decimal>
+                        </gmd:northBoundLatitude>
+                      </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                  </xsl:if>
+                  <xsl:if test="count($timeStart) + count($timeEnd)">
+                    <gmd:temporalElement>
+                      <gmd:EX_TemporalExtent>
+                        <xsl:attribute name="id">
+                          <xsl:value-of select="'boundingTemporalExtent'"/>
+                        </xsl:attribute>
+                        <gmd:extent>
+                          <gml:TimePeriod gml:id="{generate-id()}">
+                            <gml:description>
+                              <xsl:value-of select="$temporalUnits[1]"/>
+                            </gml:description>
+                            <gml:beginPosition>
+                              <xsl:value-of select="$timeStart[1]"/>
+                            </gml:beginPosition>
+                            <gml:endPosition>
+                              <xsl:value-of select="$timeEnd[1]"/>
+                            </gml:endPosition>
+                          </gml:TimePeriod>
+                        </gmd:extent>
+                      </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                  </xsl:if>
+                  <xsl:if test="count($verticalMin) + count($verticalMax)">
+                    <gmd:verticalElement>
+                      <gmd:EX_VerticalExtent>
+                        <gmd:minimumValue>
+                          <gco:Real>
+                            <xsl:choose>
+                              <xsl:when test="$verticalPositive[1] = 'down'">
+                                <xsl:value-of select="$verticalMin[1] * -1"/>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="$verticalMin[1]"/>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </gco:Real>
+                        </gmd:minimumValue>
+                        <gmd:maximumValue>
+                          <gco:Real>
+                            <xsl:choose>
+                              <xsl:when test="$verticalPositive[1] = 'down'">
+                                <xsl:value-of select="$verticalMax[1] * -1"/>
+                              </xsl:when>
+                              <xsl:otherwise>
+                                <xsl:value-of select="$verticalMax[1]"/>
+                              </xsl:otherwise>
+                            </xsl:choose>
+                          </gco:Real>
+                        </gmd:maximumValue>
+                        <gmd:verticalCRS>
+                          <xsl:attribute name="gco:nilReason">
+                            <xsl:value-of select="'missing'"/>
+                          </xsl:attribute>
+                        </gmd:verticalCRS>
+                      </gmd:EX_VerticalExtent>
+                    </gmd:verticalElement>
+                  </xsl:if>
+                </gmd:EX_Extent>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="gco:nilReason">
+                  <xsl:value-of select="'missing'"/>
+                </xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </gmd:extent>
+        </gmd:MD_DataIdentification>
+      </gmd:identificationInfo>
+      <xsl:if test="$thredds_opendapCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'OPeNDAP'"/>
+          <xsl:with-param name="serviceTypeName" select="'THREDDS OPeNDAP'"/>
+          <xsl:with-param name="serviceOperationName" select="'OPeNDAP Client Access'"/>
+          <xsl:with-param name="operationURL" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='opendap_service']/@value"/>
+          <xsl:with-param name="operationNode" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='opendap_service']" as="node()"/>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="$thredds_wcsCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'OGC-WCS'"/>
+          <xsl:with-param name="serviceTypeName" select="'Open Geospatial Consortium Web Coverage Service (WCS)'"/>
+          <xsl:with-param name="serviceOperationName" select="'GetCapabilities'"/>
+          <xsl:with-param name="operationURL" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='wcs_service']/@value"/>
+          <xsl:with-param name="operationNode" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='wcs_service']" as="node()"/>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="$thredds_wmsCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'OGC-WMS'"/>
+          <xsl:with-param name="serviceTypeName" select="'Open Geospatial Consortium Web Map Service (WMS)'"/>
+          <xsl:with-param name="serviceOperationName" select="'GetCapabilities'"/>
+          <xsl:with-param name="operationURL" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='wms_service']/@value"/>
+          <xsl:with-param name="operationNode" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='wms_service']" as="node()"/>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="$thredds_sosCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'OGC-SOS'"/>
+          <xsl:with-param name="serviceTypeName" select="'Open Geospatial Consortium Sensor Observation Service (SOS)'"/>
+          <xsl:with-param name="serviceOperationName" select="'GetCapabilities'"/>
+          <xsl:with-param name="operationURL" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='sos_service']/@value"/>
+          <xsl:with-param name="operationNode" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='sos_service']" as="node()"/>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="$thredds_netcdfsubsetCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'THREDDS_NetCDF_Subset'"/>
+          <xsl:with-param name="serviceTypeName" select="'THREDDS NetCDF Subset Service'"/>
+          <xsl:with-param name="serviceOperationName" select="'NetCDFSubsetService'"/>
+          <xsl:with-param name="operationURL" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='nccs_service']/@value"/>
+          <xsl:with-param name="operationNode" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='nccs_service']" as="node()"/>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="$thredds_httpCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'THREDDS_HTTP_Service'"/>
+          <xsl:with-param name="serviceTypeName" select="'THREDDS HTTP Service'"/>
+          <xsl:with-param name="serviceOperationName" select="'FileHTTPService'"/>
+          <xsl:with-param name="operationURL" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='httpserver_service']/@value"/>
+          <xsl:with-param name="operationNode" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='httpserver_service']" as="node()"/>
+        </xsl:call-template>
+      </xsl:if>
+      <!-- Output variables with coverage_content_type -->
+      <xsl:for-each select="//nc:variable[generate-id() = 
+      generate-id(key('coverageTypes',nc:attribute[@name='coverage_content_type']/@value)[1])]">
+        <gmd:contentInfo>
+          <gmi:MI_CoverageDescription>
+            <gmd:attributeDescription>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'unknown'"/>
+              </xsl:attribute>
+            </gmd:attributeDescription>
+            <gmd:contentType>
+              <xsl:call-template name="writeCodelist">
+                <xsl:with-param name="codeListName" select="'gmd:MD_CoverageContentTypeCode'"/>
+                <xsl:with-param name="codeListValue" select="nc:attribute[@name='coverage_content_type']/@value"/>
+              </xsl:call-template>
+            </gmd:contentType>
+            <xsl:for-each select="key('coverageTypes',nc:attribute[@name='coverage_content_type']/@value)">
+              <xsl:call-template name="writeVariableDimensions">
+                <xsl:with-param name="variableName" select="./@name"/>
+                <xsl:with-param name="variableLongName" select="./nc:attribute[@name='long_name']/@value"/>
+                <xsl:with-param name="variableStandardName" select="./nc:attribute[@name='standard_name']/@value"/>
+                <xsl:with-param name="variableType" select="./@type"/>
+                <xsl:with-param name="variableUnits" select="./nc:attribute[@name='units']/@value"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </gmi:MI_CoverageDescription>
+        </gmd:contentInfo>
+      </xsl:for-each>
+      <!-- Output variables with no coverage_content_type -->
+      <xsl:if test="count(//nc:variable[not(nc:attribute/@name='coverage_content_type')])">
+        <gmd:contentInfo>
+          <gmi:MI_CoverageDescription>
+            <gmd:attributeDescription>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'unknown'"/>
+              </xsl:attribute>
+            </gmd:attributeDescription>
+            <gmd:contentType>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'unknown'"/>
+              </xsl:attribute>
+            </gmd:contentType>
+            <xsl:for-each select="//nc:variable[not(nc:attribute/@name='coverage_content_type')]">
+              <xsl:call-template name="writeVariableDimensions">
+                <xsl:with-param name="variableName" select="./@name"/>
+                <xsl:with-param name="variableLongName" select="./nc:attribute[@name='long_name']/@value"/>
+                <xsl:with-param name="variableStandardName" select="./nc:attribute[@name='standard_name']/@value"/>
+                <xsl:with-param name="variableType" select="./@type"/>
+                <xsl:with-param name="variableUnits" select="./nc:attribute[@name='units']/@value"/>
+              </xsl:call-template>
+            </xsl:for-each>
+          </gmi:MI_CoverageDescription>
+        </gmd:contentInfo>
+      </xsl:if>
+      <!-- distributor is netCDF publisher -->
+      <xsl:if test="$publisherTotal or $thredds_opendapCnt">
+        <gmd:distributionInfo>
+          <gmd:MD_Distribution>
+            <gmd:distributor>
+              <gmd:MD_Distributor>
+                <xsl:choose>
+                  <xsl:when test="$publisherTotal">
+                    <xsl:call-template name="writeResponsibleParty">
+                      <xsl:with-param name="tagName" select="'gmd:distributorContact'"/>
+                      <xsl:with-param name="testValue" select="$publisherTotal"/>
+                      <xsl:with-param name="individualName"/>
+                      <xsl:with-param name="organisationName" select="$publisherName[1]"/>
+                      <xsl:with-param name="email" select="$publisherEmail[1]"/>
+                      <xsl:with-param name="url" select="$publisherURL[1]"/>
+                      <xsl:with-param name="urlName" select="'URL for the data publisher'"/>
+                      <xsl:with-param name="urlDescription" select="'This URL provides contact information for the publisher of this dataset'"/>
+                      <xsl:with-param name="roleCode" select="'publisher'"/>
+                    </xsl:call-template>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <gmd:distributorContact gco:nilReason="missing"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+                <gmd:distributorFormat>
+                  <gmd:MD_Format>
+                    <gmd:name>
+                      <gco:CharacterString>OPeNDAP</gco:CharacterString>
+                    </gmd:name>
+                    <gmd:version gco:nilReason="unknown"/>
+                  </gmd:MD_Format>
+                </gmd:distributorFormat>
+                <xsl:if test="$thredds_opendapCnt">
+                  <gmd:distributorTransferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                      <gmd:onLine>
+                        <gmd:CI_OnlineResource>
+                          <gmd:linkage>
+                            <gmd:URL>
+                              <xsl:value-of select="concat(/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='opendap_service']/@value,'.html')"/>
+                            </gmd:URL>
+                          </gmd:linkage>
+                          <gmd:name>
+                            <gco:CharacterString>File Information</gco:CharacterString>
+                          </gmd:name>
+                          <gmd:description>
+                            <gco:CharacterString>This URL provides a standard OPeNDAP html interface for selecting data from this dataset. Change the extension to .info for a description of the dataset.</gco:CharacterString>
+                          </gmd:description>
+                          <gmd:function>
+                            <gmd:CI_OnLineFunctionCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+                          </gmd:function>
+                        </gmd:CI_OnlineResource>
+                      </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                  </gmd:distributorTransferOptions>
+                  <!-- Climate Weather Toolkit Transfer option-->
+                  <gmd:distributorTransferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                      <gmd:onLine>
+                        <gmd:CI_OnlineResource>
+                          <gmd:linkage>
+                            <gmd:URL>
+                              <xsl:value-of select="concat('http://www.ncdc.noaa.gov/oa/wct/wct-jnlp-beta.php?singlefile=',/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='services']/nc:attribute[@name='opendap_service']/@value)"/>
+                            </gmd:URL>
+                          </gmd:linkage>
+                          <gmd:name>
+                            <gco:CharacterString>Viewer Information</gco:CharacterString>
+                          </gmd:name>
+                          <gmd:description>
+                            <gco:CharacterString>This URL provides an NCDC climate and weather toolkit view of an OPeNDAP resource.</gco:CharacterString>
+                          </gmd:description>
+                          <gmd:function>
+                            <gmd:CI_OnLineFunctionCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="mapDigital">mapDigital</gmd:CI_OnLineFunctionCode>
+                          </gmd:function>
+                        </gmd:CI_OnlineResource>
+                      </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                  </gmd:distributorTransferOptions>
+                </xsl:if>
+              </gmd:MD_Distributor>
+            </gmd:distributor>
+          </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+      </xsl:if>
+      <xsl:if test="normalize-space($history[1])!=''">
+        <gmd:dataQualityInfo>
+          <gmd:DQ_DataQuality>
+            <gmd:scope>
+              <gmd:DQ_Scope>
+                <gmd:level>
+                  <xsl:call-template name="writeCodelist">
+                    <xsl:with-param name="codeListName" select="'gmd:MD_ScopeCode'"/>
+                    <xsl:with-param name="codeListValue" select="'dataset'"/>
+                  </xsl:call-template>
+                </gmd:level>
+              </gmd:DQ_Scope>
+            </gmd:scope>
+            <gmd:lineage>
+              <gmd:LI_Lineage>
+                <gmd:statement>
+                  <xsl:call-template name="writeCharacterString">
+                    <xsl:with-param name="stringToWrite" select="$history[1]"/>
+                  </xsl:call-template>
+                </gmd:statement>
+              </gmd:LI_Lineage>
+            </gmd:lineage>
+          </gmd:DQ_DataQuality>
+        </gmd:dataQualityInfo>
+      </xsl:if>
+      <gmd:metadataMaintenance>
+        <gmd:MD_MaintenanceInformation>
+          <gmd:maintenanceAndUpdateFrequency gco:nilReason="unknown"/>
+          <gmd:maintenanceNote>
+            <gco:CharacterString>This record was translated from NcML using UnidataDD2MI.xsl Version <xsl:value-of select="$stylesheetVersion"/></gco:CharacterString>
+          </gmd:maintenanceNote>
+        </gmd:MD_MaintenanceInformation>
+      </gmd:metadataMaintenance>
+    </gmi:MI_Metadata>
+  </xsl:template>
+  <xsl:template name="writeCodelist">
+    <xsl:param name="codeListName"/>
+    <xsl:param name="codeListValue"/>
+    <xsl:variable name="codeListLocation" select="'http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml'"/>
+    <xsl:element name="{$codeListName}">
+      <xsl:attribute name="codeList">
+        <xsl:value-of select="$codeListLocation"/>
+        <xsl:value-of select="'#'"/>
+        <xsl:value-of select="substring-after($codeListName,':')"/>
+      </xsl:attribute>
+      <xsl:attribute name="codeListValue">
+        <xsl:value-of select="$codeListValue"/>
+      </xsl:attribute>
+      <xsl:value-of select="$codeListValue"/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template name="writeCharacterString">
+    <xsl:param name="stringToWrite"/>
+    <xsl:choose>
+      <xsl:when test="$stringToWrite">
+        <gco:CharacterString>
+          <xsl:value-of select="$stringToWrite"/>
+        </gco:CharacterString>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="gco:nilReason">
+          <xsl:value-of select="'missing'"/>
+        </xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="writeDate">
+    <xsl:param name="testValue"/>
+    <xsl:param name="dateToWrite"/>
+    <xsl:param name="dateType"/>
+    <xsl:if test="$testValue">      
+      <xsl:choose>
+        <xsl:when test="$dateToWrite=''">
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date gco:nilReason="missing"/>
+              <gmd:dateType>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
+                  <xsl:with-param name="codeListValue" select="$dateType"/>
+                </xsl:call-template>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </xsl:when>
+        <xsl:when test="contains($dateToWrite, 'UTC')">          
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+                <gco:DateTime>
+                  <xsl:variable name="utcDate">
+                    <xsl:value-of select="substring-before($dateToWrite, ' UTC')"/>
+                  </xsl:variable>
+                  <xsl:choose>
+                    <xsl:when test="string-length($utcDate=16)">
+                      <xsl:value-of select="concat(translate($utcDate,' ','T'),':00')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($utcDate,' ','T')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </gco:DateTime>
+              </gmd:date>
+              <gmd:dateType>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
+                  <xsl:with-param name="codeListValue" select="$dateType"/>
+                </xsl:call-template>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </xsl:when>
+        <xsl:when test="contains(translate($dateToWrite,' ','T'), 'T' ) ">          
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+                <gco:DateTime>
+                  <xsl:choose>
+                    <xsl:when test="contains($dateToWrite, 'T') and string-length($dateToWrite=16) and not(contains($dateToWrite, '-'))">
+                      <xsl:value-of select="substring($dateToWrite,1, 4)"/>
+                      <xsl:text>-</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,5,2)"/>
+                      <xsl:text>-</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,7,2)"/>
+                      <xsl:value-of select="substring($dateToWrite,9,1)"/>
+                      <xsl:value-of select="substring($dateToWrite,10,2)"/>
+                      <xsl:text>:</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,12,2)"/>
+                      <xsl:text>:</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,14)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="translate($dateToWrite,' ','T')"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </gco:DateTime>
+              </gmd:date>
+              <gmd:dateType>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
+                  <xsl:with-param name="codeListValue" select="$dateType"/>
+                </xsl:call-template>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </xsl:when>
+        <xsl:otherwise>
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+                <gco:Date>
+                  <xsl:choose>
+                    <xsl:when test="string-length($dateToWrite=16) and not(contains($dateToWrite, '-'))">
+                      <xsl:value-of select="substring($dateToWrite,1, 4)"/>
+                      <xsl:text>-</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,5,2)"/>
+                      <xsl:text>-</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,7,2)"/>
+                      <xsl:value-of select="substring($dateToWrite,9,1)"/>
+                      <xsl:value-of select="substring($dateToWrite,10,2)"/>
+                      <xsl:text>:</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,12,2)"/>
+                      <xsl:text>:</xsl:text>
+                      <xsl:value-of select="substring($dateToWrite,14)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$dateToWrite"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </gco:Date>
+              </gmd:date>
+              <gmd:dateType>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
+                  <xsl:with-param name="codeListValue" select="$dateType"/>
+                </xsl:call-template>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="writeResponsibleParty">
+    <xsl:param name="tagName"/>
+    <xsl:param name="testValue"/>
+    <xsl:param name="individualName"/>
+    <xsl:param name="organisationName"/>
+    <xsl:param name="email"/>
+    <xsl:param name="url"/>
+    <xsl:param name="urlName"/>
+    <xsl:param name="urlDescription"/>
+    <xsl:param name="roleCode"/>
+    <xsl:choose>
+      <xsl:when test="$testValue">
+        <xsl:element name="{$tagName}">
+          <gmd:CI_ResponsibleParty>
+            <gmd:individualName>
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="stringToWrite" select="$individualName"/>
+              </xsl:call-template>
+            </gmd:individualName>
+            <gmd:organisationName>
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="stringToWrite" select="$organisationName"/>
+              </xsl:call-template>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+              <xsl:choose>
+                <xsl:when test="$email or $url">
+                  <gmd:CI_Contact>
+                    <xsl:if test="$email">
+                      <gmd:address>
+                        <gmd:CI_Address>
+                          <gmd:electronicMailAddress>
+                            <gco:CharacterString>
+                              <xsl:value-of select="$email"/>
+                            </gco:CharacterString>
+                          </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                      </gmd:address>
+                    </xsl:if>
+                    <xsl:if test="$url">
+                      <gmd:onlineResource>
+                        <gmd:CI_OnlineResource>
+                          <gmd:linkage>
+                            <gmd:URL>
+                              <xsl:value-of select="$url"/>
+                            </gmd:URL>
+                          </gmd:linkage>
+                          <gmd:protocol>
+                            <gco:CharacterString>http</gco:CharacterString>
+                          </gmd:protocol>
+                          <gmd:applicationProfile>
+                            <gco:CharacterString>web browser</gco:CharacterString>
+                          </gmd:applicationProfile>
+                          <gmd:name>
+                            <gco:CharacterString>
+                              <xsl:value-of select="$urlName"/>
+                            </gco:CharacterString>
+                          </gmd:name>
+                          <gmd:description>
+                            <gco:CharacterString>
+                              <xsl:value-of select="$urlDescription"/>
+                            </gco:CharacterString>
+                          </gmd:description>
+                          <gmd:function>
+                            <xsl:call-template name="writeCodelist">
+                              <xsl:with-param name="codeListName" select="'gmd:CI_OnLineFunctionCode'"/>
+                              <xsl:with-param name="codeListValue" select="'information'"/>
+                            </xsl:call-template>
+                          </gmd:function>
+                        </gmd:CI_OnlineResource>
+                      </gmd:onlineResource>
+                    </xsl:if>
+                  </gmd:CI_Contact>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:attribute name="gco:nilReason">
+                    <xsl:value-of select="'missing'"/>
+                  </xsl:attribute>
+                </xsl:otherwise>
+              </xsl:choose>
+            </gmd:contactInfo>
+            <gmd:role>
+              <xsl:call-template name="writeCodelist">
+                <xsl:with-param name="codeListName" select="'gmd:CI_RoleCode'"/>
+                <xsl:with-param name="codeListValue" select="$roleCode"/>
+              </xsl:call-template>
+            </gmd:role>
+          </gmd:CI_ResponsibleParty>
+        </xsl:element>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:element name="{$tagName}">
+          <xsl:attribute name="gco:nilReason">missing</xsl:attribute>
+        </xsl:element>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="writeDimension">
+    <xsl:param name="dimensionName"/>
+    <xsl:param name="dimensionType"/>
+    <xsl:param name="dimensionUnits"/>
+    <xsl:param name="dimensionResolution"/>
+    <xsl:param name="dimensionSize"/>    
+    <gmd:axisDimensionProperties>
+      <gmd:MD_Dimension>
+        <xsl:if test="$dimensionName">
+          <xsl:attribute name="id">
+            <xsl:value-of select="$dimensionName"/>
+          </xsl:attribute>
+        </xsl:if>
+        <gmd:dimensionName>
+          <xsl:call-template name="writeCodelist">
+            <xsl:with-param name="codeListName" select="'gmd:MD_DimensionNameTypeCode'"/>
+            <xsl:with-param name="codeListValue" select="$dimensionType"/>
+          </xsl:call-template>
+        </gmd:dimensionName>
+        <xsl:choose>
+          <xsl:when test="$dimensionSize">
+            <gmd:dimensionSize>
+              <gco:Integer>
+                <xsl:value-of select="$dimensionSize"/>
+              </gco:Integer>
+            </gmd:dimensionSize>
+          </xsl:when>
+          <xsl:otherwise>
+            <gmd:dimensionSize>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'unknown'"/>
+              </xsl:attribute>
+            </gmd:dimensionSize>
+          </xsl:otherwise>
+        </xsl:choose>
+        <gmd:resolution>
+          <xsl:choose>
+            <xsl:when test="contains($dimensionResolution,' ')">
+              <gco:Measure>
+                <xsl:attribute name="uom">
+                  <xsl:value-of select="substring-after($dimensionResolution,' ')"/>
+                </xsl:attribute>
+                <xsl:value-of select="substring-before($dimensionResolution,' ')"/>
+              </gco:Measure>
+            </xsl:when>
+            <xsl:when test="contains($dimensionResolution,'PT')">
+              <!-- previous 
+                <xsl:if test="contains($dimensionResolution, 'S')">seconds</xsl:if>
+              <xsl:if test="substring($dimensionResolution, 4)='S'"> <xsl:value-of select="translate(substring($dimensionResolution, 4),$uppercase, $smallcase)"/> </xsl:if>
+              <xsl:if test="substring($dimensionResolution, 4)='M'">minutes</xsl:if>
+              <xsl:value-of select="substring($dimensionResolution,3,1)"/>-->
+              <xsl:choose>
+                <xsl:when test="contains($dimensionResolution, 'H') and not(contains($dimensionResolution, 'M')) and not(contains($dimensionResolution, 'S'))">
+                  <gco:Measure uom="hours">
+                    <xsl:variable name="hours">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'PT')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="substring-before($hours, 'H')"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:when test="not(contains($dimensionResolution, 'H')) and contains($dimensionResolution, 'M') and not(contains($dimensionResolution, 'S'))">
+                  <gco:Measure uom="minutes">
+                    <xsl:variable name="minutes">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'PT')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="substring-before($minutes, 'M')"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:when test="not(contains($dimensionResolution, 'H')) and not(contains($dimensionResolution, 'M')) and contains($dimensionResolution, 'S')">
+                  <gco:Measure uom="seconds">
+                    <xsl:variable name="seconds">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'PT')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="substring-before($seconds, 'S')"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:when test="contains($dimensionResolution, 'H') and contains($dimensionResolution, 'M') and not(contains($dimensionResolution, 'S'))">
+                  <gco:Measure uom="minutes">
+                    <xsl:variable name="hoursMinutes">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'PT')"/>
+                    </xsl:variable>
+                    <xsl:variable name="hours">
+                      <xsl:value-of select="substring-before($hoursMinutes, 'H')"/>
+                    </xsl:variable>
+                    <xsl:variable name="minutesAlmost">
+                      <xsl:value-of select="substring-after($hoursMinutes, 'H')"/>
+                    </xsl:variable>
+                    <xsl:variable name="minutes">
+                      <xsl:value-of select="substring-before($minutesAlmost, 'M')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="xs:integer($hours*60) + xs:integer($minutes)"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:when test="not(contains($dimensionResolution, 'H')) and contains($dimensionResolution, 'M') and contains($dimensionResolution, 'S')">
+                  <gco:Measure uom="seconds">
+                    <xsl:variable name="minutesSeconds">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'PT')"/>
+                    </xsl:variable>
+                    <xsl:variable name="minutes">
+                      <xsl:value-of select="substring-before($minutesSeconds, 'M')"/>
+                    </xsl:variable>
+                    <xsl:variable name="secondsAlmost">
+                      <xsl:value-of select="substring-after($minutesSeconds, 'M')"/>
+                    </xsl:variable>
+                    <xsl:variable name="seconds">
+                      <xsl:value-of select="substring-before($secondsAlmost, 'S')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="xs:integer($minutes*60) + xs:integer($seconds)"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:otherwise>
+                  <gco:Measure uom="missing">
+                    <xsl:value-of select="$dimensionResolution"/>
+                  </gco:Measure>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:when test="starts-with($dimensionResolution,'P')">
+              <xsl:choose>
+                <xsl:when test="contains($dimensionResolution, 'Y') and not(contains($dimensionResolution, 'M')) and not(contains($dimensionResolution, 'D'))">
+                  <gco:Measure uom="years">
+                    <xsl:variable name="years">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'P')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="substring-before($years, 'Y')"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:when test="not(contains($dimensionResolution, 'Y')) and contains($dimensionResolution, 'M') and not(contains($dimensionResolution, 'D'))">
+                  <gco:Measure uom="months">
+                    <xsl:variable name="months">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'P')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="substring-before($months, 'M')"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:when test="not(contains($dimensionResolution, 'Y')) and not(contains($dimensionResolution, 'M')) and contains($dimensionResolution, 'D')">
+                  <gco:Measure uom="days">
+                    <xsl:variable name="days">
+                      <xsl:value-of select="substring-after($dimensionResolution, 'P')"/>
+                    </xsl:variable>
+                    <xsl:value-of select="substring-before($days, 'D')"/>
+                  </gco:Measure>
+                </xsl:when>
+                <xsl:otherwise>
+                  <gco:Measure uom="missing">
+                    <xsl:value-of select="$dimensionResolution"/>
+                  </gco:Measure>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:when test="$dimensionUnits and $dimensionResolution">
+              <gco:Measure>
+                <xsl:attribute name="uom">
+                  <xsl:choose>
+                    <xsl:when test="contains($dimensionUnits, 'seconds')">seconds</xsl:when>
+                    <xsl:when test="contains($dimensionUnits, 'days')">days</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$dimensionUnits"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+                <xsl:value-of select="$dimensionResolution"/>
+              </gco:Measure>
+            </xsl:when>
+            <xsl:when test="$dimensionUnits and not($dimensionResolution)">
+              <gco:Measure>
+                <xsl:attribute name="uom">
+                  <xsl:choose>
+                    <xsl:when test="contains($dimensionUnits, 'seconds')">seconds</xsl:when>
+                    <xsl:when test="contains($dimensionUnits, 'days')">days</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="$dimensionUnits"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:attribute>
+              </gco:Measure>
+            </xsl:when>
+            <xsl:when test="not($dimensionUnits) and $dimensionResolution">
+              <gco:Measure>
+                <xsl:attribute name="uom">
+                  <xsl:value-of select="'unknown'"/>
+                </xsl:attribute>
+                <xsl:value-of select="$dimensionResolution"/>
+              </gco:Measure>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'missing'"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </gmd:resolution>
+      </gmd:MD_Dimension>
+    </gmd:axisDimensionProperties>
+  </xsl:template>
+  <xsl:template name="writeVariableDimensions">
+    <xsl:param name="variableName"/>
+    <xsl:param name="variableLongName"/>
+    <xsl:param name="variableStandardName"/>
+    <xsl:param name="variableType"/>
+    <xsl:param name="variableUnits"/>
+    <gmd:dimension>
+      <gmd:MD_Band>
+        <gmd:sequenceIdentifier>
+          <gco:MemberName>
+            <gco:aName>
+              <gco:CharacterString>
+                <xsl:value-of select="$variableName"/>
+              </gco:CharacterString>
+            </gco:aName>
+            <gco:attributeType>
+              <gco:TypeName>
+                <gco:aName>
+                  <gco:CharacterString>
+                    <xsl:value-of select="$variableType"/>
+                  </gco:CharacterString>
+                </gco:aName>
+              </gco:TypeName>
+            </gco:attributeType>
+          </gco:MemberName>
+        </gmd:sequenceIdentifier>
+        <gmd:descriptor>
+          <xsl:call-template name="writeCharacterString">
+            <xsl:with-param name="stringToWrite">
+              <xsl:value-of select="$variableLongName"/>
+              <xsl:if test="$variableStandardName">
+                <xsl:value-of select="concat(' (',$variableStandardName,')')"/>
+              </xsl:if>
+            </xsl:with-param>
+          </xsl:call-template>
+        </gmd:descriptor>
+        <xsl:if test="$variableUnits">
+          <gmd:units>
+            <xsl:attribute name="xlink:href">
+              <xsl:value-of select="'http://example.org/someUnitsDictionary.xml#'"/>
+              <xsl:value-of select="encode-for-uri($variableUnits)"/>
+            </xsl:attribute>
+          </gmd:units>
+        </xsl:if>
+      </gmd:MD_Band>
+    </gmd:dimension>
+  </xsl:template>
+  <xsl:template name="writeVariableRanges">
+    <xsl:param name="variableName"/>
+    <xsl:param name="variableLongName"/>
+    <xsl:param name="variableStandardName"/>
+    <xsl:param name="variableType"/>
+    <xsl:param name="variableUnits"/>
+    <xsl:if test="nc:attribute[contains(@name,'flag_')]">
+      <xsl:variable name="flag_masks_seq" select="tokenize(normalize-space(nc:attribute[@name='flag_masks']/@value),'\s')"/>
+      <xsl:variable name="flag_values_seq" select="tokenize(normalize-space(nc:attribute[@name='flag_values']/@value),'\s')"/>
+      <xsl:variable name="flag_names_seq" select="tokenize(normalize-space(nc:attribute[@name='flag_names']/@value),'\s')"/>
+      <xsl:variable name="flag_meanings_seq" select="tokenize(normalize-space(nc:attribute[@name='flag_meanings']/@value),'\s')"/>
+      <xsl:for-each select="$flag_values_seq">
+        <gmi:rangeElementDescription>
+          <gmi:MI_RangeElementDescription>
+            <gmi:name>
+              <gco:CharacterString>
+                <xsl:value-of select="subsequence($flag_names_seq,position(),1)"/>
+              </gco:CharacterString>
+            </gmi:name>
+            <gmi:definition>
+              <gco:CharacterString>
+                <xsl:value-of select="subsequence($flag_meanings_seq,position(),1)"/>
+              </gco:CharacterString>
+            </gmi:definition>
+            <gmi:rangeElement>
+              <gco:Record>
+                <xsl:value-of select="translate(subsequence($flag_values_seq,position(),1),',','')"/>
+              </gco:Record>
+            </gmi:rangeElement>
+          </gmi:MI_RangeElementDescription>
+        </gmi:rangeElementDescription>
+      </xsl:for-each>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="writeService">
+    <xsl:param name="serviceID"/>
+    <xsl:param name="serviceTypeName"/>
+    <xsl:param name="serviceOperationName"/>
+    <xsl:param name="operationURL"/>
+    <xsl:param name="operationNode"/>
+    <gmd:identificationInfo>
+      <xsl:element name="srv:SV_ServiceIdentification">
+        <xsl:attribute name="id">
+          <xsl:value-of select="$serviceID"/>
+        </xsl:attribute>
+        <gmd:citation>
+          <gmd:CI_Citation>
+            <gmd:title>
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="stringToWrite" select="$title[1]"/>
+              </xsl:call-template>
+            </gmd:title>
+            <xsl:choose>
+              <xsl:when test="$dateCnt">
+                <xsl:if test="count($creatorDate)">
+                  <xsl:call-template name="writeDate">
+                    <xsl:with-param name="testValue" select="count($creatorDate)"/>
+                    <xsl:with-param name="dateToWrite" select="$creatorDate[1]"/>
+                    <xsl:with-param name="dateType" select="'creation'"/>
+                  </xsl:call-template>
+                </xsl:if>
+                <xsl:if test="count($issuedDate)">
+                  <xsl:call-template name="writeDate">
+                    <xsl:with-param name="testValue" select="count($issuedDate)"/>
+                    <xsl:with-param name="dateToWrite" select="$issuedDate[1]"/>
+                    <xsl:with-param name="dateType" select="'issued'"/>
+                  </xsl:call-template>
+                </xsl:if>
+                <xsl:if test="count($modifiedDate)">
+                  <xsl:call-template name="writeDate">
+                    <xsl:with-param name="testValue" select="count($modifiedDate)"/>
+                    <xsl:with-param name="dateToWrite" select="substring($modifiedDate[1],1,10)"/>
+                    <xsl:with-param name="dateType" select="'revision'"/>
+                  </xsl:call-template>
+                </xsl:if>
+              </xsl:when>
+              <xsl:otherwise>
+                <gmd:date>
+                  <xsl:attribute name="gco:nilReason">
+                    <xsl:value-of select="'missing'"/>
+                  </xsl:attribute>
+                </gmd:date>
+              </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="$creatorTotal">
+              <xsl:call-template name="writeResponsibleParty">
+                <xsl:with-param name="tagName" select="'gmd:citedResponsibleParty'"/>
+                <xsl:with-param name="testValue" select="$creatorTotal"/>
+                <xsl:with-param name="individualName" select="$creatorName[1]"/>
+                <xsl:with-param name="organisationName" select="$institution[1]"/>
+                <xsl:with-param name="email" select="$creatorEmail[1]"/>
+                <xsl:with-param name="url" select="$creatorURL[1]"/>
+                <xsl:with-param name="roleCode" select="'originator'"/>
+              </xsl:call-template>
+            </xsl:if>
+            <xsl:if test="$contributorTotal">
+              <xsl:call-template name="writeResponsibleParty">
+                <xsl:with-param name="tagName" select="'gmd:citedResponsibleParty'"/>
+                <xsl:with-param name="testValue" select="$contributorTotal"/>
+                <xsl:with-param name="individualName" select="$contributorName[1]"/>
+                <xsl:with-param name="organisationName"/>
+                <xsl:with-param name="email"/>
+                <xsl:with-param name="url"/>
+                <xsl:with-param name="roleCode" select="/nc:netcdf/nc:attribute[@name='contributor_role']/@value"/>
+              </xsl:call-template>
+            </xsl:if>
+          </gmd:CI_Citation>
+        </gmd:citation>
+        <gmd:abstract>
+          <xsl:choose>
+            <xsl:when test="count(/nc:netcdf/nc:attribute[@name='summary']) > 0">
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="stringToWrite" select="/nc:netcdf/nc:attribute[@name='summary']/@value"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="stringToWrite" select="/nc:netcdf/nc:group[@name='THREDDSMetadata']/nc:group[@name='documentation']/nc:group[@name='document']/nc:attribute[@type='summary']/@value"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </gmd:abstract>
+        <srv:serviceType>
+          <gco:LocalName>
+            <xsl:value-of select="$serviceTypeName"/>
+          </gco:LocalName>
+        </srv:serviceType>
+        <srv:extent>
+          <xsl:choose>
+            <xsl:when test="$extentTotal">
+              <gmd:EX_Extent>
+                <xsl:if test="count($geospatial_lat_min) + count($geospatial_lon_min) + count($geospatial_lat_max) + count($geospatial_lon_max)">
+                  <gmd:geographicElement>
+                    <gmd:EX_GeographicBoundingBox>
+                      <gmd:extentTypeCode>
+                        <gco:Boolean>1</gco:Boolean>
+                      </gmd:extentTypeCode>
+                      <gmd:westBoundLongitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="$geospatial_lon_min[1]"/>
+                        </gco:Decimal>
+                      </gmd:westBoundLongitude>
+                      <gmd:eastBoundLongitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="$geospatial_lon_max[1]"/>
+                        </gco:Decimal>
+                      </gmd:eastBoundLongitude>
+                      <gmd:southBoundLatitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="$geospatial_lat_min[1]"/>
+                        </gco:Decimal>
+                      </gmd:southBoundLatitude>
+                      <gmd:northBoundLatitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="$geospatial_lat_max[1]"/>
+                        </gco:Decimal>
+                      </gmd:northBoundLatitude>
+                    </gmd:EX_GeographicBoundingBox>
+                  </gmd:geographicElement>
+                </xsl:if>
+                <xsl:if test="count($timeStart) + count($timeEnd)">
+                  <gmd:temporalElement>
+                    <gmd:EX_TemporalExtent>
+                      <gmd:extent>
+                        <gml:TimePeriod gml:id="{generate-id($operationNode)}">
+                          <gml:beginPosition>
+                            <xsl:value-of select="$timeStart[1]"/>
+                          </gml:beginPosition>
+                          <gml:endPosition>
+                            <xsl:value-of select="$timeEnd[1]"/>
+                          </gml:endPosition>
+                        </gml:TimePeriod>
+                      </gmd:extent>
+                    </gmd:EX_TemporalExtent>
+                  </gmd:temporalElement>
+                </xsl:if>
+                <xsl:if test="count($verticalMin) + count($verticalMax)">
+                  <gmd:verticalElement>
+                    <gmd:EX_VerticalExtent>
+                      <gmd:minimumValue>
+                        <gco:Real>
+                          <xsl:choose>
+                            <xsl:when test="$verticalPositive[1] = 'down'">
+                              <xsl:value-of select="$verticalMin[1] * -1"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$verticalMin[1]"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </gco:Real>
+                      </gmd:minimumValue>
+                      <gmd:maximumValue>
+                        <gco:Real>
+                          <xsl:choose>
+                            <xsl:when test="$verticalPositive[1] = 'down'">
+                              <xsl:value-of select="$verticalMax[1] * -1"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                              <xsl:value-of select="$verticalMax[1]"/>
+                            </xsl:otherwise>
+                          </xsl:choose>
+                        </gco:Real>
+                      </gmd:maximumValue>
+                      <gmd:verticalCRS>
+                        <xsl:attribute name="gco:nilReason">
+                          <xsl:value-of select="'missing'"/>
+                        </xsl:attribute>
+                      </gmd:verticalCRS>
+                    </gmd:EX_VerticalExtent>
+                  </gmd:verticalElement>
+                </xsl:if>
+              </gmd:EX_Extent>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'missing'"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </srv:extent>
+        <srv:couplingType>
+          <srv:SV_CouplingType codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#SV_CouplingType" codeListValue="tight">tight</srv:SV_CouplingType>
+        </srv:couplingType>
+        <srv:containsOperations>
+          <srv:SV_OperationMetadata>
+            <srv:operationName>
+              <gco:CharacterString>
+                <xsl:value-of select="$serviceOperationName"/>
+              </gco:CharacterString>
+            </srv:operationName>
+            <srv:DCP gco:nilReason="unknown"/>
+            <srv:connectPoint>
+              <gmd:CI_OnlineResource>
+                <gmd:linkage>
+                  <gmd:URL>
+                    <xsl:value-of select="$operationURL"/>
+                  </gmd:URL>
+                </gmd:linkage>
+                <gmd:name>
+                  <gco:CharacterString>
+                    <xsl:value-of select="$serviceID"/>
+                  </gco:CharacterString>
+                </gmd:name>
+                <gmd:description>
+                  <gco:CharacterString>
+                    <xsl:value-of select="$serviceTypeName"/>
+                  </gco:CharacterString>
+                </gmd:description>
+                <gmd:function>
+                  <gmd:CI_OnLineFunctionCode codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+                </gmd:function>
+              </gmd:CI_OnlineResource>
+            </srv:connectPoint>
+          </srv:SV_OperationMetadata>
+        </srv:containsOperations>
+        <srv:operatesOn xlink:href="#DataIdentification"/>
+      </xsl:element>
+    </gmd:identificationInfo>
+  </xsl:template>
+</xsl:stylesheet>
+-----
+
+NcSOS
+-----
+
+https://github.com/asascience-open/ncSOS[+https://github.com/asascience-open/ncSOS+]
+
+https://github.com/asascience-open/ncSOS/wiki[+https://github.com/asascience-open/ncSOS/wiki+]
+
+NcSOS adds an OGC SOS service to your existing THREDDS server.  It complies
+with the IOOS SWE Milestone 1.0 templates, i.e.
+
+https://code.google.com/p/ioostech/source/browse/#svn%2Ftrunk%2Ftemplates%2FMilestone1.0[+https://code.google.com/p/ioostech/source/browse/#svn%2Ftrunk%2Ftemplates%2FMilestone1.0+]
+
+and requires that the datasets be in any of the CF 1.6
+discrete sample geometries, i.e.
+
+http://helene.llnl.gov/cf/documents/cf-conventions/1.6/cf-conventions.html#discrete-sampling-geometries[+http://helene.llnl.gov/cf/documents/cf-conventions/1.6/cf-conventions.html#discrete-sampling-geometries+]
+
+The CF 1.7 discrete sampling geometries are at:
+
+http://helene.llnl.gov/cf/documents/cf-conventions/1.7-draft1/cf-conventions.html#discrete-sampling-geometries[+http://helene.llnl.gov/cf/documents/cf-conventions/1.7-draft1/cf-conventions.html#discrete-sampling-geometries+]
+
+NcSOS acts like other THREDDS services (such an OPeNDAP and WMS) where as
+there are individual service endpoints for each dataset. It is best to
+aggregate your files and enable the NcSOS service on top of the aggregation.
+i.e. The NcML aggregate of hourly files from an individual station would be a
+good candidate to serve with NcSOS. Serving the individual hourly files with
+NcSOS would not be as beneficial.
+
+This requires THREDDS version 4.3.16 or greater.
+
+Installation
+~~~~~~~~~~~~
+
+Delete the present ncSOS version - if present - from
+
++$TOMCAT_HOME/webapps/thredds/WEB-INF/lib+
+
+If upgrading from a version pre-RC9, then delete the
++sos-servlet.xml+ configuration file from the:
+
++$TOMCAT_HOME/webapps/thredds/WEB-INF+
+
+directory.  Then delete the following two mappings
+from:
+
++$TOMCAT_HOME/webapps/thredds/WEB-INF/web.xml+
+
+-----
+ <servlet>
+    <servlet-name>sos</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+ </servlet>
+----- 
+
+and
+
+-----
+ <servlet-mapping>
+    <servlet-name>sos</servlet-name>
+    <url-pattern>/sos/*</url-pattern>
+ </servlet-mapping>
+-----
+
+Download the JAR file from:
+
+https://github.com/asascience-open/ncSOS/releases/download/v1.0/ncSOS-1.0.zip[+https://github.com/asascience-open/ncSOS/releases/download/v1.0/ncSOS-1.0.zip+]
+
+Extract this into a local directory to obtain the
++ncSOS-1.0.jar+ file, and then copy that into
+
++$TOMCAT_HOME/webapps/thredds/WEB-INF/lib+
+
+Usage
+~~~~~
+
+Add the following service definition to the +catalog.xml+ file:
+
++<service name="sos" serviceType="SOS" base="/thredds/sos/" />+
+
+Python
+------
+
+run_nciso.py
+~~~~~~~~~~~~
+
+A Python script to run ncISO from the command line and cleanup and rename the
+result XML file names.
+
+https://github.com/neracoos-open/neracoos_catalog/tree/master/src/MetadataWAF[+https://github.com/neracoos-open/neracoos_catalog/tree/master/src/MetadataWAF+]
+
+The command-line options are:
+
+-----
+usage: run_nciso.py [-h] [-r] [-dr] [-v] [waf_dir] [tds_url]
+
+positional arguments:
+  waf_dir             Output WAF directory. Default: /var/www/htdocs/WAF
+  tds_url             THREDDS url to parse. Default:
+                      http://thredds.ucar.edu/thredds/idd/obsData.xml
+
+optional arguments:
+  -h, --help          show this help message and exit
+  -r, --rename        Don't run ncISO. Just rename the xml files in the WAF.
+  -dr, --dont_rename  Don't rename the xml files in the WAF.
+  -v, --verbose       Verbose.
+-----
+
+[source,python]
+-----
+#! /usr/bin/env python
+import os
+import sys
+import glob
+import shutil
+import argparse
+from subprocess import call
+from datetime import datetime
+"""
+ - Run java ncISO-2.3.jar to harvest and parse a THREDDS Catalog end point.
+     (ncISO homepage and jar download: http://www.ngdc.noaa.gov/eds/tds/ )
+ - Use the -waf option to put all files into a single WAF Directory where 3 subdirs are created.
+     /iso xml ISO19115-2 metadata files
+     /score html ACDD Rubric scores
+     /nciso a log file
+ @args
+ Required but with defaults.
+   - waf_dir where to put ncISO the results. WAF relative to the current diretory. ncISO will create it.
+   - thredds catalog url (.xml) Default is the NERACOOS TDS.
+ Optional
+   --verbose
+   --rename Don't run ncISO, just rename files in an existing WAF
+   --dont_rename Don't run rename files in the WAF
+
+   There is also a new_name() function to rename the files to simpler form.
+
+Eric Bridger: ebridger@gmri.org
+"""
+# RESET THESE
+tds_url = 'http://thredds.ucar.edu/thredds/idd/obsData.xml'
+waf_dir = '/var/www/htdocs/WAF'
+
+# how many TDS datasets to find. Use 1 for testing
+nciso_num = '1'
+
+###############################################
+# Fix up WAF files names created by ncISO based on the TDS catalog
+# From: <waf_dir>/iso/thredds_dodsC_UMO_DSG_SOS_A01_Aanderaa_HistoricRealtime_Agg.ncml.xml
+# To: A01_Aanderaa_HistoricRealtime_Agg.xml
+###############################################
+def new_name(fn, part_rm_cnt):
+
+  # save the waf_dir
+  dn = os.path.dirname(fn)
+  # fix up the file name
+  bn = os.path.basename(fn)
+  # remove the .ncml.xml in file Agg.ncml.xml. The ncml is due to the TDS / ncSOS aggrgation caching bug
+  bn = bn.replace(".ncml", '')
+
+  parts = bn.split('_')
+  # Already renamed these files.
+  if parts[0] != 'thredds':
+    sys.stderr.write("Already renamed: " + fn + "\n")
+    return fn
+  # get rid of leading parts
+  for _ in range(part_rm_cnt):
+    parts.pop(0)
+  new_name = dn + '/' + "_".join( parts )
+  return new_name
+###############################################
+
+parser = argparse.ArgumentParser()
+parser.add_argument("waf_dir", nargs="?", help="Output WAF directory. Default: " + waf_dir, default=waf_dir)
+parser.add_argument("tds_url", nargs="?", help="THREDDS url to parse. Default: " + tds_url, default=tds_url)
+parser.add_argument("-r", "--rename", action="store_true", help="Don't run ncISO. Just rename the xml files in the WAF.")
+parser.add_argument("-dr", "--dont_rename", action="store_true", help="Don't rename the xml files in the WAF.")
+parser.add_argument("-v", "--verbose", action="store_true", help="Verbose.")
+args = parser.parse_args()
+
+tds_url = args.tds_url
+waf_dir = args.waf_dir
+
+if args.verbose:
+  print "tds_url:", tds_url
+  print "waf_dir: ", waf_dir
+  print "rename: ", args.rename
+  print "dont_rename: ", args.dont_rename
+
+sdt = datetime.now()
+
+if not args.rename:
+  if args.verbose:
+    print "Starting ncISO-2.3 TDS crawler"
+
+  # with the -waf option a waf_dir is created with 3 subirs. iso/ score/ ncml/
+  # num set to 1 for testing
+  cmd_list = ['/usr/bin/java', '-Xms1024m', '-Xmx1024m', '-jar', 'ncISO-2.3.jar', '-ts', tds_url, '-num', nciso_num, '-depth', '20', '-iso', 'true', '-waf', waf_dir]
+
+  ret = call(cmd_list)
+  if ret:
+    print "NCISO Error: ", ret
+    exit()
+
+  if args.verbose:
+    print "ncISO Done:", ret
+  # end if not args.rename only
+
+  if not args.dont_rename:
+  # Rename the ISO files
+    for file in glob.iglob(waf_dir + '/iso/thredds_*.xml'):
+      new_file = new_name(file, 5)
+      if args.verbose:
+        print file
+        print "\t", new_file
+      shutil.move(file, new_file)
+
+    # Rename the score files
+    for file in glob.iglob(waf_dir + '/score/thredds_*.html'):
+      new_file = new_name(file, 5)
+      if args.verbose:
+        print file
+        print "\t", new_file
+      shutil.move(file, new_file)
+# end if dont_rename
+
+edt = datetime.now()
+
+if args.verbose:
+  print 'Start: ' + sdt.isoformat()
+  print 'End: ' + edt.isoformat()
+-----
+
+pyCSW
+~~~~~
+
+http://pycsw.org/[+http://pycsw.org/+]
+
+An OGC CSW server implementation written in Python. Started in 2010 (more
+formally announced in 2011), pycsw allows for the publishing and discovery of
+geospatial metadata, providing a standards-based metadata and catalogue
+component of spatial data infrastructures.
+
+

@@ -1,0 +1,174 @@
+NetCDF Attributes from Various Standards
+========================================
+Steven K. Baum
+v0.2, 2015-09-28
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+
+
+
+
+Comparison of GRIIDC Requirements to ACDD/NODC Requirements
+-----------------------------------------------------------
+
+Here is a comparison between the information required by the ISO-19115-2 editor at:
+
+https://data.gulfresearchinitiative.org/metadata-editor/[+https://data.gulfresearchinitiative.org/metadata-editor/+]
+
+and both the ACDD 1-3 recommended attributes at:
+
+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_1-3[+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_1-3+]
+
+and an NODC template at:
+
+http://www.nodc.noaa.gov/data/formats/netcdf/v1.1/point.cdl[+http://www.nodc.noaa.gov/data/formats/netcdf/v1.1/point.cdl+]
+
+The NODC comparison column is omitted when it is identical to the ACDD comparison column.
+
+The sections below correspond to the seven sections on the GOMRI page.
+
+Dataset Contact
+---------------
+
+This section collects contact information about the person primarily responsible for the creation and maintenance of the dataset. Provides future researchers the means to contact the dataset originator if additional information is needed. 
+
+*Note:*  The +role+ is a pulldown list containing +Resource Provider+, +Custodian+, +Owner+, +Distributer+, +Originator+, +Point of
+Contact+, +Principle Investigator+, +Processor+, +Publisher+ and +Author+ as choices.
+
+-----
+GRIIDC                                      ACDD
+
+individualName                              creator_name
+organisationName                            creator_institution
+positionName                                 x
+phone:voice                                  x
+phone:facsimile                              x
+phone:voice                                  x
+address:deliveryPoint                        x
+address:city                                 x
+address:administrativeArea                   x
+address:postCode                             x
+address:country                              x
+address:electronicMailAddress               creator_email
+role                                         x
+-----
+
+Dataset Information
+-------------------
+
+This section collects identifying and amplifying information about the dataset. Provides future researchers with specific details on the dataset content and additional context regarding the broader purpose of the dataset.
+
+*Note:*  The +supplementalInformation+ variable contains the concatenated entries to six separate GUI boxes:  data parameters and
+units, methods, instruments, sampling scales and rates, error analysis, and provenance and historical references.
+
+-----
+GRIIDC                                      ACDD                             NODC
+
+citation:title                              title                             title
+citation:alternateTitle                      x                                 x
+citation:date                               date_created                      date_created
+abstract                                    summary                           summary
+purpose                                      x                                 x
+status                                       x                                 x
+supplementalInformation                     platform, instrument, history     platform, instrument, history
+-----
+
+Keywords
+--------
+
+This section collects keywords/key phrases describing the theme and location of the dataset. Provides GRIIDC and future researchers with short descriptions to aid search. Some datasets may not have relevant place keywords (ex. lab simulations).
+
+-----                                       
+GRIIDC                                      ACDD
+
+descriptiveKeywords                         keywords
+topicCategory                                x
+-----
+
+Data Extent
+-----------
+
+This section collects information describing the spatial and temporal extent of the dataset contents. Provides GRIIDC and future researchers the means to search for datasets by location and/or time. Some datasets may not have relevant a location or time (ex. lab simulations); a short explanation is provided in these cases.
+
+*Note*: The geographic extent in GRIIDC is stored in a GML +Polygon+ element.  The geographic extent in ACDD by ten separate
++geospatial_*+ attributes, and in the NODC guidelines by thirteen separate +geospatial+*+ attributes.  According to the ACDD
+web page, there is a mapping between its recommendations and ISO 19115-2 detailed at:
+
+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_%28ACDD%29_Mappings[+http://wiki.esipfed.org/index.php/Attribute_Convention_for_Data_Discovery_%28ACDD%29_Mappings+]
+
+-----
+GRIIDC                                      ACDD                              NODC
+
+extent:geographicElement:polygon
+   exterior:LinearRing                      geospatial_bounds, etc.           geospatial_*
+extent:temporalElement:TimePeriod
+   description                               x                                 x
+   start_date                               time_coverage_start               time_coverage_start
+   end_date                                 time_coverage_end                 time_coverage_end
+-----
+
+Distribution Info
+-----------------
+
+This section collects technical details related to the distribution of the dataset. Provides GRIIDC and future researchers the means to evaluate the means needed to download and read the dataset. 
+
+-----
+GRIIDC                                              ACDD
+
+distributorFormat:name                               x
+distributorFormat:fileDecompressionTechnique         x
+distributorTransferOptions:transferSize              x
+distributorTransferOptions:onLine:linkage            x
+distributorTransferOptions:onLine:protocol           x
+-----
+
+Distribution Contact
+--------------------
+
+This section collects contact information about the organization or person primarily responsible for the distribution of the dataset. Generally this will contain GRIIDC contact information, but externally hosted datasets should provide their distributor contact information here. 
+
+-----
+GRIIDC                                      ACDD
+
+organisationName                            publisher_name
+contactInfo:phone:voice                      x
+contactInfo:phone:facsimile                  x
+contactInfo:address:deliveryPoint            x
+contactInfo:address:city                     x
+contactInfo:address:administrativeArea       x
+contactInfo:address:postalCode               x
+contactInfo:address:country                  x
+contactInfo:address:electronicMailAddress   publisher_email 
+contactInfo:onlineResource:linkage          publisher_url 
+contactInfo:onlineResource:protocol          x
+role                                         x
+-----
+
+Metadata Contact
+----------------
+
+This section collects contact information about the person primarily responsible for the creation and maintenance of this metadata record. Provides GRIIDC and future researchers the means to contact the metadata author if additional information is needed. 
+
+-----
+GRIIDC                                            ACDD
+
+individualName                                     x
+organisationName                                   x
+positionName                                       x
+contactInfo                                        x
+contactInfo:phone:voice                            x
+contactInfo:phone:facsimile                        x
+contactInfo:address:deliveryPoint                  x
+contactInfo:address:city                           x
+contactInfo:address:administrativeArea             x
+contactInfo:address:postalCode                     x
+contactInfo:address:country                        x
+contactInfo:address:electronicMailAddress          x
+-----
+
+

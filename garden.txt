@@ -1,0 +1,1371 @@
+Central Texas Gardening Notes
+=============================
+Steven K. Baum
+v0.0, 2015-03-02
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Major Web Sites
+---------------
+
+*Aggie Horticulture* -
+http://aggie-horticulture.tamu.edu/[+http://aggie-horticulture.tamu.edu/+]
+
+*****
+This is a one-stop shop for central Texas gardening information.  Most of
+the more specific sites listed below were pulled from somewhere or other in
+this site.
+*****
+
+Interactive Web Sites
+---------------------
+
+Integrated Pest Management for the Home Vegetable Garden -
+http://vegetableipm.tamu.edu/[+http://vegetableipm.tamu.edu/+]
+
+*****
+You choose to approach your problem via one of four ways:  insects by
+name, insects by photo, vegetable type or controls.  Each selection will
+guide you through further steps to identify your culprit and how to
+best manage it.
+*****
+
+Vegetable Variety Selector -
+http://aggie-horticulture.tamu.edu/publications/veg_variety/[+http://aggie-horticulture.tamu.edu/publications/veg_variety/+]
+
+*****
+You interactively select a general region on a Texas map or choose a county or
+region via a drop-down menu.  This takes you to another drop-down menu that
+enables you to select specific vegetables.
+*****
+
+Freely Available Publications
+-----------------------------
+
+Specific for Texas Region
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Specialty Crops of Texas* - Anon. (online) -
+http://aggie-horticulture.tamu.edu/vegetable/guides/specialty-vegetables/[+http://aggie-horticulture.tamu.edu/vegetable/guides/specialty-vegetables/+]
+
+*How to Grow the Tomato and 115 Ways to Prepare It for the Table* - George W.
+Carver (TR, 1936, online) -
+http://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-tomato/[+http://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-tomato/+]
+
+*How the Farmer Can Save His Sweet Potatoes and Ways of Preparing Them for the
+Table* - George W. Carver (TR, 1936, online) -
+http://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-sweetpotatoes/[+http://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-sweetpotatoes/+]
+
+*Building a Raised Bed Garden* - Priscilla Files (TR, 2000s, 11) -
+http://aggie-horticulture.tamu.edu/vegetable/files/2010/10/E-560_raised_bed_garden.pdf[+http://aggie-horticulture.tamu.edu/vegetable/files/2010/10/E-560_raised_bed_garden.pdf+]
+
+*Guide to Marketing Organic Produce* - Charles Hall et al. (TR, 2000s,
+online) -
+http://aggie-horticulture.tamu.edu/vegetable/guides/guide-to-marketing-organic-produce/[+http://aggie-horticulture.tamu.edu/vegetable/guides/guide-to-marketing-organic-produce/+]
+
+*Easy Gardening Series* - Joseph Masabni (TRs, 2009, various PDFs) -
+http://aggie-horticulture.tamu.edu/vegetable/easy-gardening-series/[+http://aggie-horticulture.tamu.edu/vegetable/easy-gardening-series/+]
+
+*Growing Herbs in Texas* - Joseph Masabni (TR, 2009, 11) -
+http://aggie-horticulture.tamu.edu/vegetable/files/2010/10/E-561_growing_herbs_texas.pdf[+http://aggie-horticulture.tamu.edu/vegetable/files/2010/10/E-561_growing_herbs_texas.pdf+]
+
+*Organic Vegetable Production Guide* - Joseph Masabni et al. (TR, 2000s, online) - http://aggie-horticulture.tamu.edu/vegetable/guides/organic-vegetable-production-guide/[+http://aggie-horticulture.tamu.edu/vegetable/guides/organic-vegetable-production-guide/+]
+
+*Texas Vegetable Growers Handbook* - Joseph Masabni et al. (TR, 2009, online)
+- http://aggie-horticulture.tamu.edu/vegetable/guides/texas-vegetable-growers-handbook/[+http://aggie-horticulture.tamu.edu/vegetable/guides/texas-vegetable-growers-handbook/+]
+
+*Edible Landscaping* - Barbara Poff (slides, ?, 318) - http://ucanr.edu/sites/sacmg/files/163567.pdf[+http://ucanr.edu/sites/sacmg/files/163567.pdf+]
+
+*Our Edible Landscape* - Sam Powers et al. (TR, 1987, 89) -
+https://aggie-horticulture.tamu.edu/galveston/publications/Edible-Landscape.pdf[+https://aggie-horticulture.tamu.edu/galveston/publications/Edible-Landscape.pdf+]
+
+*The Crops of Texas* - Dudley T. Smith et al. (TR, 2005, online) -
+http://aggie-horticulture.tamu.edu/vegetable/guides/the-crops-of-texas/[+http://aggie-horticulture.tamu.edu/vegetable/guides/the-crops-of-texas/+]
+
+Post-1923 Books
+~~~~~~~~~~~~~~~
+
+*Holistic Agriculture Library* -
+http://www.soilandhealth.org/01aglibrary/01aglibwelcome.html[+http://www.soilandhealth.org/01aglibrary/01aglibwelcome.html+]
+
+*Journey to Forever Online Library* -
+http://www.journeytoforever.org/farm_library.html[+http://www.journeytoforever.org/farm_library.html+]
+
+*Agrodok Publications* -
+http://www.journeytoforever.org/farm_library/agrodok.html[+http://www.journeytoforever.org/farm_library/agrodok.html+]
+
+*Root Development of Field Crops* (book, online, 1926) - John E. Weaver -
+http://www.soilandhealth.org/01aglibrary/010139fieldcroproots/010139toc.html[+http://www.soilandhealth.org/01aglibrary/010139fieldcroproots/010139toc.html+]
+
+*Root Development of Vegetable Crops* (book, online, 1927) - John E. Weaver &
+William E. Bruner -
+http://www.soilandhealth.org/01aglibrary/010137veg.roots/010137toc.html[+http://www.soilandhealth.org/01aglibrary/010137veg.roots/010137toc.html+]
+
+*The Soul of the White Ant* (book, online, 1937) - Eugene N. Marais -
+http://www.journeytoforever.org/farm_library/Marais1/whiteantToC.html[+http://www.journeytoforever.org/farm_library/Marais1/whiteantToC.html+]
+
+*An Agricultural Testament* (book, online, 1943) - Sir Albert Howard -
+http://www.journeytoforever.org/farm_library/howardAT/ATtoc.html[+http://www.journeytoforever.org/farm_library/howardAT/ATtoc.html+]
+
+*Trees and Toadstools* (book, online, 1945) - M. C. Rayner -
+http://www.journeytoforever.org/farm_library/rayner/rayner_toc.html[+http://www.journeytoforever.org/farm_library/rayner/rayner_toc.html+]
+
+*The Living Soil* (book, PDF, 1948, 223) - E. B. Balfour -
+http://www.soilandhealth.org/copyform.aspx?bookcode=010138[+http://www.soilandhealth.org/copyform.aspx?bookcode=010138+]
+
+*Weeds: Guardians of the Soil* (book, online, 1950) - Joseph A. Cocannouer -
+http://www.journeytoforever.org/farm_library/weeds/WeedsToC.html[+http://www.journeytoforever.org/farm_library/weeds/WeedsToC.html+]
+
+*Soil Fertility and Animal Health* (book, PDF, 1958, 175) - W. A. Albrecht -
+http://www.soilandhealth.org/01aglibrary/010141.soil.fertility.animal.health/010146.albrecht.animal.health.pdf[+http://www.soilandhealth.org/01aglibrary/010141.soil.fertility.animal.health/010146.albrecht.animal.health.pdf+] 
+
+*Gardening Without Irrigation* (book, 1993, online) - Steve Solomon -
+http://www.soilandhealth.org/03sov/0302hsted/030201/03020100frame.html[+http://www.soilandhealth.org/03sov/0302hsted/030201/03020100frame.html+]
+
+Pre-1923 Agriculture Books and Technical Reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+General
+^^^^^^^
+
+*Agricultural Biography: Containing a Notice of the Life and Writings of the
+British Authors on Agriculture, from the Earliest Date in 1480 to the Present
+Time* - John Donaldson (1854, 137) -
+https://books.google.com/books?id=yt9YR3leQ3AC[+https://books.google.com/books?id=yt9YR3leQ3AC+]
+
+*The Pioneers and Progress of English Farming* - Rowland Edmund Prothero Baron
+Ernle (1888, 290) -
+https://books.google.com/books?id=qU4KAQAAMAAJ[+https://books.google.com/books?id=qU4KAQAAMAAJ+]
+
+*English farming, past and present* - Baron Rowland Edmund Prothero Ernle
+(1912, 504) -
+https://books.google.com/books?id=doxJAAAAMAAJ[+https://books.google.com/books?id=doxJAAAAMAAJ+]
+
+*The American Farmer's Encyclopedia: Embracing All the Recent Discoveries in
+Agricultural Chemistry, and the Use of Mineral, Vegetable and Animal Manures,
+with Descriptions and Figures of American Insects, Injurious to Vegetation :
+Being a Complete Guide for the Cultivation of Every Variety of Garden and
+Field Crops : Illustrated by Numerous Engravings of Grasses, Grains, Animals,
+Implements, Insects, Etc* - Cuthbert William Johnson & Gouverneur Emerson
+(1860, 1179) -
+https://books.google.com/books?id=KBxEAAAAYAAJ[+https://books.google.com/books?id=KBxEAAAAYAAJ+]
+
+*Farmers of Forty Centuries; Or, Permanent Agriculture in China, Korea and
+Japan* - Franklin Hiram King (1911, 441) -
+https://books.google.com/books?id=VZ41AAAAMAAJ[+https://books.google.com/books?id=VZ41AAAAMAAJ+]
+
+*An Encyclopædia of Agriculture: Comprising the Theory and Practice of the
+Valuation, Transfer, Laying Out, Improvement, and Management of Landed
+Property : and the Cultivation and Economy of the Animal and Vegetable
+Productions of Agriculture, Including All the Latest Improvements : a General
+History of Agriculture in All Countries : and a Statistical View of Its
+Present State, with Suggestions for Its Future Progress in the British Isles*
+- John Claudius Loudon (1825, 1226) -
+  https://books.google.com/books?id=I3waAAAAYAAJ[+https://books.google.com/books?id=I3waAAAAYAAJ+]
+
+*Agricultural Writers from Sir Walter of Henley to Arthur Young, 1200-1800:
+Reproductions in Facsimile and Extracts from Their Actual Writings, Enlarged
+and Revised from Articles which Have Appeared in "The Field" from 1903-1907.
+To which is Added an Exhaustive Bibliography* - Donald McDonald (1908, 228) -
+https://books.google.com/books?id=bCAaAAAAYAAJ[+https://books.google.com/books?id=bCAaAAAAYAAJ+]
+
+*Farm Knowledge: A Complete Manual of Successful Farming Written by Recognized
+Authorities in All Parts of the Country; Based on Sound Principles and the
+Actual Experience of Real Farmers* - Edward Loomis Davenport Seymour, ed.
+
+* *Volume I - Farm Animals: The Practical Care and Management of Horses,
+Cattle, Sheep, Swine, and Poultry in Health and in Sickness; Other Farm
+Animals; Animal Products and How to Make Them* (1918, 552) -
+https://books.google.com/books?id=-axAAQAAMAAJ[+https://books.google.com/books?id=-axAAQAAMAAJ+]
+* *Volume II - Soils and Crops, Rev. Ed.: The Principles and Practices of the
+Management of Soils and the Use of Fertilizers; Farming Conditions and
+Systems in America; Farm Crops and How to Grow, Improve, and Protect Them* (1919, 558) -
+https://books.google.com/books?id=3ldEAAAAYAAJ[+https://books.google.com/books?id=3ldEAAAAYAAJ+]
+* *Volume III - Farm Implements and Construction:  The Selection and Use of
+Vehicles, Implements and Farm Machinery; Farm Power and Its Applications;
+The Principles and Practices of Farm Engineering; The Arrangement, Design,
+Construction and Equipment of Farm Buildings* (1918, 488) -
+https://books.google.com/books?id=5qpAAQAAMAAJ[+https://books.google.com/books?id=5qpAAQAAMAAJ+]
+* *Volume IV - Farm Life: Farming as a Business; The Farm Home, The Farm Family
+and the Farm Community; Farm Science in Simple Terms; Farming Facts,
+Figures, and Opportunities* (1918, 552) -
+https://books.google.com/books?id=6hY1AQAAMAAJ[+https://books.google.com/books?id=6hY1AQAAMAAJ+]
+
+Fertilizers
+^^^^^^^^^^^
+
+*Manures & the Principles of Manuring* - Charles Morton Aikman (1894, 592) -
+https://books.google.com/books?id=hSZIAAAAIAAJ[+https://books.google.com/books?id=hSZIAAAAIAAJ+]
+
+*The field book of manures: or, The American muck book; treating of the
+nature, properties, sources, history, and operations of all the principal
+fertilisers and manures* - Daniel Jay Browne (1858, 422) -
+https://books.google.com/books?id=euQMAAAAYAAJ[+https://books.google.com/books?id=euQMAAAAYAAJ+]
+
+*A practical treatise on Manures* - John French Burke (1851, 204) -
+https://books.google.com/books?id=AqJXAAAAcAAJ[+https://books.google.com/books?id=AqJXAAAAcAAJ+]
+
+*A Muck Manual, for Farmers* - Samuel Luther Dana (1842, 242) -
+https://books.google.com/books?id=TKpEAAAAIAAJ[+https://books.google.com/books?id=TKpEAAAAIAAJ+]
+
+*A Treatise on Manures: Their Nature, Preparation, and Application : with a
+Description and Use of the Most Approved British Grasses : to which is Added a
+Miscellaneous Article on Farming : with an Estimate and Description of an
+Example-farm of Three Hundred Acres : Illustrated with Cuts of Farm Buildings*
+- John Donaldson (1846, 416) - John Donaldson
+
+*The farmer's treasure: a practical treatise on the nature and value of
+manures, founded from experiments on various crops, with a brief account of
+all the most recent discoveries in agricultural chemistry* - Frederic Falkner
+& Joseph A. Smith (1844, 291) -
+https://books.google.com/books?id=_XwmAQAAMAAJ[+https://books.google.com/books?id=_XwmAQAAMAAJ+]
+
+*Soils: How to Handle and Improve Them* - Stevenson Whitcomb Fletcher (1907,
+438) -
+https://books.google.com/books?id=G64aAAAAYAAJ[+https://books.google.com/books?id=G64aAAAAYAAJ+]
+
+*Fertilizers: "Where the Materials Come from and where to Get Them in the
+Cheapest Form. How to Compound Formulas, Etc., Etc."* - James John Howard
+Gregory (1885, 116) -
+https://books.google.com/books?id=pipIAAAAIAAJ[+https://books.google.com/books?id=pipIAAAAIAAJ+]
+
+*Fertility and Fertilizer Hints* - James Edward Halligan (1911, 155) -
+https://books.google.com/books?id=EJQfAAAAIAAJ[+https://books.google.com/books?id=EJQfAAAAIAAJ+]
+
+*Soil fertility and fertilizers* - James Edward Halligan (1912, 397) -
+https://books.google.com/books?id=KLtJAAAAMAAJ[+https://books.google.com/books?id=KLtJAAAAMAAJ+]
+
+*Talks on Manures: A Series of Familiar and Practical Talks Between the Author
+and the Deacon, the Doctor, and Other Neighbors, on the Whole Subject of
+Manures and Fertilizers* - Joseph Harris (1878, 356) -
+https://books.google.com/books?id=wyNIAAAAIAAJ[+https://books.google.com/books?id=wyNIAAAAIAAJ+]
+
+*Food for Plants* - Joseph Harris (1905, 230) -
+https://books.google.com/books?id=7n4LAQAAIAAJ[+https://books.google.com/books?id=7n4LAQAAIAAJ+]
+
+*The Farmer's Mine, Or Source of Wealth: Being a Compilation, with the
+Addition of New and Important Information on the Subject of Manure, Together
+with the Most Approved Methods for the Manufacture of Vegetable Manure, by
+which the Farmer Can Obtain in the Shortest Possible Time, as Much Manure of
+the Richest Quality as He Pleases* - Henry Heermance et al. (1843, 327) -
+https://books.google.com/books?id=71xJAAAAYAAJ[+https://books.google.com/books?id=71xJAAAAYAAJ+]
+
+*Soil Fertility and Permanent Agriculture* - Cyril George Hopkins (1910, 653)
+- https://books.google.com/books?id=XKsaAAAAYAAJ[+https://books.google.com/books?id=XKsaAAAAYAAJ+]
+
+*On Fertilizers* - Cuthbert William Johnson (1844, 612) -
+https://books.google.com/books?id=sFU9AQAAMAAJ[+https://books.google.com/books?id=sFU9AQAAMAAJ+]
+
+*The manures most advantageously applicable to the various sorts of soils, and
+the causes of their beneficial effect in each particular instance* - Richard
+Kirwan
+(https://books.google.com/books?id=K3MFAAAAQAAJ[+https://books.google.com/books?id=K3MFAAAAQAAJ+]
+
+*Crop Growing and Crop Feeding: A Book for the Farm, Garden and Orchard, with
+Special Reference to the Practical Methods of Using Commercial Fertilizers
+Therein* - Wilbur Fisk Massey (1901, 383) -
+https://books.google.com/books?id=iwdDAAAAIAAJ[+https://books.google.com/books?id=iwdDAAAAIAAJ+]
+
+*Productive Farming: Or, A Familiar Digest of the Recent Discoveries of
+Liebig, Johnston, Davy, and Other Celebrated Writers on Vegetable Chemistry;
+Showing how the Results of Tillage Might be Greatly Augmented* - Joseph A.
+Smith (1843, 150) -
+https://books.google.com/books?id=xUDTAAAAMAAJ[+https://books.google.com/books?id=xUDTAAAAMAAJ+]
+
+*The home-mixing of fertilizers* - Charles Embree Thorne (1898, 289) -
+https://books.google.com/books?id=6RonAQAAMAAJ[+https://books.google.com/books?id=6RonAQAAMAAJ+]
+
+*Farm Manures* - Charles Embree Thorne (1913, 242) -
+https://books.google.com/books?id=UUYuAAAAYAAJ[+https://books.google.com/books?id=UUYuAAAAYAAJ+]
+
+*Fertilizers and crops: or, The science and practice of plant-feeding; a
+presentation of facts, giving practical methods for using fertilizers in crop
+growing, with special emphasis on the reasons underlying their use, and on the
+conditions of their great efficiency* - Lucius Lincoln Van Slyke (1912, 734) -
+https://books.google.com/books?id=xsk2AAAAMAAJ[+https://books.google.com/books?id=xsk2AAAAMAAJ+]
+
+*First principles of soil fertility* - Alfred Vivian (1908, 263) -
+https://books.google.com/books?id=V-05AAAAMAAJ[+https://books.google.com/books?id=V-05AAAAMAAJ+]
+
+*Fertilizers* - Edward Burnett Voorhees (1910, 335) -
+https://books.google.com/books?id=XV1RAAAAYAAJ[+https://books.google.com/books?id=XV1RAAAAYAAJ+]
+
+*Manures and Fertilizers: A Text-book for College Students and a Work of
+Reference for All Interested in the Scientific Aspects of Modern Farming* -
+Homer Jay Wheeler (1914, 389) -
+https://books.google.com/books?id=5CkuAAAAYAAJ[+https://books.google.com/books?id=5CkuAAAAYAAJ+]
+
+Dry-Land Farming
+^^^^^^^^^^^^^^^^
+
+*Dry Farming: Riverside Public Library Bulletin 40* - Anon. (1912, 12) -
+https://books.google.com/books?id=Yk4yAQAAMAAJ[+https://books.google.com/books?id=Yk4yAQAAMAAJ+]
+
+*Dry Farming Investigations in Montana* - Alfred Atkinson & J. B. Nelson
+(1911, 203) -
+http://books.google.com/books?id=BHIpAQAAMAAJ[+http://books.google.com/books?id=BHIpAQAAMAAJ+]
+
+*Crop-growing Suggestions to Dry-land Farmers* - Alfred Atkinson (1915, 140) -
+https://books.google.com/books?id=KQ5GAQAAMAAJ[+https://books.google.com/books?id=KQ5GAQAAMAAJ+]
+
+*Dry farm crop rotations and cultural methods* - Alfred Atkinson et al. (1917,
+54) -
+https://books.google.com/books?id=ZqQpAQAAMAAJ[+https://books.google.com/books?id=ZqQpAQAAMAAJ+]
+
+*Dry Farming in Relation to Rainfall and Evaporation* - Lyman James Briggs
+(1910, 71) -
+https://books.google.com/books?id=j9lBAAAAIAAJ[+https://books.google.com/books?id=j9lBAAAAIAAJ+]
+
+*The water requirement of plants* - Lyman James Briggs & Homer LeRoy Shantz
+(1913, 50) -
+https://books.google.com/books?id=rkIZAAAAYAAJ[+https://books.google.com/books?id=rkIZAAAAYAAJ+]
+
+*Arid Agriculture: A Hand-book for the Western Farmer and Stockman* - Burt C.
+Buffum (1909, 443) -
+https://books.google.com/books?id=yfhEAAAAIAAJ[+https://books.google.com/books?id=yfhEAAAAIAAJ+]
+
+*Campbell's 1902 Soil Culture Manual: Explains how the Rain Waters are Stored
+and Conserved in the Soil; how Moisture Moves in the Soil by Capillary
+Attraction, Percolation and Evaporation, and how These Conditions May be
+Regulated by Cultivation* - Hardy Webster Campbell (1902, 110) -
+https://books.google.com/books?id=Lm7XAAAAMAAJ[+https://books.google.com/books?id=Lm7XAAAAMAAJ+]
+
+*Campbell's 1907 Soil Culture Manual: A Complete Guide to Scientific
+Agriculture as Adapted to the Semi-arid Regions* - Hardy Webster Campbell
+(1909, 320) -
+https://books.google.com/books?id=1d5BAAAAIAAJ[+https://books.google.com/books?id=1d5BAAAAIAAJ+]
+
+*Soil Culture Primer: A Plain and Practical Discussion of the Relation of
+Plants to the Soil and the Principles of Growth* - Hardy Webster Campbell
+(1914, 108) -
+https://books.google.com/books?id=4SQxAQAAMAAJ[+https://books.google.com/books?id=4SQxAQAAMAAJ+]
+
+*Progressive Agriculture, 1916: Tillage, Not Weather, Controls Yield* - Hardy
+Webster Campbell (1916, 155) -
+https://books.google.com/books?id=PfhEAAAAIAAJ[+https://books.google.com/books?id=PfhEAAAAIAAJ+]
+
+*The New Agriculture: Or, The Waters Led Captive* - Asahel N. Cole (1885, 223)
+- https://books.google.com/books?id=FrIaAAAAYAAJ[+https://books.google.com/books?id=FrIaAAAAYAAJ+]
+
+*Combined system of drainage and irrigation: "a new system of agriculture"* -
+Asahel N. Cole (1889, 103) -
+https://books.google.com/books?id=azYSAQAAMAAJ[+https://books.google.com/books?id=azYSAQAAMAAJ+]
+
+*How to Grow Profitable Crops on the Dry Farm* - Simon Taylor Horn (1919, 60)
+- http://books.google.com/books?id=m0bTAAAAMAAJ[+http://books.google.com/books?id=m0bTAAAAMAAJ+]
+
+*Agriculture Without Irrigation in the Sahara Desert* - Thomas Henry Kearney
+(1905, 30) -
+https://books.google.com/books?id=0DdtQAAACAAJ[+https://books.google.com/books?id=0DdtQAAACAAJ+]
+
+*Date Varieties and Date Culture in Tunis* - Thomas Henry Kearney (1906, 112)
+- https://books.google.com/books?id=WtZBAAAAIAAJ[+https://books.google.com/books?id=WtZBAAAAIAAJ+]
+
+*Dry-land Olive Culture in Northern Africa* - Thomas Henry Kearney (1908, 48)
+- https://books.google.com/books?id=jdUaAAAAYAAJ[+https://books.google.com/books?id=jdUaAAAAYAAJ+]
+
+*The choice of crops for alkali land* - Thomas Henry Kearney (1911, 32) -
+https://books.google.com/books?id=yDpukApdpwcC[+https://books.google.com/books?id=yDpukApdpwcC+]
+
+*Irrigation and Drainage: Principles and Practice of Their Cultural Phases* -
+Franklin Hiram King (1909, 502) -
+https://books.google.com/books?id=cX4_AAAAYAAJ[+https://books.google.com/books?id=cX4_AAAAYAAJ+]
+
+*Dry-Farming: Its Principles and Practice* - William McDonald (1911, 314) -
+http://books.google.com/books?id=ij8MAQAAIAAJ[+http://books.google.com/books?id=ij8MAQAAIAAJ+]
+
+*A Report of Seven Years Investigation of Dry Farming Methods* - Lewis Alford
+Merrill (1910, 162) -
+https://books.google.com/books?id=repFAQAAMAAJ[+https://books.google.com/books?id=repFAQAAMAAJ+]
+
+*American Irrigation Farming: A Systematic and Practical Treatment of Every
+Phase of Irrigation Farming, Including Its History, with Statistical Tables
+and Formulas* - Walter Herbert Olin (1913, 362) -
+https://books.google.com/books?id=tzQwAAAAYAAJ[+https://books.google.com/books?id=tzQwAAAAYAAJ+]
+
+*Parsons on Dry Farming: A Collection of Articles* - Eustace Robert Parsons
+(1913, 188) -
+http://books.google.com/books?id=xTwwAAAAYAAJ[+http://books.google.com/books?id=xTwwAAAAYAAJ+]
+
+*Dry Land Farming* - Thomas Shaw (1989, 460) -
+http://books.google.com/books?id=mOtBAAAAIAAJ[+http://books.google.com/books?id=mOtBAAAAIAAJ+]
+
+*Some Principles of Dry Farming* - L. R. Waldron (1912, 41) -
+http://books.google.com/books?id=I0knAQAAMAAJ[+http://books.google.com/books?id=I0knAQAAMAAJ+]
+
+*Arid Farming Or Farming Without Irrigation* - John Andreas Widtsoe & Lewis
+Alford Merrill (1902, 56) -
+https://books.google.com/books?id=sAZGAQAAMAAJ[+https://books.google.com/books?id=sAZGAQAAMAAJ+]
+
+*The Right Way to Irrigate* - John Andreas Widtsoe & Walter Wesley McLaughlin
+(1903, 109) -
+https://books.google.com/books?id=TPFFAQAAMAAJ[+https://books.google.com/books?id=TPFFAQAAMAAJ+]
+
+*Arid Farming in Utah* - John Andreas Widtsoe & Lewis Alford Merrill (1905,
+125) -
+https://books.google.com/books?id=1gFGAQAAMAAJ[+https://books.google.com/books?id=1gFGAQAAMAAJ+]
+
+*Dry-farming: A System of Agriculture for Countries Under a Low Rainfall* -
+John Andreas Widtsoe (1920, 445) -
+http://books.google.com/books?id=Sqo1AAAAMAAJ[+http://books.google.com/books?id=Sqo1AAAAMAAJ+]
+
+I) Introduction -- dry farming defined
+II) The theoretical basis of dry-farming
+III) Dry-farm areas -- rainfall
+IV) Dry-farm areas -- general climatic features
+V) Dry-farm soils
+VI) The root-systems of plants
+VII) Storing water in the soil
+VIII) Regulating the evaporation
+IX) Regulating the transpiration
+X) Plowing and fallowing
+XI) Sowing and harvesting
+XII) Crops for dry-farming
+XIII) The composition of dry-farm crops
+XIV) Maintaining the soil fertility
+XV) Implements for dry-farming
+XVI) Irrigation and dry-farming
+XVII) The history of dry-farming
+XVIII) The present status of dry-farming
+XIX) The year of drouth
+XX) Dry-farming in a nutshell [http://books.google.com/books?id=Sqo1AAAAMAAJ&pg=PA413&output=text[txt] http://books.google.com/books?id=Sqo1AAAAMAAJ&pg=PA413&output=pdf[pdf]]
+
+*****
+Locate the dry-farm in a section with an annual precipitation of more than ten
+inches and, if possible, with small wind movement. One man with four horses
+and plenty of machinery cannot handle more than from 160 to 200 acres. Farm
+fewer acres and farm them better.
+
+Select a clay loam soil. Other soils may be equally productive, but are
+cultivated properly with somewhat more difficulty.#
+
+Make sure, with the help of the soil auger, that the soil is of uniform
+structure to a depth of at least eight feet. If streaks of loose gravel or
+layers of hardpan are near the surface, water may be lost to the plant roots.
+
+After the land has been cleared and broken let it lie fallow with clean
+cultivation, for one year. The increase in the first and later crops will pay
+for the waiting.
+
+Always plow the land early in the fall, unless abundant experience shows that
+fall plowing is an unwise practice in the locality. Always plow deeply unless
+the subsoil is infertile, in which case plow a little deeper each year until
+eight or ten inches are reached. Plow at least once for each crop. Spring
+plowing, if practiced, should be done as early as possible in the season.
+
+Follow the plow, whether in the fall or spring, with the disk and that with
+the smoothing harrow, if crops are to be sown soon afterward. If the land
+plowed in the fall is to lie fallow for the winter, leave it in the rough
+condition, except in localities where there is little or no snow and the
+winter temperature is high.
+
+Always disk the land in early spring, to prevent evaporation. Follow the disk
+with the harrow. Harrow, or in some other way stir the surface of the soil
+after every rain. If crops are on the land, harrow as long as the plants will
+stand it. If hoed crops, like corn or potatoes, are grown, use the cultivator
+throughout the season. A deep mulch or dry soil should cover the land as far
+as possible throughout the summer. Immediately after harvest disk the soil
+thoroughly.
+
+Destroy weeds as soon as they show themselves. A weedy dry-farm is doomed to
+failure.
+
+Give the land an occasional rest, that is, a clean summer fallow. Under a
+rainfall of less than fifteen inches, the land should be summer fallowed every
+other year; under an annual rainfall of fifteen to twenty inches, the summer
+fallow should occur every third or fourth year. Where the rainfall comes
+chiefly in the summer, the summer fallow is less important in ordinary years
+than where the summers are dry and the winters wet. Only an absolutely clean
+fallow should be permitted.
+
+The fertility of dry-farm soils must be maintained. Return the manure; plow
+under green leguminous crops occasionally and practice rotation. On fertile
+soils plants mature with the least water.
+
+Sow only by the drill method. Wherever possible use fall varieties of crops.
+Plant deeply — three or four inches for grain. Plant early in the fall,
+especially if the land has been summer fallowed. Use only about one half as
+much seed as is recommended for humid-farming.
+
+All the ordinary crops may be grown by dry-farming. Secure seed that has been
+raised on dry-farms. Look out for new varieties, especially adapted for
+dry-farming, that may be brought in. Wheat is king in dry-farming; corn a
+close second. Turkey wheat promises the best.
+
+Stock the dry-farm with the best modern machinery. Dry-farming is possible
+only because of the modern plow, the disk, the drill seeder, the harvester,
+the header, and the thresher.
+
+Make a home on the dry-farm. Store the flood waters in a reservoir, or pump
+the underground waters, for irrigating the family garden. Set out trees, plant
+flowers, and keep some live stock.
+
+Learn to understand the reasons back of the principles of dry-farming, apply
+the knowledge vigorously, and the crop cannot fail.
+
+Always farm as if a year of drouth were coming.
+*****
+
+*Cacti in New Mexico* - Elmer Ottis Wooton (1911, 70) -
+https://books.google.com/books?id=77kUAAAAYAAJ[+https://books.google.com/books?id=77kUAAAAYAAJ+]
+
+*The principles of irrigation practice* - John Andreas Widtsoe (1914, 496) -
+https://books.google.com/books?id=RoE1AAAAMAAJ[+https://books.google.com/books?id=RoE1AAAAMAAJ+]
+
+*Western Agriculture* - John Andreas Widtsoe & George Stewart (1918, 464) -
+https://books.google.com/books?id=qAs2AQAAIAAJ[+https://books.google.com/books?id=qAs2AQAAIAAJ+]
+
+*Carrying capacity of grazing ranges in southern Arizona* - Elmer Ottis Wooton
+(1916, 40) -
+https://books.google.com/books?id=mTzsPHmP19IC[+https://books.google.com/books?id=mTzsPHmP19IC+]
+
+*The relation of land tenure to the use of the arid grazing lands of the
+southwestern states* - Elmer Ottis Wooton (1922, 72) -
+https://books.google.com/books?id=WOuoHaMb1_EC[+https://books.google.com/books?id=WOuoHaMb1_EC+]
+
+Vegetable Gardening
+^^^^^^^^^^^^^^^^^^^
+
+*1700*
+++++++
+
+*New principles of gardening: or, The laying out and planting parterres,
+groves, wildernesses, labyrinths, avenues, parks, &c. after a more grand and
+rural manner, than has been done before: with experimental directions for
+raising the several kinds of fruit-trees, forest-trees, ever-greens and
+flowering-shrubs with which gardens are adorn'd. To which is added, the
+various names, descriptions, temperatures, medicinal virtues, uses and
+cultivations of several roots, pulse, herbs, &c. of the kitchen and physick
+gardens, that are absolutely necessary for the service of families in general*
+- Batty Langley (1728, 398) -
+  https://books.google.com/books?id=cmpZAAAAYAAJ[+https://books.google.com/books?id=cmpZAAAAYAAJ+]
+
+*A Compleat Body Of Husbandry: Containing Rules for Performing in the Most
+Profitable Manner, the Whole Business of the Farmer and Country Gentleman In
+Cultivating, Planting and Stocking of Land* - Thomas Hale (1758, 420) -
+https://books.google.com/books?id=fOg6AAAAcAAJ[+https://books.google.com/books?id=fOg6AAAAcAAJ+]
+
+*The Semi-Virgilian Husbandry, Deduced from Various Experiments: Or, an Essay
+Towards a New Course of National Farming, Formed from the Defects, Losses, and
+Disappointments of the Old and New Husbandry, and Put on the True Bias of
+Nature, in the Production of Vegetables...* - J. Randall (1764, 367) -
+https://books.google.com/books?id=WIJGAAAAYAAJ[+https://books.google.com/books?id=WIJGAAAAYAAJ+]
+
+*A New System of Practical Husbandry* - John Mills (1766-1767)
+
+* Vol. 1 - (1766, 489) -
+https://books.google.com/books?id=aTc7AAAAcAAJ[+https://books.google.com/books?id=aTc7AAAAcAAJ+]
+* Vol. 2 - (1767, 443) -
+https://books.google.com/books?id=fwFFAAAAYAAJ[+https://books.google.com/books?id=fwFFAAAAYAAJ+]
+* Vol. 3 - (1766, 473) -
+https://books.google.com/books?id=qDc7AAAAcAAJ[+https://books.google.com/books?id=qDc7AAAAcAAJ+]
+* Vol. 4 - (1766, 471) -
+https://books.google.com/books?id=vTc7AAAAcAAJ[+https://books.google.com/books?id=vTc7AAAAcAAJ+]
+* Vol. 5 - (1766, 366 & 90 page index/dictionary) -
+https://books.google.com/books?id=zTc7AAAAcAAJ[+https://books.google.com/books?id=zTc7AAAAcAAJ+] 
+
+*Every Man His Own Gardener: Being a New, and Much More Complete, Gardener's
+Kalendar Than Any One Hitherto Published. ... By Thomas Mawe. ... and Other
+Gardeners, 2nd Ed.* - John Abercrombie & Thomas Mawe (1767, 404) -
+https://books.google.com/books?id=exYAAAAAQAAJ[+https://books.google.com/books?id=exYAAAAAQAAJ+]
+
+*Rural Oeconomy: Or, Essays on the Practical Parts of Husbandry: Designed to
+Explain Several of the Most Important Methods of Conducting Farms of Various
+Kinds; Including Many Useful Hints to Gentlemen Farmers Relative to the
+Œconomical Management of Their Business ... : To which is Added, The Rural
+Socrates: Being Memoirs of a Country Philosopher* - Arthur Young (1770, 520) -
+https://books.google.com/books?id=yCdEAAAAYAAJ[+https://books.google.com/books?id=yCdEAAAAYAAJ+]
+
+*The Modern Gardener; Or, Universal Kalendar: Containing Monthly Directions
+for All the Operations of Gardening* - James Meader & Thomas Hitt (1771, 530)
+- https://books.google.com/books?id=_m8T8d3kSxsC[+https://books.google.com/books?id=_m8T8d3kSxsC+]
+
+*Winter riches, or A miscellany of rudiments, directions and observations ...
+on a new vegetable system of agriculture* - Matthew Peters (1771, 256) -
+https://books.google.com/books?id=8RUAAAAAQAAJ[+https://books.google.com/books?id=8RUAAAAAQAAJ+]
+
+*Tracts on Practical Agriculture and Gardening: Particularly Addressed to the
+Gentlemen-farmers in Great-Britain : with Several Useful Improvements in
+Stoves and Green-houses ; to which is Added a Chronological Catalogue of
+English Authors on Agriculture, Botany, Gardening Etc* - Richard Weston (1773,
+434) -
+https://books.google.com/books?id=Kn87AAAAcAAJ[+https://books.google.com/books?id=Kn87AAAAcAAJ+]
+
+*American Husbandry: Containing an Account of the Soil, Climate, Production
+and Agriculture, Of The British Colonies In North-America and the West-Indies;
+With Observations on the Advantages and Disadvantages of Settling in Them,
+Compared with Great Britain and Ireland* - Bew (1775)
+
+* Vol. 1 - (1775, 472) -
+https://books.google.com/books?id=3Pc6AAAAcAAJ[+https://books.google.com/books?id=3Pc6AAAAcAAJ+]
+* Vol. 2 - (1775, 319) - 
+https://books.google.com/books?id=7fc6AAAAcAAJ[+https://books.google.com/books?id=7fc6AAAAcAAJ+]
+
+*Agriculture Delineated; Or, The Farmer's Complete Guide: Being a Treatise on
+Lands in General: Shewing the Best Methods of Cultivating and Improving the
+Different Soils, for the Raising of Wheat, Barley, Oats, &c. Also, Remarks on
+the Management of Natural and Artificial Grasses, and Directions for Plowing,
+Sowing, Manuring, &c. According to the New and Old Husbandry. With Comparisons
+Made from Experimental Observations* - Gusavus Harrison (1775, 414) -
+https://books.google.com/books?id=ig1FAAAAYAAJ[+https://books.google.com/books?id=ig1FAAAAYAAJ+]
+
+*The complete Farmer: or, a general Dictionary of Husbandry, in all its
+branches* - James Lee (1777, unpaginated dictionary & 100 pp. gardener's
+calendar) -
+https://books.google.com/books?id=75V-XM5QgygC[+https://books.google.com/books?id=75V-XM5QgygC+]
+
+*The Universal Gardener and Botanist, Or, A General Dictionary of Gardening
+and Botany: Exhibiting in Botanical Arrangement, According to the Linnaean
+System, Every Tree, Shrub, and Herbaceous Plant, that Merit Culture, Either
+for Use, Ornament, Or Curiosity in Every Department of Gardening : Comprising
+Accurate Directions, According to Real Practice, for the Management of
+Kitchen-garden, Fruit-garden, Pleasure-ground ... : Describing the Proper
+Situations, Exposures, Soils, Manures, and Every Material and Utensil
+Requisite in the Different Garden Departments : Together with Practical
+Directions for Performing the Various Mechanical Operations of Gardening in
+General* - John Abecrombie & Thomas Mawe (1778, 1214) -
+https://books.google.com/books?id=qClAAAAAcAAJ[+https://books.google.com/books?id=qClAAAAAcAAJ+]
+
+*The Garden Mushroom:: Its Nature and Cultivation. A Treatise, Exhibiting Full
+and Plain Directions, for Producing this Desireable Plant* - John Abercrombie
+(1779, 54) -
+https://books.google.com/books?id=xOFbAAAAQAAJ[+https://books.google.com/books?id=xOFbAAAAQAAJ+]
+
+*The Propagation and Botanical Arrangements of Plants and Trees: Useful and
+Ornamental, Proper for Cultivation in Every Department of Gardening;
+Nurseries, Plantations and Agriculture. Containing the Fullest Practical
+Directions for Performing All the Different Methods of Vegetable Propagation
+... With tHE Compleatest Botanical Arrangements of All the Species and
+Varieties, Vol. 1* - John Abercrombie (1784, 383) -
+https://books.google.com/books?id=ObJCAQAAMAAJ[+https://books.google.com/books?id=ObJCAQAAMAAJ+]
+
+*The Garden Vade Mecum; Or, Compendium of General Gardening, Etc* - John
+Abercrombie (1789, 585) -
+https://books.google.com/books?id=rPxeAAAAcAAJ[+https://books.google.com/books?id=rPxeAAAAcAAJ+]
+
+*1800*
+++++++
+
+*L'école du jardin potager: contenant la description exacte de toutes les
+plantes potagères, leur culture, les qualités de terre* - Combles (1802, 446 &
+123) -
+https://books.google.com/books?id=7Q1IAAAAIAAJ[+https://books.google.com/books?id=7Q1IAAAAIAAJ+]
+
+*The Forcing, Fruit, and Kitchen Gardener* - Walter Nicol (1802, 427) -
+https://books.google.com/books?id=_mhEAAAAIAAJ[+https://books.google.com/books?id=_mhEAAAAIAAJ+]
+
+*****
+*Book First*
+
+I) https://books.google.com/books?id=_mhEAAAAIAAJ&pg=PA9&output=text#PA9[Asparagus]
+II) Cucumbers
+III) Cherries
+IV) Figs
+V) Grapes
+VI) Melons
+VII) Mushrooms
+VIII) Peaches and nectarines
+IX) Pines
+X) Strawberries
+XI) The greenhouse
+
+*Book Second*
+
+I) On the making of fruit-tree borders, etc.
+II) Culture of orchard fruits
+
+*Book Third*
+
+I) On the proper depth and situation of garden land
+II) On the nature and variety of garden land
+III) On manures, and their application
+IV) Culture of kitchen vegetables [https://books.google.com/books?id=_mhEAAAAIAAJ&pg=PA339&output=text#PA339[txt] https://books.google.com/books?id=_mhEAAAAIAAJ&pg=PA339&output=pdf#PA339[pdf]]
+V) Culture of salads and herbs
+VI) On the rotation of crops
+*****
+
+*Rural Recreations; or the Gardener's Instructor; Exhibiting All the
+Operations Necessary in the Kitchen, Flower, and Fruit
+Garden, &c. &c. for Every Month in the Year* - Society of Practical Gardeners
+(1802, 104) -
+https://books.google.com/books?id=1fwCAAAAYAAJ[+https://books.google.com/books?id=1fwCAAAAYAAJ+]
+
+*A Plain and Easy Introduction to the Knowledge and Practice of Gardening:
+With Hints on Fish-ponds* - Charles Marshall (1805, 420) -
+https://books.google.com/books?id=ayUoAAAAYAAJ[+https://books.google.com/books?id=ayUoAAAAYAAJ+]
+
+*The American Gardener's Calendar; Adapted to the Climates and Seasons of the
+United States: Containing a Complete Account of All the Work Necessary to be
+Done ... for Every Month in the Year; with Ample Practical Directions for
+Performing the Same* - Bernard M'Mahon (1806, 648) -
+https://books.google.com/books?id=8zJAAAAAIAAJ[+https://books.google.com/books?id=8zJAAAAAIAAJ+]
+
+*The Gardener's Remembrancer Throughout the Year: Exhibiting the Newest and
+Most Improved Methods ... Best Adapted for the Culture of Plants, and
+Production of Fruits, Flowers, and Esculent Vegetables ... to which is
+Prefixed a View of Mr. Forsyth's Treatise on Trees* - James McPhail (1807,
+619) -
+https://books.google.com/books?id=ggoAAAAAQAAJ[+https://books.google.com/books?id=ggoAAAAAQAAJ+]
+
+*The Experienced Farmer, Enlarged and Improved: Or Complete Practice of
+Agriculture According to the Latest Improvements : the Whole Founded on the
+Author's Own Observation and His Actual Experiments* - Richard Parkinson
+(1807)
+
+* Vol. 1 - (1807, 481) -
+https://books.google.com/books?id=LWFGAAAAYAAJ[+https://books.google.com/books?id=LWFGAAAAYAAJ+]
+* Vol. 2 - (1807, 598) -
+https://books.google.com/books?id=dVdGAAAAYAAJ[+https://books.google.com/books?id=dVdGAAAAYAAJ+]
+
+
+*1810*
+++++++
+
+*The Botanical Cabinet: Consisting of Coloured Delineations Of Plants from All Countries ; with a Short Account of Each, Directions for Managements &c. &c* (1818-?) - Conrad Loddiges
+
+* *Vol. 1* (1818, 200) - https://books.google.com/books?id=dUyu0_zDVJAC[+https://books.google.com/books?id=dUyu0_zDVJAC+]
+
+...
+
+* *Vol. 20* (1833, 200) - https://books.google.com/books?id=oLuiylQjzCAC[+https://books.google.com/books?id=oLuiylQjzCAC+]
+
+*1820*
+++++++
+
+*The gentleman and gardener's kalendar: containing ample directions for the
+cultivation of the kitchen and flower garden, green house, nursery, orchard,
+&c. for the United States of America* - Grant Thorburn (1821, 132) -
+https://books.google.com/books?id=0zQMAAAAYAAJ[+https://books.google.com/books?id=0zQMAAAAYAAJ+]
+
+*The Cottager's Companion, Or, A Complete System of Cottage Horticulture:
+Intended to Instruct the Industrious Poor of Great Britain in the Art of
+Cottage Gardening* - William Salisbury (1822, 76) -
+https://books.google.com/books?id=UEDTAAAAMAAJ[+https://books.google.com/books?id=UEDTAAAAMAAJ+]
+
+*The New-York Gardener, Or, Twelve Letters from a Farmer to His Son: In which
+He Describes the Method of Laying Out and Managing the Kitchen-garden* - P.
+Agricola (1824, 214) -
+https://books.google.com/books?id=XRgCAAAAYAAJ[+https://books.google.com/books?id=XRgCAAAAYAAJ+]
+
+*Der Küchengarten; oder, Kurze Uebersicht aller bekannten Gartengewächse, ihre
+Kultur, &c. nach dem Alphabet geordnet* - W. Falkmann (1826, 96) -
+https://books.google.com/books?id=qNBEAAAAIAAJ[+https://books.google.com/books?id=qNBEAAAAIAAJ+]
+
+*A History of English Gardening, Chronological, Biographical, Literary, and
+Critical. Tracing the Progress of the Art in This Country from the Invasion of
+the Romans to the Present Time* - George W. Johnson (1829, 450) -
+https://books.google.com/books?id=cJLnwCRhffgC[+https://books.google.com/books?id=cJLnwCRhffgC+]
+
+*1830*
+++++++
+
+*The domestic gardener's manual: being an introduction to gardening : to which
+is added, a concise naturalist's kalendar, and English botanist's companion,
+or catalogue of British plants, in the monthly order of their flowering* -
+John Towers (1830, 564) -
+https://books.google.com/books?id=0nomAQAAMAAJ[+https://books.google.com/books?id=0nomAQAAMAAJ+]
+
+*The Companion for the Kitchen Garden: History of Cultivated Vegetables;
+Comprising Their Botanical, Medicinal, Edible, and Chemical Qualities;
+Natural History; &c. &c.* - Henry Phillips (1831)
+
+* Vol. 1 - (1831, 387) -
+https://books.google.com/books?id=DlkZAAAAYAAJ[+https://books.google.com/books?id=DlkZAAAAYAAJ+]
+* Vol. 2 - (1831, 437) -
+https://books.google.com/books?id=zVgZAAAAYAAJ[+https://books.google.com/books?id=zVgZAAAAYAAJ+]
+
+*Every Man His Own Gardener: The Complete Gardener : Being a Gardener's
+Calendar and General Directory, Much More Complete Than Any One Hitherto
+Published, Enlarged and Improved by R. Forsyth* - John Abercrombie & Thomas Mawe (1832, 658) - 
+https://books.google.com/books?id=U0IBAAAAYAAJ[+https://books.google.com/books?id=U0IBAAAAYAAJ+]
+
+*The English Gardener; or, a Treatise on situation, soil, enclosing and
+laying-out of kitchen gardens, etc* - William Cobbett (1833, 359) -
+https://books.google.com/books?id=B6tWAAAAcAAJ[+https://books.google.com/books?id=B6tWAAAAcAAJ+]
+
+*The kitchen garden: its arrangement and cultivation* - George William Johnson
+(1836, 300) -
+https://books.google.com/books?id=1O9HAAAAIAAJ[+https://books.google.com/books?id=1O9HAAAAIAAJ+]
+
+*The Vegetable Cultivator: Containing a Plain and Accurate Description of All
+the Differenct Species and Varieties of Culinary Vegetables* - John Rogers
+(1839, 343) -
+https://books.google.com/books?id=zSI-AQAAMAAJ[+https://books.google.com/books?id=zSI-AQAAMAAJ+]
+
+*1840*
+++++++
+
+*The kitchen gardener's instructor: containing a catalogue of garden and herb
+seeds, with practical directions under each head, for the cultivation of
+culinary vegetables and herbs* - Thomas Bridgeman (1840, 139) -
+http://books.google.com/books?id=6j0SAQAAMAAJ[+http://books.google.com/books?id=6j0SAQAAMAAJ+]
+
+*The Young Gardener's Assistant: Containing a Catalogue of Garden & Flower
+Seeds, with Practical Directions Under Each Head for the Cultivation of
+Culinary Vegetables and Flowers ; Also Directions for Cultivating Fruit Trees,
+the Grape Vine, &c., to which is Added a Calendar, Showing the Work Necessary
+to be Done in the Various Departments of Gardening in Every Month of the Year*
+- Thomas Bridgeman (1840, 408) -
+  http://books.google.com/books?id=bW1KAAAAIAAJ[+http://books.google.com/books?id=bW1KAAAAIAAJ+]
+
+*The New American Gardener, Containing Practical Directions on the Culture of
+Fruits and Vegetables: Including Landscape and Ornamental Gardening,
+Grape-vines, Silk, Strawberries, &c. &c* - Thomas Green Fessenden (1842, 306)
+- https://books.google.com/books?id=r6g1AAAAMAAJ[+https://books.google.com/books?id=r6g1AAAAMAAJ+]
+
+*The Southern Farmer and Market Gardener: Being a Compilation of Useful
+Articles on These Subjects, from the Most Approved Writers : Developing the
+Principles and Pointing Out the Method of Their Application to the Farming and
+Gardening of the South, and Particularly of the Low Country* - Francis Simmons
+Holmes (1842, 244) -
+https://books.google.com/books?id=tos1AAAAMAAJ[+https://books.google.com/books?id=tos1AAAAMAAJ+]
+
+*The Kitchen Gardener's Instructor: Containing a Catalogue of Garden and Herb
+Seed, with Practical Directions Under Each Head for the Cultivation of
+Culinary Vegetables and Herbs. With a Calendar, Showing the Work Necessary to
+be Done in a Kitchen Garden Every Month Throughout the Season. Also,
+Directions for Forcing Or Forwarding Vegetables Out of the Ordinary Season.
+The Whole Adapted to the Climate of the United States, New and Improved
+Edition* - Thomas Bridgeman (1847, 181) -
+http://books.google.com/books?id=cUdKAAAAIAAJ[+http://books.google.com/books?id=cUdKAAAAIAAJ+]
+
+*The Family Kitchen Gardener: Containing Plain and Accurate Descriptions of
+All the Different Species and Varieties of Culinary Vegetables ... Also,
+Descriptions and Characters of the Most Select Fruits, Their Management,
+Propagation, Etc. Illustrated with Twenty-five Engravings* - Robert Buist
+(1847, 216) -
+https://books.google.com/books?id=tetEAAAAIAAJ[+https://books.google.com/books?id=tetEAAAAIAAJ+]
+
+*A Dictionary of Modern Gardening* - George William Johnson (1847, 635) -
+https://books.google.com/books?id=fmBRAAAAYAAJ[+https://books.google.com/books?id=fmBRAAAAYAAJ+]
+
+*1850*
+++++++
+
+*The Book of the Garden* - Charles McIntosh
+
+* Vol. I - Structural (1853, 889) -
+https://books.google.com/books?id=qmEDAAAAQAAJ[+https://books.google.com/books?id=qmEDAAAAQAAJ+]
+* Vol. II - Cultural (1855, 867) -
+https://books.google.com/books?id=ATpKAAAAYAAJ[+https://books.google.com/books?id=ATpKAAAAYAAJ+]
+
+*Agricultural Biography: Containing a Notice of the Life and Writings of the
+British Authors on Agriculture, from the Earliest Date in 1480 to the Present
+Time* - John Donaldson (1854, 137) -
+https://books.google.com/books?id=yt9YR3leQ3AC[+https://books.google.com/books?id=yt9YR3leQ3AC+]
+
+*The kitchen garden; or, The culture in the open ground of roots, vegetables,
+herbs, and fruits* - Edmund Saul Dixon (1855, 184) -
+https://books.google.com/books?id=uU0DAAAAQAAJ[+https://books.google.com/books?id=uU0DAAAAQAAJ+]
+
+*The American Kitchen Gardener: Containing Practical Directions for the
+Culture of Vegetables* - Thomas Green Fessenden (1856, 120) -
+http://books.google.com/books?id=CKtAAQAAMAAJ[+http://books.google.com/books?id=CKtAAQAAMAAJ+]
+
+*New and Improved Practical Gardener and Modern Horticulturist* - Charles
+McIntosh (1856, 972) -
+https://books.google.com/books?id=2dBBAAAAIAAJ[+https://books.google.com/books?id=2dBBAAAAIAAJ+]
+
+*The gardener's pocket journal, and daily assistant in the modern practice of
+English gardening* - John Abercrombie (1857, 327) -
+https://books.google.com/books?id=fFYDAAAAQAAJ[+https://books.google.com/books?id=fFYDAAAAQAAJ+]
+
+*The Young Gardener's Assistant,: In Three Parts, Containing Catalogues of
+Garden and Flower Seeds with Practical Directions Under Each Head for the
+Cultivation of Culinary Vegetables and Flowers; Also, Directions for
+Cultivation Fruit Trees, the Grape Vine, &c., : to which is Added a Calendar
+to Each Part: Showing the Work Necessary to be Done in the Various Departments
+Each Month of the Year. : The Whole Adapted to the Climate of the United
+States* - Thomas Bridgeman (1857, 495) -
+https://books.google.com/books?id=oyJAAQAAMAAJ[+https://books.google.com/books?id=oyJAAQAAMAAJ+]
+
+*Gardening for the South: or, The kitchen and fruit garden: with the best
+methods for their cultivation, together with hints upon landscape and flower
+gardening. Containing modes of culture, and descriptions of the species and
+varieties of the culinary vegetables; fruit trees and fruits, and a select
+list of ornamental trees and plants, found by trial adapted to the states of
+the Union south of Pennsylvania; with gardening calendars for the same* -
+William N. White (1857, 402) -
+http://books.google.com/books?id=klIMAAAAYAAJ[+http://books.google.com/books?id=klIMAAAAYAAJ+]
+
+*1860*
+++++++
+
+*British Agriculture: Containing the Cultivation of Land, Management of Crops,
+and the
+Economy of Animals, Illlustrated with 240 Plates...* - John Donaldson (1860,
+844) -
+https://books.google.com/books?id=2EEfAQAAMAAJ[+https://books.google.com/books?id=2EEfAQAAMAAJ+]
+
+*The Field and Garden Vegetables of America; Containing Full Descriptions of
+Nearly Eleven Hundred Species and Varieties; with Directions for Propagation,
+Culture, and Use* - Fearing Burr, Jr. (1863, 674) -
+http://books.google.com/books?id=ZJ9XAAAAcAAJ[+http://books.google.com/books?id=ZJ9XAAAAcAAJ+]
+
+*Le potager moderne: Traité complet de la culture des légumes appropriée aux
+jardins du propriétaire* - Vincent Alfred Gressent (1863, 466) -
+https://books.google.com/books?id=zno7AAAAcAAJ[+https://books.google.com/books?id=zno7AAAAcAAJ+]
+
+*The New and Improved Practical Gardener, and Modern Horticulturist:
+Exhibiting the Latest and Most Approved Management of Kitchen, Fruit, and
+Flower Gardens, the Green-house, Hot-house, Conservatory, &c. &c. for Every
+Month in the Year* - Charles McIntosh (1865, 988) -
+https://books.google.com/books?id=9jM-AQAAMAAJ[+https://books.google.com/books?id=9jM-AQAAMAAJ+]
+
+*Garden Vegetables, and How to Cultivate Them* - Fearing Burr, Jr. (1866, 355)
+- http://books.google.com/books?id=_shEAAAAIAAJ[+http://books.google.com/books?id=_shEAAAAIAAJ+]
+
+*Gardening for Profit: A Guide to the Successful Cultivation of the Market and
+Family Garden* - Peter Henderson (1867, 276) -
+https://books.google.com/books?id=4VpRAAAAYAAJ[+https://books.google.com/books?id=4VpRAAAAYAAJ+]
+
+*Gardening for the South: Or, How to Grow Vegetables and Fruits, Revised and
+Newly Stereotyped* - William N. White et al. (1868, 444) -
+http://books.google.com/books?id=5PlEAAAAIAAJ[+http://books.google.com/books?id=5PlEAAAAIAAJ+]
+
+*The American Gardener's Assistant: In Three Parts Containing Complete
+Practical Directions for the Cultivation of Vegetables, Flowers, Fruit Trees
+and Grape Vines* - Thomas Bridgeman & Sereno Edwards Todd (1869, 529) -
+http://books.google.com/books?id=u_VEAAAAIAAJ+]
+
+*1870*
+++++++
+
+*The Book of Garden Management ... (Beeton's Garden Management and Rural
+Economy.) A New Edition ... Copiously Illustrated with Coloured and Plain
+Engravings* - Samuel Orchart Beeton (1870, 771) -
+https://books.google.com/books?id=O65WAAAAcAAJ[+https://books.google.com/books?id=O65WAAAAcAAJ+]
+
+*Money in the Garden: A Vegetable Manual, Prepared with a View to Economy and
+Profit* - Patrick T. Quinn (1871, 268) -
+https://books.google.com/books?id=udkwAQAAMAAJ[+https://books.google.com/books?id=udkwAQAAMAAJ+]
+
+*Farm-gardening and Seed-growing* - Francis Brill (1872, 151) -
+https://books.google.com/books?id=AuxEAAAAIAAJ[+https://books.google.com/books?id=AuxEAAAAIAAJ+]
+
+*High-Class Kitchen Gardening: A Manual of Improved Culture of All Vegetables* - William Earley (1875, 243) - https://books.google.com/books?id=zlsDAAAAQAAJ[+https://books.google.com/books?id=zlsDAAAAQAAJ+]
+
+*Cottage Gardening: Or, Flowers, Fruits, and Vegetables for Small Gardens* -
+Edward Hobday (1877, 128) -
+https://books.google.com/books?id=iSU-AQAAMAAJ[+https://books.google.com/books?id=iSU-AQAAMAAJ+]
+
+*The Vegetable Garden: A Complete Guide to the Cultivation of Vegetables;
+Containing Thorough Instructions for Sowing, Planting, and Cultivating All
+Kinds of Vegetables; with Plain Directions for Preparing, Manuring, and
+Tilling the Soil to Suit Each Plant; Including, Also, a Summary of the Work to
+be Done in a Vegetable Garden During Each Month of the Year* - James Hogg
+(1877, 137) -
+https://books.google.com/books?id=6slEAAAAIAAJ[+https://books.google.com/books?id=6slEAAAAIAAJ+]
+
+*Kitchen Gardening Made Easy* - George M. F. Glenny (1879, 138) -
+https://books.google.com/books?id=LV4DAAAAQAAJ[+https://books.google.com/books?id=LV4DAAAAQAAJ+]
+
+*1880*
+++++++
+
+*Villa gardening: a handbook for amateur and practical gardeners* - Edward
+Hobday (1887, 555) -
+https://books.google.com/books?id=2KUuAQAAIAAJ[+https://books.google.com/books?id=2KUuAQAAIAAJ+]
+
+*1890*
+++++++
+
+*Gardening for Young and Old: The Cultivation of Garden Vegetables in the Farm
+Garden* - Joseph Harris (1890, 191) -
+https://books.google.com/books?id=OlfZAAAAMAAJ[+https://books.google.com/books?id=OlfZAAAAMAAJ+]
+
+*The Forcing of English Cucumbers* - Liberty Hyde Bailey (1891, 139) -
+http://books.google.com/books?id=-hkiAQAAMAAJ[+http://books.google.com/books?id=-hkiAQAAMAAJ+]
+
+*Experiments in the forcing of tomatoes* - Liberty Hyde Bailey (1891, 61) -
+http://books.google.com/books?id=-BkiAQAAMAAJ[+http://books.google.com/books?id=-BkiAQAAMAAJ+]
+
+*Some Troubles of Winter Tomatoes* - Liberty Hyde Bailey (1892, 158) -
+http://books.google.com/books?id=HyoiAQAAMAAJ[+http://books.google.com/books?id=HyoiAQAAMAAJ+]
+
+*Gleanings in Old Garden Literature* - William Carew Hazlitt (1892, 263) -
+https://books.google.com/books?id=2jcbAAAAYAAJ[+https://books.google.com/books?id=2jcbAAAAYAAJ+]
+
+*Celery for Profit* - Tuisco Greiner (1893, 77) -
+https://books.google.com/books?id=kkw9AQAAMAAJ[+https://books.google.com/books?id=kkw9AQAAMAAJ+]
+
+*How to Make the Garden Pay* - Tuisco Greiner (1894, 319) -
+https://books.google.com/books?id=hKlAAQAAMAAJ[+https://books.google.com/books?id=hKlAAQAAMAAJ+]
+
+*Some Market Vegetables for Florida* - Peter Henry Rolfs (1895, 199) -
+https://books.google.com/books?id=3Q9GAQAAMAAJ[+https://books.google.com/books?id=3Q9GAQAAMAAJ+]
+
+*The Culture of Vegetables and Flowers from Seeds and Roots: Also a Year's
+Work in the Vegetable Garden, Flowers All the Year Round, the Rotation and
+Chemistry of Crops, the Formation of Lawns from Seed, and Descriptions of and
+Remedies for Garden Pests* - Sutton and Sons Ltd. (1895, 425) -
+https://books.google.com/books?id=stxOAAAAYAAJ[+https://books.google.com/books?id=stxOAAAAYAAJ+]
+
+*Vegetables* - Lee Cleveland Corbett (1896, 226) -
+https://books.google.com/books?id=pfZFAQAAMAAJ[+https://books.google.com/books?id=pfZFAQAAMAAJ+]
+
+*Vegetable Culture: A Primer for Amateurs, Cottagers, and Allotment-holders* -
+Alexander Dean (1896, 136) -
+https://books.google.com/books?id=TWhEAAAAYAAJ[+https://books.google.com/books?id=TWhEAAAAYAAJ+]
+
+*Vegetables Under Glass* - Henry Dreer (1896, 101) -
+https://books.google.com/books?id=rKsbAQAAMAAJ[+https://books.google.com/books?id=rKsbAQAAMAAJ+]
+
+*Vegetable Gardening: A Manual on the Growing of Vegetables for Home Use and
+Marketing* - Sauel Bowdlear Green (1896, 224) -
+https://books.google.com/books?id=71bZAAAAMAAJ[+https://books.google.com/books?id=71bZAAAAMAAJ+]
+
+*The New Onion Culture: A Story for Gardeners Young and Old* - Tuisco Greiner
+(1896, 89) -
+https://books.google.com/books?id=TlbZAAAAMAAJ[+https://books.google.com/books?id=TlbZAAAAMAAJ+]
+
+*The Young Market Gardener: Beginner's Guide* - Tuisco Greiner (1896, 119) -
+https://books.google.com/books?id=q2dEAAAAYAAJ[+https://books.google.com/books?id=q2dEAAAAYAAJ+]
+
+*Vegetable Growing in the South for Northern Markets: Being Concise Directions
+for the Preparation of the Soil, Use and Amounts of Fertilizers, and the
+Planting of Vegetable Crops to Obtain the Earliest Vegetables : Also the Best
+Methods of Packing for Shipping, the Raising of Seed for Market, and
+Preserving it for Home Use* - Peter Henry Rolfs (1896, 255) -
+https://books.google.com/books?id=TMxEAAAAIAAJ[+https://books.google.com/books?id=TMxEAAAAIAAJ+]
+
+*Vegetable Forcing* - Herbert G. Winkler (1896, 157) -
+https://books.google.com/books?id=fm7SAAAAMAAJ[+https://books.google.com/books?id=fm7SAAAAMAAJ+]
+
+*Vegetables Out of Season in Every Garden* - E. Kemp Toogood (1899, 103) -
+https://books.google.com/books?id=IWlEAAAAYAAJ[+https://books.google.com/books?id=IWlEAAAAYAAJ+]
+
+*1900*
+++++++
+
+*Experiments with tomatoes and potatoes* - Frank William Rane (1900, 86) -
+https://books.google.com/books?id=aScnAQAAMAAJ[+https://books.google.com/books?id=aScnAQAAMAAJ+]
+
+*Mushrooms: how to Grow Them: A Practical Treatise on Mushroom Culture for
+Profit and Pleasure* - William Falconer (1901, 161) -
+https://books.google.com/books?id=LFADAAAAYAAJ[+https://books.google.com/books?id=LFADAAAAYAAJ+]
+
+*The Garden Book for Practical Farmers, Volumes 1-2* - Tuisco Greiner (1901,
+190) -
+https://books.google.com/books?id=pyA-AQAAMAAJ[+https://books.google.com/books?id=pyA-AQAAMAAJ+]
+
+*Prize Gardening: How to Derive Profit, Pleasure, Health from the Garden;
+Actual Experience of the Successful Prize Winners in the American
+Agriculturist Garden Contest* - O. Judd Company (1901, 307) -
+https://books.google.com/books?id=y1dEAAAAYAAJ[+https://books.google.com/books?id=y1dEAAAAYAAJ+]
+
+*Forcing dwarf tomatoes under glass* - Frank William Rane (1901, 68) -
+https://books.google.com/books?id=kRQnAQAAMAAJ[+https://books.google.com/books?id=kRQnAQAAMAAJ+]
+
+*A Practical Guide to Garden Plants: Containing Descriptions of the Hardiest
+and Most Beautiful Annuals and Biennials, Hardy Herbaceous and Bulbous
+Perennials, Hardy Water and Bog Plants, Flowering and Ornamental Trees and
+Shrubs, Conifers; Hardy Ferns; Hardy Bamboos and Other Ornamental Grasses.
+Also the Best Kinds of Fruits and Vegetables that May be Grown in the Open Air
+in the British Isles with Full and Practical Instruction as to Culture and
+Propagation* - John Weathers (1901, 1192) -
+https://books.google.com/books?id=5S9JAAAAMAAJ[+https://books.google.com/books?id=5S9JAAAAMAAJ+]
+
+*A selected list of vegetables for the garden* - Frank William Rane (1903, 43)
+- https://books.google.com/books?id=rSInAQAAMAAJ[+https://books.google.com/books?id=rSInAQAAMAAJ+]
+
+*Vegetable Novelties* - Frank William Rane & Harry F. Hall (1906, 180) -
+https://books.google.com/books?id=UycrAQAAMAAJ[+https://books.google.com/books?id=UycrAQAAMAAJ+]
+
+*Cyclopedia of American Agriculture - Vol. 2: Crops, 2nd Ed.* - Liberty Hyde
+Bailey, ed. (1907, 699) -
+http://books.google.com/books?id=ljiucRg4skwC[+http://books.google.com/books?id=ljiucRg4skwC+]
+
+*How to Grow Vegetables and Garden Herbs: A Practical Handbook and Planting
+Table for the Vegetable Gardener* - Allen French (1907, 312) -
+http://books.google.com/books?id=iVk-AAAAIAAJ[+http://books.google.com/books?id=iVk-AAAAIAAJ+]
+
+*The Garden Yard: A Handbook of Intensive Farming* - Bolton Hall (1909, 313) -
+https://books.google.com/books?id=uMlEAAAAIAAJ[+https://books.google.com/books?id=uMlEAAAAIAAJ+]
+
+*Making Horticulture Pay: Experiences in Gardening and Fruit Growing* -
+https://books.google.com/books?id=qBgwAAAAYAAJ[+https://books.google.com/books?id=qBgwAAAAYAAJ+]
+
+*The Home Garden: A Book on Vegetable and Small-fruit Growing, for the Use of
+the Amateur Gardener* - Eben Eugene Rexford (1909, 197) -
+https://books.google.com/books?id=LMtEAAAAIAAJ[+https://books.google.com/books?id=LMtEAAAAIAAJ+]
+
+*1910*
+++++++
+
+*How and what to Grow in a Kitchen Garden of One Acre* - E. D. Darlington & L.
+M. Moll -
+https://books.google.com/books?id=h0dAAQAAMAAJ[+https://books.google.com/books?id=h0dAAQAAMAAJ+]
+
+*Up-to-date Truck Growing in the South* - James R. Davis (1910, 188) -
+https://books.google.com/books?id=iE7ZAAAAMAAJ[+https://books.google.com/books?id=iE7ZAAAAMAAJ+]
+
+*Root and Stem Vegetables* - Alexander Dean (1910, 114) -
+https://books.google.com/books?id=5k7ZAAAAMAAJ[+https://books.google.com/books?id=5k7ZAAAAMAAJ+]
+
+*Success in Market Gardening: A New Vegetable Growers Manual* - Herbert Rawson
+& Warren W. Rawson (1910, 271) -
+https://books.google.com/books?id=98pEAAAAIAAJ[+https://books.google.com/books?id=98pEAAAAIAAJ+]
+
+*The Farmer's Vegetable Garden* - William Hale Wicks (1910, 49) -
+https://books.google.com/books?id=mhwiAQAAMAAJ[+https://books.google.com/books?id=mhwiAQAAMAAJ+]
+
+*Home Vegetable Gardening: A Complete and Practical Guide to the Planting and
+Care of All Vegetables, Fruits and Berries Worth Growing for Home Use* -
+Frederick Frye Rockwell (1911, 262) -
+https://books.google.com/books?id=jWgXAAAAYAAJ[+https://books.google.com/books?id=jWgXAAAAYAAJ+]
+
+*The Profitable Culture of Vegetables: For Market Gardeners, Small Holders,
+and Others* - Thomas Smith (1911, 425) -
+https://books.google.com/books?id=oEriAAAAMAAJ[+https://books.google.com/books?id=oEriAAAAMAAJ+]
+
+*Farm and garden rule-book: a manual of ready rules and reference with
+recipes, precepts, formulas, and tabular information for the use of general
+farmers, gardeners, fruit-growers, stockmen, dairymen, poultrymen, foresters,
+rural teachers, and others in the United States and Canada* - Liberty Hyde
+Bailey (1912, 587) -
+http://books.google.com/books?id=Q6RBAQAAIAAJ[+http://books.google.com/books?id=Q6RBAQAAIAAJ+]
+
+*The Book of a Thousand Gardens: Being the True Accounts of the Trials and
+Tribulations and Successes in a Dry Year of Something Less Than a Thousand
+Gardens in Many States and Climates, as Told in a Bunch of Letters to Henry
+Field by His Loyal Friends - His Customers* - Henry Field Seed & Nursery Co.
+(1912, 95) -
+https://books.google.com/books?id=wBUxAQAAMAAJ[+https://books.google.com/books?id=wBUxAQAAMAAJ+]
+
+*Culinary Herbs: Their Cultivation, Harvesting, Curing and Uses* - Maurice
+Grenville Kains (1912, 143) -
+https://books.google.com/books?id=d8ExAQAAMAAJ[+https://books.google.com/books?id=d8ExAQAAMAAJ+]
+
+*Florida Vegetables* - Nettie May Gifford Prange (1912, 72) -
+https://books.google.com/books?id=jh8xAQAAMAAJ[+https://books.google.com/books?id=jh8xAQAAMAAJ+]
+
+*Florida Trucking for Beginners* - Lee La Trobe Bateman (1913, 205) -
+https://books.google.com/books?id=eVTZAAAAMAAJ[+https://books.google.com/books?id=eVTZAAAAMAAJ+]
+
+*Garden Farming* - Lee Cleveland Corbett (1913, 473) -
+https://books.google.com/books?id=pF8-AAAAIAAJ[+https://books.google.com/books?id=pF8-AAAAIAAJ+]
+
+*Intensive Farming* - Lee Cleveland Corbett (1913, 146) -
+https://books.google.com/books?id=N33QAAAAMAAJ[+https://books.google.com/books?id=N33QAAAAMAAJ+]
+
+*The Kitchen Garden and the Cook - An Alphabetical Guide to the Cultivation of
+Vegetables with Recipes for Cooking Them* - Cecilia Pearse (1913, 296) -
+https://books.google.com/books?id=IBdXxyMqqOgC[+https://books.google.com/books?id=IBdXxyMqqOgC+]
+
+*The California Vegetables in Garden and Field: A Manual of Practice, with and
+Without Irrigation, for Semitropical Countries* - Edward James Wickson (1913,
+318) -
+https://books.google.com/books?id=58VBAAAAIAAJ[+https://books.google.com/books?id=58VBAAAAIAAJ+]
+
+*The New Gardening: A Guide to the Most Recent Developments in the Culture of
+Flowers, Fruits, and Vegetables* - Walter Page Wright (1913, 392) -
+https://books.google.com/books?id=5mx8hlKsxzsC[+https://books.google.com/books?id=5mx8hlKsxzsC+]
+
+*The Gardener and the Cook* - Lucy Helen Yates (1913, 259) -
+https://books.google.com/books?id=ZpjUAAAAMAAJ[+https://books.google.com/books?id=ZpjUAAAAMAAJ+]
+
+*The Forcing Book: A Manual of the Cultivation of Vegetables in Glass
+Houses*+]
+- Liberty Hyde Bailey (1914, 266) -
+  http://books.google.com/books?id=ylNAAQAAMAAJ[+http://books.google.com/books?id=ylNAAQAAMAAJ+]
+
+*Lettuce ; Miscellaneous salad crops ; Garden beans ; Garden peas ; Tomatoes ;
+Eggplants and peppers ; Cucumbers and squashes ; Melons ; Sweet corn ; Okra,
+martynia and sweet herbs ; Asparagus ; Rhubarb, artichokes and sea kale* -
+International Correspondence Schools (1914) -
+https://books.google.com/books?id=yxBWAAAAMAAJ[+https://books.google.com/books?id=yxBWAAAAMAAJ+]
+
+*Productive Vegetable Growing* - John William Lloyd (1914, 339) -
+https://books.google.com/books?id=TxNCAAAAYAAJ[+https://books.google.com/books?id=TxNCAAAAYAAJ+]
+
+*The Encyclopedia of Practical Horticulture: A Reference System of Commercial
+Horticulture, Covering the Practical and Scientific Phases of Horticulture,
+with Special Reference to Fruits and Vegetables* - Granville Lowther & William
+Worthington (1914)
+
+* Vol. 1 - 1-515 -
+https://books.google.com/books?id=A6oMAAAAYAAJ[+https://books.google.com/books?id=A6oMAAAAYAAJ+]
+* Vol. 2 - 506-1043 -
+https://books.google.com/books?id=OqkMAAAAYAAJ[+https://books.google.com/books?id=OqkMAAAAYAAJ+]
+* Vol. 3 - 1041-1559 -
+https://books.google.com/books?id=PGYmAQAAMAAJ[+https://books.google.com/books?id=PGYmAQAAMAAJ+]
+
+*The Vegetable Garden* - Ralph Levi Watts (1915, 186) -
+https://books.google.com/books?id=lmDXAAAAMAAJ[+https://books.google.com/books?id=lmDXAAAAMAAJ+]
+
+*The New Onion Culture: A Complete Guide in Growing Onions for Profit* -
+Tuisco Greiner (1916, 114) -
+https://books.google.com/books?id=5EFCAQAAMAAJ[+https://books.google.com/books?id=5EFCAQAAMAAJ+]
+
+*The Principles of Vegetable-gardening* - Liberty Hyde Bailey (1917, 458) -
+http://books.google.com/books?id=uLM1AAAAMAAJ[+http://books.google.com/books?id=uLM1AAAAMAAJ+]
+
+*Vegetable Growing* - Jesse George Boyle (1917, 334) -
+https://books.google.com/books?id=Mk7ZAAAAMAAJ[+https://books.google.com/books?id=Mk7ZAAAAMAAJ+]
+
+*1000 Hints on Vegetable Gardening* - Mae Savell Croy (1917, 275) -
+https://books.google.com/books?id=q_4sAAAAYAAJ[+https://books.google.com/books?id=q_4sAAAAYAAJ+]
+
+*Vegetable Lore, Vol. 1-2* - Maurice Fuld (1917, 98 & 107) -
+https://books.google.com/books?id=Igg9AAAAYAAJ[+https://books.google.com/books?id=Igg9AAAAYAAJ+]
+
+*How to Make the Garden Pay: A Manual for the Intensive Cultivation of Home
+Vegetable Gardens* - Edward Morrison & Charles Thomas Brues (1917, 176) -
+https://books.google.com/books?id=-27SAAAAMAAJ[+https://books.google.com/books?id=-27SAAAAMAAJ+]
+
+*Vegetable Forcing* - Ralph Levi Watts (1917, 431) -
+https://books.google.com/books?id=_ixCAAAAIAAJ[+https://books.google.com/books?id=_ixCAAAAIAAJ+]
+
+*Home Vegetable Gardening from A to Z: With Special Reference to Pacific Coast
+Conditions* - Adolph Kruhm (1918, 294) -
+https://books.google.com/books?id=QcpEAAAAIAAJ[+https://books.google.com/books?id=QcpEAAAAIAAJ+]
+
+*Productive Vegetable Growing* - John William Lloyd (1918, 339) -
+https://books.google.com/books?id=GtY8AAAAYAAJ[+https://books.google.com/books?id=GtY8AAAAYAAJ+]
+
+*Massey's Garden Book for the Southern States* - Wilbur Fisk Massey (1918,
+127) -
+https://books.google.com/books?id=IxQxAQAAMAAJ[+https://books.google.com/books?id=IxQxAQAAMAAJ+]
+
+*Vegetable Gardening* - Ralph Levi Watts (1918, 511) -
+https://books.google.com/books?id=pMExAQAAMAAJ[+https://books.google.com/books?id=pMExAQAAMAAJ+]
+
+*Market Crops of Florida* - Bradley Fertilizer Works (1919, 98) -
+https://books.google.com/books?id=8mKMCq1lkfwC[+https://books.google.com/books?id=8mKMCq1lkfwC+]
+
+*1920*
+++++++
+
+*The Vegetable Garden: Illustrations, Descriptions, and Culture of the Garden
+Vegetables of Cold and Temperate Climates, 3rd Ed.* - Vilmorin-Andrieux et al. (1920,
+805) -
+http://books.google.com/books?id=rgl-AAAAIAAJ[+http://books.google.com/books?id=rgl-AAAAIAAJ+]
+
+*Vegetable Growing in New South Wales* - A. J. Pinn & R. N. Makin (1920, 137)
+- https://books.google.com/books?id=C8dBAAAAIAAJ[+https://books.google.com/books?id=C8dBAAAAIAAJ+]
+
+*Subtropical Vegetable-Gardening* - Peter Henry Rolfs (1921, 309) -
+https://books.google.com/books?id=JaUUAAAAYAAJ[+https://books.google.com/books?id=JaUUAAAAYAAJ+]
+
+*Vegetable Growing Projects* - Ralph Levi Watts (1922, 318) -
+https://books.google.com/books?id=_GDXAAAAMAAJ[+https://books.google.com/books?id=_GDXAAAAMAAJ+]
+
+*Home vegetable gardening: in the central and high plains and mountain
+valleys* - Myron Francis Babb & James Ellsworth Kraus (1949, 98) -
+https://books.google.com/books?id=9XRIMHxdGuAC[+https://books.google.com/books?id=9XRIMHxdGuAC+]
+
+Commercial Publications
+-----------------------
+
+Until I can port them over here, a list of commercial gardening
+publications pertinent to the Texas region can be found at
+https://www.pinterest.com/skbaum/texas-vegetable-and-herb-gardening/[+https://www.pinterest.com/skbaum/texas-vegetable-and-herb-gardening/+].
+
+Problems
+--------
+
+Insect Pests
+~~~~~~~~~~~~
+
+Squash, Leaf-Footed and Stink Bugs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+I asked the knowledgeable folks on the
+https://www.facebook.com/groups/TexasGardening/[Texas Gardening] Facebook
+group what to do about this unholy trinity that are my single biggest
+gardening
+problem.
+I started by mentioning that I'd already tried:
+
+* putting boards down around the plants at night, picking them up in
+the morning, and squishing the bugs to be found there;
+* putting diatomaceous earth around the base of the plants;
+* using a portable vacuum to suck them off the plants; and
+* squishing them by hand, a most unpleasant task given how the stink
+bugs have very much earned their name.
+
+Here are some of the
+replies.
+There's certainly not a single answer to this pernicious and growing problem.
+I'm going to try every last one of them until all
+those pernicious little demons are extinct.
+
+
+*****
+"A shopvac is about the best you are going to get unless you use some high
+dose poison."
+
+"Companion planting. I had basil and dill around mine last year and only saw a
+few when it got really hot late summer."
+
+"Last year, I had them bad! I sprayed them and the eggs liberally with this
+stuff (http://www.gardenvarietyorganics.com/products/natures-guide-garlic-pepper-tea-qt[Nature's Guide Garlic Pepper Tea]) and they were gone the next day. Never came back. I don't know if there
+is a homemade recipe that might work as good."
+
+[Recipes for a homemade version of this can be found at
+http://www.dirtdoctor.com/Garlic-Pepper-Tea-Recipe_vq2992.htm[Garlic Pepper
+Tea Recipe],
+http://www.seasonedhomemaker.com/garlic-pepper-tea-a-natural-insect-repellent/[Garlic
+Pepper Tea] and
+http://www.ehow.com/how_2038558_organic-insect-repellant.html[How to Make
+Organic Insect Repellant].]
+
+"My grandmother swears by seven. She brushes the pods with it when planting and
+then when seedling. Also she checks daily and kills any at first sign. She's
+never had a crop go bad or lost due to them."
+
+"Attract skunks, or at least let them roam freely. Their presence has been the
+best control ever. Every night, they strip every last squash bug off every
+stem, without harming the plant or the squash."
+
+"An old farmer told me to sprinkle wood ashes on the ground real thick and dust
+the plants."
+
+"I'd also add that wide spacing around each plant seems to help."
+
+"I use jumping spiders, build spider houses-- they will come."
+
+[I found this especially intriguing so I found a 
+http://www.spiderroom.info/makeaspiderhouse.html[Make a Spider House] site.
+Basically, you build structures that a spider would see and think "Hey, that's
+a good place to build a web!"]
+
+"Wrap the stalks with foil."
+
+"Sprinkle plants with garlic powder pnd lant garlic around
+the edges of planting beds. Bugs can't stand it. Old trick grandpa taught me."
+
+"Use a tomato cage to support them. Wrap the stem with tin foil. Cover a
+yellow Frisbee or cup with a thick coating of Vaseline and leave in garden as
+a trap."
+
+"Plus plant marigolds garlic borage dill and basil among your plants."
+
+"Soapy water will help, too."
+
+"ok one more thing I did last year that "helped" as I downed rubber gloves and
+smashed them for sport and vengeance... I chucked their lifeless corpses in a
+pail of water with the "oils"??? forming on top in a tea like slurry... I
+poured this around my tomatoes plants...maybe the smell of death/fear??? It is
+their defence when scared??? maybe just I killed THAT many but it seem to ward
+off the juice sucking @#$%^& like garlic does vampires... kept the dogs and
+cats away from the bed too..."
+
+"Companion planting. Pyrethreum is a great start.. lavender or garlic all work
+well."
+
+"Compost tea and nicotine tea also work wonders. I make my own garlic pepper
+tea that is amazing... but we have bees as well so selective application is
+imperative."
+*****
+
+
+
+
+

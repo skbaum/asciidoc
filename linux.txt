@@ -1,0 +1,79 @@
+Linux Notes
+===========
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+X11
+---
+
+http://fedoraproject.org/wiki/How_to_create_xorg.conf[+http://fedoraproject.org/wiki/How_to_create_xorg.conf+]
+
+RPM Files
+~~~~~~~~~
+
+The X11 server distribution is packaged in RPM files of
+the form:
+
++xorg-x11-server-*+
+
+xorg.conf
+~~~~~~~~~
+
+Fedora releases since Fedora 10 do not create a +/etc/X11/xorg.conf+ file, used
+to configure the X server, by default. The X configuration is automatically
+determined each time X is started. In most cases, this works well and there is
+no need to manually specify X configuration information. 
+If you need to make manual changes to X configuration for any reason, you will
+first need to create a /etc/X11/xorg.conf file. 
+
+You can create a basic xorg.conf using the X executable itself. As root run: 
+
++Xorg :1 -configure+
+
+which will create the file:
+
++/root/xorg.conf.new+
+
+which can then be copied to the correct location via:
+
++cp /root/xorg.conf.new /etc/X11/xorg.conf+
+
+
+xrandr
+~~~~~~
+
+This is used to set the size, orientation and/or  reflection  of  the
+outputs for a screen. It can also set the screen size.
+If  invoked  without any option, it will dump the state of the outputs,
+showing the existing modes for each of them, with a '+' after the
+preferred modes and a '*' after the current mode.
+A sample output of invoking +xrandr+ without options is:
+
+-----
+Screen 0: minimum 320 x 200, current 1920 x 1080, maximum 8192 x 8192
+DVI-0 disconnected (normal left inverted right x axis y axis)
+DIN disconnected (normal left inverted right x axis y axis)
+DVI-1 connected primary 1920x1080+0+0 (normal left inverted right x axis y
+axis) 700mm x 390mm
+   1920x1080     60.00*+  60.00    50.00    59.94    24.00    23.98  
+   1920x1080i    60.00    50.00    59.94  
+   1280x720      60.00    50.00    59.94  
+   1440x576i     50.00  
+   1024x768      75.08    70.07    60.00  
+   800x600       72.19    75.00    60.32  
+   720x576       50.00  
+   720x480       60.00    59.94  
+   640x480       75.00    60.00    59.94  
+   720x400       70.08
+-----
+
+
+
+

@@ -1,0 +1,243 @@
+Python Programming Tools
+========================
+Steven K. Baum
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+== attrs
+
+https://github.com/python-attrs/attrs[`https://github.com/python-attrs/attrs`]
+
+https://www.attrs.org/en/stable/[`https://www.attrs.org/en/stable/`]
+
+https://towardsdatascience.com/probably-the-best-practice-of-object-oriented-python-attr-d8c26c0e8a4[`https://towardsdatascience.com/probably-the-best-practice-of-object-oriented-python-attr-d8c26c0e8a4`]
+
+https://jackmckew.dev/dataclasses-vs-attrs-vs-pydantic.html[`https://jackmckew.dev/dataclasses-vs-attrs-vs-pydantic.html`]
+
+=====
+The Python package that will bring back the joy of writing classes by relieving you from the drudgery of implementing object protocols (aka dunder methods). Trusted by NASA for Mars missions since 2020!
+
+Its main goal is to help you to write concise and correct software without slowing down your code.
+
+For that, it gives you a class decorator and a way to declaratively define the attributes on that class.
+=====
+
+== bandit
+
+https://github.com/PyCQA/bandit[`https://github.com/PyCQA/bandit`]
+
+https://bandit.readthedocs.io/en/latest/[`https://bandit.readthedocs.io/en/latest/`]
+
+=====
+Bandit is a tool designed to find common security issues in Python code. To do this Bandit processes each file, builds an AST from it, and runs appropriate plugins against the AST nodes. Once Bandit has finished scanning all the files it generates a report.
+=====
+
+== Black
+
+https://black.readthedocs.io/en/stable/[`https://black.readthedocs.io/en/stable/`]
+
+https://black.vercel.app/[`https://black.vercel.app/`]
+
+=====
+A Python code formatter.
+By using Black, you agree to cede control over minutiae of hand-formatting. In return, Black gives you speed, determinism, and freedom from pycodestyle nagging about formatting. You will save time and mental energy for more important matters.
+
+Black makes code review faster by producing the smallest diffs possible. Blackened code looks the same regardless of the project you’re reading. Formatting becomes transparent after a while and you can focus on the content instead.
+=====
+
+== Boltons
+
+https://boltons.readthedocs.io/en/latest/[`https://boltons.readthedocs.io/en/latest/`]
+
+https://github.com/mahmoud/boltons[`https://github.com/mahmoud/boltons`]
+
+=====
+Boltons is a set of pure-Python utilities in the same spirit as — and yet conspicuously missing from — the standard library, including:
+
+* Atomic file saving, bolted on with fileutils
+* A highly-optimized OrderedMultiDict, in dictutils
+* Two types of PriorityQueue, in queueutils
+* Chunked and windowed iteration, in iterutils
+* A full-featured TracebackInfo type, for representing stack traces, in tbutils
+* A lightweight UTC timezone available in timeutils.
+* Recursive mapping for nested data transforms, with remap
+
+And that’s just a small selection. As of May 19, 2021, boltons is 83 types and 170 functions,
+=====
+
+== Box
+
+https://github.com/cdgriffith/Box[`https://github.com/cdgriffith/Box`]
+
+https://github.com/cdgriffith/Box/wiki[`https://github.com/cdgriffith/Box/wiki`]
+
+=====
+Box is designed to be an easy drop in transparently replacements for dictionaries that adds dot notation access and a load of other features.
+=====
+
+== Darker
+
+https://github.com/akaihola/darker/[`https://github.com/akaihola/darker/`]
+
+=====
+This utility reformats and checks Python source code files in a Git repository. However, it only applies reformatting and reports errors in regions which have changed in the Git working tree since the last commit.
+
+The reformatters and linters supported are:
+
+* Black for code reformatting
+* isort for sorting imports
+* Mypy for static type checking
+* Pylint for generic static checking of code
+* Flake8 for style guide enforcement
+=====
+
+== flake8
+
+https://github.com/PyCQA/flake8[`https://github.com/PyCQA/flake8`]
+
+=====
+Flake8 is described as a tool for style guide enforcement. It is also a wrapper around PyFlakes, pycodestyle and Ned Batchelder's McCabe script. You can use Flake8 as a way to lint your code and enforce PEP8 compliance.
+=====
+
+=== flake8-bugbear
+
+https://github.com/PyCQA/flake8-bugbear[`https://github.com/PyCQA/flake8-bugbear`]
+
+=====
+A plugin for Flake8 finding likely bugs and design problems in your program. Contains warnings that don't belong in pyflakes and pycodestyle.
+It is felt that these lints don't belong in the main Python tools as they are very opinionated and do not have a PEP or standard behind them. Due to flake8 being designed to be extensible, the original creators of these lints believed that a plugin was the best route. This has resulted in better development velocity for contributors and adaptive deployment for flake8 users.
+=====
+
+== fsspec
+
+https://filesystem-spec.readthedocs.io/en/latest/index.html[`https://filesystem-spec.readthedocs.io/en/latest/index.html`]
+
+=====
+Filesystem Spec (fsspec) is a project to provide a unified pythonic interface to local, remote and embedded file systems and bytes storage.
+There are many places to store bytes, from in memory, to the local disk, cluster distributed storage, to the cloud. Many files also contain internal mappings of names to bytes, maybe in a hierarchical directory-oriented tree. Working with all these different storage media, and their associated libraries, is a pain. fsspec exists to provide a familiar API that will work the same whatever the storage backend.
+=====
+
+== functools
+
+https://docs.python.org/3/library/functools.html[`https://docs.python.org/3/library/functools.html`]
+
+https://pymotw.com/2/functools/[`https://pymotw.com/2/functools/`]
+
+https://martinheinz.dev/blog/52[`https://martinheinz.dev/blog/52`]
+
+https://www.journaldev.com/17550/python-functools[`https://www.journaldev.com/17550/python-functools`]
+
+=====
+Python standard library includes many great modules that can help you make your code cleaner and simpler and functools is definitely one of them. This module offers many useful higher order functions that act on or return other functions, which we can leverage to implement function caching, overloading, creating decorators and in general to make our code a bit more functional.
+=====
+
+== fypp
+
+https://github.com/aradi/fypp[`https://github.com/aradi/fypp`]
+
+https://fypp.readthedocs.io/en/stable/[`https://fypp.readthedocs.io/en/stable/`]
+
+=====
+A Python powered preprocessor. It can be used for any programming languages but its primary aim is to offer a Fortran preprocessor, which helps to extend Fortran with condititional compiling and template metaprogramming capabilities. Instead of introducing its own expression syntax, it uses Python expressions in its preprocessor directives, offering the consistency and versatility of Python when formulating metaprogramming tasks. It puts strong emphasis on robustness and on neat integration into developing toolchains.
+
+The features include:
+
+* definition, evaluation and removal of variables;
+* macro definitions and macro calls;
+* conditional output;
+* iterated output (e.g. for generating templates);
+* inline directives;
+* insertion of arbitrary Python expressions;
+* inclusion of files during preprocessing;
+* using Fortran-style continuation lines in preprocessor directives;
+* passing (unquoted) multiline string arguments to callables;
+* preprocessor comments;
+* suppressing the preprocessor output in selected regions;
+* explicit request for stopping the preprocessor;
+* easy check for macro parameter sanity; and
+* line number markers in output.
+=====
+
+== IceCream
+
+https://github.com/gruns/icecream[`https://github.com/gruns/icecream`]
+
+=====
+Do you ever use print() or log() to debug your code? Of course you do. IceCream, or ic for short, makes print debugging a little sweeter.
+
+ic() is like print(), but better:
+
+* It prints both expressions/variable names and their values.
+* It's 40% faster to type.
+* Data structures are pretty printed.
+* Output is syntax highlighted.
+* It optionally includes program context: filename, line number, and parent function.
+=====
+
+== Intake
+
+https://intake.readthedocs.io/en/latest/[`https://intake.readthedocs.io/en/latest/`]
+
+=====
+Intake is a lightweight package for finding, investigating, loading and disseminating data.
+Intake contains the following main components:
+
+
+
+* A set of data loaders (Drivers) with a common interface, so that you can investigate or load anything, from local or remote, with the exact same call, and turning into data structures that you already know how to manipulate, such as arrays and data-frames.
+* A Cataloging system (Catalogs) for listing data sources, their metadata and parameters, and referencing which of the Drivers should load each. The catalogs for a hierarchical, searchable structure, which can be backed by files, Intake servers or third-party data services
+* Sets of convenience functions to apply to various data sources, such as data-set persistence, automatic concatenation and metadata inference and the ability to distribute catalogs and data sources using simple packaging abstractions.
+* A GUI layer accessible in the Jupyter notebook or as a standalone webserver, which allows you to find and navigate catalogs, investigate data sources, and plot either predefined visualisations or interactively find the right view yourself
+* A client-server protocol to allow for arbitrary data cataloging services or to serve the data itself, with a pluggable auth model.
+=====
+
+== isort
+
+https://github.com/PyCQA/isort[`https://github.com/PyCQA/isort`]
+
+=====
+A Python utility / library to sort imports alphabetically, and automatically separated into sections and by type. It provides a command line utility, Python library and plugins for various editors to quickly sort all your imports. It requires Python 3.6+ to run but supports formatting Python 2 code too.
+=====
+
+== more-itertools
+
+https://github.com/more-itertools/more-itertools[`https://github.com/more-itertools/more-itertools`]
+
+https://more-itertools.readthedocs.io/en/stable/index.html[`https://more-itertools.readthedocs.io/en/stable/index.html`]
+
+=====
+Python's itertools library is a gem - you can compose elegant solutions for a variety of problems with the functions it provides. In more-itertools we collect additional building blocks, recipes, and routines for working with Python iterables.
+=====
+
+== pydantic
+
+https://github.com/samuelcolvin/pydantic[`https://github.com/samuelcolvin/pydantic`]
+
+https://pydantic-docs.helpmanual.io/[`https://pydantic-docs.helpmanual.io/`]
+
+https://towardsdatascience.com/pydantic-688e897cfd3a[`https://towardsdatascience.com/pydantic-688e897cfd3a`]
+
+https://medium.com/swlh/cool-things-you-can-do-with-pydantic-fc1c948fbde0[`https://medium.com/swlh/cool-things-you-can-do-with-pydantic-fc1c948fbde0`]
+
+=====
+Data validation and settings management using Python type hinting.
+Fast and extensible, pydantic plays nicely with your linters/IDE/brain. Define how data should be in pure, canonical Python 3.6+; validate it with pydantic.
+=====
+
+== Pylint
+
+http://pylint.pycqa.org/en/latest/[`http://pylint.pycqa.org/en/latest/`]
+
+https://www.pylint.org/[`https://www.pylint.org/`]
+
+=====
+Pylint is a tool that checks for errors in Python code, tries to enforce a coding standard and looks for code smells. It can also look for certain type errors, it can recommend suggestions about how particular blocks can be refactored and can offer you details about the code's complexity.
+=====
+
+
+
+
+

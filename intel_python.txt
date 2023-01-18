@@ -1,0 +1,487 @@
+Intel Python 
+============
+Steven K. Baum
+v0.1, 2016-08-07
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Installation
+------------
+
+The home page:
+
+https://software.intel.com/en-us/python-distribution[+https://software.intel.com/en-us/python-distribution+]
+
+Support and documentation:
+
+https://software.intel.com/en-us/articles/intel-distribution-for-python-support-and-documentation[+https://software.intel.com/en-us/articles/intel-distribution-for-python-support-and-documentation+]
+
+Jump through all the hoops, get a serial number, and download the distribution.  There are separate distributions
+for Python 2 and 3.
+
+The files look something like this:
+
+-----
+l_python27_bu_2017.0.018.tgz
+l_python35_bu_2017.0.018.tgz
+-----
+
+Unpack and decompress them, and then go to the directory.
+
+-----
+tar xzvf l_python35_bu_2017.0.018.tgz
+cd l_python35_bu_2017.0.018
+-----
+
+Run the +install.sh+ file.
+
+-----
+./install.sh
+-----
+
+The default installation directory is +/opt/intel+.  The Python 3 distribution ends up in:
+
+-----
+/opt/intel/intelpython35
+-----
+
+Configuration
+-------------
+
+Working With Anaconda
+~~~~~~~~~~~~~~~~~~~~~
+
+https://software.intel.com/en-us/articles/using-intel-distribution-for-python-with-anaconda[+https://software.intel.com/en-us/articles/using-intel-distribution-for-python-with-anaconda+]
+
+Intel has worked with Anaconda to make it easy to use Intel Python
+from Anaconda.  First, update +conda+.  I've put the Anaconda Python 3 distribution in:
+
+-----
+/opt/anaconda3
+-----
+
+and aliased the +conda+ command thusly:
+
+-----
+ln -s /opt/anaconda/bin/conda /usr/bin/conda3
+ln -s /opt/anaconda/bin/conda /usr/bin/conda
+-----
+
+so our +conda+ command looks like:
+
+-----
+conda3 update conda
+-----
+
+Next, tell conda to choose intel packages over default packages.
+
+-----
+conda3 config --add channels intel
+-----
+
+Creating a New Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create a new environment when installing.  For the Intel Python 3 environment:
+
+-----
+conda3 create -n intpy intelpython3_core python=3
+
+Using Anaconda Cloud api site https://api.anaconda.org
+Fetching package metadata .........
+Solving package specifications: ..........
+
+Package plan for installation in environment /opt/anaconda3/envs/intpy:
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    intelpython-2017.0.0b      |                2          66 KB  intel
+    icc_rt-15.0.6              |          intel_2         7.0 MB  intel
+    tbb_rt-4.4.4               |          intel_2         839 KB  intel
+    bzip2-1.0.6                |          intel_2         108 KB  intel
+    db-4.7.25                  |          intel_2         3.3 MB  intel
+    libffi-3.2.1               |          intel_2          42 KB  intel
+    mkl_rt-2017.0.1b1          |          intel_2       150.2 MB  intel
+    openssl-1.0.2h             |          intel_2         4.8 MB  intel
+    sqlite-3.8.11.1            |          intel_2         3.0 MB  intel
+    xz-5.2.1                   |          intel_2         321 KB  intel
+    zlib-1.2.8                 |          intel_2         122 KB  intel
+    tcl-8.6.4                  |          intel_2         1.3 MB  intel
+    tk-8.6.4                   |          intel_2         1.3 MB  intel
+    tix-8.4.3                  |          intel_2         256 KB  intel
+    python-3.5.1               |          intel_2        13.5 MB  intel
+    setuptools-18.2            |     intel_py35_2           6 KB  intel
+    pip-7.1.2                  |     intel_py35_2           3 KB  intel
+    py-1.4.31                  |     intel_py35_2          56 KB  intel
+    tbb-0.1                    |     intel_py35_2          98 KB  intel
+    nose-1.3.7                 |     intel_py35_2         102 KB  intel
+    pytest-2.8.5               |     intel_py35_2         102 KB  intel
+    tempita-0.5.3              |     intel_py35_2          11 KB  intel
+    cython-0.23.4              |     intel_py35_2         3.3 MB  intel
+    numpy-1.11.0               |     intel_py35_2         3.4 MB  intel
+    scipy-0.17.0               |     intel_py35_2        11.3 MB  intel
+    intelpython3_core-2017.0.1b1|                1          793 B  intel
+    ------------------------------------------------------------
+                                           Total:       204.4 MB
+
+The following NEW packages will be INSTALLED:
+
+    bzip2:             1.0.6-intel_2       intel [intel]
+    cython:            0.23.4-intel_py35_2 intel [intel]
+    db:                4.7.25-intel_2      intel [intel]
+    icc_rt:            15.0.6-intel_2      intel [intel]
+    intelpython:       2017.0.0b-2         intel
+    intelpython3_core: 2017.0.1b1-1        intel
+    libffi:            3.2.1-intel_2       intel [intel]
+    mkl_rt:            2017.0.1b1-intel_2  intel [intel]
+    nose:              1.3.7-intel_py35_2  intel [intel]
+    numpy:             1.11.0-intel_py35_2 intel [intel]
+    openssl:           1.0.2h-intel_2      intel [intel]
+    pip:               7.1.2-intel_py35_2  intel [intel]
+    py:                1.4.31-intel_py35_2 intel [intel]
+    pytest:            2.8.5-intel_py35_2  intel [intel]
+    python:            3.5.1-intel_2       intel [intel]
+    scipy:             0.17.0-intel_py35_2 intel [intel]
+    setuptools:        18.2-intel_py35_2   intel [intel]
+    sqlite:            3.8.11.1-intel_2    intel [intel]
+    tbb:               0.1-intel_py35_2    intel [intel]
+    tbb_rt:            4.4.4-intel_2       intel [intel]
+    tcl:               8.6.4-intel_2       intel [intel]
+    tempita:           0.5.3-intel_py35_2  intel [intel]
+    tix:               8.4.3-intel_2       intel [intel]
+    tk:                8.6.4-intel_2       intel [intel]
+    xz:                5.2.1-intel_2       intel [intel]
+    zlib:              1.2.8-intel_2       intel [intel]
+
+Proceed ([y]/n)?
+-----
+
+For the Intel Python 2 environment:
+
+-----
+conda3 create -n intpy2 -c intel intelpython2_core python=2
+-----
+
+Activating and Deactivating an Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To activate this new environment, use:
+
+-----
+source activate intpy
+-----
+
+or
+
+-----
+source activate intpy2
+-----
+
+To deactivate either environment, use:
+
+-----
+source deactivate
+-----
+
+We try to activate the +intpy+ environment and get an error message:
+
+-----
+source activate intpy
+
+bash: activate: No such file or directory
+-----
+
+because we haven't soft-linked the Anaconda 3 activation binaries yet.  
+
+-----
+ln -s /opt/anaconda3/bin/activate /usr/bin/activate
+ln -s /opt/anaconda3/bin/deactivate /usr/bin/deactivate
+-----
+
+Now we can activate as user rather than root.
+
+-----
+source activate intpy
+-----
+
+which brings up a new prompt:
+
+-----
+(intpy) [baum@copano]$
+-----
+
+Check the Python binary location.
+
+-----
+(intpy) [baum@copano]$ which python
+/opt/anaconda3/envs/intpy/bin/python
+-----
+
+Now deactive and try this.
+
+-----
+(intpy) [baum@copano]$ source deactivate
+[baum@copano]$ which python
+/usr/bin/python
+-----
+
+Now activate again.
+
+Using +conda+ in the Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now +conda+ can be used within the new environment to install packages.
+
+-----
+(intpy) [baum@copano]$ su
+Password:
+(intpy) [root@copano]# which conda
+/opt/anaconda3/envs/intpy/bin/conda
+Using Anaconda Cloud api site https://api.anaconda.org
+Fetching package metadata .........
+Solving package specifications: ..........
+
+Package plan for installation in environment /opt/anaconda3/envs/intpy:
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    mpmath-0.19                |     intel_py35_2         403 KB  intel
+    sympy-0.7.6                |     intel_py35_2         2.7 MB  intel
+    ------------------------------------------------------------
+                                           Total:         3.1 MB
+
+The following NEW packages will be INSTALLED:
+
+    mpmath: 0.19-intel_py35_2  intel [intel]
+    sympy:  0.7.6-intel_py35_2 intel [intel]
+
+Proceed ([y]/n)? y
+
+Fetching packages ...
+mpmath-0.19-in 100% |#################################################################| Time: 0:00:00 922.96 kB/s
+sympy-0.7.6-in 100% |#################################################################| Time: 0:00:00   3.53 MB/s
+Extracting packages ...
+[      COMPLETE      ]|####################################################################################| 100%
+Linking packages ...
+[      COMPLETE      ]|####################################################################################| 100%
+-----
+
+Check to see what was installed under the directory of the +intpy+ environment.
+
+-----
+find /opt/anaconda3/envs/intpy -name "*sympy*"
+
+/opt/anaconda3/envs/intpy/bin/isympy
+/opt/anaconda3/envs/intpy/conda-meta/sympy-0.7.6-intel_py35_2.json
+/opt/anaconda3/envs/intpy/INTEL_3RD_PARTY_LICENSES/licenses/sympy
+/opt/anaconda3/envs/intpy/share/man/man1/isympy.1
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy/unify/tests/test_sympy.py
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy/unify/usympy.py
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy/parsing/tests/test_sympy_parser.py
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy/parsing/sympy_parser.py
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy/parsing/sympy_tokenize.py
+/opt/anaconda3/envs/intpy/lib/python3.5/site-packages/sympy-0.7.6-py3.5.egg-info
+-----
+
+Additional Python Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Intel
+^^^^^
+
+The packages create by Intel for their distribution can be found at:
+
+https://anaconda.org/intel/packages[+https://anaconda.org/intel/packages+]
+
+Anaconda
+^^^^^^^^
+
+The much large Anaconda package list can be found at:
+
+https://docs.continuum.io/anaconda/pkg-docs[+https://docs.continuum.io/anaconda/pkg-docs+]
+
+Conda Forge
+^^^^^^^^^^^
+
+And the really big list at Conda Forge can be found at:
+
+https://conda-forge.github.io/feedstocks.html[+https://conda-forge.github.io/feedstocks.html+]
+
+
+Testing and Using the Intel Distribution
+----------------------------------------
+
+The Magical TBB Switch
+~~~~~~~~~~~~~~~~~~~~~~
+
+We follow the examples in the following:
+
+https://software.intel.com/en-us/blogs/2016/04/04/unleash-parallel-performance-of-python-programs[+https://software.intel.com/en-us/blogs/2016/04/04/unleash-parallel-performance-of-python-programs+]
+
+https://software.intel.com/sites/default/files/managed/f2/ad/Boost-Python-Performance-with-Intel-MKL.pdf[+https://software.intel.com/sites/default/files/managed/f2/ad/Boost-Python-Performance-with-Intel-MKL.pdf+]
+
+Put the following in +bench.py+:
+
+-----
+import dask, time
+import dask.array as da
+
+x = da.random.random((100000, 2000), chunks=(10000, 2000))
+t0 = time.time()
+
+q, r = da.linalg.qr(x)
+test = da.all(da.isclose(x, q.dot(r)))
+assert(test.compute()) # compute(get=dask.threaded.get) by default
+
+print(time.time() - t0)
+-----
+
+The explanation for what's happening therein:
+
+=====
+Here, Dask splits the array into chunks and processes them in parallel using multiple threads. But each Dask task executes expensive operations which are accelerated using Intel® MKL under the hood and thus multi-threaded by itself. It results in nested parallelism which is handled best with Intel® TBB.
+=====
+
+Run it in baseline mode first.
+
+-----
+python bench.py
+36.81017088890076
+-----
+
+and then in TBB multi-threaded mode to take advantage of the multiple cores.
+
+-----
+python -m TBB bench.py
+27.73878765106201
+-----
+
+Numba
+~~~~~
+
+http://numba.pydata.org/doc.html[+http://numba.pydata.org/doc.html+]
+
+https://software.intel.com/sites/default/files/managed/f2/ad/High-Performance-Python-with-Numba.pdf[+https://software.intel.com/sites/default/files/managed/f2/ad/High-Performance-Python-with-Numba.pdf+]
+
+Multiple Threads
+^^^^^^^^^^^^^^^^
+
+Here's an example from the official Numba documentation.
+
+http://numba.pydata.org/numba-doc/0.27.0/user/examples.html[+http://numba.pydata.org/numba-doc/0.27.0/user/examples.html+]
+
+-----
+#!/usr/bin/env python
+from __future__ import print_function, division, absolute_import
+
+import math
+import threading
+from timeit import repeat
+
+import numpy as np
+from numba import jit
+
+nthreads = 4
+size = 1000000
+
+def func_np(a, b):
+    """
+    Control function using Numpy.
+    """
+    return np.exp(2.1 * a + 3.2 * b)
+
+@jit('void(double[:], double[:], double[:])', nopython=True, nogil=True)
+def inner_func_nb(result, a, b):
+    """
+    Function under test.
+    """
+    for i in range(len(result)):
+        result[i] = math.exp(2.1 * a[i] + 3.2 * b[i])
+
+def timefunc(correct, s, func, *args, **kwargs):
+    """
+    Benchmark *func* and print out its runtime.
+    """
+    print(s.ljust(20), end=" ")
+    # Make sure the function is compiled before we start the benchmark
+    res = func(*args, **kwargs)
+    if correct is not None:
+        assert np.allclose(res, correct), (res, correct)
+    # time it
+    print('{:>5.0f} ms'.format(min(repeat(lambda: func(*args, **kwargs),
+                                          number=5, repeat=2)) * 1000))
+    return res
+
+def make_singlethread(inner_func):
+    """
+    Run the given function inside a single thread.
+    """
+    def func(*args):
+        length = len(args[0])
+        result = np.empty(length, dtype=np.float64)
+        inner_func(result, *args)
+        return result
+    return func
+
+def make_multithread(inner_func, numthreads):
+    """
+    Run the given function inside *numthreads* threads, splitting its
+    arguments into equal-sized chunks.
+    """
+    def func_mt(*args):
+        length = len(args[0])
+        result = np.empty(length, dtype=np.float64)
+        args = (result,) + args
+        chunklen = (length + numthreads - 1) // numthreads
+        # Create argument tuples for each input chunk
+        chunks = [[arg[i * chunklen:(i + 1) * chunklen] for arg in args]
+                  for i in range(numthreads)]
+        # Spawn one thread per chunk
+        threads = [threading.Thread(target=inner_func, args=chunk)
+                   for chunk in chunks]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        return result
+    return func_mt
+
+
+func_nb = make_singlethread(inner_func_nb)
+func_nb_mt = make_multithread(inner_func_nb, nthreads)
+
+a = np.random.rand(size)
+b = np.random.rand(size)
+
+correct = timefunc(None, "numpy (1 thread)", func_np, a, b)
+timefunc(correct, "numba (1 thread)", func_nb, a, b)
+timefunc(correct, "numba (%d threads)" % nthreads, func_nb_mt, a, b)
+-----
+
+On copano I get the following results.
+
+-----
+python numba_multithread.py 
+numpy (1 thread)        83 ms
+numba (1 thread)        69 ms
+numba (4 threads)       37 ms
+-----
+
+Additional attempts get more or less the same results.
+
+CUDA
+^^^^
+
+Nothing yet.
+
+

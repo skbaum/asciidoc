@@ -1,0 +1,282 @@
+
+= Compression Software
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Benchmarks
+
+=== VizAly-Foresight
+
+https://github.com/lanl/VizAly-Foresight[`https://github.com/lanl/VizAly-Foresight`]
+
+=====
+VizAly is a general framework for Analysis and Visualization of simulation data. As supercomputing resources increase, cosmological scientists are able to run more detailed and larger simulations generating massive amounts of data. Analyzing these simulations with an available open-source toolkit is important for collaborative Department of Energy scientific discovery across labs, universities, and other partners. Developed software as a part of this collection include: comparing data with other existing simulations, verifying and validating results with observation databases, new halo finder algorithms, and using analytical tools to get insights into the physics of the cosmological universe. The goal of this software project is to provide a set of open-source libraries, tools, and packages for large-scale cosmology that allows scientists to visualize, analyze, and compare large-scale simulation and observational data sets. Developed software will provide a variety of methods for processing, visualization, and analysis of astronomical observation and cosmological simulation data.
+=====
+
+== Packages
+
+=== 7-Zip
+
+https://www.7-zip.org/[`https://www.7-zip.org/`]
+
+=====
+7-Zip is a file archiver with a high compression ratio.
+=====
+
+=== Blosc
+
+https://www.blosc.org/pages/blosc-in-depth/[`https://www.blosc.org/pages/blosc-in-depth/`]
+
+=====
+Blosc is a high performance compressor optimized for binary data. It has been designed to transmit data to the processor cache faster than the traditional, non-compressed, direct memory fetch approach via a memcpy() OS call. This can be useful not only to reduce the size of large datasets on-disk or in-memory, but also to accelerate memory-bound computations (which is typical in vector-vector operations).
+
+It uses the blocking technique (as described in this article) to reduce activity on the memory bus as much as possible. In short, the blocking technique works by dividing datasets in blocks that are small enough to fit in L1 cache of modern processor and perform compression/decompression there. It also leverages SIMD (SSE2) and multi-threading capabilities present in nowadays multi-core processors so as to accelerate the compression/decompression process to a maximum.
+
+Blosc is not like other compressors: it should rather be called a meta-compressor*. This is so because it can use different codecs (libraries that can reduce the size of inputs) and filters (libraries that generally improve compression ratio) under the hood. At any rate, it can also be called a compressor because it ships with different codecs out of the box.
+=====
+
+=== Brotli
+
+https://github.com/google/brotli[`https://github.com/google/brotli`]
+
+=====
+Brotli is a generic-purpose lossless compression algorithm that compresses data using a combination of a modern variant of the LZ77 algorithm, Huffman coding and 2nd order context modeling, with a compression ratio comparable to the best currently available general-purpose compression methods. It is similar in speed with deflate but offers more dense compression.
+=====
+
+=== bzip2
+
+https://sourceware.org/bzip2/[`https://sourceware.org/bzip2/`]
+
+https://en.wikipedia.org/wiki/Bzip2[`https://en.wikipedia.org/wiki/Bzip2`]
+
+=====
+bzip2 is a freely available, patent free (see below), high-quality data compressor. It typically compresses files to within 10% to 15% of the best available techniques (the PPM family of statistical compressors), whilst being around twice as fast at compression and six times faster at decompression.
+=====
+
+=== cmix
+
+http://www.byronknoll.com/cmix.html[`http://www.byronknoll.com/cmix.html`]
+
+https://github.com/byronknoll/cmix[`https://github.com/byronknoll/cmix`]
+
+=====
+cmix is a lossless data compression program aimed at optimizing compression ratio at the cost of high CPU/memory usage. cmix is free software distributed under the GNU General Public License.
+
+cmix works in Linux, Windows, and Mac OS X. At least 32GB of RAM is recommended to run cmix.
+
+cmix can only compress/decompress single files. To compress multiple files or directories, create an archive file using "tar" (or some similar tool).
+
+For some files, preprocessing using "precomp" may improve compression.
+=====
+
+=== DENSITY
+
+https://github.com/k0dai/density[`https://github.com/k0dai/density`]
+
+=====
+Superfast compression library
+
+DENSITY is a free C99, open-source, BSD licensed compression library.
+
+It is focused on high-speed compression, at the best ratio possible. All three of DENSITY's algorithms are currently at the pareto frontier of compression speed vs ratio (cf. here for an independent benchmark).
+=====
+
+=== Draco
+
+https://github.com/google/draco[`https://github.com/google/draco`]
+
+=====
+Draco is a library for compressing and decompressing 3D geometric meshes and point clouds. It is intended to improve the storage and transmission of 3D graphics.
+
+Draco was designed and built for compression efficiency and speed. The code supports compressing points, connectivity information, texture coordinates, color information, normals, and any other generic attributes associated with geometry. With Draco, applications using 3D graphics can be significantly smaller without compromising visual fidelity. For users, this means apps can now be downloaded faster, 3D graphics in the browser can load quicker, and VR and AR scenes can now be transmitted with a fraction of the bandwidth and rendered quickly.
+=====
+
+=== FastLZ
+
+https://ariya.github.io/FastLZ/[`https://ariya.github.io/FastLZ/`]
+
+=====
+FastLZ (MIT license) is an ANSI C/C90 implementation of Lempel-Ziv 77 algorithm (LZ77) of lossless data compression. It is suitable to compress series of text/paragraphs, sequences of raw pixel data, or any other blocks of data with lots of repetition. It is not intended to be used on images, videos, and other formats of data typically already in an optimal compressed form.
+
+The focus for FastLZ is a very fast compression and decompression, doing that at the cost of the compression ratio. 
+=====
+
+=== fpzip
+
+https://github.com/LLNL/fpzip[`https://github.com/LLNL/fpzip`]]]]]]
+
+=====
+fpzip is a library and command-line utility for lossless and optionally lossy compression of 2D and 3D floating-point arrays. fpzip assumes spatially correlated scalar-valued data, such as regularly sampled continuous functions, and is not suitable for compressing unstructured streams of floating-point numbers. In lossy mode, fpzip discards some number of least significant mantissa bits and losslessly compresses the result. fpzip currently supports IEEE-754 single (32-bit) and double (64-bit) precision floating-point data. fpzip is written in C++ but has a C compatible API that can be called from C and other languages. It conforms to the C++98 and C89 language standards.
+=====
+
+=== ISABELA
+
+http://freescience.org/cs/ISABELA/ISABELA.html[`http://freescience.org/cs/ISABELA/ISABELA.html`]
+
+=====
+Modern large-scale scientific simulations running on HPC systems generate voluminous amounts of data during a single run. To lessen the I/O load during a simulation run, scientists are forced to capture data infrequently, thereby making data collection an intrinsically lossy process. Yet, most lossless compression techniques are hardly suitable for large-scale reduction of floating-point datasets from scientific simulations as the data tends to be inherently random and hard-to-compress.
+
+We introduce an effective method for In-situ Sort-And-B-spline Error-bounded Lossy Abatement (ISABELA) of scientific data. ISABELA is particularly designed for compressing spatio-temporal scientific data that is characterized as being inherently noisy and random-like, and thus commonly believed to be incompressible. With ISABELA, we apply a preconditioner to seemingly random and noisy data along spatial resolution to achieve an accurate fitting model that achieve a very high correlation (≥ 0.99) with the original data. 
+=====
+
+=== LZ4
+
+https://lz4.github.io/lz4/[`https://lz4.github.io/lz4/`]
+
+https://github.com/lz4/lz4[`https://github.com/lz4/lz4`]
+
+=====
+LZ4 is lossless compression algorithm, providing compression speed > 500 MB/s per core, scalable with multi-cores CPU. It features an extremely fast decoder, with speed in multiple GB/s per core, typically reaching RAM speed limits on multi-core systems.
+
+Speed can be tuned dynamically, selecting an "acceleration" factor which trades compression ratio for faster speed. On the other end, a high compression derivative, LZ4_HC, is also provided, trading CPU time for improved compression ratio. All versions feature the same decompression speed.
+
+LZ4 is also compatible with dictionary compression, both at API and CLI levels. It can ingest any input file as dictionary, though only the final 64KB are used. This capability can be combined with the Zstandard Dictionary Builder, in order to drastically improve compression performance on small files.
+=====
+
+=== LZFSE
+
+https://github.com/lzfse/lzfse[`https://github.com/lzfse/lzfse`]
+
+=====
+This is a reference C implementation of the LZFSE compressor introduced in the Compression library with OS X 10.11 and iOS 9.
+
+LZFSE is a Lempel-Ziv style data compression algorithm using Finite State Entropy coding. It targets similar compression rates at higher compression and decompression speed compared to deflate using zlib.
+=====
+
+=== MGARD
+
+https://github.com/CODARcode/MGARD[`https://github.com/CODARcode/MGARD`]
+
+=====
+MGARD (MultiGrid Adaptive Reduction of Data) is a technique for multilevel lossy compression of scientific data based on the theory of multigrid methods. This is an experimental C++ implementation for integration with existing software; use at your own risk!
+=====
+
+=== nccompress
+
+https://github.com/coecms/nccompress[`https://github.com/coecms/nccompress`]
+
+=====
+The nccompress package has been written to facilitate compressing netcdf files. Although nccompress can work on single files, it is particularly useful to compress all uncompressed files under whole directory trees. This can allow users to compress files regularly using the same script each time.
+
+The nccompress package consists of three python programs, ncfind, nc2nc and nccompress. nc2nc can copy netCDF files with compression and an optimised chunking strategy that has reasonable performance for many datasets. His two main limitations: it is slower than some other programs, and it can only compress netCDF3 or netCDF4 classic format.
+
+The convenience utility ncvarinfo is also included, and though it has no direct relevance to compression, it is a convenient way to get a summary of the contents of a netCDF file.
+=====
+
+=== ncrecompress
+
+https://github.com/coecms/ncrecompress[`https://github.com/coecms/ncrecompress`]
+
+=====
+Re-compress a netcdf file in parallel using HDF5 raw IO.
+Uses openmp to paralleise the compression.
+=====
+
+=== NNCP
+
+https://bellard.org/nncp/[`https://bellard.org/nncp/`]
+
+=====
+NNCP is an experiment to build a practical lossless data compressor with neural networks.
+=====
+
+=== Numcodecs
+
+https://numcodecs.readthedocs.io/en/stable/[`https://numcodecs.readthedocs.io/en/stable/`]
+
+=====
+Numcodecs is a Python package providing buffer compression and transformation codecs for use in data storage and communication applications. These include:
+
+* Compression codecs, e.g., Zlib, BZ2, LZMA and Blosc.
+* Pre-compression filters, e.g., Delta, Quantize, FixedScaleOffset, PackBits, Categorize.
+* Integrity checks, e.g., CRC32, Adler32.
+
+All codecs implement the same API, allowing codecs to be organized into pipelines in a variety of ways.
+=====
+
+=== Precomp
+
+https://github.com/schnaader/precomp-cpp[`https://github.com/schnaader/precomp-cpp`]
+
+=====
+Precomp is a command line precompressor that can be used to further compress files that are already compressed. It improves compression on some file-/streamtypes - works on files and streams that are compressed with zLib or the Deflate compression method (like PDF, PNG, ZIP and many more), bZip2, GIF, JPG and MP3. Precomp tries to decompress the streams, and if they can be decompressed and "re-"compressed so that they are bit-to-bit-identical with the original stream, the decompressed stream can be used instead of the compressed one.
+
+The result of Precomp is either a smaller, LZMA2 compressed file with extension .pcf (PCF = PreCompressedFile) or, when using -cn, a file containing decompressed data from the original file together with reconstruction data. In this case, the file is larger than the original file, but can be compressed with any compression algorithm stronger than Deflate to get better compression.
+=====
+
+=== Snappy
+
+https://github.com/google/snappy[`https://github.com/google/snappy`]
+
+=====
+Snappy is a compression/decompression library. It does not aim for maximum compression, or compatibility with any other compression library; instead, it aims for very high speeds and reasonable compression. For instance, compared to the fastest mode of zlib, Snappy is an order of magnitude faster for most inputs, but the resulting compressed files are anywhere from 20% to 100% bigger. 
+=====
+
+=== SZ
+
+https://szcompressor.org/[`https://szcompressor.org/`]
+
+=====
+SZ is a modular parametrizable lossy compressor framework for scientific data (floating point and integers). It has applications in simulations, AI and instruments. It is a production quality software and a research platform for lossy compression. SZ is open and transparent. Open because all interested researchers and students can study or contribute to it. Transparent because all performance improvements are detailed in publications.
+
+SZ can be used for classic use-cases: visualization, accelerating I/O, reducing memory and storage footprint and more advanced use-cases like compression of DNN models and training sets, acceleration of computation, checkpoint/restart, reducing streaming intensity and running efficiently large problems that cannot fit in memory. Other use-cases will augment this list as users find new opportunities to benefit from lossy compression of scientific data.
+
+SZ has implementations on CPU, GPU, and FPGA and is integrated in the main I/O libraries: HFD5, ADIOS, PnetCDF.
+=====
+
+=== tthresh
+
+https://github.com/rballester/tthresh[`https://github.com/rballester/tthresh`]
+
+=====
+A data compressor ntended for Cartesian grid data of 3 or more dimensions, and leverages the higher-order singular value decomposition (HOSVD), a generalization of the SVD to 3 and more dimensions.
+=====
+
+=== Zarr
+
+https://github.com/zarr-developers/zarr-python[`https://github.com/zarr-developers/zarr-python`]
+
+https://zarr.readthedocs.io/en/stable/[`https://zarr.readthedocs.io/en/stable/`]
+
+=====
+Zarr is a Python package providing an implementation of compressed, chunked, N-dimensional arrays, designed for use in parallel computing.
+=====
+
+=== zfp
+
+https://github.com/LLNL/zfp[`https://github.com/LLNL/zfp`]
+
+https://computing.llnl.gov/projects/floating-point-compression[`https://computing.llnl.gov/projects/floating-point-compression`]
+
+https://zfp.readthedocs.io/en/release0.5.5/[`https://zfp.readthedocs.io/en/release0.5.5/`]
+
+=====
+zfp is a compressed format for representing multidimensional floating-point and integer arrays. zfp provides compressed-array classes that support high throughput read and write random access to individual array elements. zfp also supports serial and parallel (OpenMP and CUDA) compression of whole arrays, e.g., for applications that read and write large data sets to and from disk.
+
+zfp uses lossy but optionally error-bounded compression to achieve high compression ratios. Bit-for-bit lossless compression is also possible through one of zfp's compression modes. zfp works best for 2D, 3D, and 4D arrays that exhibit spatial correlation, such as continuous fields from physics simulations, natural images, regularly sampled terrain surfaces, etc. zfp compression of 1D arrays is possible but generally discouraged.
+=====
+
+=== zlib-ng
+
+https://github.com/zlib-ng/zlib-ng[`https://github.com/zlib-ng/zlib-ng`]
+
+=====
+The idea of zlib-ng is not to replace zlib, but to co-exist as a drop-in replacement with a lower threshold for code change.
+=====
+
+=== zstd
+
+https://github.com/facebook/zstd[`https://github.com/facebook/zstd`]
+
+=====
+Zstandard, or zstd as short version, is a fast lossless compression algorithm, targeting real-time compression scenarios at zlib-level and better compression ratios. It's backed by a very fast entropy stage, provided by Huff0 and FSE library.
+
+The project is provided as an open-source dual BSD and GPLv2 licensed C library, and a command line utility producing and decoding .zst, .gz, .xz and .lz4 files.
+=====
+
+

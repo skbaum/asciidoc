@@ -1,0 +1,545 @@
+Jupyter Notebooks
+=================
+Steven K. Baum
+v0.9, 2015-03-02
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Collections
+-----------
+
+IPython Notebook
+~~~~~~~~~~~~~~~~
+
+http://nbviewer.ipython.org/github/ipython/ipython/blob/master/examples/Notebook/Index.ipynb[+http://nbviewer.ipython.org/github/ipython/ipython/blob/master/examples/Notebook/Index.ipynb+]
+
+IPython Cookbook
+~~~~~~~~~~~~~~~~
+
+https://github.com/ipython-books/cookbook-code[+https://github.com/ipython-books/cookbook-code+]
+
+*****
+Recipes of the IPython Cookbook, the definitive guide to high-performance scientific computing and data science in Python.
+*****
+
+Python for Developers
+~~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/ricardoduarte/python-for-developers[+https://github.com/ricardoduarte/python-for-developers+]
+
+http://ricardoduarte.github.io/python-for-developers/[+http://ricardoduarte.github.io/python-for-developers/+
+]
+
+*****
+This book is geared toward those who already have programming knowledge. It covers topics that include: creation of user interfaces, computer graphics, internet applications, distributed systems, among other issues.
+*****
+
+Lectures on Scientific Computing with Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*00 - Introduction to Scientific Computing with Python* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-0-Scientific-Computing-with-Python.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-0-Scientific-Computing-with-Python.ipynb+]
+
+*01 - Introduction to Python Programming* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-1-Introduction-to-Python-Programming.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-1-Introduction-to-Python-Programming.ipynb+]
+
+*02 - Numpy* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-2-Numpy.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-2-Numpy.ipynb+]
+
+*03 - Scipy* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-3-Scipy.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-3-Scipy.ipynb+]
+
+*04 - Matplotlib* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-4-Matplotlib.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-4-Matplotlib.ipynb+]
+
+*05 - Sympy* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-5-Sympy.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-5-Sympy.ipynb+]
+
+*06A - Fortran and C* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-6A-Fortran-and-C.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-6A-Fortran-and-C.ipynb+]
+
+*06B - HPC* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-6B-HPC.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-6B-HPC.ipynb+]
+
+*07 - Revision Control Software* - https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-7-Revision-Control-Software.ipynb[+https://github.com/jrjohansson/scientific-python-lectures/blob/master/Lecture-7-Revision-Control-Software.ipynb+]
+
+Python for Geosciences
+~~~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/koldunovn/python_for_geosciences[+https://github.com/koldunovn/python_for_geosciences+]
+
+*01 - Scientific Modules and IPython* - https://github.com/koldunovn/python_for_geosciences/blob/master/01%20-%20Scientific%20modules%20and%20IPython.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/01%20-%20Scientific%20modules%20and%20IPython.ipynb+]
+
+*02 - Python Basics* - https://github.com/koldunovn/python_for_geosciences/blob/master/02%20-%20Python%20basics.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/02%20-%20Python%20basics.ipynb+]
+
+*03 - Numpy Arrays* - https://github.com/koldunovn/python_for_geosciences/blob/master/03%20-%20NumPy%20arrays.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/03%20-%20NumPy%20arrays.ipynb+]
+
+*04 - Working with Different Data Formats* - https://github.com/koldunovn/python_for_geosciences/blob/master/04%20-%20Work%20with%20different%20data%20formats.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/04%20-%20Work%20with%20different%20data%20formats.ipynb+]
+
+*05 - Graphs and Maps with Matplotlib and Basemap* - https://github.com/koldunovn/python_for_geosciences/blob/master/05%20-%20Graphs%20and%20maps%20%28Matplotlib%20and%20Basemap%29.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/05%20-%20Graphs%20and%20maps%20%28Matplotlib%20and%20Basemap%29.ipynb+]
+
+*06 - Time Series Analysis with Pandas* - https://github.com/koldunovn/python_for_geosciences/blob/master/06%20-%20Time%20series%20analysis%20%28Pandas%29.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/06%20-%20Time%20series%20analysis%20%28Pandas%29.ipynb+]
+
+*07 - Other Modules for Geoscientists* - https://github.com/koldunovn/python_for_geosciences/blob/master/07%20-%20Other%20modules%20for%20geoscientists.ipynb[+https://github.com/koldunovn/python_for_geosciences/blob/master/07%20-%20Other%20modules%20for%20geoscientists.ipynb+]
+
+*****
+Using Iris, Cartopy, Pydap, F2PY, netcdf4-python.
+*****
+
+Unidata Python Workshop 2015
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Intro to Numpy and Matplotlib* - https://github.com/Unidata/unidata-python-workshop/blob/master/intro-numpy-and-matplotlib.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/intro-numpy-and-matplotlib.ipynb+]
+
+*Pythonic Data Analysis* - https://github.com/Unidata/unidata-python-workshop/blob/master/pythonic-data-analysis-solution.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/pythonic-data-analysis-solution.ipynb+]
+
+*Reading netCDF data* - https://github.com/Unidata/unidata-python-workshop/blob/master/reading_netCDF.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/reading_netCDF.ipynb+]
+
+*Writing netCDF data* - https://github.com/Unidata/unidata-python-workshop/blob/master/writing_netCDF.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/writing_netCDF.ipynb+]
+
+*****
+How to use the https://github.com/Unidata/netcdf4-python[netcdf4-python] package.
+*****
+
+*netCDF File Visualization Case Study* - https://github.com/Unidata/unidata-python-workshop/blob/master/casestudy.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/casestudy.ipynb+]
+
+*****
+A visualization case study using netCDF, GRIB metadata, the
+https://github.com/xray/xray[xray] data analysis library, and
+the http://scitools.org.uk/cartopy/[cartopy] visualization library.
+*****
+
+*Geoscience visualization with Matplotlib and CartoPy* - https://github.com/Unidata/unidata-python-workshop/blob/master/matplotlib-and-cartopy.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/matplotlib-and-cartopy.ipynb+]
+
+*Using numpy and KD-trees with netCDF data* - https://github.com/Unidata/unidata-python-workshop/blob/master/netcdf-by-coordinates.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/netcdf-by-coordinates.ipynb+]
+
+*****
+The goal is to demonstrate how to quickly access netCDF data based on geospatial coordinates instead of array indices.  See also http://www.unidata.ucar.edu/blogs/developer/en/entry/accessing_netcdf_data_by_coordinates[Accessing netCDF Data by Coordinates].
+*****
+
+*Exploring Web Map Service (WMS)* - https://github.com/Unidata/unidata-python-workshop/blob/master/wms_sample.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/wms_sample.ipynb+]
+
+*Using Python to get the latest NEXRAD Composite* - https://github.com/Unidata/unidata-python-workshop/blob/master/CompositeRadar.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/CompositeRadar.ipynb+]
+
+*Using the Google Geocoding API to geolocate METAR data* - https://github.com/Unidata/unidata-python-workshop/blob/master/Geocoded_METAR.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/Geocoded_METAR.ipynb+]
+
+*MetPy Python Toolkit for Meteorology* - https://github.com/Unidata/unidata-python-workshop/blob/master/MetPy.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/MetPy.ipynb+]
+
+*Using Siphon to Query the NetCDF Subset Service* - https://github.com/Unidata/unidata-python-workshop/blob/master/SIPHON_NCSS_Example.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/SIPHON_NCSS_Example.ipynb+]
+
+*Using Siphon to get NEXRAD Level 3 data from a TDS* - https://github.com/Unidata/unidata-python-workshop/blob/master/SIPHON_RadarServer_Example.ipynb[+https://github.com/Unidata/unidata-python-workshop/blob/master/SIPHON_RadarServer_Example.ipynb+]
+
+*****
+Using the https://github.com/Unidata/siphon[Siphon] Python utilities to retrieve data from a
+THREDDS server.
+*****
+
+Miscellaneous
+-------------
+
+Python/IPython
+~~~~~~~~~~~~~~
+
+*A Crash Course in Python for Scientists* - http://nbviewer.ipython.org/gist/rpmuller/5920182[+http://nbviewer.ipython.org/gist/rpmuller/5920182+]
+
+*Using Numba to Speed Up Numerical Codes* - http://nbviewer.ipython.org/gist/Juanlu001/3914904[+http://nbviewer.ipython.org/gist/Juanlu001/3914904+]
+
+*A collection of not-so-obvious Python stuff you should know!* - http://nbviewer.ipython.org/github/rasbt/python_reference/blob/master/tutorials/not_so_obvious_python_stuff.ipynb?create=1[+http://nbviewer.ipython.org/github/rasbt/python_reference/blob/master/tutorials/not_so_obvious_python_stuff.ipynb?create=1+]
+
+*Python 3 OOP* - http://nbviewer.ipython.org/github/lgiordani/blog_source/tree/master/pelican/content/notebooks/[+http://nbviewer.ipython.org/github/lgiordani/blog_source/tree/master/pelican/content/notebooks/+]
+
+*CFD Python:  12 Steps to Navier-Stokes* - http://lorenabarba.com/blog/cfd-python-12-steps-to-navier-stokes/[+http://lorenabarba.com/blog/cfd-python-12-steps-to-navier-stokes/+]
+
+*Python for Signal Processing* - http://nbviewer.ipython.org/github/unpingco/Python-for-Signal-Processing/tree/master/[+http://nbviewer.ipython.org/github/unpingco/Python-for-Signal-Processing/tree/master/+]
+
+*AeroPython:  Classical Aerodynamics with Python* - https://github.com/barbagroup/AeroPython[+https://github.com/barbagroup/AeroPython+]
+
+*Exploratory Computing with Python* - http://mbakker7.github.io/exploratory_computing_with_python/[+http://mbakker7.github.io/exploratory_computing_with_python/+]
+
+
+*****
+A series of notebooks introducing the object oriented programming implementation in Python 3.
+*****
+
+Julia
+~~~~~
+
+*JuliaBox* - https://juliabox.org/[+https://juliabox.org/+]
+
+*****
+A site for creating and sharing IJulia notebooks.
+*****
+
+*An Introduction to Julia* - https://github.com/scidom/JuliaIntro.jl[+https://github.com/scidom/JuliaIntro.jl+]
+
+*Learn Julia* - https://github.com/aviks/learn-julia[+https://github.com/aviks/learn-julia+]
+
+*Scipy 2014 Julia* - https://github.com/dpsanders/scipy_2014_julia[+https://github.com/dpsanders/scipy_2014_julia+]
+
+*Julia - EuroSciPy14* - http://nbviewer.ipython.org/github/stevengj/Julia-EuroSciPy14/blob/master/Overview.ipynb[+http://nbviewer.ipython.org/github/stevengj/Julia-EuroSciPy14/blob/master/Overview.ipynb+] 
+
+*****
+The Julia tutorial delivered at Scipy 2014.
+*****
+
+*Vectorization in Julia* - https://software.intel.com/en-us/articles/vectorization-in-julia[+https://software.intel.com/en-us/articles/vectorization-in-julia+]
+
+*World of Julia* - https://github.com/jiahao/ijulia-notebooks/blob/master/2014-06-30-world-of-julia.ipynb[+https://github.com/jiahao/ijulia-notebooks/blob/master/2014-06-30-world-of-julia.ipynb+]
+
+*2-D Daubechies Wavelets* - http://nbviewer.ipython.org/github/gpeyre/numerical-tours/blob/master/julia/wavelet_4_daubechies2d.ipynb[+http://nbviewer.ipython.org/github/gpeyre/numerical-tours/blob/master/julia/wavelet_4_daubechies2d.ipynb+]
+
+*Functional Geometry* - http://nbviewer.ipython.org/github/shashi/ijulia-notebooks/blob/master/funcgeo/Functional%20Geometry.ipynb[+http://nbviewer.ipython.org/github/shashi/ijulia-notebooks/blob/master/funcgeo/Functional%20Geometry.ipynb+]
+
+*Tricked-Out Iterators in Julia* - https://github.com/carljv/Julia-Iterators/blob/master/iterator_tricks.ipynb[+https://github.com/carljv/Julia-Iterators/blob/master/iterator_tricks.ipynb+]
+
+*****
+See also the http://slendermeans.org/julia-iterators.html[blog post].
+*****
+
+Graphics
+~~~~~~~~
+
+*21 Interactive Plots from matplotlib, ggplot for Python,
+prettyplotlib, Stack Overflow, and seaborn* -
+http://nbviewer.ipython.org/gist/msund/7ac1203ded66fe8134cc[+http://nbviewer.ipython.org/gist/msund/7ac1203ded66fe8134cc+]
+
+*Bokeh 5-Minute Overview* -
+http://nbviewer.ipython.org/github/damianavila/bokeh_overview/blob/master/Bokeh%20Overview.ipynb?create=1[+http://nbviewer.ipython.org/github/damianavila/bokeh_overview/blob/master/Bokeh%20Overview.ipynb?create=1+]
+
+*Bokeh in Python* - http://nbviewer.ipython.org/github/bokeh/bokeh-notebooks/blob/master/index.ipynb[+http://nbviewer.ipython.org/github/bokeh/bokeh-notebooks/blob/master/index.ipynb+]
+
+*matplotlib: 2D and 3D plotting in Python* -
+http://nbviewer.ipython.org/github/jrjohansson/scientific-python-lectures/blob/master/Lecture-4-Matplotlib.ipynb[+http://nbviewer.ipython.org/github/jrjohansson/scientific-python-lectures/blob/master/Lecture-4-Matplotlib.ipynb+]
+
+*matta: view and scaffold d3.js visualizations in IPython notebooks* -
+http://nbviewer.ipython.org/github/carnby/matta/blob/master/examples/Basic%20Examples.ipynb[+http://nbviewer.ipython.org/github/carnby/matta/blob/master/examples/Basic%20Examples.ipynb+]
+
+*Plotly's Python API User Guide* -
+http://nbviewer.ipython.org/github/plotly/python-user-guide/blob/master/s00_homepage/s00_homepage.ipynb[+http://nbviewer.ipython.org/github/plotly/python-user-guide/blob/master/s00_homepage/s00_homepage.ipynb+]
+
+Geoscience
+~~~~~~~~~~
+
+*Amazon River Discharge* - https://github.com/koldunovn/nk_public_notebooks/blob/master/Amazon%20river%20discharge.ipynb[+https://github.com/koldunovn/nk_public_notebooks/blob/master/Amazon%20river%20discharge.ipynb+]
+
+*****
+Uses Pandas, Matplotlib, Basemap and Nio.
+*****
+
+*Geospatial Data with Python* - http://nbviewer.ipython.org/github/mqlaql/geospatial-data/blob/master/Geospatial-Data-with-Python.ipynb[+http://nbviewer.ipython.org/github/mqlaql/geospatial-data/blob/master/Geospatial-Data-with-Python.ipynb+]
+
+*Interpolation Between Grids with Basemap* - http://earthpy.org/interpolation_between_grids_with_basemap.html[+http://earthpy.org/interpolation_between_grids_with_basemap.html+]
+
+*Interpolation Between Grids with Pyresample* - http://earthpy.org/interpolation_between_grids_with_pyresample.html[+http://earthpy.org/interpolation_between_grids_with_pyresample.html+]
+
+*****
+The use of https://github.com/pytroll/pyresample[pyresample] to resample geospatial images.
+*****
+
+Signell
+^^^^^^^
+
+*Cartopy Terrain* - https://github.com/rsignell-usgs/notebook/blob/master/Cartopy/Cartopy_terrain.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/Cartopy/Cartopy_terrain.ipynb+]
+
+*****
+"Demonstrates cartopy's ability to draw map tiles which are downloaded on
+demand from the MapQuest tile server. Internally these tiles are then combined
+into a single image and displayed in the cartopy GeoAxes."
+*****
+
+Exploring Climate Data: Past and Future* - https://github.com/rsignell-usgs/ipython-notebooks/blob/master/files/Dust%20Bowl%20climate%20data%20example%20with%20GDP.ipynb[+https://github.com/rsignell-usgs/ipython-notebooks/blob/master/files/Dust%20Bowl%20climate%20data%20example%20with%20GDP.ipynb+]
+
+*****
+Using Python tools to access and manipulate climate data to discover how much precipitation
+there was in the dustbowl years of the 1930s.
+*****
+
+*Read realtime data from NERACOOS ERDDAP* -
+http://nbviewer.ipython.org/gist/rsignell-usgs/2a668eb67b1b41519475/ERDDAP_Brad.ipynb[+http://nbviewer.ipython.org/gist/rsignell-usgs/2a668eb67b1b41519475/ERDDAP_Brad.ipynb+]
+
+ERDDAP
+++++++
+
+*NOAA NDBC Buoy Data from ERDDAP* - https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_NERACOOS.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_NERACOOS.ipynb+]
+
+*Read Bathymetric Data* - https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_read_bathy.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_read_bathy.ipynb+]
+
+*Read Boston Harbor Water Temperature* - https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_Boston_Water_temp.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_Boston_Water_temp.ipynb+]
+
+*Read Chlorophyll Data* - https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_read.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_read.ipynb+]
+
+*Read Data from MPALA ERDDAP* - https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_MPALA.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_MPALA.ipynb+]
+
+*Read GTS Data* - https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_GTS_Test.ipynb[+https://github.com/rsignell-usgs/notebook/blob/master/ERDDAP/ERDDAP_GTS_Test.ipynb+]
+
+
+
+SciTools: Cartopy, Iris and Biggus
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*Cartopy in a Nutshell* -
+http://nbviewer.ipython.org/github/SciTools/courses/blob/master/course_content/cartopy_intro.ipynb[+http://nbviewer.ipython.org/github/SciTools/courses/blob/master/course_content/cartopy_intro.ipynb+]
+
+*An Introduction to Iris* -
+http://nbviewer.ipython.org/github/SciTools/courses/blob/master/course_content/iris_intro.ipynb[+http://nbviewer.ipython.org/github/SciTools/courses/blob/master/course_content/iris_intro.ipynb+]
+
+*Using Iris to Access Data from US-IOOS Models* -
+https://www.wakari.io/sharing/bundle/rsignell/scitools[+https://www.wakari.io/sharing/bundle/rsignell/scitools+]
+
+*Using Iris to access NCEP CFSR 30-year Wave Hindcast* -
+http://nbviewer.ipython.org/gist/rsignell-usgs/5492513[+http://nbviewer.ipython.org/gist/rsignell-usgs/5492513+]
+
+*Iris Example Code* -
+http://nbviewer.ipython.org/github/pp-mo/iris_example_code/blob/master/index.ipynb[+http://nbviewer.ipython.org/github/pp-mo/iris_example_code/blob/master/index.ipynb+]
+
+*Efficient large data operations with Biggus* -
+http://nbviewer.ipython.org/github/pp-mo/biggus_talk/blob/master/biggus_talk.ipynb[+http://nbviewer.ipython.org/github/pp-mo/biggus_talk/blob/master/biggus_talk.ipynb+]
+
+Numerical Analysis
+~~~~~~~~~~~~~~~~~~
+
+*Lectures and materials for the Fall 2014 Skoltech numerical linear algebra
+course* - https://github.com/oseledets/NLA[+https://github.com/oseledets/NLA+]
+
+*Some Linear Algebra with Cython* -
+http://nbviewer.ipython.org/github/carljv/cython_testing/blob/master/cython_linalg.ipynb[+http://nbviewer.ipython.org/github/carljv/cython_testing/blob/master/cython_linalg.ipynb+]
+
+*The Matrix Exponential* - http://nbviewer.ipython.org/github/sdrelton/matrix_function_notebooks/blob/master/TheMatrixExponential.ipynb[+http://nbviewer.ipython.org/github/sdrelton/matrix_function_notebooks/blob/master/TheMatrixExponential.ipynb+]
+
+Data Analysis/Science
+~~~~~~~~~~~~~~~~~~~~~
+
+*Learn Data Science* - http://learnds.com/[+http://learnds.com/+]
+
+*Pandas Cookbook* -
+https://github.com/jvns/pandas-cookbook[+https://github.com/jvns/pandas-cookbook+]
+
+*Timeseries with Pandas* -
+http://nbviewer.ipython.org/github/changhiskhan/talks/blob/master/pydata2012/pandas_timeseries.ipynb[+http://nbviewer.ipython.org/github/changhiskhan/talks/blob/master/pydata2012/pandas_timeseries.ipynb+]
+
+*Pandas Tutorials* -
+https://bitbucket.org/hrojas/learn-pandas[+https://bitbucket.org/hrojas/learn-pandas+]
+
+*Analyzing and visualizing sun spot data with Pandas* - http://nbviewer.ipython.org/gist/jhemann/4569783[+http://nbviewer.ipython.org/gist/jhemann/4569783+]
+
+Parallel
+~~~~~~~~
+
+Easily distributing a parallel IPython Notebook on a cluster -
+http://twiecki.github.io/blog/2014/02/24/ipython-nb-cluster/[+http://twiecki.github.io/blog/2014/02/24/ipython-nb-cluster/+]
+
+Version Control
+~~~~~~~~~~~~~~~
+
+*Version Control for Fun and Profit* - http://nbviewer.ipython.org/github/fperez/reprosw/blob/master/Version%20Control.ipynb[+http://nbviewer.ipython.org/github/fperez/reprosw/blob/master/Version%20Control.ipynb+]
+
+Uncategorized
+-------------
+
+IPython Cookbook -
+http://ipython-books.github.io/cookbook/[+http://ipython-books.github.io/cookbook/+]
+
+IPython Mini-Book Examples -
+https://github.com/rossant/ipython-minibook[+https://github.com/rossant/ipython-minibook+]
+
+Bookstore for IPython Notebooks -
+https://developer.rackspace.com/blog/bookstore-for-ipython-notebooks/[+https://developer.rackspace.com/blog/bookstore-for-ipython-notebooks/+]
+
+Why the three biggest positive contributions to reproducible research are the
+iPython Notebook, knitr, and Galaxy -
+http://simplystatistics.org/2014/09/04/why-the-three-biggest-positive-contributions-to-reproducible-research-are-the-ipython-notebook-knitr-and-galaxy/[+http://simplystatistics.org/2014/09/04/why-the-three-biggest-positive-contributions-to-reproducible-research-are-the-ipython-notebook-knitr-and-galaxy/+]
+
+Javascript/Python Bi-directional Communication -
+https://jakevdp.github.io/blog/2013/06/01/ipython-notebook-javascript-python-communication/[+https://jakevdp.github.io/blog/2013/06/01/ipython-notebook-javascript-python-communication/+]
+
+The IPython Notebook: Get Close to Your Data with Python and JavaScript -
+https://github.com/ellisonbg/talk-2014-strata-sc[+https://github.com/ellisonbg/talk-2014-strata-sc+]
+
+Python
+------
+
+NumPy in the browser: proof of concept with Numba, LLVM, and emscripten -
+http://cyrille.rossant.net/numpy-browser-llvm/[+http://cyrille.rossant.net/numpy-browser-llvm/+]
+
+Awesome Python: A curated list of awesome Python frameworks, libraries and
+software -
+https://github.com/vinta/awesome-python[+https://github.com/vinta/awesome-python+]
+
+11 Must-Read Python Blogs -
+http://codecondo.com/blogs-for-python-developers/[+http://codecondo.com/blogs-for-python-developers/+]
+
+First Steps With Python -
+https://realpython.com/learn/python-first-steps/[+https://realpython.com/learn/python-first-steps/+]
+
+Intermediate Pythonista -
+http://intermediatepythonista.com/[+http://intermediatepythonista.com/+]
+
+* The Function -
+http://intermediatepythonista.com/the-function[+http://intermediatepythonista.com/the-function+]
+
+Python Tips Tricks and Idioms -
+https://codefisher.org/catch/blog/2015/01/27/python-tips-tricks-and-idioms/[+https://codefisher.org/catch/blog/2015/01/27/python-tips-tricks-and-idioms/+]
+
+Top 10 Python idioms I wish I'd learned earlier  -
+http://prooffreaderplus.blogspot.com/2014/11/top-10-python-idioms-i-wished-id.html[+http://prooffreaderplus.blogspot.com/2014/11/top-10-python-idioms-i-wished-id.html+]
+
+Python Tips and Traps -
+https://www.airpair.com/python/posts/python-tips-and-traps[+https://www.airpair.com/python/posts/python-tips-and-traps+]
+
+Hidden Features of Python -
+http://stackoverflow.com/questions/101268/hidden-features-of-python[+http://stackoverflow.com/questions/101268/hidden-features-of-python+]
+
+Asynchronous Python and Databases -
+http://techspot.zzzeek.org/2015/02/15/asynchronous-python-and-databases/[+http://techspot.zzzeek.org/2015/02/15/asynchronous-python-and-databases/+]
+
+Fast Non-Standard Data Structures for Python -
+http://kmike.ru/python-data-structures/[+http://kmike.ru/python-data-structures/+]
+
+Fun With Python Lists -
+http://matthiaseisen.com/fwl/py/[+http://matthiaseisen.com/fwl/py/+]
+
+Packaging a python library -
+http://blog.ionelmc.ro/2014/05/25/python-packaging/[+http://blog.ionelmc.ro/2014/05/25/python-packaging/+]
+
+Importing Python Modules -
+http://effbot.org/zone/import-confusion.htm[+http://effbot.org/zone/import-confusion.htm+]
+
+Solving Problems with Sets and Comprehensions in Python -
+https://hackhands.com/solving-problems-sets-comprehensions-python/[+https://hackhands.com/solving-problems-sets-comprehensions-python/+]
+
+A guide to Python's function decorators -
+http://thecodeship.com/patterns/guide-to-python-function-decorators/[+http://thecodeship.com/patterns/guide-to-python-function-decorators/+]
+
+High Performance Python Extensions -
+https://www.crumpington.com/blog/2014/10-19-high-performance-python-extensions-part-1.html[+https://www.crumpington.com/blog/2014/10-19-high-performance-python-extensions-part-1.html+]
+
+How to run external programs from Python and capture their output -
+http://fastml.com/how-to-run-external-programs-from-python-and-capture-their-output/[+http://fastml.com/how-to-run-external-programs-from-python-and-capture-their-output/+]
+
+Python Metaprogramming for Mad Scientists and Evil Geniuses -
+https://www.youtube.com/watch?v=Adr_QuDZxuM[+https://www.youtube.com/watch?v=Adr_QuDZxuM+]
+
+Advanced Use of Python Decorators and Metaclasses -
+http://lgiordani.com/blog/2014/10/14/decorators-and-metaclasses/[+http://lgiordani.com/blog/2014/10/14/decorators-and-metaclasses/+]
+
+5 Functional Programming Tips in Python -
+http://robinandeer.svbtle.com/5-functional-programming-tips-in-python[+http://robinandeer.svbtle.com/5-functional-programming-tips-in-python+]
+
+LowClass Python: Style Guide for Data Scientists -
+http://columbia-applied-data-science.github.io/pages/lowclass-python-style-guide.html[+http://columbia-applied-data-science.github.io/pages/lowclass-python-style-guide.html+]
+
+Dataframes in Python -
+http://ajkl.github.io/Dataframes/[+http://ajkl.github.io/Dataframes/+]
+
+Working with Dataframes in Python -
+http://www.gregreda.com/2013/10/26/working-with-pandas-dataframes/[+http://www.gregreda.com/2013/10/26/working-with-pandas-dataframes/+]
+
+Learn Python Through Public Data Hacking -
+http://www.dabeaz.com/pydata/[+http://www.dabeaz.com/pydata/+]
+
+14 Best Python Pandas Features -
+http://www.bigdataexaminer.com/14-best-python-pandas-features/[+http://www.bigdataexaminer.com/14-best-python-pandas-features/+]
+
+Things in Pandas I Wish I'd Had Known Earlier -
+http://nbviewer.ipython.org/github/rasbt/python_reference/blob/master/tutorials/things_in_pandas.ipynb[+http://nbviewer.ipython.org/github/rasbt/python_reference/blob/master/tutorials/things_in_pandas.ipynb+]
+
+Mistakes Developers Make When Using Python for Big Data -
+https://www.airpair.com/python/posts/top-mistakes-python-big-data-analytics[+https://www.airpair.com/python/posts/top-mistakes-python-big-data-analytics+]
+
+Digital Signal Processing in Python -
+http://greenteapress.com/thinkdsp/[+http://greenteapress.com/thinkdsp/+]
+
+Overview of Python Visualization Tools -
+http://pbpython.com/visualization-tools-1.html[+http://pbpython.com/visualization-tools-1.html+]
+
+11 Python Libraries You Might Not Know -
+http://blog.yhathq.com/posts/11-python-libraries-you-might-not-know.html[+http://blog.yhathq.com/posts/11-python-libraries-you-might-not-know.html+]
+
+Data Science 45-Minute Ipython Notebook Intros -
+https://github.com/DrSkippy/Data-Science-45min-Intros[+https://github.com/DrSkippy/Data-Science-45min-Intros+]
+
+Must-Watch Videos About Python -
+https://github.com/s16h/py-must-watch[+https://github.com/s16h/py-must-watch+]
+
+Plotly for Python User Guide -
+https://plot.ly/python/user-guide/[+https://plot.ly/python/user-guide/+]
+
+Plotting Data Online via Plotly and Python -
+http://www.blog.pythonlibrary.org/2014/10/27/plotting-data-online-via-plotly-and-python/[+http://www.blog.pythonlibrary.org/2014/10/27/plotting-data-online-via-plotly-and-python/+]
+
+Create a GUI in Python with WxWidgets -
+http://talkera.org/python/creating-a-gui-in-python-with-wxwidgets-tutorial-for-beginners/[+http://talkera.org/python/creating-a-gui-in-python-with-wxwidgets-tutorial-for-beginners/+]
+
+Let's Write an LLVM Specializer for Python -
+http://dev.stephendiehl.com/numpile/[+http://dev.stephendiehl.com/numpile/+]
+
+Use pew, not virtualenvwrapper, for Python virtualenvs -
+http://planspace.org/20150120-use_pew_not_virtualenvwrapper_for_python_virtualenvs/[+http://planspace.org/20150120-use_pew_not_virtualenvwrapper_for_python_virtualenvs/+]
+
+Data Animations with Python and MoviePy -
+http://zulko.github.io/blog/2014/11/29/data-animations-with-python-and-moviepy/[+http://zulko.github.io/blog/2014/11/29/data-animations-with-python-and-moviepy/+]
+
+Building Quantum Computing Applications with Python -
+http://talkera.org/python/an-introduction-to-building-quantum-computing-applications-with-python/[+http://talkera.org/python/an-introduction-to-building-quantum-computing-applications-with-python/+]
+
+Simple and effective coin segmentation using Python and OpenCV -
+http://blog.christianperone.com/?p=2711[+http://blog.christianperone.com/?p=2711+]
+
+Primer on Jinja Templating -
+https://realpython.com/blog/python/primer-on-jinja-templating/[+https://realpython.com/blog/python/primer-on-jinja-templating/+]
+
+Vector Animations with Python -
+http://zulko.github.io/blog/2014/09/20/vector-animations-with-python/[+http://zulko.github.io/blog/2014/09/20/vector-animations-with-python/+]
+
+Interactive Data Visualization with D3.js, DC.js, Python, and MongoDB -
+http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/[+http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/+]
+
+Making GIFs From Video Files With Python -
+http://zulko.github.io/blog/2014/01/23/making-animated-gifs-from-video-files-with-python/#[+http://zulko.github.io/blog/2014/01/23/making-animated-gifs-from-video-files-with-python/#+]
+
+Getting started with Graphviz and Python -
+http://matthiaseisen.com/pp/patterns/p0204/[+http://matthiaseisen.com/pp/patterns/p0204/+]
+
+Web Scraping With Scrapy and MongoDB -
+https://realpython.com/blog/python/web-scraping-with-scrapy-and-mongodb/#.VL0O62C2BPQ.hackernews[+https://realpython.com/blog/python/web-scraping-with-scrapy-and-mongodb/#.VL0O62C2BPQ.hackernews+]
+
+Natural Language Processing with Python -
+http://www.nltk.org/book/[+http://www.nltk.org/book/+]
+
+Hacker's Guide to Neural Networks -
+http://karpathy.github.io/neuralnets/[+http://karpathy.github.io/neuralnets/+]
+
+Machine Learning for Hackers (Python notebooks of examples in MLFH book) -
+http://nbviewer.ipython.org/github/carljv/Will_it_Python/tree/master/MLFH/[+http://nbviewer.ipython.org/github/carljv/Will_it_Python/tree/master/MLFH/+]
+
+Probabilistic Programming and Bayesian Methods for Hackers -
+http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/[+http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/+]
+
+Full Stack Development - Fetching Data, Visualizing With D3, and Deploying
+With Dokku -
+https://realpython.com/blog/python/web-development-with-flask-fetching-data-with-requests/\#.VCwFPZHt-t0.hackernews[+https://realpython.com/blog/python/web-development-with-flask-fetching-data-with-requests/#.VCwFPZHt-t0.hackernews+]
+
+12 Steps to Navier Stokes With Python -
+http://nbviewer.ipython.org/github/barbagroup/CFDPython/blob/master/lessons/01_Step_1.ipynb[+http://nbviewer.ipython.org/github/barbagroup/CFDPython/blob/master/lessons/01_Step_1.ipynb+] (https://github.com/barbagroup/CFDPython[+https://github.com/barbagroup/CFDPython+])
+
+Translating SQL to Pandas -
+http://nbviewer.ipython.org/github/gjreda/pydata2014nyc/blob/master/demo.ipynb[+http://nbviewer.ipython.org/github/gjreda/pydata2014nyc/blob/master/demo.ipynb+]
+
+An Even Better Lisp Interpreter in Python -
+http://norvig.com/lispy2.html?[+http://norvig.com/lispy2.html?+]
+
+Practical Data Science in Python -
+http://radimrehurek.com/data_science_python/[+http://radimrehurek.com/data_science_python/+]
+
+Hierarchical Agglomerative Clustering: A Python Tutorial -
+http://nbviewer.ipython.org/github/rasbt/pattern_classification/blob/master/clustering/hierarchical/clust_complete_linkage.ipynb[+http://nbviewer.ipython.org/github/rasbt/pattern_classification/blob/master/clustering/hierarchical/clust_complete_linkage.ipynb+]
+
+Frequentism and Bayesianism: A Python-driven Primer -
+http://arxiv.org/abs/1411.5018[+http://arxiv.org/abs/1411.5018+]
+
+Algorithms in Python (PDF Book) -
+http://www.astro.sunysb.edu/steinkirch/reviews/algorithms_in_python.pdf[+http://www.astro.sunysb.edu/steinkirch/reviews/algorithms_in_python.pdf+]
+
+TDD Web Dev With Python (ASCIIDOC format) -
+https://github.com/hjwp/Book-TDD-Web-Dev-Python[+https://github.com/hjwp/Book-TDD-Web-Dev-Python+]
+
+
+
+

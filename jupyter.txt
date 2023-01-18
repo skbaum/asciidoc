@@ -1,0 +1,1698 @@
+Jupyter Notes
+=============
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+== Latest Setup (2021-02-12)
+
+-----
+conda create -n jlab
+conda activate jlab
+conda install -c conda-forge jupyterlab
+conda install -c conda-forge -c plotly jupyter-dash
+conda install nodejs
+jupyter labextension install @jupyterlab/katex-extension
+jupyter labextension install @jupyterlab/geojson-extension
+pip install jupyterlab_latex
+jupyter labextension install @jupyterlab/toc
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
+conda install numpy
+pip install perspective-python
+#  The previous command replaced pyarrow 1.01 with 0.17, so we'll upgrade it.
+conda upgrade pyarrow
+jupyter labextension install @finos/perspective-jupyterlab
+#  The next command would downgrade jupyterlab, so no go.
+#conda install -c conda-forge jupyterlab jupyterlab-git
+conda install -c conda-forge 'jupyterlab>=3.0.0,<4.0.0a0' jupyterlab-lsp
+pip install 'python-language-server[all]'
+pip install dask-labextension
+conda install -c conda-forge jupyterlab-sos
+conda install -c conda-forge sos-notebook
+conda install jupyterlab-transient-display-data -c conda-forge
+git clone https://github.com/jupyter/nbconvert.git
+cd nbconvert
+pip install -e .
+conda install -c conda-forge voila
+conda install -c conda-forge rise
+conda install lfortran -c conda-forge
+#  This spun for a while and did nothing.
+#conda install jupyter fortran_kernel -c conda-forge
+pip install git+https://github.com/glue-viz/glue-jupyter.git
+jupyter labextension install jupyter-threejs
+-----
+
+When running `jupyter lab` the first time, it wanted an unknown password.
+This was solved by running:
+
+-----
+jupyter lab password
+Enter password: 
+Verify password: 
+-----
+
+Jupyter and Extensions
+----------------------
+
+Jupyter is the extension of the IPython Notebook package to other programming
+languages.  The language agnostic bits of IPython Notebook were extracted and became Jupyter, which
+can be used with Python, Julia, etc.
+
+Basic Package Sites
+~~~~~~~~~~~~~~~~~~~
+
+*Project Jupyter* - http://jupyter.org/[+http://jupyter.org/+]
+
+*Project Jupyter Blog* - https://blog.jupyter.org/[+https://blog.jupyter.org/+]
+
+The official site for the Jupyter package.
+
+*Jupyter on Twitter* - https://twitter.com/ProjectJupyter[+https://twitter.com/ProjectJupyter+]
+
+The Twitter feed for the Jupyter project.
+
+*IPython Notebook* - http://ipython.org/notebook.html[+http://ipython.org/notebook.html+]
+
+The official site for IPython Notebook, which spawned the Jupyter project and still (7/15) contains
+most of the documentation about how to configure and use either.
+
+* *The IPython Notebook* - http://ipython.org/ipython-doc/stable/notebook/index.html[+http://ipython.org/ipython-doc/stable/notebook/index.html+]
+
+The present (7/15) bible of the IPython Notebook and Jupyter.
+
+* *Markdown* - http://daringfireball.net/projects/markdown/syntax[+http://daringfireball.net/projects/markdown/syntax+]
+
+The package used to render text.
+
+* *MathJax* - http://www.mathjax.org/[+http://www.mathjax.org/+]
+
+The package used to render equations.
+
+Try Jupyter
+~~~~~~~~~~~
+
+https://try.jupyter.org/[+https://try.jupyter.org/+]
+
+A freely available online Jupyter server that allows you to try using it with
+various programming languages.
+
+Extensions
+~~~~~~~~~~
+
+bookstore
+^^^^^^^^^
+
+https://bookstore.readthedocs.io/en/latest/[`https://bookstore.readthedocs.io/en/latest/`]
+
+https://github.com/nteract/bookstore[`https://github.com/nteract/bookstore`]
+
+"bookstore provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks."
+
+Elyra
+^^^^^
+
+https://github.com/elyra-ai/elyra[`https://github.com/elyra-ai/elyra`]
+
+"Elyra is a set of AI-centric extensions to JupyterLab Notebooks."
+
+fastpages
+^^^^^^^^^
+
+https://github.com/fastai/fastpages[`https://github.com/fastai/fastpages`]
+
+"An easy to use blogging platform, with support for Jupyter notebooks, Word docs, and Markdown.
+fastpages uses GitHub Actions to simplify the process of creating Jekyll blog posts on GitHub Pages from a variety of input formats."
+
+glue-jupyter
+^^^^^^^^^^^^
+
+https://github.com/glue-viz/glue-jupyter[`https://github.com/glue-viz/glue-jupyter`]
+
+"Glue is a Python library to explore relationships within and among datasets. The main interface until now has been based on Qt, but the glue-jupyter package aims to provide a way to use Glue in Jupyter notebooks and Jupyter lab instead."
+
+glue
+++++
+
+http://docs.glueviz.org/en/stable/[`http://docs.glueviz.org/en/stable/`]
+
+"Glue is a Python library to explore relationships within and among related datasets. Its main features include:
+
+* Linked Statistical Graphics. With Glue, users can create scatter plots, histograms and images (2D and 3D) of their data. Glue is focused on the brushing and linking paradigm, where selections in any graph propagate to all others.
+* Flexible linking across data. Glue uses the logical links that exist between different data sets to overlay visualizations of different data, and to propagate selections across data sets. These links are specified by the user, and are arbitrarily flexible.
+* Full scripting capability. Glue is written in Python, and built on top of its standard scientific libraries (i.e., Numpy, Matplotlib, Scipy). Users can easily integrate their own python code for data input, cleaning, and analysis."
+
+ipyannotator
+^^^^^^^^^^^^
+
+https://cfp.jupytercon.com/2020/schedule/presentation/237/ipyannotator-the-infinitely-hackable-annotation-framework/[`https://cfp.jupytercon.com/2020/schedule/presentation/237/ipyannotator-the-infinitely-hackable-annotation-framework/`]
+
+https://github.com/palaimon/ipyannotator[`https://github.com/palaimon/ipyannotator`]
+
+"An infinitely hackable annotation framework."
+
+ipycanvas
+^^^^^^^^^
+
+https://github.com/martinRenou/ipycanvas[`https://github.com/martinRenou/ipycanvas`]
+
+https://ipycanvas.readthedocs.io/en/latest/[`https://ipycanvas.readthedocs.io/en/latest/`]
+
+"ipycanvas is a lightweight, fast and stable library exposing the browser's Canvas API to IPython. It allows you to draw simple primitives directly from Python like text, lines, polygons, arcs, images etc. This simple toolset allows you to draw literally anything."
+
+ipycytoscape
+^^^^^^^^^^^^
+
+https://github.com/QuantStack/ipycytoscape[`https://github.com/QuantStack/ipycytoscape`]
+
+"A widget enabling interactive graph visualization with cytoscape.js in JupyterLab and the Jupyter notebook."
+
+cytoscape.js
+++++++++++++
+
+https://js.cytoscape.org/[`https://js.cytoscape.org/`]
+
+"Graph theory (network) library for visualisation and analysis."
+
+ipympl
+^^^^^^
+
+https://github.com/matplotlib/ipympl[`https://github.com/matplotlib/ipympl`]
+
+"Leveraging the Jupyter interactive widgets framework, ipympl enables the interactive features of matplotlib in the Jupyter notebook and in JupyterLab."
+
+ipyparallel
+^^^^^^^^^^^
+
+https://ipyparallel.readthedocs.io/en/latest/intro.html[`https://ipyparallel.readthedocs.io/en/latest/intro.html`]
+
+"FUCK"
+
+ipysheet
+^^^^^^^^
+
+https://ipysheet.readthedocs.io/en/latest/[`https://ipysheet.readthedocs.io/en/latest/`]
+
+https://github.com/QuantStack/ipysheet[`https://github.com/QuantStack/ipysheet`]
+
+"A spreadsheet for Jupyter notebooks."
+
+ipython-sql
+^^^^^^^^^^^
+
+https://github.com/catherinedevlin/ipython-sql[`https://github.com/catherinedevlin/ipython-sql`]
+
+"Connect to a database, using SQLAlchemy URL connect strings, then issue SQL commands within IPython or IPython Notebook."
+
+ipywidgets
+^^^^^^^^^^
+
+https://ipywidgets.readthedocs.io/en/latest/[`https://ipywidgets.readthedocs.io/en/latest/`]
+
+https://github.com/jupyter-widgets/ipywidgets[`https://github.com/jupyter-widgets/ipywidgets`]
+
+"ipywidgets, also known as jupyter-widgets or simply widgets, are interactive HTML widgets for Jupyter notebooks and the IPython kernel.
+Notebooks come alive when interactive widgets are used. Users gain control of their data and can visualize changes in the data.
+Learning becomes an immersive, fun experience. Researchers can easily see how changing inputs to a model impact the results."
+
+bqplot
+++++++
+
+https://github.com/bqplot/bqplot[`https://github.com/bqplot/bqplot`]
+
+https://bqplot.readthedocs.io/en/latest/[`https://bqplot.readthedocs.io/en/latest/`]
+
+"bqplot is a 2-D visualization system for Jupyter, based on the constructs of the Grammar of Graphics."
+
+ipygany
++++++++
+
+https://github.com/QuantStack/ipygany[`https://github.com/QuantStack/ipygany`]
+
+https://ipygany.readthedocs.io/en/latest/[`https://ipygany.readthedocs.io/en/latest/`]
+
+"Jupyter widgets for 3-D mesh analysis."
+
+ipyleaflet
+++++++++++
+
+https://github.com/jupyter-widgets/ipyleaflet[`https://github.com/jupyter-widgets/ipyleaflet`]
+
+https://ipyleaflet.readthedocs.io/en/latest/[`https://ipyleaflet.readthedocs.io/en/latest/`]
+
+"A Jupyter / Leaflet bridge enabling interactive maps in the Jupyter notebook."
+
+ipyvolume
++++++++++
+
+https://github.com/maartenbreddels/ipyvolume[`https://github.com/maartenbreddels/ipyvolume`]
+
+https://ipyvolume.readthedocs.io/en/latest/index.html[`https://ipyvolume.readthedocs.io/en/latest/index.html`]
+
+"3d plotting for Python in the Jupyter notebook based on IPython widgets using WebGL."
+
+ipywebrtc
++++++++++
+
+https://github.com/maartenbreddels/ipywebrtc[`https://github.com/maartenbreddels/ipywebrtc`]
+
+"WebRTC and MediaStream API exposed in the Jupyter notebook/lab."
+
+pythreejs
++++++++++
+
+https://github.com/jupyter-widgets/pythreejs[`https://github.com/jupyter-widgets/pythreejs`]
+
+"A Python / ThreeJS bridge utilizing the Jupyter widget infrastructure."
+
+jdaviz
+^^^^^^
+
+https://github.com/spacetelescope/jdaviz[`https://github.com/spacetelescope/jdaviz`]
+
+https://jdaviz.readthedocs.io/en/latest/[`https://jdaviz.readthedocs.io/en/latest/`]
+
+"jdaviz is a package of astronomical data analysis visualization tools based on the Jupyter platform. It is one tool that is a part of STScI's larger Data Analysis Tools Ecosystem. These GUI-based tools link data visualization and interactive analysis. They are designed to work within a Jupyter notebook cell, as a standalone desktop application, or as embedded windows within a website -- all with nearly-identical user interfaces."
+
+itkwidgets
+^^^^^^^^^^
+
+https://github.com/InsightSoftwareConsortium/itkwidgets[`https://github.com/InsightSoftwareConsortium/itkwidgets`]
+
+"Interactive Jupyter widgets to visualize images, point sets, and meshes."
+
+Jupyter Book
+^^^^^^^^^^^^
+
+https://beta.jupyterbook.org/intro.html[`https://beta.jupyterbook.org/intro.html`]
+
+https://github.com/firasm/jupyterbook_course_template[`https://github.com/firasm/jupyterbook_course_template`]
+
+"Jupyter Book is an open source project for building beautiful, publication-quality books and documents from computational material."
+
+Jupyter Dash
+^^^^^^^^^^^^
+
+https://github.com/plotly/jupyter-dash[`https://github.com/plotly/jupyter-dash`]
+
+"This library makes it easy to develop Plotly Dash apps interactively from within Jupyter environments (e.g. classic Notebook, JupyterLab, Visual Studio Code notebooks, nteract, PyCharm notebooks, etc.)."
+
+jupyterlab-hdf5
+^^^^^^^^^^^^^^^
+
+https://github.com/jupyterlab/jupyterlab-hdf5[`https://github.com/jupyterlab/jupyterlab-hdf5`]
+
+"Open and explore HDF5 files in JupyterLab. Can handle very large (TB) sized files. New in release v0.5.0, jlab-hdf5 can now open datasets of any dimensionality, from 0 to 32. Any 0D, 1D, or 2D slab of any dataset can easily be selected and displayed using numpy-style index syntax."
+
+jupyterlab-plotly
+^^^^^^^^^^^^^^^^^
+
+https://plotly.com/python/getting-started/[`https://plotly.com/python/getting-started/`]
+
+"The plotly Python library is an interactive, open-source plotting library that supports over 40 unique chart types covering a wide range of statistical, financial, geographic, scientific, and 3-dimensional use-cases.
+
+Built on top of the Plotly JavaScript library (plotly.js), plotly enables Python users to create beautiful interactive web-based visualizations that can be displayed in Jupyter notebooks, saved to standalone HTML files, or served as part of pure Python-built web applications using Dash. The plotly Python library is sometimes referred to as "plotly.py" to differentiate it from the JavaScript library.
+
+Thanks to deep integration with the orca image export utility, plotly also provides great support for non-web contexts including desktop editors (e.g. QtConsole, Spyder, PyCharm) and static document publishing (e.g. exporting notebooks to PDF with high-quality vector images)."
+
+jupyterlab-sos
+^^^^^^^^^^^^^^
+
+https://github.com/vatlab/jupyterlab-sos[`https://github.com/vatlab/jupyterlab-sos`]
+
+"jupyterlab-sos is a JupyterLab extension for the SoS Polyglot Notebook that allows you to use multiple Jupyter kernels in one notebook. It is also a frontend to the SoS Workflow Engine that is designed for daily computational research with both exploratory interactive data analysis and batch data processing."
+
+SoS Notebook
+++++++++++++
+
+https://github.com/vatlab/sos-notebook[`https://github.com/vatlab/sos-notebook`]
+
+"SoS Notebook is a Jupyter kernel that allows the use of multiple kernels in one Jupyter notebook. Using language modules that understand datatypes of underlying languages (modules sos-bash, sos-r, sos-matlab, etc), SoS Notebook allows data exchange among live kernels of supported languages.
+
+SoS Notebook also extends the Jupyter frontend and adds a console panel for the execution of scratch commands and display of intermediate results and progress information, and a number of shortcuts and magics to facilitate interactive data analysis. All these features have been ported to JupyterLab, either in the sos extension jupyterlab-sos or contributed to JupyterLab as core features."
+
+
+jupyter-server-proxy
+^^^^^^^^^^^^^^^^^^^^
+
+https://github.com/jupyterhub/jupyter-server-proxy/[`https://github.com/jupyterhub/jupyter-server-proxy/`]
+
+"Jupyter Server Proxy lets you run arbitrary external processes (such as RStudio, Shiny Server, Syncthing, PostgreSQL, Code Server, etc) alongside your notebook server and provide authenticated web access to them using a path like /rstudio next to others like /lab. Alongside the python package that provides the main functionality, the JupyterLab extension (@jupyterlab/server-proxy) provides buttons in the JupyterLab launcher window to get to RStudio for example."
+
+Jupytext
+^^^^^^^^
+
+https://github.com/mwouts/jupytext[`https://github.com/mwouts/jupytext`]
+
+"Jupytext is a plugin for Jupyter that can save Jupyter notebooks as either
+
+* Markdown files (or MyST Markdown files, or R Markdown documents)
+* Scripts in many languages."
+
+katex-extension
+^^^^^^^^^^^^^^^
+
+https://github.com/jupyterlab/jupyter-renderers/tree/master/packages/katex-extension[`https://github.com/jupyterlab/jupyter-renderers/tree/master/packages/katex-extension`]
+
+"A JupyterLab extension for rendering KaTeX math.
+The default LaTeX renderer in JupyterLab uses MathJax, which, while powerful, can be slow to render complex equations. This extension substitutes the MathJax renderer with the KaTeX renderer. KaTeX is much faster, at the cost of being less full-featured than MathJax. If you want faster math processing and the subset of LaTeX provided by KaTeX is sufficient for your purposes, this may be the extension for you."
+
+mathjax3-extension
+^^^^^^^^^^^^^^^^^^
+
+https://github.com/jupyterlab/jupyter-renderers/tree/master/packages/mathjax3-extension[`https://github.com/jupyterlab/jupyter-renderers/tree/master/packages/mathjax3-extension`]
+
+"A JupyterLab extension for rendering math with MathJax 3.
+The default LaTeX renderer in JupyterLab uses MathJax 2. This extension substitutes the MathJax 2 renderer with the MathJax 3 renderer."
+
+MyST-NB
+^^^^^^^
+
+https://myst-nb.readthedocs.io/en/latest/[`https://myst-nb.readthedocs.io/en/latest/`]
+
+"MyST-NB is a reference implementation of MyST Markdown Notebooks, and an open source tool for working with Jupyter Notebooks in the Sphinx ecosystem. It provides the following primary features:
+
+* Parse ipynb files in Sphinx. Directly convert Jupyter Notebooks into Sphinx documents.
+* Execute and Cache your notebook content. Save time building your documentation without needing to commit your notebook outputs directly into git.
+* Write MyST Markdown. MyST Markdown allows you to write Sphinx roles and directives in markdown.
+* Insert notebook outputs into your content. Generate outputs as you build your documentation, and insert them across pages.
+* Write Jupyter Notebooks entirely with Markdown. You can define the structure of a notebook in pure-text making it more diff-able."
+
+nbconvert
+^^^^^^^^^
+
+https://github.com/jupyter/nbconvert[`https://github.com/jupyter/nbconvert`]
+
+"The nbconvert tool, jupyter nbconvert, converts notebooks to various other formats via Jinja templates. The nbconvert tool allows you to convert an .ipynb notebook file into various static formats including HTML, LaTeX,
+PDF, Reveal JS, Markdown, ReStructured Text, or an executable script."
+
+nbviewer
+^^^^^^^^
+
+http://nbviewer.ipython.org/[+http://nbviewer.ipython.org/+]
+
+A web site that renders notebooks available on other websites.
+
+nteract
+^^^^^^^
+
+https://github.com/nteract/nteract/tree/master/applications/jupyter-extension[`https://github.com/nteract/nteract/tree/master/applications/jupyter-extension`]
+
+"nteract as an extension to the jupyter notebook server."
+
+Perspective
+^^^^^^^^^^^
+
+https://github.com/finos/perspective[`https://github.com/finos/perspective`]
+
+"Perspective is an interactive visualization component for large, real-time datasets. Originally developed for J.P. Morgan's trading business, Perspective makes it simple to build user-configurable analytics entirely in the browser, or in concert with Python and/or JupyterLab. Use it to create reports, dashboards, notebooks and applications, with static data or streaming updates via Apache Arrow."
+
+pydeck
+^^^^^^
+
+https://github.com/visgl/deck.gl/tree/master/bindings/pydeck[`https://github.com/visgl/deck.gl/tree/master/bindings/pydeck`]
+
+i"The pydeck library is a set of Python bindings for making spatial visualizations with deck.gl, optimized for a Jupyter environment."
+
+deck.gl
++++++++
+
+https://deck.gl/[`https://deck.gl/`]
+
+"deck.gl is a WebGL-powered framework for visual exploratory data analysis of large datasets.
+deck.gl allows complex visualizations to be constructed by composing existing layers, and makes it easy to package and share new visualizations as reusable layers.
+By emulating 64 bit floating point computations in the GPU, deck.gl renders datasets with unparalleled accuracy and performance.
+
+deck.gl is a great match with React, supporting efficient WebGL rendering under the Reactive programming paradigm. And when used with Mapbox GL it automatically coordinates with the Mapbox camera system to provide compelling 2D and 3D visualizations on top of your Mapbox based maps."
+
+RISE
+^^^^
+
+https://github.com/damianavila/RISE[+https://github.com/damianavila/RISE+]
+
+A Jupyter slideshow extension also know as +live_reveal+.
+
+vaex-jupyter
+^^^^^^^^^^^^
+
+https://vaex.readthedocs.io/en/latest/tutorial_jupyter.html[`https://vaex.readthedocs.io/en/latest/tutorial_jupyter.html`]
+
+"The vaex-jupyter package contains the building blocks to interactively define an N-dimensional grid, which is then used for visualizations."
+
+Voila
+^^^^^
+
+https://github.com/voila-dashboards/voila[`https://github.com/voila-dashboards/voila`]
+
+https://voila.readthedocs.io/en/stable/[`https://voila.readthedocs.io/en/stable/`]
+
+"Voilà turns Jupyter notebooks into standalone web applications.
+
+Unlike the usual HTML-converted notebooks, each user connecting to the Voilà tornado application gets a dedicated Jupyter kernel which can execute the callbacks to changes in Jupyter interactive widgets."
+
+Examples
+~~~~~~~~
+
+*A Gallery of Interesting Notebooks* - https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks[+https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks+]
+
+JupyterHub
+----------
+
+Installing your own Jupyter server.
+
+https://github.com/jupyterhub/jupyterhub[+https://github.com/jupyterhub/jupyterhub+]
+
+A multi-user server that manages and proxies multiple instances of the single-user
+Jupyter notebook server.
+
+Simple Test Configuration and Test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install the required software.
+
+-----
+npm install -g configurable-http-proxy
+pip3 install jupyterhub
+pip3 install --upgrade notebook
+-----
+
+Start the server.
+
+-----
+jupyterhub
+
+[I 2016-08-11 13:47:41.747 JupyterHub app:622] Loading cookie_secret from /home/baum/jupyterhub_cookie_secret
+[W 2016-08-11 13:47:41.777 JupyterHub app:304] 
+    Generating CONFIGPROXY_AUTH_TOKEN. Restarting the Hub will require restarting the proxy.
+    Set CONFIGPROXY_AUTH_TOKEN env or JupyterHub.proxy_auth_token config to avoid this message.
+    
+[W 2016-08-11 13:47:41.781 JupyterHub app:757] No admin users, admin interface will be unavailable.
+[W 2016-08-11 13:47:41.781 JupyterHub app:758] Add any administrative users to `c.Authenticator.admin_users` in config.
+[I 2016-08-11 13:47:41.782 JupyterHub app:785] Not using whitelist. Any authenticated user will be allowed.
+[I 2016-08-11 13:47:41.797 JupyterHub app:1231] Hub API listening on http://127.0.0.1:8081/hub/
+[E 2016-08-11 13:47:41.801 JupyterHub app:963] Refusing to run JuptyterHub without SSL. If you are terminating SSL in another layer, pass --no-ssl to tell JupyterHub to allow the proxy to listen on HTTP.
+-----
+
+That didn't work, so try the suggested +--no-ssl+.
+
+-----
+jupyterhub --no-ssl
+
+[I 2016-08-11 13:48:34.980 JupyterHub app:622] Loading cookie_secret from /home/baum/jupyterhub_cookie_secret
+[W 2016-08-11 13:48:35.011 JupyterHub app:304] 
+    Generating CONFIGPROXY_AUTH_TOKEN. Restarting the Hub will require restarting the proxy.
+    Set CONFIGPROXY_AUTH_TOKEN env or JupyterHub.proxy_auth_token config to avoid this message.
+    
+[W 2016-08-11 13:48:35.015 JupyterHub app:757] No admin users, admin interface will be unavailable.
+[W 2016-08-11 13:48:35.016 JupyterHub app:758] Add any administrative users to `c.Authenticator.admin_users` in config.
+[I 2016-08-11 13:48:35.016 JupyterHub app:785] Not using whitelist. Any authenticated user will be allowed.
+[I 2016-08-11 13:48:35.032 JupyterHub app:1231] Hub API listening on http://127.0.0.1:8081/hub/
+[W 2016-08-11 13:48:35.035 JupyterHub app:959] Running JupyterHub without SSL. There better be SSL termination happening somewhere else...
+[I 2016-08-11 13:48:35.035 JupyterHub app:968] Starting proxy @ http://*:8000/
+13:48:35.164 - info: [ConfigProxy] Proxying http://*:8000 to http://127.0.0.1:8081
+13:48:35.166 - info: [ConfigProxy] Proxy API at http://127.0.0.1:8001/api/routes
+[I 2016-08-11 13:48:35.241 JupyterHub app:1254] JupyterHub is now running at http://127.0.0.1:8000/
+-----
+
+Test this by sending the browser to:
+
++http://copano.tamu.edu:8000/+
+
+and we have succeeded.
+
+Security
+~~~~~~~~
+
+https://github.com/jupyterhub/jupyterhub/blob/master/docs/source/getting-started.md#security[+https://github.com/jupyterhub/jupyterhub/blob/master/docs/source/getting-started.md#security+]
+
+The default JupyterHub configuration requires SSL encryption (HTTPS) to run.
+
+Signed SSL Certificate
+^^^^^^^^^^^^^^^^^^^^^^
+
+A signed SSL certificate should be obtained and the location specified in the configuration file.
+The configuration file is:
+
++/etc/jupyterhub/jupyterhub_config.py+
+
+The locations of the SSL key and certificate are specified in the file as:
+
+-----
+c.JupyterHub.ssl_key = '/etc/pki/tls/private/copano.tamu.edu.key'
+c.JupyterHub.ssl_cert = '/etc/pki/tls/certs/copano_tamu_edu_cert.cer'
+-----
+
+Cookie Secret
+^^^^^^^^^^^^^
+
+The cookie secret is an encryption key, used to encrypt the browser cookies used for authentication. If this value changes for the Hub, all single-user servers must also be restarted. Normally, this value is stored in a file, the location of which can be specified in a config file as follows:
+
+-----
+c.JupyterHub.cookie_secret_file = '/srv/jupyterhub/cookie_secret'
+-----
+
+This file should be a long random string encoded in MIME Base64.
+This is done via the following:
+
+-----
+mkdir /srv/jupyterhub
+openssl rand -base64 2048 > /srv/jupyterhub/cookie_secret
+chmod 600 /srv/jupyterhub/cookie_secret
+-----
+
+The permissions of the +cookie_secret+ file need to be changed as shown or the server won't start.
+
+Proxy Authentication Token
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Hub authenticates its requests to the Proxy using a secret token that the Hub and Proxy agree upon.
+This string should be a random string, and can be placed in the configuration file via:
+
+-----
+c.JupyterHub.proxy_auth_token = '0bc02bede919e99a26de1e2a7a5aadfaf6228de836ec39a05a6c6942831d8fe5'
+-----
+
+Such a string can be created via:
+
+-----
+openssl rand -hex 32
+-----
+
+Configuring Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The default authenticator used PAM to authenticate users with the username and password they already
+have on the machine on which the server will run.
+You can restrict which users are allowed to log in via:
+
+-----
+c.Authenticator.whitelist = {'larry', 'moe', 'curly'}
+-----
+
+JupyterHub admin users can take actions on the behalf of users such as stopping and restarting their
+serverrs, and adding and removing users from the whitelist.  A set of admin users
+can be established via:
+
+-----
+c.Authenticator.admin_users = {'moe'}
+-----
+
+Logging in With Authentication Set
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now we start the server via:
+
+-----
+jupyterhub -f /etc/jupyterhub/jupyterhub_config.py 
+
+[I 2016-08-11 14:25:42.149 JupyterHub app:622] Loading cookie_secret from /srv/jupyterhub/cookie_secret
+[I 2016-08-11 14:25:42.211 JupyterHub app:785] Not using whitelist. Any authenticated user will be allowed.
+[I 2016-08-11 14:25:42.226 JupyterHub app:1231] Hub API listening on http://127.0.0.1:8081/hub/
+[I 2016-08-11 14:25:42.230 JupyterHub app:968] Starting proxy @ http://*:8000/
+14:25:42.366 - info: [ConfigProxy] Proxying https://*:8000 to http://127.0.0.1:8081
+14:25:42.368 - info: [ConfigProxy] Proxy API at http://127.0.0.1:8001/api/routes
+[I 2016-08-11 14:25:42.437 JupyterHub app:1254] JupyterHub is now running at http://127.0.0.1:8000/
+-----
+
+And when we try to log in via the URL:
+
++https://copano.tamu.edu:8000/+
+
+we get the following additional messages:
+
+-----
+I 2016-08-11 14:35:42.867 JupyterHub spawner:467] Spawning jupyterhub-singleuser --user=baum --port=57235 --cookie-name=jupyter-hub-token-baum --base-url=/user/baum --hub-host= --hub-prefix=/hub/ --hub-api-url=http://127.0.0.1:8081/hub/api --ip=127.0.0.1
+[I 2016-08-11 14:35:43.571 baum notebookapp:1079] Serving notebooks from local directory: /home/baum
+[I 2016-08-11 14:35:43.571 baum notebookapp:1079] 0 active kernels 
+[I 2016-08-11 14:35:43.571 baum notebookapp:1079] The Jupyter Notebook is running at: http://127.0.0.1:57235/user/baum/
+[I 2016-08-11 14:35:43.571 baum notebookapp:1080] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[I 2016-08-11 14:35:43.639 baum log:47] 302 GET /user/baum (127.0.0.1) 1.43ms
+[I 2016-08-11 14:35:43.641 JupyterHub base:306] User baum server took 0.865 seconds to start
+[I 2016-08-11 14:35:43.641 JupyterHub orm:159] Adding user baum to proxy /user/baum => http://127.0.0.1:57235
+[I 2016-08-11 14:35:43.659 JupyterHub log:100] 302 POST /hub/login?next= (@127.0.0.1) 992.52ms
+[I 2016-08-11 14:35:43.660 JupyterHub login:86] User logged in: baum
+[I 2016-08-11 14:35:43.678 baum log:47] 302 GET /user/baum (127.0.0.1) 0.71ms
+[I 2016-08-11 14:35:43.678 JupyterHub log:100] 302 GET /hub/ (baum@127.0.0.1) 7.59ms
+[I 2016-08-11 14:35:43.718 JupyterHub log:100] 200 GET /hub/api/authorizations/cookie/jupyter-hub-token-baum/[secret] (baum@127.0.0.1) 15.22ms
+-----
+
+Logging in as Admin
+~~~~~~~~~~~~~~~~~~~
+
+Users with administration privileges can log in to the admin page via:
+
++https://copano.tamu.edu:8000/admin+
+
+Using sudo to Run JupyterHub Without root Privileges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/jupyterhub/jupyterhub/wiki/Using-sudo-to-run-JupyterHub-without-root-privileges[+https://github.com/jupyterhub/jupyterhub/wiki/Using-sudo-to-run-JupyterHub-without-root-privileges+]
+
+First create a user - preferably without a login shell or password - to run the hub:
+
+-----
+useradd jupyter
+-----
+
+Next, the +sudospawner+ package needs to be installed:
+
+-----
+pip3 install git+https://github.com/jupyter/sudospawner
+-----
+
+NOw give the new user sudo permission to only launch the +sudospawner+ script by
+adding the following to +/etc/sudoers+ via the use of +visudo+:
+
+-----
+# comma-separated whitelist of users that can spawn single-user servers
+Runas_Alias JUPYTER_USERS = baum
+
+# the command(s) the Hub can run on behalf of the above users without needing a password
+# the exact path may differ, depending on how sudospawner was installed
+Cmnd_Alias JUPYTER_CMD = /usr/local/bin/sudospawner
+
+# actually give the Hub user permission to run the above command on behalf
+# of the above users without prompting for a password
+jupyter ALL=(JUPYTER_USERS) NOPASSWD:JUPYTER_CMD
+-----
+
+If you don't want to keep editing the +/etc/sudoers+ file you can replace the
+last line in the above with:
+
+-----
+jupyter ALL=(%jupyterhub) NOPASSWD:JUPYTER_CMD
+-----
+
+where you've created a +jupyterhub+ group via:
+
+-----
+groupadd jupyterhub
+-----
+
+and then just add users to the +jupyterhub+ group via:
+
+-----
+adduser -G jupyterhub newuser
+-----
+
+Test sudo Setup
+~~~~~~~~~~~~~~~
+
+Now test the sudo setup via the following command.
+This should prompt for the +$USER+ password to switch to user +jupyter+, but
+should not prompt for a password for the second switch.
+Note that the string used for the +sudospawner+ command has to exactly
+match that specified in the +/etc/sudoers+ file.
+
+-----
+sudo -u jupyter sudo -n -u $USER /usr/local/bin/sudospawner --help
+
+Usage: /usr/local/bin/sudospawner [OPTIONS]
+
+Options:
+
+  --help                           show this help information
+...
+-----
+
+Make a Directory for JupyterHub and Start the Server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you've not already created the directory:
+
+-----
+/etc/jupyterhub
+-----
+
+into which you've placed the +jupyterhub_config.py+ file, create it now and
+make the owner +jupyter+ via:
+
+-----
+mkdir /etc/jupyterhub
+chown jupyter /etc/jupyterhub
+-----
+
+If you've created a +cookie_secret+ file in +/srv/jupyterhub+ or
+specified a separate JupyterHub log file as +/var/log/jupyterhub+ you
+also have to make +jupyter+ the owner of those via:
+
+-----
+chown -R jupyter /srv/jupyterhub
+chown -R jupyter /var/log/jupyterhub
+-----
+
+Now start the JupyterHub server as user +jupyter+ via:
+
+-----
+cd /etc/jupyterhub
+sudo -u jupyter /usr/local/bin/jupyterhub --JupyterHub.spawner_class=sudospawner.SudoSpawner
+-----
+
+Note that you have to use the full path for the +jupyterhub+ binary, e.g.
++/usr/local/bin/jupyterhub+ in this case.
+
+Note also that if you don't run the command in the directory in which your
+configuration file +jupyterhub_config.py+ is located, then you have to additionally specify the
+location of the file in your command.  If you run it in a different directory the command would be:
+
+-----
+sudo -u jupyter /usr/local/bin/jupyterhub --JupyterHub.spawner_class=sudospawner.SudoSpawner -f /etc/jupyterhub/jupyterhub_config.py
+-----
+
+
+Languages for Jupyter
+---------------------
+
+*IPython Kernels for Other Languages* - https://github.com/ipython/ipython/wiki/IPython%20kernels%20for%20other%20languages[+https://github.com/ipython/ipython/wiki/IPython%20kernels%20for%20other%20languages+]
+
+*Creating Language Kernels for IPython* - http://andrew.gibiansky.com/blog/ipython/ipython-kernels/[+http://andrew.gibiansky.com/blog/ipython/ipython-kernels/+]
+
+*Messaging in IPython* - http://ipython.org/ipython-doc/rel-1.1.0/development/messaging.html[+http://ipython.org/ipython-doc/rel-1.1.0/development/messaging.html+]
+
+This document explains the basic communications design and messaging specification for how the various IPython objects interact over a network transport. The current implementation uses the ZeroMQ library for messaging within and between hosts.
+
+
+Julia
+~~~~~
+
+https://github.com/JuliaLang/IJulia.jl[+https://github.com/JuliaLang/IJulia.jl+]
+
+Installation
+^^^^^^^^^^^^
+
+After installing Julia, run:
+
+-----
+Pkg.add("IJulia")
+
+at the Julia command line prompt.
+-----
+
+Updating
+^^^^^^^^
+
+To update the packages in Julia - including IJulia - run:
+
+-----
+Pkg.update()
+-----
+
+at the command-line prompt.  If a new version of Julia is installed,
+the initial installation procedure must be repeated.
+
+Using
+^^^^^
+
+The IJulia notebook can be invoked either by entering the
+following at the Julia command-line prompt:
+
+-----
+using IJulia
+notebook()
+-----
+
+or by invoking Jupyter and choosing the Julia option
+under the *New* menu.
+
+R Language
+~~~~~~~~~~
+
+https://github.com/IRkernel/IRkernel[+https://github.com/IRkernel/IRkernel+]
+
+Status
+^^^^^^
+
+This is currently (7/15) installed and working on the Jupyterhub installation
+on +terrebonne+.
+
+Installation
+^^^^^^^^^^^^
+
+Stable Snapshot Versions
+++++++++++++++++++++++++
+
+At the R command-line prompt:
+
+-----
+install.packages(c('rzmq','repr','IRkernel','IRdisplay'),
+                 repos = c('http://irkernel.github.io/', getOption('repos')),
+                 type = 'source')
+IRkernel::installspec()
+-----
+
+Development Versions
+++++++++++++++++++++
+
+At the R command-line prompt:
+
+-----
+install.packages('devtools')
+install.packages('RCurl')
+library(devtools)
+install_github('IRkernel/repr')
+install_github('IRkernel/IRdisplay')
+install_github('IRkernel/IRkernel')
+IRkernel::installspec()
+-----
+
+These versions can be update by repeating the
++install_github('IRkernel/...')+ steps.
+
+Using
+-----
+
+The +IRkernel+ can be invoked either from the dropdown
+*New* menu on the Jupyterhub page, or by invoking
+Jupyter via:
+
+-----
+ipython console --kernel=ir
+ipython qtconsole --kernel=ir
+-----
+
+nbgrader
+--------
+
+https://nbgrader.readthedocs.io/en/latest/index.html[+https://nbgrader.readthedocs.io/en/latest/index.html+]
+
+Installation
+~~~~~~~~~~~~
+
+Steps taken for copano.
+
+Install +nbgrader+ and put in on the binary path.
+
+-----
+su
+pip3 install nbgrader
+ln -s /opt/anaconda3/bin/nbgrader /usr/bin/nbgrader
+-----
+
+Install the extensions systemwide and activate them.
+
+-----
+nbgrader extension install
+nbgrader extension activate
+-----
+
+To avoid reinstalling the extension when +nbgrader+ is updated.
+
+-----
+nbgrader extension install --symlink
+-----
+
++nbgrader extension install+ Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-----
+sudo -i -u jupyter
+nbgrader extension install --help-all
+Install the nbgrader extensions
+
+Options
+-------
+
+Arguments that take values are actually convenience aliases to full
+Configurables, whose aliases are listed on the help line. For more information
+on full configurables, see '--help-all'.
+
+--overwrite
+    Force overwrite of existing files
+--sys-prefix
+    Use sys.prefix as the prefix for installing nbextensions (for environments, packaging)
+-s
+    Create symlink instead of copying files
+--user
+    Apply the operation only for the given user
+--debug
+    set log level to logging.DEBUG (maximize logging output)
+--system
+    Apply the operation system-wide
+--py
+    Install from a Python package
+--symlink
+    Create symlink instead of copying files
+--python
+    Install from a Python package
+--prefix=<Unicode> (InstallNBExtensionApp.prefix)
+    Default: ''
+    Installation prefix
+--nbextensions=<Unicode> (InstallNBExtensionApp.nbextensions_dir)
+    Default: ''
+    Full path to nbextensions dir (probably use prefix or user)
+--destination=<Unicode> (InstallNBExtensionApp.destination)
+    Default: ''
+    Destination for the copy or symlink
+
+Class parameters
+----------------
+
+Parameters are set from command-line arguments of the form:
+`--Class.trait=value`. This line is evaluated in Python, so simple expressions
+are allowed, e.g.:: `--C.a='range(3)'` For setting C.a=[0,1,2].
+
+ExtensionInstallApp options
+---------------------------
+--ExtensionInstallApp.answer_yes=<Bool>
+    Default: False
+    Answer yes to any prompts.
+--ExtensionInstallApp.assignment_id=<Unicode>
+    Default: ''
+    The assignment name. This MUST be specified, either by setting the config
+    option, passing an argument on the command line, or using the --assignment
+    option on the command line.
+--ExtensionInstallApp.autograded_directory=<Unicode>
+    Default: 'autograded'
+    The name of the directory that contains assignment submissions after they
+    have been autograded. This corresponds to the `nbgrader_step` variable in
+    the `directory_structure` config option.
+--ExtensionInstallApp.config_file=<Unicode>
+    Default: ''
+    Full path of a config file.
+--ExtensionInstallApp.config_file_name=<Unicode>
+    Default: ''
+    Specify a config file to load.
+--ExtensionInstallApp.course_directory=<Unicode>
+    Default: ''
+    The root directory for the course files (that includes the `source`,
+    `release`, `submitted`, `autograded`, etc. directories). Defaults to the
+    current working directory.
+--ExtensionInstallApp.course_id=<Unicode>
+    Default: ''
+    A key that is unique per instructor and course. This MUST be specified,
+    either by setting the config option, or using the --course option on the
+    command line.
+--ExtensionInstallApp.db_assignments=<List>
+    Default: []
+    A list of assignments that will be created in the database. Each item in the
+    list should be a dictionary with the following keys:
+        - name
+        - duedate (optional)
+    The values will be stored in the database. Please see the API documentation
+    on the `Assignment` database model for details on these fields.
+--ExtensionInstallApp.db_students=<List>
+    Default: []
+    A list of student that will be created in the database. Each item in the
+    list should be a dictionary with the following keys:
+        - id
+        - first_name (optional)
+        - last_name (optional)
+        - email (optional)
+    The values will be stored in the database. Please see the API documentation
+    on the `Student` database model for details on these fields.
+--ExtensionInstallApp.db_url=<Unicode>
+    Default: ''
+    URL to the database. Defaults to sqlite:///<course_directory>/gradebook.db,
+    where <course_directory> is another configurable variable.
+--ExtensionInstallApp.directory_structure=<Unicode>
+    Default: '{nbgrader_step}/{student_id}/{assignment_id}'
+    Format string for the directory structure that nbgrader works over during
+    the grading process. This MUST contain named keys for 'nbgrader_step',
+    'student_id', and 'assignment_id'. It SHOULD NOT contain a key for
+    'notebook_id', as this will be automatically joined with the rest of the
+    path.
+--ExtensionInstallApp.feedback_directory=<Unicode>
+    Default: 'feedback'
+    The name of the directory that contains assignment feedback after grading
+    has been completed. This corresponds to the `nbgrader_step` variable in the
+    `directory_structure` config option.
+--ExtensionInstallApp.generate_config=<Bool>
+    Default: False
+    Generate default config file.
+--ExtensionInstallApp.ignore=<List>
+    Default: ['.ipynb_checkpoints', '*.pyc', '__pycache__']
+    List of file names or file globs to be ignored when copying directories.
+--ExtensionInstallApp.log_datefmt=<Unicode>
+    Default: '%Y-%m-%d %H:%M:%S'
+    The date format used by logging formatters for %(asctime)s
+--ExtensionInstallApp.log_format=<Unicode>
+    Default: '[%(name)s]%(highlevel)s %(message)s'
+    The Logging format template
+--ExtensionInstallApp.log_level=<Enum>
+    Default: 30
+    Choices: (0, 10, 20, 30, 40, 50, 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL')
+    Set the log level by value or name.
+--ExtensionInstallApp.logfile=<Unicode>
+    Default: '.nbgrader.log'
+    Name of the logfile to log to.
+--ExtensionInstallApp.nbextensions_dir=<Unicode>
+    Default: ''
+    Full path to nbextensions dir (probably use prefix or user)
+--ExtensionInstallApp.notebook_id=<Unicode>
+    Default: '*'
+    File glob to match notebook names, excluding the '.ipynb' extension. This
+    can be changed to filter by notebook.
+--ExtensionInstallApp.overwrite=<Bool>
+    Default: False
+    Force overwrite of existing files
+--ExtensionInstallApp.prefix=<Unicode>
+    Default: ''
+    Installation prefix
+--ExtensionInstallApp.python=<Bool>
+    Default: False
+    Install from a Python package
+--ExtensionInstallApp.release_directory=<Unicode>
+    Default: 'release'
+    The name of the directory that contains the version of the assignment that
+    will be released to students. This corresponds to the `nbgrader_step`
+    variable in the `directory_structure` config option.
+--ExtensionInstallApp.source_directory=<Unicode>
+    Default: 'source'
+    The name of the directory that contains the master/instructor version of
+    assignments. This corresponds to the `nbgrader_step` variable in the
+    `directory_structure` config option.
+--ExtensionInstallApp.student_id=<Unicode>
+    Default: '*'
+    File glob to match student IDs. This can be changed to filter by student.
+    Note: this is always changed to '.' when running `nbgrader assign`, as the
+    assign step doesn't have any student ID associated with it.
+--ExtensionInstallApp.submitted_directory=<Unicode>
+    Default: 'submitted'
+    The name of the directory that contains assignments that have been submitted
+    by students for grading. This corresponds to the `nbgrader_step` variable in
+    the `directory_structure` config option.
+--ExtensionInstallApp.symlink=<Bool>
+    Default: False
+    Create symlinks instead of copying files
+--ExtensionInstallApp.sys_prefix=<Bool>
+    Default: False
+    Use the sys.prefix as the prefix
+--ExtensionInstallApp.user=<Bool>
+    Default: False
+    Whether to do a user install
+--ExtensionInstallApp.verbose=<Any>
+    Default: None
+    DEPRECATED: Verbosity level
+
+InstallNBExtensionApp options
+-----------------------------
+--InstallNBExtensionApp.answer_yes=<Bool>
+    Default: False
+    Answer yes to any prompts.
+--InstallNBExtensionApp.config_file=<Unicode>
+    Default: ''
+    Full path of a config file.
+--InstallNBExtensionApp.config_file_name=<Unicode>
+    Default: ''
+    Specify a config file to load.
+--InstallNBExtensionApp.destination=<Unicode>
+    Default: ''
+    Destination for the copy or symlink
+--InstallNBExtensionApp.generate_config=<Bool>
+    Default: False
+    Generate default config file.
+--InstallNBExtensionApp.log_datefmt=<Unicode>
+    Default: '%Y-%m-%d %H:%M:%S'
+    The date format used by logging formatters for %(asctime)s
+--InstallNBExtensionApp.log_format=<Unicode>
+    Default: '[%(name)s]%(highlevel)s %(message)s'
+    The Logging format template
+--InstallNBExtensionApp.log_level=<Enum>
+    Default: 30
+    Choices: (0, 10, 20, 30, 40, 50, 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL')
+    Set the log level by value or name.
+--InstallNBExtensionApp.nbextensions_dir=<Unicode>
+    Default: ''
+    Full path to nbextensions dir (probably use prefix or user)
+--InstallNBExtensionApp.overwrite=<Bool>
+    Default: False
+    Force overwrite of existing files
+--InstallNBExtensionApp.prefix=<Unicode>
+    Default: ''
+    Installation prefix
+--InstallNBExtensionApp.python=<Bool>
+    Default: False
+    Install from a Python package
+--InstallNBExtensionApp.symlink=<Bool>
+    Default: False
+    Create symlinks instead of copying files
+--InstallNBExtensionApp.sys_prefix=<Bool>
+    Default: False
+    Use the sys.prefix as the prefix
+--InstallNBExtensionApp.user=<Bool>
+    Default: False
+    Whether to do a user install
+--InstallNBExtensionApp.verbose=<Any>
+    Default: None
+    DEPRECATED: Verbosity level
+
+Examples
+--------
+
+    nbgrader extension install
+    nbgrader extension install --user
+    nbgrader extension install --prefix=/path/to/prefix
+    nbgrader extension install --nbextensions=/path/to/nbextensions
+-----
+
+Using Quick Start to Set Up a Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Get a quick start and create an example directory with example course files by
+using the +nbgrader quickstart+ command.
+In this example +test001+ is the course identification number, and we create a
++courses+ subdirectory in which to keep all courses.
+
+-----
+mkdir courses
+cd courses
+nbgrader quickstart test001
+[QuickStartApp | INFO] Creating directory '/home/baum/courses/test001'...
+[QuickStartApp | INFO] Copying example from the user guide...
+[QuickStartApp | INFO] Generating example config file...
+[QuickStartApp | INFO] Done! The course files are located in '/home/baum/courses/test001'.
+    
+    To get started, you can edit the source notebooks located in:
+    
+        /home/baum/courses/test001/source/ps1
+    
+    Once you have edited them to your satisfaction, you can create
+    the student version by running `nbgrader assign ps1` from the
+    '/home/baum/courses/test001' directory.
+    
+    For further details, please see the full nbgrader documentation at:
+    
+        http://nbgrader.readthedocs.org/
+-----
+
+This will create the following directory structure in the +courses+ directory:
+
+-----
+test001/:
+total 32
+-rw-rw-r--. 1 baum baum 24604 Sep  6 10:29 nbgrader_config.py
+drwxr-xr-x. 3 baum baum  4096 Aug 31 14:57 source
+
+test001/source:
+total 8
+-rw-r--r--. 1 baum baum 1030 Jun 25 03:36 header.ipynb
+drwxr-xr-x. 2 baum baum 4096 Aug 31 14:57 ps1
+
+test001/source/ps1:
+total 20
+-rw-r--r--. 1 baum baum 5733 Jun 25 03:36 jupyter.png
+-rw-r--r--. 1 baum baum 6766 Jun 25 03:36 problem1.ipynb
+-rw-r--r--. 1 baum baum 1857 Jun 25 03:36 problem2.ipynb
+-----
+
++quickstart+ Options
+^^^^^^^^^^^^^^^^^^^^
+
+-----
+QuickStartApp options
+---------------------
+nbgrader quickstart --help-all
+Create an example class files directory with an example config file and                                                      
+assignment                                                                                                                   
+                                                                                                                             
+Options                                                                                                                      
+-------                                                                                                                      
+                                                                                                                             
+Arguments that take values are actually convenience aliases to full                                                          
+Configurables, whose aliases are listed on the help line. For more information                                               
+on full configurables, see '--help-all'.                                                                                     
+                                                                                                                             
+--force                                                                                                                      
+    Overwrite existing files if they already exist. WARNING: this is                                                         
+    equivalent to doing:                                                                                                     
+                                                                                                                             
+        rm -r <course_id>                                                                                                    
+        nbgrader quickstart <course_id>                                                                                      
+                                                                                                                             
+    So be careful when using this flag!
+
+NbGrader options                                                                                                             
+----------------
+--NbGrader.answer_yes=<Bool>                                                                                                 
+    Default: False                                                                                                           
+    Answer yes to any prompts.
+...
+--NbGrader.submitted_directory=<Unicode>
+    Default: 'submitted'
+    The name of the directory that contains assignments that have been submitted
+    by students for grading. This corresponds to the `nbgrader_step` variable in
+    the `directory_structure` config option.
+
+QuickStartApp options
+---------------------
+--QuickStartApp.answer_yes=<Bool>
+    Default: False
+    Answer yes to any prompts.
+--QuickStartApp.assignment_id=<Unicode>
+    Default: ''
+    The assignment name. This MUST be specified, either by setting the config
+    option, passing an argument on the command line, or using the --assignment
+    option on the command line.
+--QuickStartApp.autograded_directory=<Unicode>
+    Default: 'autograded'
+    The name of the directory that contains assignment submissions after they
+    have been autograded. This corresponds to the `nbgrader_step` variable in
+    the `directory_structure` config option.
+--QuickStartApp.config_file=<Unicode>
+    Default: ''
+    Full path of a config file.
+--QuickStartApp.config_file_name=<Unicode>
+    Default: ''
+    Specify a config file to load.
+--QuickStartApp.course_directory=<Unicode>
+    Default: ''
+    The root directory for the course files (that includes the `source`,
+    `release`, `submitted`, `autograded`, etc. directories). Defaults to the
+    current working directory.
+--QuickStartApp.course_id=<Unicode>
+    Default: ''
+    A key that is unique per instructor and course. This MUST be specified,
+    either by setting the config option, or using the --course option on the
+    command line.
+--QuickStartApp.db_assignments=<List>
+    Default: []
+    A list of assignments that will be created in the database. Each item in the
+    list should be a dictionary with the following keys:
+        - name
+        - duedate (optional)
+    The values will be stored in the database. Please see the API documentation
+    on the `Assignment` database model for details on these fields.
+--QuickStartApp.db_students=<List>
+    Default: []
+    A list of student that will be created in the database. Each item in the
+    list should be a dictionary with the following keys:
+        - id
+        - first_name (optional)
+        - last_name (optional)
+        - email (optional)
+    The values will be stored in the database. Please see the API documentation
+    on the `Student` database model for details on these fields.
+--QuickStartApp.db_url=<Unicode>
+    Default: ''
+    URL to the database. Defaults to sqlite:///<course_directory>/gradebook.db,
+    where <course_directory> is another configurable variable.
+--QuickStartApp.directory_structure=<Unicode>
+    Default: '{nbgrader_step}/{student_id}/{assignment_id}'
+    Format string for the directory structure that nbgrader works over during
+    the grading process. This MUST contain named keys for 'nbgrader_step',
+    'student_id', and 'assignment_id'. It SHOULD NOT contain a key for
+    'notebook_id', as this will be automatically joined with the rest of the
+    path.
+--QuickStartApp.feedback_directory=<Unicode>
+    Default: 'feedback'
+    The name of the directory that contains assignment feedback after grading
+    has been completed. This corresponds to the `nbgrader_step` variable in the
+    `directory_structure` config option.
+--QuickStartApp.force=<Bool>
+    Default: False
+    Whether to overwrite existing files
+--QuickStartApp.generate_config=<Bool>
+    Default: False
+    Generate default config file.
+--QuickStartApp.ignore=<List>
+    Default: ['.ipynb_checkpoints', '*.pyc', '__pycache__']
+    List of file names or file globs to be ignored when copying directories.
+--QuickStartApp.log_datefmt=<Unicode>
+    Default: '%Y-%m-%d %H:%M:%S'
+    The date format used by logging formatters for %(asctime)s
+--QuickStartApp.log_format=<Unicode>
+    Default: '[%(name)s]%(highlevel)s %(message)s'
+    The Logging format template
+--QuickStartApp.log_level=<Enum>
+    Default: 30
+    Choices: (0, 10, 20, 30, 40, 50, 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL')
+    Set the log level by value or name.
+--QuickStartApp.logfile=<Unicode>
+    Default: '.nbgrader.log'
+    Name of the logfile to log to.
+--QuickStartApp.notebook_id=<Unicode>
+    Default: '*'
+    File glob to match notebook names, excluding the '.ipynb' extension. This
+    can be changed to filter by notebook.
+--QuickStartApp.release_directory=<Unicode>
+    Default: 'release'
+    The name of the directory that contains the version of the assignment that
+    will be released to students. This corresponds to the `nbgrader_step`
+    variable in the `directory_structure` config option.
+--QuickStartApp.source_directory=<Unicode>
+    Default: 'source'
+    The name of the directory that contains the master/instructor version of
+    assignments. This corresponds to the `nbgrader_step` variable in the
+    `directory_structure` config option.
+--QuickStartApp.student_id=<Unicode>
+    Default: '*'
+    File glob to match student IDs. This can be changed to filter by student.
+    Note: this is always changed to '.' when running `nbgrader assign`, as the
+    assign step doesn't have any student ID associated with it.
+--QuickStartApp.submitted_directory=<Unicode>
+    Default: 'submitted'
+    The name of the directory that contains assignments that have been submitted
+    by students for grading. This corresponds to the `nbgrader_step` variable in
+    the `directory_structure` config option.
+
+Examples
+--------
+
+    You can run `nbgrader quickstart` just on its own from where ever you
+    would like to create the example class files directory. It takes just
+    one argument, which is the name of your course:
+    
+        nbgrader quickstart course101
+    
+    Note that this class name need not necessarily be the same as the
+    `NbGrader.course_id` configuration option, however by default, the
+    quickstart command will set `NbGrader.course_id` to be the name you give
+    on the command line. If you want to use a different folder name, go
+    ahead and just provide the name of the folder where your class files
+    will be stored, e.g.:
+    
+        nbgrader quickstart "World Music"
+    
+    and then after running the quickstart commmand, you can edit the
+    `nbgrader_config.py` file to change `NbGrader.course_id`.
+-----
+
+Using nbgrader with Jupyterhub and SSL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://nbgrader.readthedocs.io/en/latest/configuration/jupyterhub_config.html[+https://nbgrader.readthedocs.io/en/latest/configuration/jupyterhub_config.html+]
+
+Configuring the +nbgrader_config.py+ File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The directory for each course created using +nbgrader quickstart+ contains
+a configuration file called +nbgrader_config.py+.
+
+The first part of the file is created by +quickstart+ and contains:
+
+* a +course_id+ to distinguish this course from others
+* a sample assignmnet +ps1+
+* a contrived list of students
+
+Its form is show below.
+
+-----
+c = get_config()
+
+###############################################################################
+# Begin additions by nbgrader quickstart
+###############################################################################
+
+# You only need this if you are running nbgrader on a shared
+# server set up.
+c.NbGrader.course_id = "test001"
+
+# Update this list with other assignments you want
+c.NbGrader.db_assignments = [dict(name="ps1")]
+
+# Change the students in this list with that actual students in
+# your course
+c.NbGrader.db_students = [
+    dict(id="bitdiddle", first_name="Ben", last_name="Bitdiddle"),
+    dict(id="hacker", first_name="Alyssa", last_name="Hacker"),
+    dict(id="reasoner", first_name="Louis", last_name="Reasoner")
+]
+
+###############################################################################
+# End additions by nbgrader quickstart
+###############################################################################
+-----
+
+This is followed by a dizzying array of dozens of further options that can be uncommented
+and specified as desired.
+Only a small subset of these need to set for interoperability with Jupyterhub, though.
+
+The Quick and Easy Way to Start and Use nbgrader and formgrader
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, set up your +nbgrader_config.py+ file as in the following where:
+
+* +ocng0001+ is replaced by the name of your class
+* +baum+ is replaced by a list of your graders
+
+The rest should stay the same.
+
+-----
+import os
+
+c = get_config()
+
+c.NbGrader.course_id = "ocng0001"
+c.TransferApp.exchange_directory = "/tmp/exchange"
+c.NbGrader.db_assignments = [dict(name="ps1")]
+c.NbGrader.db_students = [
+    dict(id="bitdiddle", first_name="Ben", last_name="Bitdiddle"),
+    dict(id="hacker", first_name="Alyssa", last_name="Hacker"),
+    dict(id="reasoner", first_name="Louis", last_name="Reasoner")
+]
+
+c.FormgradeApp.ip = "127.0.0.1"
+c.FormgradeApp.port = 9000
+c.FormgradeApp.authenticator_class = "nbgrader.auth.hubauth.HubAuth"
+c.HubAuth.hub_base_url = "https://localhost:8000"
+c.HubAuth.notebook_url_prefix = "ocng0001"
+c.HubAuth.graders = ["baum"]
+c.HubAuth.hub_db = "/etc/jupyterhub/jupyterhub.sqlite"
+c.HubAuth.hubapi_token = os.environ['JPY_API_TOKEN']
+-----
+
+The authorization token +JPY_API_TOKEN+ must be set as user +jupyter+ and
+then exported for use by the other user, in this case +baum+, which should
+be changed to whatever username is doing this.
+
+-----
+sudo -i -u jupyter
+[password]
+export CONFIGPROXY_AUTH_TOKEN='[token goes here]'
+export JPY_API_TOKEN=$(/usr/local/bin/jupyterhub token --db=sqlite:////etc/jupyterhub/jupyterhub.sqlite -f /etc/jupyterhub/jupyterhub_config.py baum)
+env | grep JPY
+JPY_API_TOKEN=[token]
+exit
+export JPY_API_TOKEN=[token]
+nbgrader formgrade
+-----
+
+This should churn out something like the following:
+
+-----
+[FormgradeApp | WARNING] Config option `hub_db` not recognized by `HubAuth`.
+[FormgradeApp | INFO] Proxying /hub/nbgrader/ocng0001 --> http://127.0.0.1:9000
+[FormgradeApp | INFO] Serving MathJax from /opt/anaconda3/lib/python3.5/site-packages/notebook/static/components/MathJax/MathJax.js
+[FormgradeApp | INFO] Form grader running at http://127.0.0.1:9000/
+[FormgradeApp | INFO] Use Control-C to stop this server
+[FormgradeApp | INFO] 304 GET /hub/nbgrader/ocng0001 (127.0.0.1) 104.74ms
+-----
+
+Now go to the following URL:
+
+-----
+https://copano.tamu.edu:8000/hub/nbgrader/ocng0001
+-----
+
+where once again +ocng0001+ is changed to the name of your course.
+
+
+Extraneous Stuff to Be Ignored
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://nbgrader.readthedocs.io/en/latest/configuration/jupyterhub_config.html[+https://nbgrader.readthedocs.io/en/latest/configuration/jupyterhub_config.html+]
+
+and is:
+
+-----
+## Options that are specific to the formgrader and integrating it with JuptyerHub:
+
+c.FormgradeApp.ip = "127.0.0.1"
+c.FormgradeApp.port = 9000
+c.FormgradeApp.authenticator_class = "nbgrader.auth.hubauth.HubAuth"
+
+# This is the actual URL or public IP address where JupyterHub is running (by
+# default, the HubAuth will just use the same address as what the formgrader is
+# running on -- so in this case, 127.0.0.1). If you have JupyterHub behind a
+# domain name, you probably want to set that here.
+c.HubAuth.hub_address = "127.0.0.1"
+
+# Change this to be the path to the user guide folder in your clone of
+# nbgrader, or just wherever you have your class files. This is relative
+# to the root of the notebook server launched by JupyterHub, which is
+# probably your home directory. This is used for accessing the *live*
+# version of notebooks via JupyterHub. If you don't want to access the
+# live notebooks and are fine with just the static interface provided by
+# the formgrader, then you can ignore this option.
+c.HubAuth.notebook_url_prefix = "path/to/class_files"
+
+# Change this to be the list of unix usernames that are allowed to access
+# the formgrader.
+c.HubAuth.graders = ["instructor1", "instructor2"]
+
+# This loads the environment variable containing the hubapi token that we will
+# generate by running the `jupyterhub token <name>` command, just before we
+# actually launch the formgrader.
+c.HubAuth.hubapi_token = os.environ['JPY_API_TOKEN']
+-----
+
+SSL and nbgrader
+~~~~~~~~~~~~~~~~
+
+There are additional hoops that must be traversed if SSL enters the
+Jupyterhub/nbgrader mix.
+
+Configuration Files
+^^^^^^^^^^^^^^^^^^^
+
+Prototype
++++++++++
+
+An example of +jupyterhub_config.py+ and +nbgrader_config.py+ files that are
+apparently successful can be found at:
+
+https://github.com/jupyter/nbgrader/issues/400[+https://github.com/jupyter/nbgrader/issues/400+]
+
+The +jupyterhub_config.py+ file is:
+
+-----
+c = get_config()
+c.JupyterHub.ssl_cert = './jupyterhub_cert.pem'
+c.JupyterHub.ssl_key = './jupyterhub_key.pem'
+c.JupyterHub.proxy_auth_token = 'foo'
+c.Authenticator.admin_users = ['jhamrick']
+c.Authenticator.whitelist = ['jhamrick']
+-----
+
+The +nbgrader_config.py+ file is:
+
+-----
+c = get_config()
+c.NbGrader.course_id = "example_course"
+c.TransferApp.exchange_directory = "/tmp/exchange"
+c.FormgradeApp.ip = "127.0.0.1"
+c.FormgradeApp.port = 9000
+c.FormgradeApp.authenticator_class = "nbgrader.auth.hubauth.HubAuth"
+c.HubAuth.hub_base_url = "https://localhost:8000"
+c.HubAuth.notebook_url_prefix = "path/to/class_files"
+c.HubAuth.graders = ["jhamrick"]
+c.HubAuth.generate_hubapi_token = True
+c.HubAuth.hub_db = "/tmp/jupyterhub/jupyterhub.sqlite"
+-----
+
+Local Example
++++++++++++++
+
+The +nbgrader_config.py+ file is:
+
+-----
+c.NbGrader.course_id = "ocng0001"
+c.TransferApp.exchange_directory = "/tmp/exchange"
+c.NbGrader.db_assignments = [dict(name="ps1")]
+c.NbGrader.db_students = [
+    dict(id="bitdiddle", first_name="Ben", last_name="Bitdiddle"),
+    dict(id="hacker", first_name="Alyssa", last_name="Hacker"),
+    dict(id="reasoner", first_name="Louis", last_name="Reasoner")
+]
+c.FormgradeApp.ip = "copano.tamu.edu"
+c.FormgradeApp.port = 9000
+c.FormgradeApp.authenticator_class = "nbgrader.auth.hubauth.HubAuth"
+c.HubAuth.hub_base_url = "https://copano.tamu.edu:8000"
+c.HubAuth.notebook_url_prefix = "ocng0001"
+c.HubAuth.graders = ["baum"]
+c.HubAuth.generate_hubapi_token = True
+c.HubAuth.hub_db = "/etc/jupyterhub/jupyterhub.sqlite"
+-----
+
+
+And now we run the form grader:
+
+-----
+nbgrader formgrade
+[FormgradeApp | INFO] Serving MathJax from /opt/anaconda3/lib/python3.5/site-packages/notebook/static/components/MathJax/MathJax.js
+[FormgradeApp | INFO] Form grader running at http://localhost:5000/
+[FormgradeApp | INFO] Use Control-C to stop this server
+[W 12:46:47.218 FormgradeNotebookApp] Unrecognized JSON config file version, assuming version 1
+[I 12:46:47.812 FormgradeNotebookApp] [nb_conda_kernels] enabled, 3 kernels found
+[I 12:46:48.239 FormgradeNotebookApp] [nb_anacondacloud] enabled
+[I 12:46:48.288 FormgradeNotebookApp] ✓ nbpresent HTML export ENABLED
+[W 12:46:48.288 FormgradeNotebookApp] ✗ nbpresent PDF export DISABLED: No module named 'nbbrowserpdf'
+[I 12:46:48.291 FormgradeNotebookApp] [nb_conda] enabled
+[I 12:46:48.299 FormgradeNotebookApp] Serving notebooks from local directory: /etc/jupyterhub
+[I 12:46:48.299 FormgradeNotebookApp] 0 active kernels 
+[I 12:46:48.299 FormgradeNotebookApp] The Jupyter Notebook is running at: http://localhost:39609/
+[I 12:46:48.299 FormgradeNotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+-----
+
+The official documentation at:
+
+https://nbgrader.readthedocs.io/en/latest/configuration/jupyterhub_config.html[+https://nbgrader.readthedocs.io/en/latest/configuration/jupyterhub_config.html+]
+
+tells us that this launches the formgrader, which can then be accessed from:
+
+-----
+copano.tamu.edu:8000/hub/nbgrader/ocng0001
+-----
+
+Problems
+~~~~~~~~
+
+The present state of +nbgrader_config.py+ is
+
+-----
+c.FormgradeApp.ip = "copano.tamu.edu"
+c.FormgradeApp.port = 9000
+c.FormgradeApp.authenticator_class = "nbgrader.auth.hubauth.HubAuth"
+c.HubAuth.hub_base_url = "https://copano.tamu.edu:8000"
+c.HubAuth.notebook_url_prefix = "ocng0001"
+c.HubAuth.graders = ["baum"]
+c.HubAuth.generate_hubapi_token = True
+c.HubAuth.hub_db = "/etc/jupyterhub/jupyterhub.sqlite"
+-----
+
+
+Examples
+~~~~~~~~
+
+Wrong URL
+^^^^^^^^^
+
+https://github.com/jupyter/nbgrader/issues/516[+https://github.com/jupyter/nbgrader/issues/516+]
+
+The +nbgrader_config.py+ file:
+
+-----
+c = get_config()
+
+c.NbGrader.course_id = 'sts437'
+c.FormgradeApp.authenticator_class = u'nbgrader.auth.hubauth.HubAuth'
+c.FormgradeApp.port = 5005
+c.HubAuth.proxy_token = u'xxxxxxxxxxxx'
+c.HubAuth.hubapi_token = u'u'xxxxxxxxxxxx'
+c.HubAuth.hub_base_url = u'https://www.example.com'
+c.HubAuth.notebook_url_prefix = u'/home/randy3k/nbgrader/sts437'
+c.HubAuth.graders = ['randy3k']
+
+c.NbGrader.db_assignments = [dict(name="hw1")]
+c.NbGrader.db_students = [
+    dict(id="shingx1")
+]
+-----
+
+Running +nbgrader formgrade+:
+
+-----
+[FormgradeApp | INFO] Proxying /hub/nbgrader/sts437 --> http://localhost:5005
+[FormgradeApp | INFO] Serving MathJax from /opt/conda/lib/python3.5/site-packages/notebook/static/components/MathJax/MathJax.js
+[FormgradeApp | INFO] Form grader running at http://localhost:5005/
+[FormgradeApp | INFO] Use Control-C to stop this server
+[FormgradeApp | WARNING] 404 GET / (127.0.0.1) 1.61ms
+-----
+
+Accessing via:
+
++localhost:5005+
+
+didn't wor, but accessing via:
+
++https://www.example.com/hub/nbgrader/sts437+
+
+did work.
+
+
+

@@ -1,0 +1,2111 @@
+GCOOS-Related Datasets at IMARS
+===============================
+Steven K. Baum
+v0.5, 2013-02-18
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+Documentation about GCOOS-specific datasets at IMARS.  The aims of this
+document are to provide:
+
+* a xref:summary[summary] GCOOS-related files available on the IMARS FTP and THREDDS
+servers;
+* an xref:dataset_details[overview] of what is contained within each type of dataset file;
+* xref:products[pointers] to where information about the products/variables within the
+files can be found.
+
+The majority of files are available via the FTP site:
+
+ftp://imars.marine.usf.edu/[+ftp://imars.marine.usf.edu/+]
+
+with a limited subset also available via a THREDDS server:
+
+http://imars.marine.usf.edu:8080/thredds/catalog.html[+http://imars.marine.usf.edu:8080/thredds/catalog.html+]
+
+The following xref:summary[summary] section lists the GCOOS-related subdirectories on the
+FTP site, and adds a link to the THREDDS server when available.
+Details about the datasets are available in the xref:dataset_details[dataset details] section.
+Details about the provenance of the variables contained within the dataset
+files can be found in the xref:products[products] section.
+
+
+The total size of all daily, weekly, monthly and yearly final OC,
+SST, SST4 and NPP files is under 0.5 Tb.  The intermediate files are
+not included in this estimate.
+
+
+
+[[summary]]
+Summary
+-------
+
+GCOOS-Related Directories at IMARS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These are the GCOOS-related directories found under the following FTP
+directories at the IMARS site:
+
+ftp://imars.marine.usf.edu/modis/imars/final/[+ftp://imars.marine.usf.edu/modis/imars/final/+]
+
+ftp://imars.marine.usf.edu/avhrr/imars/final/[+ftp://imars.marine.usf.edu/avhrr/imars/final/+]
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/[+ftp://imars.marine.usf.edu/seawifs/imars/final/+]
+
+ftp://imars.marine.usf.edu/viirs/imars/final/[+ftp://imars.marine.usf.edu/viirs/imars/final/+]
+
+These directories contain data obtained from the following corresponding
+instrument projects:
+
+*Moderate Resolution Imaging Spectroradiometer (MODIS)* -
+http://modis.gsfc.nasa.gov/[+http://modis.gsfc.nasa.gov/+]
+
+** Overview of MODIS Aqua Data Processing -
+http://oceancolor.gsfc.nasa.gov/DOCS/MODISA_processing.html[+http://oceancolor.gsfc.nasa.gov/DOCS/MODISA_processing.html+]
+
+** Implementation of MODIS SST Processing -
+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/[+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/+]
+
+*Advanced Very High Resolution Radiometer (AVHRR)* -
+http://noaasis.noaa.gov/NOAASIS/ml/avhrr.html[+http://noaasis.noaa.gov/NOAASIS/ml/avhrr.html+]
+
+*Sea-Viewing Wide Field-of-View Sensor (SeaWIFS)* -
+http://oceancolor.gsfc.nasa.gov/SeaWiFS/[+http://oceancolor.gsfc.nasa.gov/SeaWiFS/+]
+
+** Overview of SeaWIFS Data Processing and Distribution -
+http://oceancolor.gsfc.nasa.gov/DOCS/SW_proc.html[+http://oceancolor.gsfc.nasa.gov/DOCS/SW_proc.html+]
+
+*Visible Infrared Imaging Radiometer Suite (VIIRS)* -
+http://www.raytheon.com/capabilities/products/viirs/[+http://www.raytheon.com/capabilities/products/viirs/+]
+
+This section merely lists the directories containing the GCOOS-related files.
+Details about the contents of the files can be found in the
+xref:dataset_details[dataset details] section by clicking on the active links
+that begin every directory listing.
+
+*Note*:  If obtaining the files, it is recommended that you maintain the
+subdirectory structures since many identical filenames are used several times
+for different files.
+
+MODIS Custom
+^^^^^^^^^^^^
+
+*Content*: "HotSpots are defined as the difference between the measured (1 km)
+near-real-time nighttime only sea surface
+temperatures (SST) and the AVHRR Pathfinder maximum monthly mean (MMM) SST
+derived from a 4km climatology. Only positive values are derived,
+since the HotSpot is designed to show the occurrence and distribution of
+thermal stress conducive to coral bleaching."
+
+xref:gcoos_dss_crw[Custom DSS-CRW] - 2003-2014 - HDF4 & PNG : ftp://imars.marine.usf.edu/modis/imars/final/custom/1km/dss-crw/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/custom/1km/dss-crw/gcoos/+]
+
+* THREDDS -
+http://imars.marine.usf.edu:8080/thredds/avhrrCatalog.html?dataset=avhrr/dsscrw/florida[+http://imars.marine.usf.edu:8080/thredds/avhrrCatalog.html?dataset=avhrr/dsscrw/florida+]
+
+MODIS OC
+^^^^^^^^
+
+Ocean color data.
+
+xref:gcoos_oc_daily[Daily OC] - 2003-2013 - HDF4: ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/oc/gcoos/+]
+
+xref:gcoos_oc_weekly[Weekly OC] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/oc/gcoos/+]
+
+* THREDDS -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=weekly/oc/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=weekly/oc/gcoos+]
+
+xref:gcoos_oc_monthly[Monthly OC] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/oc/gcoos/+]
+
+* THREDDS -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/oc/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/oc/gcoos+]
+
+xref:gcoos_oc_yearly[Yearly OC] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/oc/gcoos/+]
+
+* THREDDS -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=yearly/oc/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=yearly/oc/gcoos+]
+
+MODIS SST
+^^^^^^^^^
+
+SST derived from long-wave MODIS bands.
+
+*Content*: long-wave SST
+(http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/sst_transition.html[+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/sst_transition.html+])
+
+xref:gcoos_sst_daily[Daily SST] - 2003-2013 - HDF4: ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst/gcoos/+]
+
+xref:gcoos_sst_weekly[Weekly SST] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst/gcoos/+]
+
+* THREDDS Night -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=weekly/sst_night/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=weekly/sst_night/gcoos+]
+* THREDDS Day -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=weekly/sst_day/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=weekly/sst_day/gcoos+]
+
+xref:gcoos_sst_monthly[Monthly SST] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst/gcoos/+]
+
+* THREDDS Night -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/sst_night/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/sst_night/gcoos+]
+* THREDDS Day -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/sst_day/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/sst_day/gcoos+]
+
+xref:gcoos_sst_yearly[Yearly SST] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst/gcoos/+]
+
+* THREDDS Night -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/sst_night/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=monthly/sst_night/gcoos+]
+* THREDDS Day -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=yearly/sst_day/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=yearly/sst_day/gcoos+]
+
+
+
+MODIS SST4
+^^^^^^^^^^
+
+SST derived from short-wave MODIS bands.
+
+*Content*:  short-wave SST
+(http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/[+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/+])
+
+xref:gcoos_sst4_daily[Daily SST4] - 2003-2013 - HDF4: ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst4/gcoos/+]
+
+xref:gcoos_sst4_weekly[Weekly SST4] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst4/gcoos/+]
+
+xref:gcoos_sst4_monthly[Monthly SST4] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst4/gcoos/+]
+
+xref:gcoos_sst4_yearly[Yearly SST4] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst4/gcoos/+]
+
+MODIS NPP
+^^^^^^^^^
+
+Net primary productivity.
+
+xref:gcoos_npp_weekly[Weekly NPP] - 2003-2013 - HDF4 & PNG:  ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/npp/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/npp/gcoos/+]
+
+xref:gcoos_npp_monthly[Monthly NPP] - 2003-2013 - HDF4 & PNG: ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/npp/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/npp/gcoos/+]
+
+xref:gcoos_npp_yearly[Yearly NPP] - 2013 - HDF4 & PNG: ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/npp/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/npp/gcoos/+]
+
+MODIS Pass Data
+^^^^^^^^^^^^^^^
+
+No-Glint OC:
+ftp://imars.marine.usf.edu/modis/imars/final/pass/1km/no_glint_oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/pass/1km/no_glint_oc/gcoos/+]
+
+OC:
+ftp://imars.marine.usf.edu/modis/imars/final/pass/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/pass/1km/oc/gcoos/+]
+
+* THREDDS -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=pass/oc/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=pass/oc/gcoos+]
+
+SST:
+ftp://imars.marine.usf.edu/modis/imars/final/pass/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/pass/1km/sst/gcoos/+]
+
+* THREDDS -
+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=pass/sst/gcoos[+http://imars.marine.usf.edu:8080/thredds/modisCatalog.html?dataset=pass/sst/gcoos+]
+
+AVHRR SST
+^^^^^^^^^
+
+xref:gcoos_avhrr_weekly[Weekly AVHRR SST] - 1994-2014 - PNG:
+ftp://imars.marine.usf.edu/avhrr/imars/final/weekly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/avhrr/imars/final/weekly/1km/sst/gcoos/+]
+
+xref:gcoos_avhrr_monthly[Monthly AVHRR SST] - 1994-2014 - PNG:
+ftp://imars.marine.usf.edu/avhrr/imars/final/monthly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/avhrr/imars/final/monthly/1km/sst/gcoos/+]
+
+SeaWIFS OC
+^^^^^^^^^^
+
+xref:seawifs_oc_daily[Daily SeaWIFS OC] - 1998-2010 - HDF4:
+ftp://imars.marine.usf.edu/seawifs/imars/final/daily/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/daily/1km/oc/gcoos/+]
+
+xref:seawifs_oc_weekly[Weekly SeaWIFS OC] - 1998-2010 - HDF4 & PNG:
+ftp://imars.marine.usf.edu/seawifs/imars/final/weekly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/weekly/1km/oc/gcoos/+]
+
+xref:seawifs_oc_monthly[Monthly SeaWIFS OC] - 1998-2010 - HDF4 & PNG:
+ftp://imars.marine.usf.edu/seawifs/imars/final/monthly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/monthly/1km/oc/gcoos/+]
+
+xref:seawifs_oc_yearly[Yearly SeaWIFS OC] - 1998-2006 - HDF4 & PNG:
+ftp://imars.marine.usf.edu/seawifs/imars/final/yearly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/yearly/1km/oc/gcoos/+]
+
+VIIRS OC
+^^^^^^^^
+
+0.75 km Pass - 2013/02-2014/06 - HDF5 & PNG
+ftp://imars.marine.usf.edu/viirs/imars/intermediate/pass/0.75km/oc/gcoos/[+ftp://imars.marine.usf.edu/viirs/imars/intermediate/pass/0.75km/oc/gcoos/+]
+
+VIIRS SST
+^^^^^^^^^
+
+0.75 km Pass - 2013/02-2014/06 - HDF5 & PNG
+ftp://imars.marine.usf.edu/viirs/imars/intermediate/pass/0.75km/sst/gcoos/[+ftp://imars.marine.usf.edu/viirs/imars/intermediate/pass/0.75km/sst/gcoos/+]
+
+GCOOS IMARS Intermediate Directories
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These are the GCOOS-related directories under:
+
+ftp://imars.marine.usf.edu/modis/imars/intermediate/[+ftp://imars.marine.usf.edu/modis/imars/intermediate/+]
+
+Many of these exist but are not listed here.
+
+
+
+
+Sizes of Files
+~~~~~~~~~~~~~~
+
+The size of everything listed below gives a total of under *450 Gb*
+
+
+Daily Final MODIS File Total Sizes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note:  There are no daily NPP files.
+
+* xref:gcoos_oc_daily[+OC+] files:  46 Mb apiece x 11 years x 365 files per year = *184 Gb*
+* xref:gcoos_sst[+SST+] files:  12 Mb apiece x 11 years x 365 files per year = *48 Gb*
+* xref:gcoos_sst4[+SST4+] files:  12 Mb apiece x 11 years x 365 files per year = *48 Gb*
+
+Weekly Final MODIS Files
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* NPP - 2003-2013 - 12 Mb x 52 x 11 = *7 Gb*
+* SST - 2003-2013 - 12 Mb x 52 x 11 = *7 Gb*
+* SST4 - 2003-2013 - 12 Mb x 52 x 11 = *7 Gb*
+* OC - 2003-2013 - 149 Mb x 52 x 11 = *85 Gb*
+
+Monthly & Yearly MODIS Files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These sizes are much smaller than for the daily and weekly files, and are
+estimated at a total of not more than *30 Gb*.
+
+
+[[dataset_details]]
+IMARS Dataset Details
+---------------------
+
+This section contains the details of each type of file.  The details are:
+
+* the directory location at the FTP site;
+* a typical filename and its location at the FTP site;
+* a list of variables contained within that typical file; and
+* the metadata header for that typical file.
+
+An overview of MODIS is at:
+
+https://lpdaac.usgs.gov/products/modis_products_table/modis_overview[+https://lpdaac.usgs.gov/products/modis_products_table/modis_overview+]
+
+The IMARS ftp site is:
+
+ftp://imars.marine.usf.edu/[+ftp://imars.marine.usf.edu/+]
+
+The MODIS subdirectory is:
+
+ftp://imars.marine.usf.edu/modis/[+ftp://imars.marine.usf.edu/modis/+]
+
+The MODIS subdirectory for final daily products is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/+]
+
+
+[[gcoos_dss_crw]]
++DSS-CRW+ Custom Data
+~~~~~~~~~~~~~~~~~~~~~
+
+The top directory for the +DSS-CRW+ custom data is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/custom/1km/dss-crw/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/custom/1km/dss-crw/gcoos/+]
+
+A typical file, e.g. +multiple.20030102.0000.gcoos.crw-dss.hdf+ is found
+at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/custom/1km/dss-crw/gcoos/2003.01/multiple.20030102.0000.gcoos.crw-dss.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/custom/1km/dss-crw/gcoos/2003.01/multiple.20030102.0000.gcoos.crw-dss.hdf+]
+
+and contains the variables:
+
+* +hotspot+
+
+The file header is:
+
+-----
+netcdf multiple.20030102.0000.gcoos.crw-dss {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float hotspot(fakeDim0, fakeDim1) ;
+		hotspot:Title = "HotSpot" ;
+		hotspot:Description = "HotSpots are defined as the difference
+between the measured (1 km) near-real-time nighttime only sea surfa
+ce temperatures (SST) and the AVHRR Pathfinder maximum monthly mean (MMM) SST
+derived from a 4km climatology. Only positive values are derived, s
+ince the HotSpot is designed to show the occurrence and distribution of
+thermal stress conducive to coral bleaching." ;
+
+data:
+...
+-----
+
+MODIS OC Fields
+~~~~~~~~~~~~~~~
+
+The +oc+ part of the filenames stands for +ocean color+.  The variables
+contained within these standard MODIS Level-2 OC files are explained at:
+
+http://oceancolor.gsfc.nasa.gov/REPROCESSING/R2009/format/[+http://oceancolor.gsfc.nasa.gov/REPROCESSING/R2009/format/+]
+
+The variables contained within the xref:gcoos_oc_daily[daily] files are:
+
+* +chlor_a+ - chlorophyll-a (OC3v5 algorithm)
+(http://oceancolor.gsfc.nasa.gov/REPROCESSING/R2009/ocv6/[+http://oceancolor.gsfc.nasa.gov/REPROCESSING/R2009/ocv6/+]) +
+*Source Code*:
+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi?a=42[+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi?a=42+]
+* +Kd_490+ - diffuse attenuation at 490-nm (KD2 algorithm)
+(http://oceancolor.gsfc.nasa.gov/REPROCESSING/R2009/kdv4/[+http://oceancolor.gsfc.nasa.gov/REPROCESSING/R2009/kdv4/+]) +
+*Source Code*:
+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi?a=10[+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi?a=10+]
+* +nflh+ - fluorescence line height (normalized)
+http://oceancolor.gsfc.nasa.gov/WIKI/OCFLH.html[+http://oceancolor.gsfc.nasa.gov/WIKI/OCFLH.html+])
+* +ipar+ - instantaneous photosynthetically available radiation
+(http://modis.gsfc.nasa.gov/data/dataprod/dataproducts.php?MOD_NUMBER=22[+http://modis.gsfc.nasa.gov/data/dataprod/dataproducts.php?MOD_NUMBER=22+]) +
+*Source Code*:
+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi?a=56[+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi?a=56+]
+
+The variables contained within the xref:gcoos_oc_weekly[weekly], 
+xref:gcoos_oc_monthly[monthly] and xref:gcoos_oc_yearly[yearly] files are:
+
+* +Rrs_412+ - remote sensing reflectance at 412-nm
+* +Rrs_443+ - remote sensing reflectance at 443-nm
+* +Rrs_469+ - remote sensing reflectance at 469-nm 
+* +Rrs_488+ - remote sensing reflectance at 488-nm
+* +Rrs_531+ - remote sensing reflectance at 531-nm 
+* +Rrs_547+ - remote sensing reflectance at 547-nm
+* +Rrs_555+ - remote sensing reflectance at 555-nm
+* +Rrs_645+ - remote sensing reflectance at 645-nm
+* +Rrs_667+ - remote sensing reflectance at 667-nm 
+* +Rrs_678+ - remote sensing reflectance at 678-nm 
+* +chlor_a+ 
+* +Kd_490+
+* +nflh+
+
+
+[[gcoos_oc_daily]]
++oc+ Daily GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the +oc+ daily data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/oc/gcoos/+]
+
+A typical file, e.g. +AQUA.20030101.0000.gcoos.oc.hdf+ found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/oc/gcoos/2003/AQUA.20030101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/oc/gcoos/2003/AQUA.20030101.0000.gcoos.oc.hdf+]
+
+The file header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.oc {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+	fakeDim2 = 1430 ;
+	fakeDim3 = 2090 ;
+	fakeDim4 = 1430 ;
+	fakeDim5 = 2090 ;
+	fakeDim6 = 1430 ;
+	fakeDim7 = 2090 ;
+
+variables:
+	float chlor_a(fakeDim0, fakeDim1) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "A2003001175000_1.L2b" ;
+		chlor_a:units = "mg m^-3" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+	float Kd_490(fakeDim2, fakeDim3) ;
+		Kd_490:Projection Category = "IDL" ;
+		Kd_490:Projection Name = "Cylindrical" ;
+		Kd_490:Source = "A2003001175000_1.L2b" ;
+		Kd_490:units = "m^-1" ;
+		Kd_490:Slope = 1.f ;
+		Kd_490:Intercept = 0.f ;
+		Kd_490:Scaling = "linear" ;
+		Kd_490:Limit = 18., -98., 31., -79. ;
+		Kd_490:Projection ID = 8 ;
+		Kd_490:Latitude Center = 0. ;
+		Kd_490:Longitude Center = -88.5 ;
+		Kd_490:Rotation = 0. ;
+		Kd_490:Position = 0., 0., 1., 1. ;
+		Kd_490:Isotropic = 0 ;
+		Kd_490:Scale = 0. ;
+		Kd_490:Central_Azimuth = 0. ;
+	float nflh(fakeDim4, fakeDim5) ;
+		nflh:Projection Category = "IDL" ;
+		nflh:Projection Name = "Cylindrical" ;
+		nflh:Source = "A2003001175000_1.L2b" ;
+		nflh:units = "mW cm^-2 um^-1 sr^-1" ;
+		nflh:Slope = 1.f ;
+		nflh:Intercept = 0.f ;
+		nflh:Scaling = "linear" ;
+		nflh:Limit = 18., -98., 31., -79. ;
+		nflh:Projection ID = 8 ;
+		nflh:Latitude Center = 0. ;
+		nflh:Longitude Center = -88.5 ;
+		nflh:Rotation = 0. ;
+		nflh:Position = 0., 0., 1., 1. ;
+		nflh:Isotropic = 0 ;
+		nflh:Scale = 0. ;
+		nflh:Central_Azimuth = 0. ;
+	float ipar(fakeDim6, fakeDim7) ;
+		ipar:Projection Category = "IDL" ;
+		ipar:Projection Name = "Cylindrical" ;
+		ipar:Source = "A2003001175000_1.L2b" ;
+		ipar:units = "Ein m^-2 s^-1" ;
+		ipar:Slope = 1.f ;
+		ipar:Intercept = 0.f ;
+		ipar:Scaling = "linear" ;
+		ipar:Limit = 18., -98., 31., -79. ;
+		ipar:Projection ID = 8 ;
+		ipar:Latitude Center = 0. ;
+		ipar:Longitude Center = -88.5 ;
+		ipar:Rotation = 0. ;
+		ipar:Position = 0., 0., 1., 1. ;
+		ipar:Isotropic = 0 ;
+		ipar:Scale = 0. ;
+		ipar:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_oc_weekly]]
++oc+ Weekly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the +oc+ weekly data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/oc/gcoos/+]
+
+A typical file, e.g. +AQUA.20030101.0000.gcoos.oc.hdf+ found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/oc/gcoos/2003/AQUA.20030101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/oc/gcoos/2003/AQUA.20030101.0000.gcoos.oc.hdf+]
+
+The file header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.oc {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+	fakeDim2 = 1430 ;
+	fakeDim3 = 2090 ;
+	fakeDim4 = 1430 ;
+	fakeDim5 = 2090 ;
+	fakeDim6 = 1430 ;
+	fakeDim7 = 2090 ;
+	fakeDim8 = 1430 ;
+	fakeDim9 = 2090 ;
+	fakeDim10 = 1430 ;
+	fakeDim11 = 2090 ;
+	fakeDim12 = 1430 ;
+	fakeDim13 = 2090 ;
+	fakeDim14 = 1430 ;
+	fakeDim15 = 2090 ;
+	fakeDim16 = 1430 ;
+	fakeDim17 = 2090 ;
+	fakeDim18 = 1430 ;
+	fakeDim19 = 2090 ;
+	fakeDim20 = 1430 ;
+	fakeDim21 = 2090 ;
+	fakeDim22 = 1430 ;
+	fakeDim23 = 2090 ;
+	fakeDim24 = 1430 ;
+	fakeDim25 = 2090 ;
+
+variables:
+	float Rrs_412(fakeDim0, fakeDim1) ;
+		Rrs_412:Projection Category = "IDL" ;
+		Rrs_412:Projection Name = "Cylindrical" ;
+		Rrs_412:Source = "A2003001_1_DAY.L3" ;
+		Rrs_412:units = "sr^-1" ;
+		Rrs_412:Slope = 1.f ;
+		Rrs_412:Intercept = 0.f ;
+		Rrs_412:Scaling = "linear" ;
+		Rrs_412:Limit = 18., -98., 31., -79. ;
+		Rrs_412:Projection ID = 8 ;
+		Rrs_412:Latitude Center = 0. ;
+		Rrs_412:Longitude Center = -88.5 ;
+		Rrs_412:Rotation = 0. ;
+		Rrs_412:Position = 0., 0., 1., 1. ;
+		Rrs_412:Isotropic = 0 ;
+		Rrs_412:Scale = 0. ;
+		Rrs_412:Central_Azimuth = 0. ;
+	float Rrs_443(fakeDim2, fakeDim3) ;
+		Rrs_443:Projection Category = "IDL" ;
+		Rrs_443:Projection Name = "Cylindrical" ;
+		Rrs_443:Source = "A2003001_1_DAY.L3" ;
+		Rrs_443:units = "sr^-1" ;
+		Rrs_443:Slope = 1.f ;
+		Rrs_443:Intercept = 0.f ;
+		Rrs_443:Scaling = "linear" ;
+		Rrs_443:Limit = 18., -98., 31., -79. ;
+		Rrs_443:Projection ID = 8 ;
+		Rrs_443:Latitude Center = 0. ;
+		Rrs_443:Longitude Center = -88.5 ;
+		Rrs_443:Rotation = 0. ;
+		Rrs_443:Position = 0., 0., 1., 1. ;
+		Rrs_443:Isotropic = 0 ;
+		Rrs_443:Scale = 0. ;
+		Rrs_443:Central_Azimuth = 0. ;
+	float Rrs_469(fakeDim4, fakeDim5) ;
+		Rrs_469:Projection Category = "IDL" ;
+		Rrs_469:Projection Name = "Cylindrical" ;
+		Rrs_469:Source = "A2003001_1_DAY.L3" ;
+		Rrs_469:units = "sr^-1" ;
+		Rrs_469:Slope = 1.f ;
+		Rrs_469:Intercept = 0.f ;
+		Rrs_469:Scaling = "linear" ;
+		Rrs_469:Limit = 18., -98., 31., -79. ;
+		Rrs_469:Projection ID = 8 ;
+		Rrs_469:Latitude Center = 0. ;
+		Rrs_469:Longitude Center = -88.5 ;
+		Rrs_469:Rotation = 0. ;
+		Rrs_469:Position = 0., 0., 1., 1. ;
+		Rrs_469:Isotropic = 0 ;
+		Rrs_469:Scale = 0. ;
+		Rrs_469:Central_Azimuth = 0. ;
+	float Rrs_488(fakeDim6, fakeDim7) ;
+		Rrs_488:Projection Category = "IDL" ;
+		Rrs_488:Projection Name = "Cylindrical" ;
+		Rrs_488:Source = "A2003001_1_DAY.L3" ;
+		Rrs_488:units = "sr^-1" ;
+		Rrs_488:Slope = 1.f ;
+		Rrs_488:Intercept = 0.f ;
+		Rrs_488:Scaling = "linear" ;
+		Rrs_488:Limit = 18., -98., 31., -79. ;
+		Rrs_488:Projection ID = 8 ;
+		Rrs_488:Latitude Center = 0. ;
+		Rrs_488:Longitude Center = -88.5 ;
+		Rrs_488:Rotation = 0. ;
+		Rrs_488:Position = 0., 0., 1., 1. ;
+		Rrs_488:Isotropic = 0 ;
+		Rrs_488:Scale = 0. ;
+		Rrs_488:Central_Azimuth = 0. ;
+	float Rrs_531(fakeDim8, fakeDim9) ;
+		Rrs_531:Projection Category = "IDL" ;
+		Rrs_531:Projection Name = "Cylindrical" ;
+		Rrs_531:Source = "A2003001_1_DAY.L3" ;
+		Rrs_531:units = "sr^-1" ;
+		Rrs_531:Slope = 1.f ;
+		Rrs_531:Intercept = 0.f ;
+		Rrs_531:Scaling = "linear" ;
+		Rrs_531:Limit = 18., -98., 31., -79. ;
+		Rrs_531:Projection ID = 8 ;
+		Rrs_531:Latitude Center = 0. ;
+		Rrs_531:Longitude Center = -88.5 ;
+		Rrs_531:Rotation = 0. ;
+		Rrs_531:Position = 0., 0., 1., 1. ;
+		Rrs_531:Isotropic = 0 ;
+		Rrs_531:Scale = 0. ;
+		Rrs_531:Central_Azimuth = 0. ;
+	float Rrs_547(fakeDim10, fakeDim11) ;
+		Rrs_547:Projection Category = "IDL" ;
+		Rrs_547:Projection Name = "Cylindrical" ;
+		Rrs_547:Source = "A2003001_1_DAY.L3" ;
+		Rrs_547:units = "sr^-1" ;
+		Rrs_547:Slope = 1.f ;
+		Rrs_547:Intercept = 0.f ;
+		Rrs_547:Scaling = "linear" ;
+		Rrs_547:Limit = 18., -98., 31., -79. ;
+		Rrs_547:Projection ID = 8 ;
+		Rrs_547:Latitude Center = 0. ;
+		Rrs_547:Longitude Center = -88.5 ;
+		Rrs_547:Rotation = 0. ;
+		Rrs_547:Position = 0., 0., 1., 1. ;
+		Rrs_547:Isotropic = 0 ;
+		Rrs_547:Scale = 0. ;
+		Rrs_547:Central_Azimuth = 0. ;
+	float Rrs_555(fakeDim12, fakeDim13) ;
+		Rrs_555:Projection Category = "IDL" ;
+		Rrs_555:Projection Name = "Cylindrical" ;
+		Rrs_555:Source = "A2003001_1_DAY.L3" ;
+		Rrs_555:units = "sr^-1" ;
+		Rrs_555:Slope = 1.f ;
+		Rrs_555:Intercept = 0.f ;
+		Rrs_555:Scaling = "linear" ;
+		Rrs_555:Limit = 18., -98., 31., -79. ;
+		Rrs_555:Projection ID = 8 ;
+		Rrs_555:Latitude Center = 0. ;
+		Rrs_555:Longitude Center = -88.5 ;
+		Rrs_555:Rotation = 0. ;
+		Rrs_555:Position = 0., 0., 1., 1. ;
+		Rrs_555:Isotropic = 0 ;
+		Rrs_555:Scale = 0. ;
+		Rrs_555:Central_Azimuth = 0. ;
+	float Rrs_645(fakeDim14, fakeDim15) ;
+		Rrs_645:Projection Category = "IDL" ;
+		Rrs_645:Projection Name = "Cylindrical" ;
+		Rrs_645:Source = "A2003001_1_DAY.L3" ;
+		Rrs_645:units = "sr^-1" ;
+		Rrs_645:Slope = 1.f ;
+		Rrs_645:Intercept = 0.f ;
+		Rrs_645:Scaling = "linear" ;
+		Rrs_645:Limit = 18., -98., 31., -79. ;
+		Rrs_645:Projection ID = 8 ;
+		Rrs_645:Latitude Center = 0. ;
+		Rrs_645:Longitude Center = -88.5 ;
+		Rrs_645:Rotation = 0. ;
+		Rrs_645:Position = 0., 0., 1., 1. ;
+		Rrs_645:Isotropic = 0 ;
+		Rrs_645:Scale = 0. ;
+		Rrs_645:Central_Azimuth = 0. ;
+	float Rrs_667(fakeDim16, fakeDim17) ;
+		Rrs_667:Projection Category = "IDL" ;
+		Rrs_667:Projection Name = "Cylindrical" ;
+		Rrs_667:Source = "A2003001_1_DAY.L3" ;
+		Rrs_667:units = "sr^-1" ;
+		Rrs_667:Slope = 1.f ;
+		Rrs_667:Intercept = 0.f ;
+		Rrs_667:Scaling = "linear" ;
+		Rrs_667:Limit = 18., -98., 31., -79. ;
+		Rrs_667:Projection ID = 8 ;
+		Rrs_667:Latitude Center = 0. ;
+		Rrs_667:Longitude Center = -88.5 ;
+		Rrs_667:Rotation = 0. ;
+		Rrs_667:Position = 0., 0., 1., 1. ;
+		Rrs_667:Isotropic = 0 ;
+		Rrs_667:Scale = 0. ;
+		Rrs_667:Central_Azimuth = 0. ;
+	float Rrs_678(fakeDim18, fakeDim19) ;
+		Rrs_678:Projection Category = "IDL" ;
+		Rrs_678:Projection Name = "Cylindrical" ;
+		Rrs_678:Source = "A2003001_1_DAY.L3" ;
+		Rrs_678:units = "sr^-1" ;
+		Rrs_678:Slope = 1.f ;
+		Rrs_678:Intercept = 0.f ;
+		Rrs_678:Scaling = "linear" ;
+		Rrs_678:Limit = 18., -98., 31., -79. ;
+		Rrs_678:Projection ID = 8 ;
+		Rrs_678:Latitude Center = 0. ;
+		Rrs_678:Longitude Center = -88.5 ;
+		Rrs_678:Rotation = 0. ;
+		Rrs_678:Position = 0., 0., 1., 1. ;
+		Rrs_678:Isotropic = 0 ;
+		Rrs_678:Scale = 0. ;
+		Rrs_678:Central_Azimuth = 0. ;
+	float chlor_a(fakeDim20, fakeDim21) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "A20030012003007_1_7D.L3" ;
+		chlor_a:units = "mg m^-3" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+	float Kd_490(fakeDim22, fakeDim23) ;
+		Kd_490:Projection Category = "IDL" ;
+		Kd_490:Projection Name = "Cylindrical" ;
+		Kd_490:Source = "A20030012003007_1_7D.L3" ;
+		Kd_490:units = "m^-1" ;
+		Kd_490:Slope = 1.f ;
+		Kd_490:Intercept = 0.f ;
+		Kd_490:Scaling = "linear" ;
+		Kd_490:Limit = 18., -98., 31., -79. ;
+		Kd_490:Projection ID = 8 ;
+		Kd_490:Latitude Center = 0. ;
+		Kd_490:Longitude Center = -88.5 ;
+		Kd_490:Rotation = 0. ;
+		Kd_490:Position = 0., 0., 1., 1. ;
+		Kd_490:Isotropic = 0 ;
+		Kd_490:Scale = 0. ;
+		Kd_490:Central_Azimuth = 0. ;
+	float nflh(fakeDim24, fakeDim25) ;
+		nflh:Projection Category = "IDL" ;
+		nflh:Projection Name = "Cylindrical" ;
+		nflh:Source = "A20030012003007_1_7D.L3" ;
+		nflh:units = "mW cm^-2 um^-1 sr^-1" ;
+		nflh:Slope = 1.f ;
+		nflh:Intercept = 0.f ;
+		nflh:Scaling = "linear" ;
+		nflh:Limit = 18., -98., 31., -79. ;
+		nflh:Projection ID = 8 ;
+		nflh:Latitude Center = 0. ;
+		nflh:Longitude Center = -88.5 ;
+		nflh:Rotation = 0. ;
+		nflh:Position = 0., 0., 1., 1. ;
+		nflh:Isotropic = 0 ;
+		nflh:Scale = 0. ;
+		nflh:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_oc_monthly]]
++oc+ Monthly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the +oc+ monthly data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/oc/gcoos/+]
+
+A typical file, e.g. +AQUA.20030101.0000.gcoos.oc.hdf+ found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/oc/gcoos/2003/AQUA.20030101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/oc/gcoos/2003/AQUA.20030101.0000.gcoos.oc.hdf+]
+
+The file header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.oc(3) {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+	fakeDim2 = 1430 ;
+	fakeDim3 = 2090 ;
+	fakeDim4 = 1430 ;
+	fakeDim5 = 2090 ;
+	fakeDim6 = 1430 ;
+	fakeDim7 = 2090 ;
+	fakeDim8 = 1430 ;
+	fakeDim9 = 2090 ;
+	fakeDim10 = 1430 ;
+	fakeDim11 = 2090 ;
+	fakeDim12 = 1430 ;
+	fakeDim13 = 2090 ;
+	fakeDim14 = 1430 ;
+	fakeDim15 = 2090 ;
+	fakeDim16 = 1430 ;
+	fakeDim17 = 2090 ;
+	fakeDim18 = 1430 ;
+	fakeDim19 = 2090 ;
+	fakeDim20 = 1430 ;
+	fakeDim21 = 2090 ;
+	fakeDim22 = 1430 ;
+	fakeDim23 = 2090 ;
+	fakeDim24 = 1430 ;
+	fakeDim25 = 2090 ;
+
+variables:
+	float Rrs_412(fakeDim0, fakeDim1) ;
+		Rrs_412:Projection Category = "IDL" ;
+		Rrs_412:Projection Name = "Cylindrical" ;
+		Rrs_412:Source = "A2003001_1_DAY.L3" ;
+		Rrs_412:units = "sr^-1" ;
+		Rrs_412:Slope = 1.f ;
+		Rrs_412:Intercept = 0.f ;
+		Rrs_412:Scaling = "linear" ;
+		Rrs_412:Limit = 18., -98., 31., -79. ;
+		Rrs_412:Projection ID = 8 ;
+		Rrs_412:Latitude Center = 0. ;
+		Rrs_412:Longitude Center = -88.5 ;
+		Rrs_412:Rotation = 0. ;
+		Rrs_412:Position = 0., 0., 1., 1. ;
+		Rrs_412:Isotropic = 0 ;
+		Rrs_412:Scale = 0. ;
+		Rrs_412:Central_Azimuth = 0. ;
+	float Rrs_443(fakeDim2, fakeDim3) ;
+		Rrs_443:Projection Category = "IDL" ;
+		Rrs_443:Projection Name = "Cylindrical" ;
+		Rrs_443:Source = "A2003001_1_DAY.L3" ;
+		Rrs_443:units = "sr^-1" ;
+		Rrs_443:Slope = 1.f ;
+		Rrs_443:Intercept = 0.f ;
+		Rrs_443:Scaling = "linear" ;
+		Rrs_443:Limit = 18., -98., 31., -79. ;
+		Rrs_443:Projection ID = 8 ;
+		Rrs_443:Latitude Center = 0. ;
+		Rrs_443:Longitude Center = -88.5 ;
+		Rrs_443:Rotation = 0. ;
+		Rrs_443:Position = 0., 0., 1., 1. ;
+		Rrs_443:Isotropic = 0 ;
+		Rrs_443:Scale = 0. ;
+		Rrs_443:Central_Azimuth = 0. ;
+	float Rrs_469(fakeDim4, fakeDim5) ;
+		Rrs_469:Projection Category = "IDL" ;
+		Rrs_469:Projection Name = "Cylindrical" ;
+		Rrs_469:Source = "A2003001_1_DAY.L3" ;
+		Rrs_469:units = "sr^-1" ;
+		Rrs_469:Slope = 1.f ;
+		Rrs_469:Intercept = 0.f ;
+		Rrs_469:Scaling = "linear" ;
+		Rrs_469:Limit = 18., -98., 31., -79. ;
+		Rrs_469:Projection ID = 8 ;
+		Rrs_469:Latitude Center = 0. ;
+		Rrs_469:Longitude Center = -88.5 ;
+		Rrs_469:Rotation = 0. ;
+		Rrs_469:Position = 0., 0., 1., 1. ;
+		Rrs_469:Isotropic = 0 ;
+		Rrs_469:Scale = 0. ;
+		Rrs_469:Central_Azimuth = 0. ;
+	float Rrs_488(fakeDim6, fakeDim7) ;
+		Rrs_488:Projection Category = "IDL" ;
+		Rrs_488:Projection Name = "Cylindrical" ;
+		Rrs_488:Source = "A2003001_1_DAY.L3" ;
+		Rrs_488:units = "sr^-1" ;
+		Rrs_488:Slope = 1.f ;
+		Rrs_488:Intercept = 0.f ;
+		Rrs_488:Scaling = "linear" ;
+		Rrs_488:Limit = 18., -98., 31., -79. ;
+		Rrs_488:Projection ID = 8 ;
+		Rrs_488:Latitude Center = 0. ;
+		Rrs_488:Longitude Center = -88.5 ;
+		Rrs_488:Rotation = 0. ;
+		Rrs_488:Position = 0., 0., 1., 1. ;
+		Rrs_488:Isotropic = 0 ;
+		Rrs_488:Scale = 0. ;
+		Rrs_488:Central_Azimuth = 0. ;
+	float Rrs_531(fakeDim8, fakeDim9) ;
+		Rrs_531:Projection Category = "IDL" ;
+		Rrs_531:Projection Name = "Cylindrical" ;
+		Rrs_531:Source = "A2003001_1_DAY.L3" ;
+		Rrs_531:units = "sr^-1" ;
+		Rrs_531:Slope = 1.f ;
+		Rrs_531:Intercept = 0.f ;
+		Rrs_531:Scaling = "linear" ;
+		Rrs_531:Limit = 18., -98., 31., -79. ;
+		Rrs_531:Projection ID = 8 ;
+		Rrs_531:Latitude Center = 0. ;
+		Rrs_531:Longitude Center = -88.5 ;
+		Rrs_531:Rotation = 0. ;
+		Rrs_531:Position = 0., 0., 1., 1. ;
+		Rrs_531:Isotropic = 0 ;
+		Rrs_531:Scale = 0. ;
+		Rrs_531:Central_Azimuth = 0. ;
+	float Rrs_547(fakeDim10, fakeDim11) ;
+		Rrs_547:Projection Category = "IDL" ;
+		Rrs_547:Projection Name = "Cylindrical" ;
+		Rrs_547:Source = "A2003001_1_DAY.L3" ;
+		Rrs_547:units = "sr^-1" ;
+		Rrs_547:Slope = 1.f ;
+		Rrs_547:Intercept = 0.f ;
+		Rrs_547:Scaling = "linear" ;
+		Rrs_547:Limit = 18., -98., 31., -79. ;
+		Rrs_547:Projection ID = 8 ;
+		Rrs_547:Latitude Center = 0. ;
+		Rrs_547:Longitude Center = -88.5 ;
+		Rrs_547:Rotation = 0. ;
+		Rrs_547:Position = 0., 0., 1., 1. ;
+		Rrs_547:Isotropic = 0 ;
+		Rrs_547:Scale = 0. ;
+		Rrs_547:Central_Azimuth = 0. ;
+	float Rrs_555(fakeDim12, fakeDim13) ;
+		Rrs_555:Projection Category = "IDL" ;
+		Rrs_555:Projection Name = "Cylindrical" ;
+		Rrs_555:Source = "A2003001_1_DAY.L3" ;
+		Rrs_555:units = "sr^-1" ;
+		Rrs_555:Slope = 1.f ;
+		Rrs_555:Intercept = 0.f ;
+		Rrs_555:Scaling = "linear" ;
+		Rrs_555:Limit = 18., -98., 31., -79. ;
+		Rrs_555:Projection ID = 8 ;
+		Rrs_555:Latitude Center = 0. ;
+		Rrs_555:Longitude Center = -88.5 ;
+		Rrs_555:Rotation = 0. ;
+		Rrs_555:Position = 0., 0., 1., 1. ;
+		Rrs_555:Isotropic = 0 ;
+		Rrs_555:Scale = 0. ;
+		Rrs_555:Central_Azimuth = 0. ;
+	float Rrs_645(fakeDim14, fakeDim15) ;
+		Rrs_645:Projection Category = "IDL" ;
+		Rrs_645:Projection Name = "Cylindrical" ;
+		Rrs_645:Source = "A2003001_1_DAY.L3" ;
+		Rrs_645:units = "sr^-1" ;
+		Rrs_645:Slope = 1.f ;
+		Rrs_645:Intercept = 0.f ;
+		Rrs_645:Scaling = "linear" ;
+		Rrs_645:Limit = 18., -98., 31., -79. ;
+		Rrs_645:Projection ID = 8 ;
+		Rrs_645:Latitude Center = 0. ;
+		Rrs_645:Longitude Center = -88.5 ;
+		Rrs_645:Rotation = 0. ;
+		Rrs_645:Position = 0., 0., 1., 1. ;
+		Rrs_645:Isotropic = 0 ;
+		Rrs_645:Scale = 0. ;
+		Rrs_645:Central_Azimuth = 0. ;
+	float Rrs_667(fakeDim16, fakeDim17) ;
+		Rrs_667:Projection Category = "IDL" ;
+		Rrs_667:Projection Name = "Cylindrical" ;
+		Rrs_667:Source = "A2003001_1_DAY.L3" ;
+		Rrs_667:units = "sr^-1" ;
+		Rrs_667:Slope = 1.f ;
+		Rrs_667:Intercept = 0.f ;
+		Rrs_667:Scaling = "linear" ;
+		Rrs_667:Limit = 18., -98., 31., -79. ;
+		Rrs_667:Projection ID = 8 ;
+		Rrs_667:Latitude Center = 0. ;
+		Rrs_667:Longitude Center = -88.5 ;
+		Rrs_667:Rotation = 0. ;
+		Rrs_667:Position = 0., 0., 1., 1. ;
+		Rrs_667:Isotropic = 0 ;
+		Rrs_667:Scale = 0. ;
+		Rrs_667:Central_Azimuth = 0. ;
+	float Rrs_678(fakeDim18, fakeDim19) ;
+		Rrs_678:Projection Category = "IDL" ;
+		Rrs_678:Projection Name = "Cylindrical" ;
+		Rrs_678:Source = "A2003001_1_DAY.L3" ;
+		Rrs_678:units = "sr^-1" ;
+		Rrs_678:Slope = 1.f ;
+		Rrs_678:Intercept = 0.f ;
+		Rrs_678:Scaling = "linear" ;
+		Rrs_678:Limit = 18., -98., 31., -79. ;
+		Rrs_678:Projection ID = 8 ;
+		Rrs_678:Latitude Center = 0. ;
+		Rrs_678:Longitude Center = -88.5 ;
+		Rrs_678:Rotation = 0. ;
+		Rrs_678:Position = 0., 0., 1., 1. ;
+		Rrs_678:Isotropic = 0 ;
+		Rrs_678:Scale = 0. ;
+		Rrs_678:Central_Azimuth = 0. ;
+	float chlor_a(fakeDim20, fakeDim21) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "A20030012003031_1_MO.L3" ;
+		chlor_a:units = "mg m^-3" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+	float Kd_490(fakeDim22, fakeDim23) ;
+		Kd_490:Projection Category = "IDL" ;
+		Kd_490:Projection Name = "Cylindrical" ;
+		Kd_490:Source = "A20030012003031_1_MO.L3" ;
+		Kd_490:units = "m^-1" ;
+		Kd_490:Slope = 1.f ;
+		Kd_490:Intercept = 0.f ;
+		Kd_490:Scaling = "linear" ;
+		Kd_490:Limit = 18., -98., 31., -79. ;
+		Kd_490:Projection ID = 8 ;
+		Kd_490:Latitude Center = 0. ;
+		Kd_490:Longitude Center = -88.5 ;
+		Kd_490:Rotation = 0. ;
+		Kd_490:Position = 0., 0., 1., 1. ;
+		Kd_490:Isotropic = 0 ;
+		Kd_490:Scale = 0. ;
+		Kd_490:Central_Azimuth = 0. ;
+	float nflh(fakeDim24, fakeDim25) ;
+		nflh:Projection Category = "IDL" ;
+		nflh:Projection Name = "Cylindrical" ;
+		nflh:Source = "A20030012003031_1_MO.L3" ;
+		nflh:units = "mW cm^-2 um^-1 sr^-1" ;
+		nflh:Slope = 1.f ;
+		nflh:Intercept = 0.f ;
+		nflh:Scaling = "linear" ;
+		nflh:Limit = 18., -98., 31., -79. ;
+		nflh:Projection ID = 8 ;
+		nflh:Latitude Center = 0. ;
+		nflh:Longitude Center = -88.5 ;
+		nflh:Rotation = 0. ;
+		nflh:Position = 0., 0., 1., 1. ;
+		nflh:Isotropic = 0 ;
+		nflh:Scale = 0. ;
+		nflh:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+
+[[gcoos_oc_yearly]]
++oc+ Yearly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the +oc+ yearly data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/oc/gcoos/+]
+
+A typical file, e.g. +AQUA.20030101.0000.gcoos.oc.hdf+ found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/oc/gcoos/AQUA.20030101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/oc/gcoos/AQUA.20030101.0000.gcoos.oc.hdf+]
+
+The file header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.oc {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+	fakeDim2 = 1430 ;
+	fakeDim3 = 2090 ;
+	fakeDim4 = 1430 ;
+	fakeDim5 = 2090 ;
+	fakeDim6 = 1430 ;
+	fakeDim7 = 2090 ;
+	fakeDim8 = 1430 ;
+	fakeDim9 = 2090 ;
+	fakeDim10 = 1430 ;
+	fakeDim11 = 2090 ;
+	fakeDim12 = 1430 ;
+	fakeDim13 = 2090 ;
+	fakeDim14 = 1430 ;
+	fakeDim15 = 2090 ;
+	fakeDim16 = 1430 ;
+	fakeDim17 = 2090 ;
+	fakeDim18 = 1430 ;
+	fakeDim19 = 2090 ;
+	fakeDim20 = 1430 ;
+	fakeDim21 = 2090 ;
+	fakeDim22 = 1430 ;
+	fakeDim23 = 2090 ;
+	fakeDim24 = 1430 ;
+	fakeDim25 = 2090 ;
+
+variables:
+	float Rrs_412(fakeDim0, fakeDim1) ;
+		Rrs_412:Projection Category = "IDL" ;
+		Rrs_412:Projection Name = "Cylindrical" ;
+		Rrs_412:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_412:units = "sr^-1" ;
+		Rrs_412:Slope = 1.f ;
+		Rrs_412:Intercept = 0.f ;
+		Rrs_412:Scaling = "linear" ;
+		Rrs_412:Limit = 18., -98., 31., -79. ;
+		Rrs_412:Projection ID = 8 ;
+		Rrs_412:Latitude Center = 0. ;
+		Rrs_412:Longitude Center = -88.5 ;
+		Rrs_412:Rotation = 0. ;
+		Rrs_412:Position = 0., 0., 1., 1. ;
+		Rrs_412:Isotropic = 0 ;
+		Rrs_412:Scale = 0. ;
+		Rrs_412:Central_Azimuth = 0. ;
+	float Rrs_443(fakeDim2, fakeDim3) ;
+		Rrs_443:Projection Category = "IDL" ;
+		Rrs_443:Projection Name = "Cylindrical" ;
+		Rrs_443:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_443:units = "sr^-1" ;
+		Rrs_443:Slope = 1.f ;
+		Rrs_443:Intercept = 0.f ;
+		Rrs_443:Scaling = "linear" ;
+		Rrs_443:Limit = 18., -98., 31., -79. ;
+		Rrs_443:Projection ID = 8 ;
+		Rrs_443:Latitude Center = 0. ;
+		Rrs_443:Longitude Center = -88.5 ;
+		Rrs_443:Rotation = 0. ;
+		Rrs_443:Position = 0., 0., 1., 1. ;
+		Rrs_443:Isotropic = 0 ;
+		Rrs_443:Scale = 0. ;
+		Rrs_443:Central_Azimuth = 0. ;
+	float Rrs_469(fakeDim4, fakeDim5) ;
+		Rrs_469:Projection Category = "IDL" ;
+		Rrs_469:Projection Name = "Cylindrical" ;
+		Rrs_469:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_469:units = "sr^-1" ;
+		Rrs_469:Slope = 1.f ;
+		Rrs_469:Intercept = 0.f ;
+		Rrs_469:Scaling = "linear" ;
+		Rrs_469:Limit = 18., -98., 31., -79. ;
+		Rrs_469:Projection ID = 8 ;
+		Rrs_469:Latitude Center = 0. ;
+		Rrs_469:Longitude Center = -88.5 ;
+		Rrs_469:Rotation = 0. ;
+		Rrs_469:Position = 0., 0., 1., 1. ;
+		Rrs_469:Isotropic = 0 ;
+		Rrs_469:Scale = 0. ;
+		Rrs_469:Central_Azimuth = 0. ;
+	float Rrs_488(fakeDim6, fakeDim7) ;
+		Rrs_488:Projection Category = "IDL" ;
+		Rrs_488:Projection Name = "Cylindrical" ;
+		Rrs_488:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_488:units = "sr^-1" ;
+		Rrs_488:Slope = 1.f ;
+		Rrs_488:Intercept = 0.f ;
+		Rrs_488:Scaling = "linear" ;
+		Rrs_488:Limit = 18., -98., 31., -79. ;
+		Rrs_488:Projection ID = 8 ;
+		Rrs_488:Latitude Center = 0. ;
+		Rrs_488:Longitude Center = -88.5 ;
+		Rrs_488:Rotation = 0. ;
+		Rrs_488:Position = 0., 0., 1., 1. ;
+		Rrs_488:Isotropic = 0 ;
+		Rrs_488:Scale = 0. ;
+		Rrs_488:Central_Azimuth = 0. ;
+	float Rrs_531(fakeDim8, fakeDim9) ;
+		Rrs_531:Projection Category = "IDL" ;
+		Rrs_531:Projection Name = "Cylindrical" ;
+		Rrs_531:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_531:units = "sr^-1" ;
+		Rrs_531:Slope = 1.f ;
+		Rrs_531:Intercept = 0.f ;
+		Rrs_531:Scaling = "linear" ;
+		Rrs_531:Limit = 18., -98., 31., -79. ;
+		Rrs_531:Projection ID = 8 ;
+		Rrs_531:Latitude Center = 0. ;
+		Rrs_531:Longitude Center = -88.5 ;
+		Rrs_531:Rotation = 0. ;
+		Rrs_531:Position = 0., 0., 1., 1. ;
+		Rrs_531:Isotropic = 0 ;
+		Rrs_531:Scale = 0. ;
+		Rrs_531:Central_Azimuth = 0. ;
+	float Rrs_547(fakeDim10, fakeDim11) ;
+		Rrs_547:Projection Category = "IDL" ;
+		Rrs_547:Projection Name = "Cylindrical" ;
+		Rrs_547:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_547:units = "sr^-1" ;
+		Rrs_547:Slope = 1.f ;
+		Rrs_547:Intercept = 0.f ;
+		Rrs_547:Scaling = "linear" ;
+		Rrs_547:Limit = 18., -98., 31., -79. ;
+		Rrs_547:Projection ID = 8 ;
+		Rrs_547:Latitude Center = 0. ;
+		Rrs_547:Longitude Center = -88.5 ;
+		Rrs_547:Rotation = 0. ;
+		Rrs_547:Position = 0., 0., 1., 1. ;
+		Rrs_547:Isotropic = 0 ;
+		Rrs_547:Scale = 0. ;
+		Rrs_547:Central_Azimuth = 0. ;
+	float Rrs_555(fakeDim12, fakeDim13) ;
+		Rrs_555:Projection Category = "IDL" ;
+		Rrs_555:Projection Name = "Cylindrical" ;
+		Rrs_555:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_555:units = "sr^-1" ;
+		Rrs_555:Slope = 1.f ;
+		Rrs_555:Intercept = 0.f ;
+		Rrs_555:Scaling = "linear" ;
+		Rrs_555:Limit = 18., -98., 31., -79. ;
+		Rrs_555:Projection ID = 8 ;
+		Rrs_555:Latitude Center = 0. ;
+		Rrs_555:Longitude Center = -88.5 ;
+		Rrs_555:Rotation = 0. ;
+		Rrs_555:Position = 0., 0., 1., 1. ;
+		Rrs_555:Isotropic = 0 ;
+		Rrs_555:Scale = 0. ;
+		Rrs_555:Central_Azimuth = 0. ;
+	float Rrs_645(fakeDim14, fakeDim15) ;
+		Rrs_645:Projection Category = "IDL" ;
+		Rrs_645:Projection Name = "Cylindrical" ;
+		Rrs_645:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_645:units = "sr^-1" ;
+		Rrs_645:Slope = 1.f ;
+		Rrs_645:Intercept = 0.f ;
+		Rrs_645:Scaling = "linear" ;
+		Rrs_645:Limit = 18., -98., 31., -79. ;
+		Rrs_645:Projection ID = 8 ;
+		Rrs_645:Latitude Center = 0. ;
+		Rrs_645:Longitude Center = -88.5 ;
+		Rrs_645:Rotation = 0. ;
+		Rrs_645:Position = 0., 0., 1., 1. ;
+		Rrs_645:Isotropic = 0 ;
+		Rrs_645:Scale = 0. ;
+		Rrs_645:Central_Azimuth = 0. ;
+	float Rrs_667(fakeDim16, fakeDim17) ;
+		Rrs_667:Projection Category = "IDL" ;
+		Rrs_667:Projection Name = "Cylindrical" ;
+		Rrs_667:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_667:units = "sr^-1" ;
+		Rrs_667:Slope = 1.f ;
+		Rrs_667:Intercept = 0.f ;
+		Rrs_667:Scaling = "linear" ;
+		Rrs_667:Limit = 18., -98., 31., -79. ;
+		Rrs_667:Projection ID = 8 ;
+		Rrs_667:Latitude Center = 0. ;
+		Rrs_667:Longitude Center = -88.5 ;
+		Rrs_667:Rotation = 0. ;
+		Rrs_667:Position = 0., 0., 1., 1. ;
+		Rrs_667:Isotropic = 0 ;
+		Rrs_667:Scale = 0. ;
+		Rrs_667:Central_Azimuth = 0. ;
+	float Rrs_678(fakeDim18, fakeDim19) ;
+		Rrs_678:Projection Category = "IDL" ;
+		Rrs_678:Projection Name = "Cylindrical" ;
+		Rrs_678:Source = "A20030012003031_1_MO.L3" ;
+		Rrs_678:units = "sr^-1" ;
+		Rrs_678:Slope = 1.f ;
+		Rrs_678:Intercept = 0.f ;
+		Rrs_678:Scaling = "linear" ;
+		Rrs_678:Limit = 18., -98., 31., -79. ;
+		Rrs_678:Projection ID = 8 ;
+		Rrs_678:Latitude Center = 0. ;
+		Rrs_678:Longitude Center = -88.5 ;
+		Rrs_678:Rotation = 0. ;
+		Rrs_678:Position = 0., 0., 1., 1. ;
+		Rrs_678:Isotropic = 0 ;
+		Rrs_678:Scale = 0. ;
+		Rrs_678:Central_Azimuth = 0. ;
+	float chlor_a(fakeDim20, fakeDim21) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "A20030012003031_1_MO.L3" ;
+		chlor_a:units = "mg m^-3" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+	float Kd_490(fakeDim22, fakeDim23) ;
+		Kd_490:Projection Category = "IDL" ;
+		Kd_490:Projection Name = "Cylindrical" ;
+		Kd_490:Source = "A20030012003031_1_MO.L3" ;
+		Kd_490:units = "m^-1" ;
+		Kd_490:Slope = 1.f ;
+		Kd_490:Intercept = 0.f ;
+		Kd_490:Scaling = "linear" ;
+		Kd_490:Limit = 18., -98., 31., -79. ;
+		Kd_490:Projection ID = 8 ;
+		Kd_490:Latitude Center = 0. ;
+		Kd_490:Longitude Center = -88.5 ;
+		Kd_490:Rotation = 0. ;
+		Kd_490:Position = 0., 0., 1., 1. ;
+		Kd_490:Isotropic = 0 ;
+		Kd_490:Scale = 0. ;
+		Kd_490:Central_Azimuth = 0. ;
+	float nflh(fakeDim24, fakeDim25) ;
+		nflh:Projection Category = "IDL" ;
+		nflh:Projection Name = "Cylindrical" ;
+		nflh:Source = "A20030012003031_1_MO.L3" ;
+		nflh:units = "mW cm^-2 um^-1 sr^-1" ;
+		nflh:Slope = 1.f ;
+		nflh:Intercept = 0.f ;
+		nflh:Scaling = "linear" ;
+		nflh:Limit = 18., -98., 31., -79. ;
+		nflh:Projection ID = 8 ;
+		nflh:Latitude Center = 0. ;
+		nflh:Longitude Center = -88.5 ;
+		nflh:Rotation = 0. ;
+		nflh:Position = 0., 0., 1., 1. ;
+		nflh:Isotropic = 0 ;
+		nflh:Scale = 0. ;
+		nflh:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+
+MODIS SST Fields
+~~~~~~~~~~~~~~~~
+
+The variable +SST+ is used for the SST derived from long-wave MODIS data.  The
+details are given at:
+
+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/sst_transition.html[+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/sst_transition.html+]
+
+A brief synopsis:  "The long-wave SST algorithm makes use of MODIS bands 31
+and 32 at 11 amd 12 um. The brightness temperatures are derived from the
+observed radiances by inversion (in linear space) of the radiance versus
+blackbody temperature relationship."
+
+*Source Code*:
+http://oceancolor.gsfc.nasa.gov/DOCS/OCSSW/sst_8c_source.html[+http://oceancolor.gsfc.nasa.gov/DOCS/OCSSW/sst_8c_source.html+]
+
+[[gcoos_sst_daily]]
++sst+ Daily GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the daily +sst+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst/gcoos/+]
+
+and a typical file is +AQUA.20030101.0000.gcoos.sst.day.hdf+ which can be
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst/gcoos/2003/AQUA.20030101.0000.gcoos.sst.day.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst/gcoos/2003/AQUA.20030101.0000.gcoos.sst.day.hdf+]
+
+The variables is this file are:
+
+* +sst+
+
+The complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst.day {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst(fakeDim0, fakeDim1) ;
+		sst:Projection Category = "IDL" ;
+		sst:Projection Name = "Cylindrical" ;
+		sst:Source = "A2003001175000_.L2b" ;
+		sst:units = "degrees-C" ;
+		sst:Slope = 1.f ;
+		sst:Intercept = 0.f ;
+		sst:Scaling = "linear" ;
+		sst:Limit = 18., -98., 31., -79. ;
+		sst:Projection ID = 8 ;
+		sst:Latitude Center = 0. ;
+		sst:Longitude Center = -88.5 ;
+		sst:Rotation = 0. ;
+		sst:Position = 0., 0., 1., 1. ;
+		sst:Isotropic = 0 ;
+		sst:Scale = 0. ;
+		sst:Central_Azimuth = 0. ;
+
+data:
+
+...
+-----
+
+[[gcoos_sst_weekly]]
++sst+ Weekly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the weekly +sst+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst/gcoos/+]
+
+and a typical file is +AQUA.20030101.0000.gcoos.sst.day.hdf+ which can be
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst/gcoos/2003/AQUA.20030101.0000.gcoos.sst.day.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst/gcoos/2003/AQUA.20030101.0000.gcoos.sst.day.hdf+]
+
+The variables is this file are:
+
+* +sst+
+
+The complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst.day {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst(fakeDim0, fakeDim1) ;
+		sst:Projection Category = "IDL" ;
+		sst:Projection Name = "Cylindrical" ;
+		sst:Source = "A2003001_1_DAY.L3" ;
+		sst:units = "degrees-C" ;
+		sst:Slope = 1.f ;
+		sst:Intercept = 0.f ;
+		sst:Scaling = "linear" ;
+		sst:Limit = 18., -98., 31., -79. ;
+		sst:Projection ID = 8 ;
+		sst:Latitude Center = 0. ;
+		sst:Longitude Center = -88.5 ;
+		sst:Rotation = 0. ;
+		sst:Position = 0., 0., 1., 1. ;
+		sst:Isotropic = 0 ;
+		sst:Scale = 0. ;
+		sst:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_sst_monthly]]
++sst+ Monthly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the monthly +sst+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst/gcoos/+]
+
+and a typical file is +AQUA.20030101.0000.gcoos.sst.day.hdf+ which can be
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst/gcoos/2003/AQUA.20030101.0000.gcoos.sst.day.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst/gcoos/2003/AQUA.20030101.0000.gcoos.sst.day.hdf+]
+
+The variables in this file are:
+
+* +sst+
+
+The complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst.day {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst(fakeDim0, fakeDim1) ;
+		sst:Projection Category = "IDL" ;
+		sst:Projection Name = "Cylindrical" ;
+		sst:Source = "A2003001_1_DAY.L3" ;
+		sst:units = "degrees-C" ;
+		sst:Slope = 1.f ;
+		sst:Intercept = 0.f ;
+		sst:Scaling = "linear" ;
+		sst:Limit = 18., -98., 31., -79. ;
+		sst:Projection ID = 8 ;
+		sst:Latitude Center = 0. ;
+		sst:Longitude Center = -88.5 ;
+		sst:Rotation = 0. ;
+		sst:Position = 0., 0., 1., 1. ;
+		sst:Isotropic = 0 ;
+		sst:Scale = 0. ;
+		sst:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_sst_yearly]]
++sst+ Yearly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top directory for the yearly +sst+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst/gcoos/+]
+
+and a typical file is +AQUA.20030101.0000.gcoos.sst.day.hdf+ which can be
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst/gcoos/AQUA.20030101.0000.gcoos.sst.day.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst/gcoos/AQUA.20030101.0000.gcoos.sst.day.hdf+]
+
+The variables is this file are:
+
+* +sst+
+
+The complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst.day {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst(fakeDim0, fakeDim1) ;
+		sst:Projection Category = "IDL" ;
+		sst:Projection Name = "Cylindrical" ;
+		sst:Source = "A20030012003031_1_MO.L3" ;
+		sst:units = "degrees-C" ;
+		sst:Slope = 1.f ;
+		sst:Intercept = 0.f ;
+		sst:Scaling = "linear" ;
+		sst:Limit = 18., -98., 31., -79. ;
+		sst:Projection ID = 8 ;
+		sst:Latitude Center = 0. ;
+		sst:Longitude Center = -88.5 ;
+		sst:Rotation = 0. ;
+		sst:Position = 0., 0., 1., 1. ;
+		sst:Isotropic = 0 ;
+		sst:Scale = 0. ;
+		sst:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+MODIS SST4 Fields
+~~~~~~~~~~~~~~~~
+
+The variable +SST4+ is used for the SST derived from short-wave MODIS data.  The
+details are given at:
+
+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/sst_transition.html[+http://oceancolor.gsfc.nasa.gov/DOCS/modis_sst/sst_transition.html+]
+
+A brief synopsis: "The short-wave SST algorithm makes use of MODIS bands 22
+and 23 at 3.959 amd 4.050 um. The brightness temperatures are derived from the
+observed radiances by inversion (in log space) of a the radiance versus
+blackbody temperature relationship."
+
+*Source Code*:
+http://oceancolor.gsfc.nasa.gov/DOCS/OCSSW/sst_8c_source.html[+http://oceancolor.gsfc.nasa.gov/DOCS/OCSSW/sst_8c_source.html+]
+
+[[gcoos_sst4_daily]]
++sst4+ Daily GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the daily +sst4+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst4/gcoos/+]
+
+And a typical file is +AQUA.20030101.0000.gcoos.sst4.night.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst4/gcoos/2003/AQUA.20030101.0000.gcoos.sst4.night.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/daily/1km/sst4/gcoos/2003/AQUA.20030101.0000.gcoos.sst4.night.hdf+]
+
+The variables in this file are:
+
+* +sst4+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst4.night {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst4(fakeDim0, fakeDim1) ;
+		sst4:Projection Category = "IDL" ;
+		sst4:Projection Name = "Cylindrical" ;
+		sst4:Source = "A2003001065500_1.L2b" ;
+		sst4:units = "degrees-C" ;
+		sst4:Slope = 1.f ;
+		sst4:Intercept = 0.f ;
+		sst4:Scaling = "linear" ;
+		sst4:Limit = 18., -98., 31., -79. ;
+		sst4:Projection ID = 8 ;
+		sst4:Latitude Center = 0. ;
+		sst4:Longitude Center = -88.5 ;
+		sst4:Rotation = 0. ;
+		sst4:Position = 0., 0., 1., 1. ;
+		sst4:Isotropic = 0 ;
+		sst4:Scale = 0. ;
+		sst4:Central_Azimuth = 0. ;
+
+data:
+
+...
+-----
+
+[[gcoos_sst4_weekly]]
++sst4+ Weekly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the weekly +sst4+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst4/gcoos/+]
+
+And a typical file is +AQUA.20030101.0000.gcoos.sst4.night.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst4/gcoos/2003/AQUA.20030101.0000.gcoos.sst4.night.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/sst4/gcoos/2003/AQUA.20030101.0000.gcoos.sst4.night.hdf+]
+
+The variables in this file are:
+
+* +sst4+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst4.night {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst4(fakeDim0, fakeDim1) ;
+		sst4:Projection Category = "IDL" ;
+		sst4:Projection Name = "Cylindrical" ;
+		sst4:Source = "A2003001_1_DAY.L3" ;
+		sst4:units = "degrees-C" ;
+		sst4:Slope = 1.f ;
+		sst4:Intercept = 0.f ;
+		sst4:Scaling = "linear" ;
+		sst4:Limit = 18., -98., 31., -79. ;
+		sst4:Projection ID = 8 ;
+		sst4:Latitude Center = 0. ;
+		sst4:Longitude Center = -88.5 ;
+		sst4:Rotation = 0. ;
+		sst4:Position = 0., 0., 1., 1. ;
+		sst4:Isotropic = 0 ;
+		sst4:Scale = 0. ;
+		sst4:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_sst4_monthly]]
++sst4+ Monthly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the monthly +sst4+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst4/gcoos/+]
+
+And a typical file is +AQUA.20030101.0000.gcoos.sst4.night.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst4/gcoos/2003/AQUA.20030101.0000.gcoos.sst4.night.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/sst4/gcoos/2003/AQUA.20030101.0000.gcoos.sst4.night.hdf+]
+
+The variables in this file are:
+
+* +sst4+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst4.night {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst4(fakeDim0, fakeDim1) ;
+		sst4:Projection Category = "IDL" ;
+		sst4:Projection Name = "Cylindrical" ;
+		sst4:Source = "A2003001_1_DAY.L3" ;
+		sst4:units = "degrees-C" ;
+		sst4:Slope = 1.f ;
+		sst4:Intercept = 0.f ;
+		sst4:Scaling = "linear" ;
+		sst4:Limit = 18., -98., 31., -79. ;
+		sst4:Projection ID = 8 ;
+		sst4:Latitude Center = 0. ;
+		sst4:Longitude Center = -88.5 ;
+		sst4:Rotation = 0. ;
+		sst4:Position = 0., 0., 1., 1. ;
+		sst4:Isotropic = 0 ;
+		sst4:Scale = 0. ;
+		sst4:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_sst4_yearly]]
++sst4+ Yearly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the yearly +sst4+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst4/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst4/gcoos/+]
+
+And a typical file is +AQUA.20030101.0000.gcoos.sst4.night.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst4/gcoos/AQUA.20030101.0000.gcoos.sst4.night.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/sst4/gcoos/AQUA.20030101.0000.gcoos.sst4.night.hdf+]
+
+The variables in this file are:
+
+* +sst4+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.sst4.night {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float sst4(fakeDim0, fakeDim1) ;
+		sst4:Projection Category = "IDL" ;
+		sst4:Projection Name = "Cylindrical" ;
+		sst4:Source = "A20030012003031_1_SST4N_MO.L3" ;
+		sst4:units = "degrees-C" ;
+		sst4:Slope = 1.f ;
+		sst4:Intercept = 0.f ;
+		sst4:Scaling = "linear" ;
+		sst4:Limit = 18., -98., 31., -79. ;
+		sst4:Projection ID = 8 ;
+		sst4:Latitude Center = 0. ;
+		sst4:Longitude Center = -88.5 ;
+		sst4:Rotation = 0. ;
+		sst4:Position = 0., 0., 1., 1. ;
+		sst4:Isotropic = 0 ;
+		sst4:Scale = 0. ;
+		sst4:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+Net Primary Productivity Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This...
+
+[[gcoos_npp_weekly]]
++NPP+ Weekly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the weekly +NPP+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/npp/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/npp/gcoos/+]
+
+And a typical file is +AQUA.20030101.0000.gcoos.npp.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/npp/gcoos/2003/AQUA.20030101.0000.gcoos.npp.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/weekly/1km/npp/gcoos/2003/AQUA.20030101.0000.gcoos.npp.hdf+]
+
+The variables in this file are:
+
+* +npp_mapped+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.npp {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float npp mapped(fakeDim0, fakeDim1) ;
+		npp mapped:Projection Category = "IDL" ;
+		npp mapped:Projection Name = "Cylindrical" ;
+		npp mapped:Source = "./npp_tmp/A20030012003007_1_7D.L3_npp" ;
+		npp mapped:Slope = 1.f ;
+		npp mapped:Intercept = 0.f ;
+		npp mapped:Scaling = "linear" ;
+		npp mapped:Limit = 18., -98., 31., -79. ;
+		npp mapped:Projection ID = 8 ;
+		npp mapped:Latitude Center = 0. ;
+		npp mapped:Longitude Center = -88.5 ;
+		npp mapped:Rotation = 0. ;
+		npp mapped:Position = 0., 0., 1., 1. ;
+		npp mapped:Isotropic = 0 ;
+		npp mapped:Scale = 0. ;
+		npp mapped:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_npp_monthly]]
++NPP+ Weekly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the monthly +NPP+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/npp/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/npp/gcoos/+]
+
+And a typical file is +AQUA.20030101.0000.gcoos.npp.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/npp/gcoos/2003/AQUA.20030101.0000.gcoos.npp.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/monthly/1km/npp/gcoos/2003/AQUA.20030101.0000.gcoos.npp.hdf+]
+
+The variables in this file are:
+
+* +npp_mapped+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20030101.0000.gcoos.npp {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float npp mapped(fakeDim0, fakeDim1) ;
+		npp mapped:Projection Category = "IDL" ;
+		npp mapped:Projection Name = "Cylindrical" ;
+		npp mapped:Source = "./npp_tmp/A20030012003031_1_MO.L3_npp" ;
+		npp mapped:Slope = 1.f ;
+		npp mapped:Intercept = 0.f ;
+		npp mapped:Scaling = "linear" ;
+		npp mapped:Limit = 18., -98., 31., -79. ;
+		npp mapped:Projection ID = 8 ;
+		npp mapped:Latitude Center = 0. ;
+		npp mapped:Longitude Center = -88.5 ;
+		npp mapped:Rotation = 0. ;
+		npp mapped:Position = 0., 0., 1., 1. ;
+		npp mapped:Isotropic = 0 ;
+		npp mapped:Scale = 0. ;
+		npp mapped:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+
+[[gcoos_npp_yearly]]
++NPP+ Yearly GCOOS Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the yearly +NPP+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/npp/gcoos/[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/npp/gcoos/+]
+
+And a typical file is +AQUA.20130101.0000.gcoos.npp.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/npp/gcoos/AQUA.20130101.0000.gcoos.npp.hdf[+ftp://imars.marine.usf.edu/modis/imars/final/yearly/1km/npp/gcoos/AQUA.20130101.0000.gcoos.npp.hdf+]
+
+The variables in this file are:
+
+* +npp_mapped+
+
+and the complete header is:
+
+-----
+netcdf AQUA.20130101.0000.gcoos.npp {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float npp mapped(fakeDim0, fakeDim1) ;
+		npp mapped:Projection Category = "IDL" ;
+		npp mapped:Projection Name = "Cylindrical" ;
+		npp mapped:Source = "./npp_tmp/A2013_1_YR.L3_npp" ;
+		npp mapped:Slope = 1.f ;
+		npp mapped:Intercept = 0.f ;
+		npp mapped:Scaling = "linear" ;
+		npp mapped:Limit = 18., -98., 31., -79. ;
+		npp mapped:Projection ID = 8 ;
+		npp mapped:Latitude Center = 0. ;
+		npp mapped:Longitude Center = -88.5 ;
+		npp mapped:Rotation = 0. ;
+		npp mapped:Position = 0., 0., 1., 1. ;
+		npp mapped:Isotropic = 0 ;
+		npp mapped:Scale = 0. ;
+		npp mapped:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[gcoos_avhrr_weekly]]
++AVHRR+ Weekly GCOOS SST Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The top level directory for the weekly AVHRR +SST+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/avhrr/imars/final/weekly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/avhrr/imars/final/weekly/1km/sst/gcoos/+]
+
+And a typical file is +multiple.19940101.0000.gcoos.sst.day.png+ which is
+found at:
+
+ftp://imars.marine.usf.edu/avhrr/imars/final/weekly/1km/sst/gcoos/1994/multiple.19940101.0000.gcoos.sst.day.png[+ftp://imars.marine.usf.edu/avhrr/imars/final/weekly/1km/sst/gcoos/1994/multiple.19940101.0000.gcoos.sst.day.png+]
+
+[[gcoos_avhrr_monthly]]
++AVHRR+ Monthly GCOOS SST Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The top level directory for the monthly AVHRR +SST+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/avhrr/imars/final/monthly/1km/sst/gcoos/[+ftp://imars.marine.usf.edu/avhrr/imars/final/monthly/1km/sst/gcoos/+]
+
+And a typical file is +multiple.19940101.0000.gcoos.sst.day.png+ which is
+found at:
+
+ftp://imars.marine.usf.edu/avhrr/imars/final/monthly/1km/sst/gcoos/1994/multiple.19940101.0000.gcoos.sst.day.png[+ftp://imars.marine.usf.edu/avhrr/imars/final/monthly/1km/sst/gcoos/1994/multiple.19940101.0000.gcoos.sst.day.png+]
+
+SeaWIFS Ocean Color
+~~~~~~~~~~~~~~~~~~~
+
+The variables in the files are:
+
+* +chlor_a+ - chlorophyll a concentration from sensor default chlorophyll
+algorithm
+(http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi[+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi+])
+
+[[seawifs_oc_daily]]
+SeaWIFS Daily GCOOS OC Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the daily SeaWIFS +OC+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/daily/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/daily/1km/oc/gcoos/+]
+
+And a typical file is +SEASTAR.19980101.0000.gcoos.oc.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/daily/1km/oc/gcoos/1998.01/SEASTAR.19980101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/seawifs/imars/final/daily/1km/oc/gcoos/1998.01/SEASTAR.19980101.0000.gcoos.oc.hdf+]
+
+The HDF file header is:
+
+-----
+netcdf SEASTAR.19980101.0000.gcoos.oc {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float chlor_a(fakeDim0, fakeDim1) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "S1998001162406_1.L2b" ;
+		chlor_a:units = "unknown" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[seawifs_oc_weekly]]
+SeaWIFS Weekly GCOOS OC Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the weekly SeaWIFS +OC+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/weekly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/weekly/1km/oc/gcoos/+]
+
+And a typical file is +SEASTAR.19980101.0000.gcoos.oc.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/weekly/1km/oc/gcoos/1998/SEASTAR.19980101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/seawifs/imars/final/weekly/1km/oc/gcoos/1998/SEASTAR.19980101.0000.gcoos.oc.hdf+]
+
+The HDF file header is:
+
+-----
+netcdf SEASTAR.19980101.0000.gcoos.oc {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float chlor_a(fakeDim0, fakeDim1) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "S1998001_1_DAY.L3" ;
+		chlor_a:units = "unknown" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[seawifs_oc_monthly]]
+SeaWIFS Monthly GCOOS OC Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the monthly SeaWIFS +OC+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/monthly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/monthly/1km/oc/gcoos/+]
+
+And a typical file is +SEASTAR.19980101.0000.gcoos.oc.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/monthly/1km/oc/gcoos/1998/SEASTAR.19980101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/seawifs/imars/final/monthly/1km/oc/gcoos/1998/SEASTAR.19980101.0000.gcoos.oc.hdf+]
+
+The HDF file header is:
+
+-----
+netcdf SEASTAR.19980101.0000.gcoos.oc(2) {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float chlor_a(fakeDim0, fakeDim1) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "S1998001_1_DAY.L3" ;
+		chlor_a:units = "unknown" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[seawifs_oc_yearly]]
+SeaWIFS Yearly GCOOS OC Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The top level directory for the yearly SeaWIFS +OC+ data for GCOOS is:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/yearly/1km/oc/gcoos/[+ftp://imars.marine.usf.edu/seawifs/imars/final/yearly/1km/oc/gcoos/+]
+
+And a typical file is +SEASTAR.19980101.0000.gcoos.oc.hdf+ which is
+found at:
+
+ftp://imars.marine.usf.edu/seawifs/imars/final/yearly/1km/oc/gcoos/SEASTAR.19980101.0000.gcoos.oc.hdf[+ftp://imars.marine.usf.edu/seawifs/imars/final/yearly/1km/oc/gcoos/SEASTAR.19980101.0000.gcoos.oc.hdf+]
+
+The HDF file header is:
+
+-----
+netcdf SEASTAR.19980101.0000.gcoos.oc {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+
+variables:
+	float chlor_a(fakeDim0, fakeDim1) ;
+		chlor_a:Projection Category = "IDL" ;
+		chlor_a:Projection Name = "Cylindrical" ;
+		chlor_a:Source = "S19980011998031_1_MO.L3" ;
+		chlor_a:units = "unknown" ;
+		chlor_a:Slope = 1.f ;
+		chlor_a:Intercept = 0.f ;
+		chlor_a:Scaling = "linear" ;
+		chlor_a:Limit = 18., -98., 31., -79. ;
+		chlor_a:Projection ID = 8 ;
+		chlor_a:Latitude Center = 0. ;
+		chlor_a:Longitude Center = -88.5 ;
+		chlor_a:Rotation = 0. ;
+		chlor_a:Position = 0., 0., 1., 1. ;
+		chlor_a:Isotropic = 0 ;
+		chlor_a:Scale = 0. ;
+		chlor_a:Central_Azimuth = 0. ;
+
+data:
+...
+-----
+
+[[products]]
+Output Products/Variables Information
+-------------------------------------
+
+The variables/products in the ocean color (OC) files are explained at the following
+sites.  At these sites you can discover what the various products are, how
+they are derived, and even obtain the source code used to create them.
+
+* Ocean Color Products and Algorithsm -
+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi[+http://oceancolor.gsfc.nasa.gov/cgi/algorithms.cgi+]
+
+* MSL12 Output Products -
+http://oceancolor.gsfc.nasa.gov/DOCS/MSL12/MSl12_prod.html[+http://oceancolor.gsfc.nasa.gov/DOCS/MSL12/MSl12_prod.html+]
+
+
+
+
+
+
+
+

@@ -1,0 +1,238 @@
+Programming Techniques
+======================
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+Uncategorized
+-------------
+
+*The Web IS a computer, HTML its language (and a pushy Scheme CGI setting it
+off)* - Oleg Kiselyov -
+http://okmij.org/ftp/Communications.html#web-computer[+http://okmij.org/ftp/Communications.html#web-computer+]
+
+*****
+An article that shows off a tail-f CGI script that starts a Server-Net-Browser
+hyper-computer. The article argues that the Web itself may act as some sort of
+a distributed, multi-threaded hyper-computer.
+*****
+
+Lazy Evaluation
+---------------
+
+Docs
+~~~~
+
+*Lazy evaluation (Wikipedia)* - 
+http://en.wikipedia.org/wiki/Lazy_evaluation[+http://en.wikipedia.org/wiki/Lazy_evaluation+]
+
+*****
+In programming language theory, lazy evaluation, or call-by-need[1] is an
+evaluation strategy which delays the evaluation of an expression until its
+value is needed (non-strict evaluation) and which also avoids repeated
+evaluations (sharing).[2][3] The sharing can reduce the running time of
+certain functions by an exponential factor over other non-strict evaluation
+strategies, such as call-by-name.
+...
+From version 2.2 forward, Python manifests lazy evaluation by implementing
+iterators (lazy sequences) unlike tuple or list sequences.
+*****
+
+*Specific "scientific" data structures, and their processing* (paper, PDF,
+2011, 15) - Jerzy Karczmarczuk -
+http://arxiv.org/abs/1109.0783[+http://arxiv.org/abs/1109.0783+]
+
+*****
+Programming physicists use, as all programmers, arrays, lists, tuples,
+records, etc., and this requires some change in their thought patterns while
+converting their formulae into some code, since the "data structures" operated
+upon, while elaborating some theory and its consequences, are rather: power
+series and Pad\'e approximants, differential forms and other instances of
+differential algebras, functionals (for the variational calculus),
+trajectories (solutions of differential equations), Young diagrams and Feynman
+graphs, etc. Such data is often used in a [semi-]numerical setting, not
+necessarily "symbolic", appropriate for the computer algebra packages. Modules
+adapted to such data may be "just libraries", but often they become specific,
+embedded sub-languages, typically mapped into object-oriented frameworks, with
+overloaded mathematical operations. Here we present a functional approach to
+this philosophy. We show how the usage of Haskell datatypes and - fundamental
+for our tutorial - the application of lazy evaluation makes it possible to
+operate upon such data (in particular: the "infinite" sequences) in a natural
+and comfortable manner. 
+*****
+
+Python
+~~~~~~
+
+*Lazy evaluation and declarative approach in Python* (slides, 2012) - Alexey 
+Kachayev -
+http://kachayev.github.io/talks/kharkivpy%236/index.html#/[+http://kachayev.github.io/talks/kharkivpy%236/index.html#/+]
+
+*Functional programming in Python becomes lazy* (article, 2003) - David Mertz -
+http://gnosis.cx/publish/programming/charming_python_b13.html[+http://gnosis.cx/publish/programming/charming_python_b13.html+]
+
+*****
+Python 2.2 introduced simple generators to Python language, and reconceived
+standard loops in terms of underlying iterators. With Python 2.3, generators
+become standard (no need for _future_), and the new module itertools is
+introduced to work flexibly with iterators. Over time, I think more
+capabilities will be introduced to this module, but already it is a very
+interesting thing. The itertools modules is essentially a set of combinatorial
+higher-order functions, but ones that work with lazy iterators rather than
+with finite lists. This installment explores the new module, and gives reader
+a sense of the new expressive power available with combinatorial iterators.
+*****
+
+[[Biggus]]
+Biggus
+^^^^^^
+
+Biggus is a pure-Python library for handling very large (i.e. too large for
+system memory) n-dimensional arrays.
+It has two main components:
+
+* Representation, lazy indexing, and conversion to persistent files and NumPy
+arrays; and
+* Lazy calculation.
+
+At the core of Biggus is the Array which provides a simple, consistent,
+NumPy-esque interface to n-dimensional data which avoids reading data until
+explicitly requested by user code. Commonly these Array objects are created by
+wrapping "concrete" data sources such as HDF5 variables, netCDF4 variables, or
+even just NumPy arrays.
+
+Once created, Array objects can be concatenated and stacked to form new Array
+objects, which can themselves be concatenated and stacked as required. In this
+way it is possible to construct virtual arrays of arbitrary size, spanning
+multiple data sources.
+
+In addition, all Array objects can be indexed to extract subsets. As with the
+concatenation and stacking operations, this does not cause any data to be
+read.
+
+User code may request any Array object be saved to a "concrete" data form
+(e.g. HDF5, etc. as above). The size of this operation is not limited by
+system memory. Alternatively, user code may explicitly request any Array
+object to provide the corresponding NumPy array in memory. It is the
+responsibility of the user code to determine if this is an appropriate action.
+
+https://github.com/SciTools/biggus[+https://github.com/SciTools/biggus+]
+
+https://github.com/SciTools/biggus/wiki[+https://github.com/SciTools/biggus/wiki+]
+
+https://github.com/SciTools/biggus/wiki/Sample-usage[+https://github.com/SciTools/biggus/wiki/Sample-usage+]
+
+[[lazy_python]]
+lazy_python
+^^^^^^^^^^^
+
+A module for making python lazily evaluated (kinda).  This
+runs under Python 3.5 and 3.4.
+
+https://github.com/llllllllll/lazy_python[+https://github.com/llllllllll/lazy_python+]
+
+https://news.ycombinator.com/item?id=9132881[+https://news.ycombinator.com/item?id=9132881+]
+
+Meta-Programming
+----------------
+
+Conferences
+~~~~~~~~~~~
+
+*High-Performance Domain-Specific Languages using Delite* (2012) -
+http://cgo2012.hyperdsls.org/[+http://cgo2012.hyperdsls.org/+]
+
+*Bridging the Theory of Staged Programming Languages and
+the Practice of High-Performance Computing* (2012) -
+http://shonan.nii.ac.jp/seminar/019/[+http://shonan.nii.ac.jp/seminar/019/+]
+
+* Conference Summary -
+http://www.nii.ac.jp/shonan/wp-content/uploads/2011/09/No.2012-4.pdf[+http://www.nii.ac.jp/shonan/wp-content/uploads/2011/09/No.2012-4.pdf+]
+
+*Staging and High Performance Computing* (2014) -
+http://shonan.nii.ac.jp/seminar/056/[+http://shonan.nii.ac.jp/seminar/056/+]
+
+* Conference Summary -
+http://okmij.org/ftp/meta-programming/shonan2-report.pdf[+http://okmij.org/ftp/meta-programming/shonan2-report.pdf+]
+
+Docs
+~~~~
+
+*Multi-stage programming with functors and monads: eliminating abstraction
+overhead from generic code* - Jacques Carette & Oleg Kiselyev -
+http://okmij.org/ftp/meta-programming/HPC.html[+http://okmij.org/ftp/meta-programming/HPC.html+]
+
+http://www.cas.mcmaster.ca/\~carette/metamonads/index.html[+http://www.cas.mcmaster.ca/~carette/metamonads/index.html+]
+
+*****
+We use multi-stage programming, monads and OCaml's advanced module system to
+demonstrate how to eliminate all abstraction overhead from generic programs
+while avoiding any inspection of the resulting code. We demonstrate this
+clearly with Gaussian Elimination as a representative family of symbolic and
+numeric algorithms. We parameterize our code to a great extent -- over domain,
+input and permutation matrix representations, determinant and rank tracking,
+pivoting policies, result types, etc. -- at no run-time cost. Because the
+resulting code is generated just right and not changed afterward, MetaOCaml
+guarantees that the generated code is well-typed. We further demonstrate that
+various abstraction parameters (aspects) can be made orthogonal and
+compositional, even in the presence of name-generation for temporaries, and
+``interleaving'' of aspects. We also show how to encode some domain-specific
+knowledge so that ``clearly wrong'' compositions can be rejected at or before
+generation time, rather than during the compilation or running of the
+generated code.
+*****
+
+
+*Generating optimal code with confidence* - Oleg Kiselyov et al. -
+http://okmij.org/ftp/meta-programming/HPC.html[+http://okmij.org/ftp/meta-programming/HPC.html+]
+
+*****
+Can we generate optimal code in one pass, without further transformations
+such as common-subexpression-elimination, without looking into the code at all
+after it has been generated? The papers below answer affirmatively. The papers
+discuss in detail the generation of a straight-line C, Fortran, etc. code for
+the power-of-two FFT. The papers show that with the help of Abstract
+Interpretation we can exactly match the quality of code generated by the
+well-known system FFTW. The second paper demonstrates that our generated
+power-of-two FFT code has exactly the same number of floating-point operations
+as that in codelets of FFTW. The significant difference from FFTW is that we
+do not do any intensional code analysis -- the generated code is a black box
+and can not be processed nor manipulated any further. Moreover, the generated
+code cannot even be compared in equality. The reason for these restrictions is
+to maintain strong invariants about the generated code, e.g., that the
+generated code is automatically strongly typed and does not need to be
+typechecked. These invariants and the absence of ad hoc manipulation on the
+generated low-level code significantly increase our confidence in the result.
+
+Unlike FFTW, we know precisely where savings are coming from, and which
+particular equivalences contribute to which improvements in the code.
+
+The paper makes the case that ``there are benefits to focusing on writing
+better generators rather than on fixing the results of simple generators.''
+*****
+
+Tools
+~~~~~
+
+[[MetaOCaml]]
+MetaOCaml
+^^^^^^^^^
+
+MetaOCaml is a multi-stage extension of the OCaml programming language, and
+provides three basic constructs called Brackets, Escape, and Run for building,
+combining, and executing future-stage computations, respectively.
+
+http://www.cs.rice.edu/\~taha/MetaOCaml/[+http://www.cs.rice.edu/~taha/MetaOCaml/+]
+
+http://www.sciencedirect.com/science/journal/01676423/62/1[+http://www.sciencedirect.com/science/journal/01676423/62/1+]
+
+
+
+

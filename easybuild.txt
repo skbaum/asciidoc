@@ -1,0 +1,51 @@
+
+= Easybuild
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Intro
+
+*Building Software with EasyBuild* - https://ulhpc-tutorials.readthedocs.io/en/latest/tools/easybuild/[`https://ulhpc-tutorials.readthedocs.io/en/latest/tools/easybuild/`]
+
+*Introduction to EasyBuild* - https://www.slideshare.net/insideHPC/introduction-to-easybuild-tutorial-part-1[`https://www.slideshare.net/insideHPC/introduction-to-easybuild-tutorial-part-1`]
+
+*EasyBuild Tutorial* - https://docs.it4i.cz/software/tools/easybuild/[`https://docs.it4i.cz/software/tools/easybuild/`]
+
+
+
+
+== Setting Up
+
+Add the following to `.bashrc`:
+
+-----
+# Easybuild
+export EASYBUILD_PREFIX=/back/EASYBUILD/.local/easybuild
+export EASYBUILD_MODULES_TOOL=Lmod
+export EASYBUILD_MODULE_NAMING_SCHEME=CategorizedModuleNamingScheme
+# Use the below variable to run:
+#    module use $LOCAL_MODULES
+#    module load tools/EasyBuild
+export LOCAL_MODULES=${EASYBUILD_PREFIX}/modules/all
+
+alias ma="module avail"
+alias ml="module list"
+function mu(){
+   module use $LOCAL_MODULES
+   module load tools/EasyBuild
+}
+-----
+
+
+
+==== Cubic
+
+== MoPy
+
+=== Mube
+

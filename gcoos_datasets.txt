@@ -1,0 +1,1123 @@
+GCOOS Datasets
+==============
+Steven K. Baum
+v0.1, 2019-03-29
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+gcoos_ioos_station_COAPS_N7_2010_**_ocn.nc
+------------------------------------------
+
+*Title*: GCOOS netCDF Data for urn:ioos:station:COAPS:N7 for the period 2010-**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*featureType*: timeSeries
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Location*: http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/[+http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/+]
+
+*Time Variables*: time, z, sea_water_temperature
+
+-----
+netcdf gcoos_ioos_station_COAPS_N7_2010_01_ocn {
+dimensions:
+	time = UNLIMITED ; // (43396 currently)
+variables:
+	int timeSeries ;
+		timeSeries:long_name = "COAPS Tower N7" ;
+		timeSeries:units = "s" ;
+		timeSeries:cf_role = "timeseries_id" ;
+	double time(time) ;
+		time:long_name = "Time" ;
+		time:standard_name = "time" ;
+		time:units = "seconds since 1970-01-01 00:00:00 UTC" ;
+		time:calendar = "julian" ;
+		time:axis = "T" ;
+		time:comment = "" ;
+	double lat ;
+		lat:long_name = "Latitude" ;
+		lat:standard_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+		lat:valid_min = -90. ;
+		lat:valid_max = 90. ;
+		lat:comment = "" ;
+	double lon ;
+		lon:long_name = "Longitude" ;
+		lon:standard_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+		lon:valid_min = -180. ;
+		lon:valid_max = 180. ;
+		lon:comment = "" ;
+	double z(time) ;
+		z:_FillValue = -999. ;
+		z:long_name = "Altitude" ;
+		z:standard_name = "altitude" ;
+		z:units = "m" ;
+		z:positive = "down" ;
+		z:comment = "" ;
+	char instrument1 ;
+		instrument1:long_name = "TEMPERATURE SENSORS" ;
+		instrument1:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument1:make_model = "" ;
+		instrument1:serial_number = "" ;
+		instrument1:calibration_date = "" ;
+		instrument1:factory_calibrated = "" ;
+		instrument1:user_calibrated = "" ;
+		instrument1:calibration_report = "" ;
+		instrument1:accuracy = "" ;
+		instrument1:valid_range = "" ;
+		instrument1:precision = "" ;
+		instrument1:comment = "" ;
+	char platform ;
+		platform:long_name = "COAPS Tower N7" ;
+		platform:comment = "" ;
+		platform:call_sign = "" ;
+		platform:ncei_code = "147F, 3614" ;
+		platform:wmo_code = "" ;
+		platform:imo_code = "" ;
+		platform:ioos_code = "urn:ioos:station:COAPS:N7" ;
+	int crs ;
+		crs:grid_mapping_name = "latitude_longitude" ;
+		crs:epsg_code = "EPSG:4326" ;
+		crs:semi_major_axis = 6378137 ;
+		crs:inverse_flattening = 298.257223563 ;
+	double sea_water_temperature(time) ;
+		sea_water_temperature:_FillValue = -999. ;
+		sea_water_temperature:long_name = "sea water temperature" ;
+		sea_water_temperature:standard_name = "sea_water_temperature" ;
+		sea_water_temperature:ncei_name = "sea_water_temperature" ;
+		sea_water_temperature:units = "Celsius" ;
+		sea_water_temperature:scale_factor = 1. ;
+		sea_water_temperature:add_offset = 0. ;
+		sea_water_temperature:missing_value = -999. ;
+		sea_water_temperature:valid_min = -10. ;
+		sea_water_temperature:valid_max = 35. ;
+		sea_water_temperature:coordinates = "time lat lon z" ;
+		sea_water_temperature:coverage_content_type = "physicalMeasurement" ;
+		sea_water_temperature:grid_mapping = "crs" ;
+		sea_water_temperature:source = "GCOOS LDN upload/SOS." ;
+		sea_water_temperature:references = "http://coaps.fsu.edu/ngi/" ;
+		sea_water_temperature:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_temperature:platform = "platform" ;
+		sea_water_temperature:instrument = "instrument1" ;
+		sea_water_temperature:comment = "" ;
+
+// global attributes:
+		:_NCProperties = "version=1|netcdflibversion=4.4.1.1|hdf5libversion=1.8.18" ;
+		:ncei_template_version = "NCEI_NetCDF_TimeSeries_Orthogonal_Template_v2.0" ;
+		:featureType = "timeSeries" ;
+		:title = "GCOOS netCDF Data for urn:ioos:station:COAPS:N7 for the period 2010-01" ;
+		:summary = "2010-01 time series data for urn:ioos:station:COAPS:N7 platform served via GCOOS Data Portal. The uuid was generated using the uuid python module, invoking the command uuid.uuid4()." ;
+		:keywords = "EARTH SCIENCE > OCEANS > OCEAN CIRCULATION > OCEAN CURRENTS,EARTH SCIENCE > TERRESTRIAL HYDROSPHERE > WATER QUALITY/WATER CHEMISTRY > CHLOROPHYLL,EARTH SCIENCE > OCEANS > OCEAN CHEMISTRY > OXYGEN,EARTH SCIENCE > OCEANS > COASTAL PROCESSES > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SEA SURFACE TOPOGRAPHY > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SALINITY/DENSITY > SALINITY,EARTH SCIENCE > OCEANS > OCEAN TEMPERATURE > WATER TEMPERATURE" ;
+		:keywords_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		:Conventions = "CF-1.6, ACDD-1.3" ;
+		:id = "gcoos_ioos_station_COAPS_N7_2010_01_ocn.hdr" ;
+		:naming_authority = "ioos:station:COAPS" ;
+		:history = "V1 2017-11-01" ;
+		:source = "OGC SOS/WAF endpoint or data push" ;
+		:processing_level = "Data ingested as provided." ;
+		:comment = "" ;
+		:acknowledgment = "NOAA IOOS Program" ;
+		:license = "Creative Common (CC) 0" ;
+		:standard_name_vocabulary = "CF Standard Name Table v33" ;
+		:date_ceated = "Created:2017-11-01" ;
+		:creator_name = "Felimon Gayanilo" ;
+		:creator_email = "felimon.gayanilo@gcoos.org" ;
+		:creator_url = "https://www.linkedin.com/in/felimon-gayanilo-56728418" ;
+		:creator_type = "person" ;
+		:creator_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:institution = "Texas A&M University" ;
+		:project = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_name = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_email = "info@gcoos.org" ;
+		:publisher_url = "data.gcoos.org" ;
+		:publisher_type = "institution" ;
+		:publisher_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:geospatial_lat_min = 29.6619 ;
+		:geospatial_lat_max = 29.6619 ;
+		:geospatial_lat_resolution = "" ;
+		:geospatial_lon_min = -84.3731 ;
+		:geospatial_lon_max = -84.3731 ;
+		:geospatial_lon_resolution = "" ;
+		:geospatial_vertical_min = 1. ;
+		:geospatial_vertical_max = 1. ;
+		:geospatial_vertical_positive = "down" ;
+		:geospatial_vertical_resolution = "" ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_units = "EPSG:4979" ;
+		:time_coverage_start = "2010-01-01T00:00:00Z" ;
+		:time_coverage_end = "2010-01-31T23:59:00Z" ;
+		:time_coverage_duration = "" ;
+		:time_coverage_resolution = "" ;
+		:uuid = "7c747390-c1d9-4cd2-bb0c-8815cd7b43c2" ;
+		:sea_name = "Gulf of Mexico" ;
+		:program = "NOAA IOOS" ;
+		:contributor_name = "Center for Ocean-Atmospheric Prediction Studies (COAPS)" ;
+		:contributor_role = "Federal assets in the region" ;
+		:date_created = "2017-11-01" ;
+		:date_modified = "2017-11-01" ;
+		:date_issued = "2017-11-01" ;
+		:date_metadata_modified = "2017-11-01" ;
+		:product_version = "Ver. 1.0" ;
+		:platform = "In Situ Ocean-based Platforms > MOORINGS" ;
+		:platform_vocabulary = "CF Standard Name Table v33, GCMD Earth Science Keywords. Version 8.1" ;
+		:instrument = "" ;
+		:instrument_vocabulary = "GCMD Earth Science Keywords. Version 8.1" ;
+		:cdm_data_type = "Station" ;
+		:metadata_link = "" ;
+		:references = "" ;
+}
+-----
+
+
+gcoos_ioos_station_DISL_CATA_2010_**_ocn.nc
+-------------------------------------------
+
+*Title*: GCOOS netCDF Data for urn:ioos:station:DISL:CATA for the period 2010-**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*featureType*: timeSeries
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Location*: http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/[+http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/+]
+
+*Time Variables*: time, z, mole_concentration_of_dissolved_molecular_oxygen_in_sea_water,
+sea_water_practical_salinity, sea_water_temperature
+
+-----
+netcdf gcoos_ioos_station_DISL_CATA_2010_01_ocn {
+dimensions:
+	time = UNLIMITED ; // (2973 currently)
+variables:
+	int timeSeries ;
+		timeSeries:long_name = "Cedar Point, AL" ;
+		timeSeries:units = "s" ;
+		timeSeries:cf_role = "timeseries_id" ;
+	double time(time) ;
+		time:long_name = "Time" ;
+		time:standard_name = "time" ;
+		time:units = "seconds since 1970-01-01 00:00:00 UTC" ;
+		time:calendar = "julian" ;
+		time:axis = "T" ;
+		time:comment = "" ;
+	double lat ;
+		lat:long_name = "Latitude" ;
+		lat:standard_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+		lat:valid_min = -90. ;
+		lat:valid_max = 90. ;
+		lat:comment = "" ;
+	double lon ;
+		lon:long_name = "Longitude" ;
+		lon:standard_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+		lon:valid_min = -180. ;
+		lon:valid_max = 180. ;
+		lon:comment = "" ;
+	double z(time) ;
+		z:_FillValue = -999. ;
+		z:long_name = "Altitude" ;
+		z:standard_name = "altitude" ;
+		z:units = "m" ;
+		z:positive = "down" ;
+		z:comment = "" ;
+	char instrument1 ;
+		instrument1:long_name = "OXYGEN METERS" ;
+		instrument1:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument1:make_model = "" ;
+		instrument1:serial_number = "" ;
+		instrument1:calibration_date = "" ;
+		instrument1:factory_calibrated = "" ;
+		instrument1:user_calibrated = "" ;
+		instrument1:calibration_report = "" ;
+		instrument1:accuracy = "" ;
+		instrument1:valid_range = "" ;
+		instrument1:precision = "" ;
+		instrument1:comment = "" ;
+	char instrument2 ;
+		instrument2:long_name = "CONDUCTIVITY METERS" ;
+		instrument2:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument2:make_model = "" ;
+		instrument2:serial_number = "" ;
+		instrument2:calibration_date = "" ;
+		instrument2:factory_calibrated = "" ;
+		instrument2:user_calibrated = "" ;
+		instrument2:calibration_report = "" ;
+		instrument2:accuracy = "" ;
+		instrument2:valid_range = "" ;
+		instrument2:precision = "" ;
+		instrument2:comment = "" ;
+	char instrument3 ;
+		instrument3:long_name = "TEMPERATURE SENSORS" ;
+		instrument3:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument3:make_model = "" ;
+		instrument3:serial_number = "" ;
+		instrument3:calibration_date = "" ;
+		instrument3:factory_calibrated = "" ;
+		instrument3:user_calibrated = "" ;
+		instrument3:calibration_report = "" ;
+		instrument3:accuracy = "" ;
+		instrument3:valid_range = "" ;
+		instrument3:precision = "" ;
+		instrument3:comment = "" ;
+	char platform ;
+		platform:long_name = "Cedar Point, AL" ;
+		platform:comment = "" ;
+		platform:call_sign = "" ;
+		platform:ncei_code = "147F, 3614" ;
+		platform:wmo_code = "" ;
+		platform:imo_code = "" ;
+		platform:ioos_code = "urn:ioos:station:DISL:CATA" ;
+	int crs ;
+		crs:grid_mapping_name = "latitude_longitude" ;
+		crs:epsg_code = "EPSG:4326" ;
+		crs:semi_major_axis = 6378137 ;
+		crs:inverse_flattening = 298.257223563 ;
+	double mole_concentration_of_dissolved_molecular_oxygen_in_sea_water(time) ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:_FillValue = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:long_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:standard_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:ncei_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:units = "ug L-1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:scale_factor = 1. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:add_offset = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:missing_value = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_min = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_max = 20. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coordinates = "time lat lon z" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coverage_content_type = "physicalMeasurement" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:grid_mapping = "crs" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:source = "GCOOS LDN upload/SOS." ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=830" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:cell_methods = "time: point lat: point lon: point z: point" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:platform = "platform" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:instrument = "instrument1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:comment = "" ;
+	double sea_water_practical_salinity(time) ;
+		sea_water_practical_salinity:_FillValue = -999. ;
+		sea_water_practical_salinity:long_name = "sea water practical salinity" ;
+		sea_water_practical_salinity:standard_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:ncei_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:units = "1" ;
+		sea_water_practical_salinity:scale_factor = 1. ;
+		sea_water_practical_salinity:add_offset = 0. ;
+		sea_water_practical_salinity:missing_value = -999. ;
+		sea_water_practical_salinity:valid_min = 0. ;
+		sea_water_practical_salinity:valid_max = 38. ;
+		sea_water_practical_salinity:coordinates = "time lat lon z" ;
+		sea_water_practical_salinity:coverage_content_type = "physicalMeasurement" ;
+		sea_water_practical_salinity:grid_mapping = "crs" ;
+		sea_water_practical_salinity:source = "GCOOS LDN upload/SOS." ;
+		sea_water_practical_salinity:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=830" ;
+		sea_water_practical_salinity:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_practical_salinity:platform = "platform" ;
+		sea_water_practical_salinity:instrument = "instrument2" ;
+		sea_water_practical_salinity:comment = "" ;
+	double sea_water_temperature(time) ;
+		sea_water_temperature:_FillValue = -999. ;
+		sea_water_temperature:long_name = "sea water temperature" ;
+		sea_water_temperature:standard_name = "sea_water_temperature" ;
+		sea_water_temperature:ncei_name = "sea_water_temperature" ;
+		sea_water_temperature:units = "Celsius" ;
+		sea_water_temperature:scale_factor = 1. ;
+		sea_water_temperature:add_offset = 0. ;
+		sea_water_temperature:missing_value = -999. ;
+		sea_water_temperature:valid_min = -10. ;
+		sea_water_temperature:valid_max = 35. ;
+		sea_water_temperature:coordinates = "time lat lon z" ;
+		sea_water_temperature:coverage_content_type = "physicalMeasurement" ;
+		sea_water_temperature:grid_mapping = "crs" ;
+		sea_water_temperature:source = "GCOOS LDN upload/SOS." ;
+		sea_water_temperature:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=830" ;
+		sea_water_temperature:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_temperature:platform = "platform" ;
+		sea_water_temperature:instrument = "instrument3" ;
+		sea_water_temperature:comment = "" ;
+
+// global attributes:
+		:ncei_template_version = "NCEI_NetCDF_TimeSeries_Orthogonal_Template_v2.0" ;
+		:featureType = "timeSeries" ;
+		:title = "GCOOS netCDF Data for urn:ioos:station:DISL:CATA for the period 2010-01" ;
+		:summary = "2010-01 time series data for urn:ioos:station:DISL:CATA platform served via GCOOS Data Portal. The uuid was generated using the uuid python module, invoking the command uuid.uuid4()." ;
+		:keywords = "EARTH SCIENCE > OCEANS > OCEAN CIRCULATION > OCEAN CURRENTS,EARTH SCIENCE > TERRESTRIAL HYDROSPHERE > WATER QUALITY/WATER CHEMISTRY > CHLOROPHYLL,EARTH SCIENCE > OCEANS > OCEAN CHEMISTRY > OXYGEN,EARTH SCIENCE > OCEANS > COASTAL PROCESSES > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SEA SURFACE TOPOGRAPHY > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SALINITY/DENSITY > SALINITY,EARTH SCIENCE > OCEANS > OCEAN TEMPERATURE > WATER TEMPERATURE" ;
+		:keywords_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		:Conventions = "CF-1.6, ACDD-1.3" ;
+		:id = "gcoos_ioos_station_DISL_CATA_2010_01_ocn.hdr" ;
+		:naming_authority = "ioos:station:DISL" ;
+		:history = "V1 2017-05-23" ;
+		:source = "OGC SOS/WAF endpoint or data push" ;
+		:processing_level = "Data ingested as provided." ;
+		:comment = "" ;
+		:acknowledgment = "NOAA IOOS Program" ;
+		:license = "Creative Common (CC) 0" ;
+		:standard_name_vocabulary = "CF Standard Name Table v33" ;
+		:date_ceated = "Created:2017-05-23" ;
+		:creator_name = "Felimon Gayanilo" ;
+		:creator_email = "felimon.gayanilo@gcoos.org" ;
+		:creator_url = "https://www.linkedin.com/in/felimon-gayanilo-56728418" ;
+		:creator_type = "person" ;
+		:creator_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:institution = "Texas A&M University" ;
+		:project = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_name = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_email = "info@gcoos.org" ;
+		:publisher_url = "data.gcoos.org" ;
+		:publisher_type = "institution" ;
+		:publisher_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:geospatial_lat_min = 30.3085 ;
+		:geospatial_lat_max = 30.3085 ;
+		:geospatial_lat_resolution = "" ;
+		:geospatial_lon_min = -88.1395 ;
+		:geospatial_lon_max = -88.1395 ;
+		:geospatial_lon_resolution = "" ;
+		:geospatial_vertical_min = 0. ;
+		:geospatial_vertical_max = 2.978 ;
+		:geospatial_vertical_positive = "down" ;
+		:geospatial_vertical_resolution = "" ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_units = "EPSG:4979" ;
+		:time_coverage_start = "2010-01-01T00:00:00Z" ;
+		:time_coverage_end = "2010-01-31T23:30:00Z" ;
+		:time_coverage_duration = "" ;
+		:time_coverage_resolution = "" ;
+		:uuid = "70e4b77c-dd96-4f43-94e1-2842682d996f" ;
+		:sea_name = "Gulf of Mexico" ;
+		:program = "NOAA IOOS" ;
+		:contributor_name = "Dauphin Island Sea Laboratory (DISL)" ;
+		:contributor_role = "Federal assets in the region" ;
+		:date_created = "2017-05-23" ;
+		:date_modified = "2017-05-23" ;
+		:date_issued = "2017-05-23" ;
+		:date_metadata_modified = "2017-05-23" ;
+		:product_version = "Ver. 1.0" ;
+		:platform = "In Situ Ocean-based Platforms > MOORINGS" ;
+		:platform_vocabulary = "CF Standard Name Table v33, GCMD Earth Science Keywords. Version 8.1" ;
+		:instrument = "" ;
+		:instrument_vocabulary = "GCMD Earth Science Keywords. Version 8.1" ;
+		:cdm_data_type = "Station" ;
+		:metadata_link = "" ;
+		:references = "" ;
+}
+-----
+
+
+gcoos_ioos_station_DISL_DISL_2010_**_ocn.nc
+-------------------------------------------
+
+*Title*: GCOOS netCDF Data for urn:ioos:station:DISL:DISL for the period 2010-**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*featureType*: timeSeries
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Location*: http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/[+http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/+]
+
+*Time Variables*: time, z, mole_concentration_of_dissolved_molecular_oxygen_in_sea_water,
+sea_water_practical_salinity, sea_water_temperature
+
+-----
+netcdf gcoos_ioos_station_DISL_DISL_2010_01_ocn {
+dimensions:
+	time = UNLIMITED ; // (2950 currently)
+variables:
+	int timeSeries ;
+		timeSeries:long_name = "Dauphin Island, AL" ;
+		timeSeries:units = "s" ;
+		timeSeries:cf_role = "timeseries_id" ;
+	double time(time) ;
+		time:long_name = "Time" ;
+		time:standard_name = "time" ;
+		time:units = "seconds since 1970-01-01 00:00:00 UTC" ;
+		time:calendar = "julian" ;
+		time:axis = "T" ;
+		time:comment = "" ;
+	double lat ;
+		lat:long_name = "Latitude" ;
+		lat:standard_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+		lat:valid_min = -90. ;
+		lat:valid_max = 90. ;
+		lat:comment = "" ;
+	double lon ;
+		lon:long_name = "Longitude" ;
+		lon:standard_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+		lon:valid_min = -180. ;
+		lon:valid_max = 180. ;
+		lon:comment = "" ;
+	double z(time) ;
+		z:_FillValue = -999. ;
+		z:long_name = "Altitude" ;
+		z:standard_name = "altitude" ;
+		z:units = "m" ;
+		z:positive = "down" ;
+		z:comment = "" ;
+	char instrument1 ;
+		instrument1:long_name = "OXYGEN METERS" ;
+		instrument1:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument1:make_model = "" ;
+		instrument1:serial_number = "" ;
+		instrument1:calibration_date = "" ;
+		instrument1:factory_calibrated = "" ;
+		instrument1:user_calibrated = "" ;
+		instrument1:calibration_report = "" ;
+		instrument1:accuracy = "" ;
+		instrument1:valid_range = "" ;
+		instrument1:precision = "" ;
+		instrument1:comment = "" ;
+	char instrument2 ;
+		instrument2:long_name = "CONDUCTIVITY METERS" ;
+		instrument2:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument2:make_model = "" ;
+		instrument2:serial_number = "" ;
+		instrument2:calibration_date = "" ;
+		instrument2:factory_calibrated = "" ;
+		instrument2:user_calibrated = "" ;
+		instrument2:calibration_report = "" ;
+		instrument2:accuracy = "" ;
+		instrument2:valid_range = "" ;
+		instrument2:precision = "" ;
+		instrument2:comment = "" ;
+	char instrument3 ;
+		instrument3:long_name = "TEMPERATURE SENSORS" ;
+		instrument3:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument3:make_model = "" ;
+		instrument3:serial_number = "" ;
+		instrument3:calibration_date = "" ;
+		instrument3:factory_calibrated = "" ;
+		instrument3:user_calibrated = "" ;
+		instrument3:calibration_report = "" ;
+		instrument3:accuracy = "" ;
+		instrument3:valid_range = "" ;
+		instrument3:precision = "" ;
+		instrument3:comment = "" ;
+	char platform ;
+		platform:long_name = "Dauphin Island, AL" ;
+		platform:comment = "" ;
+		platform:call_sign = "" ;
+		platform:ncei_code = "147F, 3614" ;
+		platform:wmo_code = "" ;
+		platform:imo_code = "" ;
+		platform:ioos_code = "urn:ioos:station:DISL:DISL" ;
+	int crs ;
+		crs:grid_mapping_name = "latitude_longitude" ;
+		crs:epsg_code = "EPSG:4326" ;
+		crs:semi_major_axis = 6378137 ;
+		crs:inverse_flattening = 298.257223563 ;
+	double mole_concentration_of_dissolved_molecular_oxygen_in_sea_water(time) ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:_FillValue = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:long_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:standard_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:ncei_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:units = "ug L-1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:scale_factor = 1. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:add_offset = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:missing_value = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_min = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_max = 20. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coordinates = "time lat lon z" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coverage_content_type = "physicalMeasurement" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:grid_mapping = "crs" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:source = "GCOOS LDN upload/SOS." ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=628" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:cell_methods = "time: point lat: point lon: point z: point" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:platform = "platform" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:instrument = "instrument1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:comment = "" ;
+	double sea_water_practical_salinity(time) ;
+		sea_water_practical_salinity:_FillValue = -999. ;
+		sea_water_practical_salinity:long_name = "sea water practical salinity" ;
+		sea_water_practical_salinity:standard_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:ncei_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:units = "1" ;
+		sea_water_practical_salinity:scale_factor = 1. ;
+		sea_water_practical_salinity:add_offset = 0. ;
+		sea_water_practical_salinity:missing_value = -999. ;
+		sea_water_practical_salinity:valid_min = 0. ;
+		sea_water_practical_salinity:valid_max = 38. ;
+		sea_water_practical_salinity:coordinates = "time lat lon z" ;
+		sea_water_practical_salinity:coverage_content_type = "physicalMeasurement" ;
+		sea_water_practical_salinity:grid_mapping = "crs" ;
+		sea_water_practical_salinity:source = "GCOOS LDN upload/SOS." ;
+		sea_water_practical_salinity:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=628" ;
+		sea_water_practical_salinity:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_practical_salinity:platform = "platform" ;
+		sea_water_practical_salinity:instrument = "instrument2" ;
+		sea_water_practical_salinity:comment = "" ;
+	double sea_water_temperature(time) ;
+		sea_water_temperature:_FillValue = -999. ;
+		sea_water_temperature:long_name = "sea water temperature" ;
+		sea_water_temperature:standard_name = "sea_water_temperature" ;
+		sea_water_temperature:ncei_name = "sea_water_temperature" ;
+		sea_water_temperature:units = "Celsius" ;
+		sea_water_temperature:scale_factor = 1. ;
+		sea_water_temperature:add_offset = 0. ;
+		sea_water_temperature:missing_value = -999. ;
+		sea_water_temperature:valid_min = -10. ;
+		sea_water_temperature:valid_max = 35. ;
+		sea_water_temperature:coordinates = "time lat lon z" ;
+		sea_water_temperature:coverage_content_type = "physicalMeasurement" ;
+		sea_water_temperature:grid_mapping = "crs" ;
+		sea_water_temperature:source = "GCOOS LDN upload/SOS." ;
+		sea_water_temperature:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=628" ;
+		sea_water_temperature:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_temperature:platform = "platform" ;
+		sea_water_temperature:instrument = "instrument3" ;
+		sea_water_temperature:comment = "" ;
+
+// global attributes:
+		:ncei_template_version = "NCEI_NetCDF_TimeSeries_Orthogonal_Template_v2.0" ;
+		:featureType = "timeSeries" ;
+		:title = "GCOOS netCDF Data for urn:ioos:station:DISL:DISL for the period 2010-01" ;
+		:summary = "2010-01 time series data for urn:ioos:station:DISL:DISL platform served via GCOOS Data Portal. The uuid was generated using the uuid python module, invoking the command uuid.uuid4()." ;
+		:keywords = "EARTH SCIENCE > OCEANS > OCEAN CIRCULATION > OCEAN CURRENTS,EARTH SCIENCE > TERRESTRIAL HYDROSPHERE > WATER QUALITY/WATER CHEMISTRY > CHLOROPHYLL,EARTH SCIENCE > OCEANS > OCEAN CHEMISTRY > OXYGEN,EARTH SCIENCE > OCEANS > COASTAL PROCESSES > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SEA SURFACE TOPOGRAPHY > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SALINITY/DENSITY > SALINITY,EARTH SCIENCE > OCEANS > OCEAN TEMPERATURE > WATER TEMPERATURE" ;
+		:keywords_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		:Conventions = "CF-1.6, ACDD-1.3" ;
+		:id = "gcoos_ioos_station_DISL_DISL_2010_01_ocn.hdr" ;
+		:naming_authority = "ioos:station:DISL" ;
+		:history = "V1 2017-05-23" ;
+		:source = "OGC SOS/WAF endpoint or data push" ;
+		:processing_level = "Data ingested as provided." ;
+		:comment = "" ;
+		:acknowledgment = "NOAA IOOS Program" ;
+		:license = "Creative Common (CC) 0" ;
+		:standard_name_vocabulary = "CF Standard Name Table v33" ;
+		:date_ceated = "Created:2017-05-23" ;
+		:creator_name = "Felimon Gayanilo" ;
+		:creator_email = "felimon.gayanilo@gcoos.org" ;
+		:creator_url = "https://www.linkedin.com/in/felimon-gayanilo-56728418" ;
+		:creator_type = "person" ;
+		:creator_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:institution = "Texas A&M University" ;
+		:project = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_name = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_email = "info@gcoos.org" ;
+		:publisher_url = "data.gcoos.org" ;
+		:publisher_type = "institution" ;
+		:publisher_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:geospatial_lat_min = 30.2513 ;
+		:geospatial_lat_max = 30.2513 ;
+		:geospatial_lat_resolution = "" ;
+		:geospatial_lon_min = -88.0778 ;
+		:geospatial_lon_max = -88.0778 ;
+		:geospatial_lon_resolution = "" ;
+		:geospatial_vertical_min = -1.72 ;
+		:geospatial_vertical_max = 7.65 ;
+		:geospatial_vertical_positive = "down" ;
+		:geospatial_vertical_resolution = "" ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_units = "EPSG:4979" ;
+		:time_coverage_start = "2010-01-01T06:30:00Z" ;
+		:time_coverage_end = "2010-01-31T23:30:00Z" ;
+		:time_coverage_duration = "" ;
+		:time_coverage_resolution = "" ;
+		:uuid = "882e4856-5944-48a5-8685-e4a08e6fb6bf" ;
+		:sea_name = "Gulf of Mexico" ;
+		:program = "NOAA IOOS" ;
+		:contributor_name = "Dauphin Island Sea Laboratory (DISL)" ;
+		:contributor_role = "Federal assets in the region" ;
+		:date_created = "2017-05-23" ;
+		:date_modified = "2017-05-23" ;
+		:date_issued = "2017-05-23" ;
+		:date_metadata_modified = "2017-05-23" ;
+		:product_version = "Ver. 1.0" ;
+		:platform = "In Situ Ocean-based Platforms > MOORINGS" ;
+		:platform_vocabulary = "CF Standard Name Table v33, GCMD Earth Science Keywords. Version 8.1" ;
+		:instrument = "" ;
+		:instrument_vocabulary = "GCMD Earth Science Keywords. Version 8.1" ;
+		:cdm_data_type = "Station" ;
+		:metadata_link = "" ;
+		:references = "" ;
+}
+-----
+
+
+gcoos_ioos_station_DISL_MBLA_2010_**_ocn.nc
+-------------------------------------------
+
+*Title*: GCOOS netCDF Data for urn:ioos:station:DISL:MBLA for the period 2010-**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*featureType*: timeSeries
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Location*: http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/[+http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/+]
+
+*Time Variables*: time, z, mole_concentration_of_dissolved_molecular_oxygen_in_sea_water,
+sea_water_practical_salinity, sea_water_temperature
+
+-----
+netcdf gcoos_ioos_station_DISL_MBLA_2010_01_ocn {
+dimensions:
+	time = UNLIMITED ; // (1337 currently)
+variables:
+	int timeSeries ;
+		timeSeries:long_name = "Middle Bay Light, AL" ;
+		timeSeries:units = "s" ;
+		timeSeries:cf_role = "timeseries_id" ;
+	double time(time) ;
+		time:long_name = "Time" ;
+		time:standard_name = "time" ;
+		time:units = "seconds since 1970-01-01 00:00:00 UTC" ;
+		time:calendar = "julian" ;
+		time:axis = "T" ;
+		time:comment = "" ;
+	double lat ;
+		lat:long_name = "Latitude" ;
+		lat:standard_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+		lat:valid_min = -90. ;
+		lat:valid_max = 90. ;
+		lat:comment = "" ;
+	double lon ;
+		lon:long_name = "Longitude" ;
+		lon:standard_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+		lon:valid_min = -180. ;
+		lon:valid_max = 180. ;
+		lon:comment = "" ;
+	double z(time) ;
+		z:_FillValue = -999. ;
+		z:long_name = "Altitude" ;
+		z:standard_name = "altitude" ;
+		z:units = "m" ;
+		z:positive = "down" ;
+		z:comment = "" ;
+	char instrument1 ;
+		instrument1:long_name = "OXYGEN METERS" ;
+		instrument1:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument1:make_model = "" ;
+		instrument1:serial_number = "" ;
+		instrument1:calibration_date = "" ;
+		instrument1:factory_calibrated = "" ;
+		instrument1:user_calibrated = "" ;
+		instrument1:calibration_report = "" ;
+		instrument1:accuracy = "" ;
+		instrument1:valid_range = "" ;
+		instrument1:precision = "" ;
+		instrument1:comment = "" ;
+	char instrument2 ;
+		instrument2:long_name = "CONDUCTIVITY METERS" ;
+		instrument2:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument2:make_model = "" ;
+		instrument2:serial_number = "" ;
+		instrument2:calibration_date = "" ;
+		instrument2:factory_calibrated = "" ;
+		instrument2:user_calibrated = "" ;
+		instrument2:calibration_report = "" ;
+		instrument2:accuracy = "" ;
+		instrument2:valid_range = "" ;
+		instrument2:precision = "" ;
+		instrument2:comment = "" ;
+	char instrument3 ;
+		instrument3:long_name = "TEMPERATURE SENSORS" ;
+		instrument3:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument3:make_model = "" ;
+		instrument3:serial_number = "" ;
+		instrument3:calibration_date = "" ;
+		instrument3:factory_calibrated = "" ;
+		instrument3:user_calibrated = "" ;
+		instrument3:calibration_report = "" ;
+		instrument3:accuracy = "" ;
+		instrument3:valid_range = "" ;
+		instrument3:precision = "" ;
+		instrument3:comment = "" ;
+	char platform ;
+		platform:long_name = "Middle Bay Light, AL" ;
+		platform:comment = "" ;
+		platform:call_sign = "" ;
+		platform:ncei_code = "147F, 3614" ;
+		platform:wmo_code = "" ;
+		platform:imo_code = "" ;
+		platform:ioos_code = "urn:ioos:station:DISL:MBLA" ;
+	int crs ;
+		crs:grid_mapping_name = "latitude_longitude" ;
+		crs:epsg_code = "EPSG:4326" ;
+		crs:semi_major_axis = 6378137 ;
+		crs:inverse_flattening = 298.257223563 ;
+	double mole_concentration_of_dissolved_molecular_oxygen_in_sea_water(time) ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:_FillValue = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:long_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:standard_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:ncei_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:units = "ug L-1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:scale_factor = 1. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:add_offset = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:missing_value = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_min = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_max = 20. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coordinates = "time lat lon z" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coverage_content_type = "physicalMeasurement" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:grid_mapping = "crs" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:source = "GCOOS LDN upload/SOS." ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:references = "http://www.mymobilebay.com/stationdata/StationInfomiddlebay.asp?jday=&property=&chartyear=&StationID=188" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:cell_methods = "time: point lat: point lon: point z: point" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:platform = "platform" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:instrument = "instrument1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:comment = "" ;
+	double sea_water_practical_salinity(time) ;
+		sea_water_practical_salinity:_FillValue = -999. ;
+		sea_water_practical_salinity:long_name = "sea water practical salinity" ;
+		sea_water_practical_salinity:standard_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:ncei_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:units = "1" ;
+		sea_water_practical_salinity:scale_factor = 1. ;
+		sea_water_practical_salinity:add_offset = 0. ;
+		sea_water_practical_salinity:missing_value = -999. ;
+		sea_water_practical_salinity:valid_min = 0. ;
+		sea_water_practical_salinity:valid_max = 38. ;
+		sea_water_practical_salinity:coordinates = "time lat lon z" ;
+		sea_water_practical_salinity:coverage_content_type = "physicalMeasurement" ;
+		sea_water_practical_salinity:grid_mapping = "crs" ;
+		sea_water_practical_salinity:source = "GCOOS LDN upload/SOS." ;
+		sea_water_practical_salinity:references = "http://www.mymobilebay.com/stationdata/StationInfomiddlebay.asp?jday=&property=&chartyear=&StationID=188" ;
+		sea_water_practical_salinity:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_practical_salinity:platform = "platform" ;
+		sea_water_practical_salinity:instrument = "instrument2" ;
+		sea_water_practical_salinity:comment = "" ;
+	double sea_water_temperature(time) ;
+		sea_water_temperature:_FillValue = -999. ;
+		sea_water_temperature:long_name = "sea water temperature" ;
+		sea_water_temperature:standard_name = "sea_water_temperature" ;
+		sea_water_temperature:ncei_name = "sea_water_temperature" ;
+		sea_water_temperature:units = "Celsius" ;
+		sea_water_temperature:scale_factor = 1. ;
+		sea_water_temperature:add_offset = 0. ;
+		sea_water_temperature:missing_value = -999. ;
+		sea_water_temperature:valid_min = -10. ;
+		sea_water_temperature:valid_max = 35. ;
+		sea_water_temperature:coordinates = "time lat lon z" ;
+		sea_water_temperature:coverage_content_type = "physicalMeasurement" ;
+		sea_water_temperature:grid_mapping = "crs" ;
+		sea_water_temperature:source = "GCOOS LDN upload/SOS." ;
+		sea_water_temperature:references = "http://www.mymobilebay.com/stationdata/StationInfomiddlebay.asp?jday=&property=&chartyear=&StationID=188" ;
+		sea_water_temperature:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_temperature:platform = "platform" ;
+		sea_water_temperature:instrument = "instrument3" ;
+		sea_water_temperature:comment = "" ;
+
+// global attributes:
+		:ncei_template_version = "NCEI_NetCDF_TimeSeries_Orthogonal_Template_v2.0" ;
+		:featureType = "timeSeries" ;
+		:title = "GCOOS netCDF Data for urn:ioos:station:DISL:MBLA for the period 2010-01" ;
+		:summary = "2010-01 time series data for urn:ioos:station:DISL:MBLA platform served via GCOOS Data Portal. The uuid was generated using the uuid python module, invoking the command uuid.uuid4()." ;
+		:keywords = "EARTH SCIENCE > OCEANS > OCEAN CIRCULATION > OCEAN CURRENTS,EARTH SCIENCE > TERRESTRIAL HYDROSPHERE > WATER QUALITY/WATER CHEMISTRY > CHLOROPHYLL,EARTH SCIENCE > OCEANS > OCEAN CHEMISTRY > OXYGEN,EARTH SCIENCE > OCEANS > COASTAL PROCESSES > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SEA SURFACE TOPOGRAPHY > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SALINITY/DENSITY > SALINITY,EARTH SCIENCE > OCEANS > OCEAN TEMPERATURE > WATER TEMPERATURE" ;
+		:keywords_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		:Conventions = "CF-1.6, ACDD-1.3" ;
+		:id = "gcoos_ioos_station_DISL_MBLA_2010_01_ocn.hdr" ;
+		:naming_authority = "ioos:station:DISL" ;
+		:history = "V1 2017-05-22" ;
+		:source = "OGC SOS/WAF endpoint or data push" ;
+		:processing_level = "Data ingested as provided." ;
+		:comment = "" ;
+		:acknowledgment = "NOAA IOOS Program" ;
+		:license = "Creative Common (CC) 0" ;
+		:standard_name_vocabulary = "CF Standard Name Table v33" ;
+		:date_ceated = "Created:2017-05-22" ;
+		:creator_name = "Felimon Gayanilo" ;
+		:creator_email = "felimon.gayanilo@gcoos.org" ;
+		:creator_url = "https://www.linkedin.com/in/felimon-gayanilo-56728418" ;
+		:creator_type = "person" ;
+		:creator_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:institution = "Texas A&M University" ;
+		:project = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_name = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_email = "info@gcoos.org" ;
+		:publisher_url = "data.gcoos.org" ;
+		:publisher_type = "institution" ;
+		:publisher_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:geospatial_lat_min = 30.4367 ;
+		:geospatial_lat_max = 30.4367 ;
+		:geospatial_lat_resolution = "" ;
+		:geospatial_lon_min = -88.0117 ;
+		:geospatial_lon_max = -88.0117 ;
+		:geospatial_lon_resolution = "" ;
+		:geospatial_vertical_min = 0.115 ;
+		:geospatial_vertical_max = 3.3 ;
+		:geospatial_vertical_positive = "down" ;
+		:geospatial_vertical_resolution = "" ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_units = "EPSG:4979" ;
+		:time_coverage_start = "2010-01-14T20:44:00Z" ;
+		:time_coverage_end = "2010-01-30T13:16:00Z" ;
+		:time_coverage_duration = "" ;
+		:time_coverage_resolution = "" ;
+		:uuid = "4d540d74-4f82-4a12-8fd3-fbb97dd6733f" ;
+		:sea_name = "Gulf of Mexico" ;
+		:program = "NOAA IOOS" ;
+		:contributor_name = "Dauphin Island Sea Laboratory (DISL)" ;
+		:contributor_role = "Federal assets in the region" ;
+		:date_created = "2017-05-22" ;
+		:date_modified = "2017-05-22" ;
+		:date_issued = "2017-05-22" ;
+		:date_metadata_modified = "2017-05-22" ;
+		:product_version = "Ver. 1.0" ;
+		:platform = "In Situ Ocean-based Platforms > MOORINGS" ;
+		:platform_vocabulary = "CF Standard Name Table v33, GCMD Earth Science Keywords. Version 8.1" ;
+		:instrument = "" ;
+		:instrument_vocabulary = "GCMD Earth Science Keywords. Version 8.1" ;
+		:cdm_data_type = "Station" ;
+		:metadata_link = "" ;
+		:references = "" ;
+}
+-----
+
+
+gcoos_ioos_station_DISL_MHPA_2010_**_ocn.nc
+-------------------------------------------
+
+*Title*: GCOOS netCDF Data for urn:ioos:station:DISL:MHPA for the period 2010-**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*featureType*: timeSeries
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Location*: http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/[+http://data.gcoos.org/data/waf/nc_by_platform/ocn/ldn/2010/+]
+
+*Time Variables*: time, z, mole_concentration_of_dissolved_molecular_oxygen_in_sea_water,
+sea_water_practical_salinity, sea_water_temperature
+
+-----
+netcdf gcoos_ioos_station_DISL_MHPA_2010_01_ocn {
+dimensions:
+	time = UNLIMITED ; // (2950 currently)
+variables:
+	int timeSeries ;
+		timeSeries:long_name = "Meaher Park, AL" ;
+		timeSeries:units = "s" ;
+		timeSeries:cf_role = "timeseries_id" ;
+	double time(time) ;
+		time:long_name = "Time" ;
+		time:standard_name = "time" ;
+		time:units = "seconds since 1970-01-01 00:00:00 UTC" ;
+		time:calendar = "julian" ;
+		time:axis = "T" ;
+		time:comment = "" ;
+	double lat ;
+		lat:long_name = "Latitude" ;
+		lat:standard_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+		lat:valid_min = -90. ;
+		lat:valid_max = 90. ;
+		lat:comment = "" ;
+	double lon ;
+		lon:long_name = "Longitude" ;
+		lon:standard_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+		lon:valid_min = -180. ;
+		lon:valid_max = 180. ;
+		lon:comment = "" ;
+	double z(time) ;
+		z:_FillValue = -999. ;
+		z:long_name = "Altitude" ;
+		z:standard_name = "altitude" ;
+		z:units = "m" ;
+		z:positive = "down" ;
+		z:comment = "" ;
+	char instrument1 ;
+		instrument1:long_name = "OXYGEN METERS" ;
+		instrument1:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument1:make_model = "" ;
+		instrument1:serial_number = "" ;
+		instrument1:calibration_date = "" ;
+		instrument1:factory_calibrated = "" ;
+		instrument1:user_calibrated = "" ;
+		instrument1:calibration_report = "" ;
+		instrument1:accuracy = "" ;
+		instrument1:valid_range = "" ;
+		instrument1:precision = "" ;
+		instrument1:comment = "" ;
+	char instrument2 ;
+		instrument2:long_name = "CONDUCTIVITY METERS" ;
+		instrument2:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument2:make_model = "" ;
+		instrument2:serial_number = "" ;
+		instrument2:calibration_date = "" ;
+		instrument2:factory_calibrated = "" ;
+		instrument2:user_calibrated = "" ;
+		instrument2:calibration_report = "" ;
+		instrument2:accuracy = "" ;
+		instrument2:valid_range = "" ;
+		instrument2:precision = "" ;
+		instrument2:comment = "" ;
+	char instrument3 ;
+		instrument3:long_name = "TEMPERATURE SENSORS" ;
+		instrument3:instrument_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		instrument3:make_model = "" ;
+		instrument3:serial_number = "" ;
+		instrument3:calibration_date = "" ;
+		instrument3:factory_calibrated = "" ;
+		instrument3:user_calibrated = "" ;
+		instrument3:calibration_report = "" ;
+		instrument3:accuracy = "" ;
+		instrument3:valid_range = "" ;
+		instrument3:precision = "" ;
+		instrument3:comment = "" ;
+	char platform ;
+		platform:long_name = "Meaher Park, AL" ;
+		platform:comment = "" ;
+		platform:call_sign = "" ;
+		platform:ncei_code = "147F, 3614" ;
+		platform:wmo_code = "" ;
+		platform:imo_code = "" ;
+		platform:ioos_code = "urn:ioos:station:DISL:MHPA" ;
+	int crs ;
+		crs:grid_mapping_name = "latitude_longitude" ;
+		crs:epsg_code = "EPSG:4326" ;
+		crs:semi_major_axis = 6378137 ;
+		crs:inverse_flattening = 298.257223563 ;
+	double mole_concentration_of_dissolved_molecular_oxygen_in_sea_water(time) ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:_FillValue = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:long_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:standard_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:ncei_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:units = "ug L-1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:scale_factor = 1. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:add_offset = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:missing_value = -999. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_min = 0. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:valid_max = 20. ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coordinates = "time lat lon z" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:coverage_content_type = "physicalMeasurement" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:grid_mapping = "crs" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:source = "GCOOS LDN upload/SOS." ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=703" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:cell_methods = "time: point lat: point lon: point z: point" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:platform = "platform" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:instrument = "instrument1" ;
+		mole_concentration_of_dissolved_molecular_oxygen_in_sea_water:comment = "" ;
+	double sea_water_practical_salinity(time) ;
+		sea_water_practical_salinity:_FillValue = -999. ;
+		sea_water_practical_salinity:long_name = "sea water practical salinity" ;
+		sea_water_practical_salinity:standard_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:ncei_name = "sea_water_practical_salinity" ;
+		sea_water_practical_salinity:units = "1" ;
+		sea_water_practical_salinity:scale_factor = 1. ;
+		sea_water_practical_salinity:add_offset = 0. ;
+		sea_water_practical_salinity:missing_value = -999. ;
+		sea_water_practical_salinity:valid_min = 0. ;
+		sea_water_practical_salinity:valid_max = 38. ;
+		sea_water_practical_salinity:coordinates = "time lat lon z" ;
+		sea_water_practical_salinity:coverage_content_type = "physicalMeasurement" ;
+		sea_water_practical_salinity:grid_mapping = "crs" ;
+		sea_water_practical_salinity:source = "GCOOS LDN upload/SOS." ;
+		sea_water_practical_salinity:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=703" ;
+		sea_water_practical_salinity:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_practical_salinity:platform = "platform" ;
+		sea_water_practical_salinity:instrument = "instrument2" ;
+		sea_water_practical_salinity:comment = "" ;
+	double sea_water_temperature(time) ;
+		sea_water_temperature:_FillValue = -999. ;
+		sea_water_temperature:long_name = "sea water temperature" ;
+		sea_water_temperature:standard_name = "sea_water_temperature" ;
+		sea_water_temperature:ncei_name = "sea_water_temperature" ;
+		sea_water_temperature:units = "Celsius" ;
+		sea_water_temperature:scale_factor = 1. ;
+		sea_water_temperature:add_offset = 0. ;
+		sea_water_temperature:missing_value = -999. ;
+		sea_water_temperature:valid_min = -10. ;
+		sea_water_temperature:valid_max = 35. ;
+		sea_water_temperature:coordinates = "time lat lon z" ;
+		sea_water_temperature:coverage_content_type = "physicalMeasurement" ;
+		sea_water_temperature:grid_mapping = "crs" ;
+		sea_water_temperature:source = "GCOOS LDN upload/SOS." ;
+		sea_water_temperature:references = "http://www.mymobilebay.com/stationdata/StationInfo.asp?jday=&property=&chartyear=&StationID=703" ;
+		sea_water_temperature:cell_methods = "time: point lat: point lon: point z: point" ;
+		sea_water_temperature:platform = "platform" ;
+		sea_water_temperature:instrument = "instrument3" ;
+		sea_water_temperature:comment = "" ;
+
+// global attributes:
+		:ncei_template_version = "NCEI_NetCDF_TimeSeries_Orthogonal_Template_v2.0" ;
+		:featureType = "timeSeries" ;
+		:title = "GCOOS netCDF Data for urn:ioos:station:DISL:MHPA for the period 2010-01" ;
+		:summary = "2010-01 time series data for urn:ioos:station:DISL:MHPA platform served via GCOOS Data Portal. The uuid was generated using the uuid python module, invoking the command uuid.uuid4()." ;
+		:keywords = "EARTH SCIENCE > OCEANS > OCEAN CIRCULATION > OCEAN CURRENTS,EARTH SCIENCE > TERRESTRIAL HYDROSPHERE > WATER QUALITY/WATER CHEMISTRY > CHLOROPHYLL,EARTH SCIENCE > OCEANS > OCEAN CHEMISTRY > OXYGEN,EARTH SCIENCE > OCEANS > COASTAL PROCESSES > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SEA SURFACE TOPOGRAPHY > SEA SURFACE HEIGHT,EARTH SCIENCE > OCEANS > SALINITY/DENSITY > SALINITY,EARTH SCIENCE > OCEANS > OCEAN TEMPERATURE > WATER TEMPERATURE" ;
+		:keywords_vocabulary = "GCMD Science Keywords Version 8.1" ;
+		:Conventions = "CF-1.6, ACDD-1.3" ;
+		:id = "gcoos_ioos_station_DISL_MHPA_2010_01_ocn.hdr" ;
+		:naming_authority = "ioos:station:DISL" ;
+		:history = "V1 2017-05-22" ;
+		:source = "OGC SOS/WAF endpoint or data push" ;
+		:processing_level = "Data ingested as provided." ;
+		:comment = "" ;
+		:acknowledgment = "NOAA IOOS Program" ;
+		:license = "Creative Common (CC) 0" ;
+		:standard_name_vocabulary = "CF Standard Name Table v33" ;
+		:date_ceated = "Created:2017-05-22" ;
+		:creator_name = "Felimon Gayanilo" ;
+		:creator_email = "felimon.gayanilo@gcoos.org" ;
+		:creator_url = "https://www.linkedin.com/in/felimon-gayanilo-56728418" ;
+		:creator_type = "person" ;
+		:creator_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:institution = "Texas A&M University" ;
+		:project = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_name = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:publisher_email = "info@gcoos.org" ;
+		:publisher_url = "data.gcoos.org" ;
+		:publisher_type = "institution" ;
+		:publisher_institution = "Gulf of Mexico Coastal Ocean Observing System (GCOOS)" ;
+		:geospatial_lat_min = 30.6671 ;
+		:geospatial_lat_max = 30.6671 ;
+		:geospatial_lat_resolution = "" ;
+		:geospatial_lon_min = -87.9365 ;
+		:geospatial_lon_max = -87.9365 ;
+		:geospatial_lon_resolution = "" ;
+		:geospatial_vertical_min = -0.9 ;
+		:geospatial_vertical_max = 6.332 ;
+		:geospatial_vertical_positive = "down" ;
+		:geospatial_vertical_resolution = "" ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_units = "EPSG:4979" ;
+		:time_coverage_start = "2010-01-01T06:30:00Z" ;
+		:time_coverage_end = "2010-01-31T23:30:00Z" ;
+		:time_coverage_duration = "" ;
+		:time_coverage_resolution = "" ;
+		:uuid = "8a58ca00-6568-4a3e-b5fa-24e6ea3c5196" ;
+		:sea_name = "Gulf of Mexico" ;
+		:program = "NOAA IOOS" ;
+		:contributor_name = "Dauphin Island Sea Laboratory (DISL)" ;
+		:contributor_role = "Federal assets in the region" ;
+		:date_created = "2017-05-22" ;
+		:date_modified = "2017-05-22" ;
+		:date_issued = "2017-05-22" ;
+		:date_metadata_modified = "2017-05-22" ;
+		:product_version = "Ver. 1.0" ;
+		:platform = "In Situ Ocean-based Platforms > MOORINGS" ;
+		:platform_vocabulary = "CF Standard Name Table v33, GCMD Earth Science Keywords. Version 8.1" ;
+		:instrument = "" ;
+		:instrument_vocabulary = "GCMD Earth Science Keywords. Version 8.1" ;
+		:cdm_data_type = "Station" ;
+		:metadata_link = "" ;
+		:references = "" ;
+}
+-----
+
+
+
+
+
+
+
+

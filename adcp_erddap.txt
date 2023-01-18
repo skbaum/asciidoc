@@ -1,0 +1,1199 @@
+ADCP Files on ERDDAP
+====================
+Steven K. Baum
+v0.1, 2016-08-02
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+Overview
+--------
+
+Goal and Problem
+~~~~~~~~~~~~~~~~
+
+The goal is to make ADCP files available via an ERDDAP server such that temporal and spatial subsets can be identified and obtained via the elegant capabilities available on an ERDDAP server.
+The problem is choosing which data structures are best for accomplishing this goal.
+
+Overview of ADCPs
+~~~~~~~~~~~~~~~~~
+
+An ADCP is
+
+ERDDAP
+~~~~~~
+
+The ERDDAP server...
+
+Procedure
+---------
+
+This is the step-by-step procedure used to create the NetCDF meta-files for each ADCP dataset for the ERDDAP data server.
+
+Location of Project
+~~~~~~~~~~~~~~~~~~~
+
+This work was performed on +barataria+ in the directory:
+
+-----
+/home/baum/CTD_ERDDAP/data_adcp
+-----
+
+The datasets were all initially placed in the subdirectory:
+
+-----
+/home/baum/CTD_ERDDAP/datasets_adcp
+-----
+
+Making the ADCP NetCDF Files CF-Compliant
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Problems were found with most of the ADCP NetCDF files in regards to their compliance to the CF
+standard at:
+
+http://cfconventions.org/[+http://cfconventions.org/+]
+
+The ADCP data structure fits into the trajectory of profiles category, the CF recommendations for
+which can be found at:
+
+http://cfconventions.org/cf-conventions/v1.6.0/cf-conventions.html#_trajectory_of_profiles[+http://cfconventions.org/cf-conventions/v1.6.0/cf-conventions.html#_trajectory_of_profiles+]
+
+The Recommended Format
+~~~~~~~~~~~~~~~~~~~~~~
+
+The recommended format for an ADCP file containing a single trajectory is:
+
+=====
+   dimensions:
+      profile = 33;
+      z = 42 ;
+   
+   variables:
+      int trajectory;
+          trajectory:cf_role = "trajectory_id" ;
+
+      float lon(profile) ;
+          lon:standard_name = "longitude";
+          lon:units = "degrees_east";
+      float lat(profile) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+
+      float alt(profile, z) ;
+          alt:standard_name = “altitude”;
+          alt:long_name = "height above mean sea level" ;
+          alt:units = "km" ;
+          alt:positive = "up" ;
+           alt:axis = "Z" ;  
+
+      double time(profile ) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+
+      float pressure(profile, z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat alt" ;
+
+      float temperature(profile, z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat alt" ;
+
+      float humidity(profile, z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat alt" ;
+
+   attributes:
+    :featureType = "trajectoryProfile";
+=====
+
+An Incorrect Format
+~~~~~~~~~~~~~~~~~~~
+
+An example of a non-conformant file is found in:
+
++/home/baum/CTD_ERDDAP/datasets_adcp/GISR_G03_ADCP/ORIGINAL/13PE15_75_LTA_001_0.nc+
+
+where the time variable is handled thusly:
+
+=====
+        char reference_time(format_datstr) ;
+                reference_time:long_name = "Date of reference julian day" ;
+                reference_time:conventions = "YYYYMMDDHHMMSS" ;
+                reference_time:standard_name = "reference_time" ;
+        double Julian_day(obs) ;
+                Julian_day:long_name = "Julian day relative to reference_time" ;
+                Julian_day:standard_name = "Julian_day" ;
+        char date_time_UTC(obs, format_datstr) ;
+                date_time_UTC:long_name = "ASCII gregorian date and time" ;
+                date_time_UTC:convention = "YYYYMMDDHHMMSS" ;
+                date_time_UTC:standard_name = "UTC_day" ;
+...
+ reference_time = "19500101000000" ;
+...
+ Julian_day = 22977.3523391206, 22977.3628148148, 22977.3732210649,...
+...
+ date_time_UTC =
+  "20121128082722",
+  "20121128084227",
+  "20121128085726",...
+=====
+
+Additional problems include:
+
+* the +featureType+ should be +trajectoryProfile+ and not +trajectory+
+
+* there is no +trajectory+ variable
+
+* the recommended dimension name for the number of profiles
+is +profile+ rather than the name +obs+ found in the file
+
+* various parameters such as +ADCP_transmitter_frequency+ are stored in 1-D arrays
+rather than being more simply created as scalar variables, e.g. as:
+
+=====
++float ADCP_transmitter_frequency(const1) ;+
+
+rather than:
+
++double ADCP_transmitter_frequency ;+
+=====
+
+Python Scripts to Reformat the NetCDF Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To correct these problems, Python scripts were written to transmogrify the original files
+into more conforming files.  Since ADCP files in various NetCDF formats were received, more than one 
+translation program has been written.
+
+The +xray_GISR_G0.py+ Script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A translation program for the files in the +GISR_G03_ADCP+, +GISR_G05_ADCP_75Khz+ and
++GISR_G05_ADCP_300Khz+ groups the following program was used:
+
+[[app-listing]]
+[source,python,numbered]
+.xray_GISR_G0.py
+----
+#!/usr/bin/python3
+
+import numpy as np
+import xarray as xr
+import datetime
+import netCDF4
+from netcdftime import utime
+import sys
+import os
+
+home = "/home/baum/CTD_ERDDAP/datasets_adcp/"
+origdir = "ORIGINAL/"
+
+#dir = "GISR_G03_ADCP/"
+#dsin = "13PE15_75_LTA_001_0.nc"
+
+#dir = "GISR_G05_ADCP_75Khz/"
+#dsin = "14PE05_75_STA_010_7.nc"
+
+dir = "GISR_G05_ADCP_300Khz/"
+dsin = "14PE15_300_STA_006_0.nc"
+
+base = dsin.split('.')[0]
+newbase = base + "_mod"
+dsout = newbase + "." + dsin.split('.')[1]
+print (" dsin = ",dsin," dsout = ",dsout)
+
+start_time = "days since 1950-01-01 00:00:00"
+print (" file = ",dir + origdir + dsin)
+ds = xr.open_dataset(dir + origdir + dsin,decode_times=False)
+
+cdftime = utime(start_time)
+
+ds.attrs['featureType'] = 'trajectoryProfile'
+ds.attrs['comment'] = "Converted to NetCDF4 and CF 1.6 compliance by S. Baum in July 2016.  See http://pong.tamu.edu/~baum/adcp_cf.html for details and software."
+
+ds['trajectory'] = np.float((1))
+#ds['trajectory'] = np.chararray((1))
+#ds['trajectory'] = np.chararray((1), itemsize=25)
+#ds[0] = base
+ds.trajectory.attrs['cf_role'] = "trajectory_id"
+
+lat = xr.DataArray(np.empty([ds.latitude.values.size], dtype='f4'), dims=['profile'])
+lat[:] = ds.latitude.values
+lat.attrs = ds.latitude.attrs
+ds['latitude'] = lat
+
+lon = xr.DataArray(np.empty([ds.longitude.values.size], dtype='f4'), dims=['profile'])
+lon[:] = ds.longitude.values
+lon.attrs = ds.longitude.attrs
+ds['longitude'] = lon
+
+ds.rename({'ADCP_transmitter_frequency':'atf'},inplace=True)
+ds['ADCP_transmitter_frequency'] = np.float(ds.atf.values)
+print(ds.atf.attrs)
+for key in sorted(ds.atf.attrs.keys()):
+	ds.ADCP_transmitter_frequency.attrs[key] = ds.atf.attrs[key]
+
+ds.rename({'scale_factor':'sf'},inplace=True)
+ds['scale_factor'] = np.float(ds.sf.values)
+print(ds.sf.attrs)
+for key in sorted(ds.sf.attrs.keys()):
+        ds.scale_factor.attrs[key] = ds.sf.attrs[key]
+
+ds.rename({'beam_angle':'ba'},inplace=True)
+ds['beam_angle'] = np.float(ds.ba.values)
+print(ds.ba.attrs)
+for key in sorted(ds.ba.attrs.keys()):
+        ds.beam_angle.attrs[key] = ds.ba.attrs[key]
+
+ds.rename({'bin_length':'bl'},inplace=True)
+ds['bin_length'] = np.float(ds.bl.values)
+print(ds.bl.attrs)
+for key in sorted(ds.bl.attrs.keys()):
+        ds.bin_length.attrs[key] = ds.bl.attrs[key]
+
+ds.rename({'ADCP_angle_in_ship_axis':'aa'},inplace=True)
+ds['ADCP_angle_in_ship_axis'] = np.float(ds.aa.values)
+print(ds.aa.attrs)
+for key in sorted(ds.aa.attrs.keys()):
+        ds.ADCP_angle_in_ship_axis.attrs[key] = ds.aa.attrs[key]
+
+ds.rename({'depth_bin1_middle':'db'},inplace=True)
+ds['depth_bin1_middle'] = np.float(ds.db.values)
+print(ds.db.attrs)
+for key in sorted(ds.db.attrs.keys()):
+        ds.depth_bin1_middle.attrs[key] = ds.db.attrs[key]
+
+ds.rename({'num_ping_per_ensemble':'np'},inplace=True)
+ds['num_ping_per_ensemble'] = np.float(ds.np.values)
+print(ds.np.attrs)
+for key in sorted(ds.np.attrs.keys()):
+        ds.num_ping_per_ensemble.attrs[key] = ds.np.attrs[key]
+
+ds.rename({'transducer_depth':'td'},inplace=True)
+ds['transducer_depth'] = np.float(ds.td.values)
+print(ds.td.attrs)
+for key in sorted(ds.td.attrs.keys()):
+        ds.transducer_depth.attrs[key] = ds.td.attrs[key]
+
+#ds.rename({'reference_time':'rt'},inplace=True)
+#ds['reference_time'] = np.str(ds.rt.values)
+#print(ds.rt.attrs)
+#for key in sorted(ds.rt.attrs.keys()):
+#        ds.reference_time.attrs[key] = ds.rt.attrs[key]
+
+jd = xr.DataArray(np.empty([ds.Julian_day.values.size], dtype='f4'), dims=['profile'])
+jd[:] = ds.Julian_day.values
+jd.attrs = ds.Julian_day.attrs
+ds['Julian_day'] = jd
+
+#  Add new variable 'trjaecctory' with 'cf_role' attribute.
+
+d = xr.DataArray(np.empty([ds.depth.values.size], dtype='f4'), dims=['z'])
+d[:] = ds.depth.values
+d.attrs = ds.depth.attrs
+ds['depth'] = d
+
+#  Used for GISR_G03_ADCP, GISR_G05_ADCP_75Khz, GISR_G05_ADCP_300Khz
+
+rl = xr.DataArray(np.empty([2], dtype='i4'), dims=['nrlli'])
+rl[:] = ds.ref_layer_Ilim.values
+rl.attrs = ds.ref_layer_Ilim.attrs
+ds['ref_layer_Ilim'] = rl
+
+nppe = xr.DataArray(np.empty([ds.num_ping_per_ensemble.values.size], dtype='f4'), dims=['profile'])
+nppe[:] = ds.num_ping_per_ensemble.values
+nppe.attrs = ds.num_ping_per_ensemble.attrs
+ds['num_ping_per_ensemble'] = nppe
+
+b = xr.DataArray(np.empty([ds.bathymetry.values.size], dtype='f4'), dims=['profile'])
+b[:] = ds.bathymetry.values
+b.attrs = ds.bathymetry.attrs
+ds['bathymetry'] = b
+
+us = xr.DataArray(np.empty([ds.uvel_ship.values.size], dtype='f4'), dims=['profile'])
+us[:] = ds.uvel_ship.values
+us.attrs = ds.uvel_ship.attrs
+ds['uvel_ship'] = us
+
+vs = xr.DataArray(np.empty([ds.vvel_ship.values.size], dtype='f4'), dims=['profile'])
+vs[:] = ds.vvel_ship.values
+vs.attrs = ds.vvel_ship.attrs
+ds['vvel_ship'] = vs
+
+ubt = xr.DataArray(np.empty([ds.u_bottom_track.values.size], dtype='f4'), dims=['profile'])
+ubt[:] = ds.u_bottom_track.values
+ubt.attrs = ds.u_bottom_track.attrs
+ds['u_bottom_track'] = ubt
+
+vbt = xr.DataArray(np.empty([ds.v_bottom_track.values.size], dtype='f4'), dims=['profile'])
+vbt[:] = ds.v_bottom_track.values
+vbt.attrs = ds.v_bottom_track.attrs
+ds['v_bottom_track'] = vbt
+
+wbt = xr.DataArray(np.empty([ds.w_bottom_track.values.size], dtype='f4'), dims=['profile'])
+wbt[:] = ds.w_bottom_track.values
+wbt.attrs = ds.w_bottom_track.attrs
+ds['w_bottom_track'] = wbt
+
+br = xr.DataArray(np.empty([ds.bottom_range.values.size], dtype='f4'), dims=['profile'])
+br[:] = ds.bottom_range.values
+br.attrs = ds.bottom_range.attrs
+ds['bottom_range'] = br
+
+ta = xr.DataArray(np.empty([ds.temperature_ADCP.values.size], dtype='f4'), dims=['profile'])
+ta[:] = ds.temperature_ADCP.values
+ta.attrs = ds.temperature_ADCP.attrs
+ds['temperature_ADCP'] = ta
+
+heading = xr.DataArray(np.empty([ds.heading.values.size], dtype='f4'), dims=['profile'])
+heading[:] = ds.heading.values
+heading.attrs = ds.heading.attrs
+ds['heading'] = heading
+
+pitch = xr.DataArray(np.empty([ds.pitch.values.size], dtype='f4'), dims=['profile'])
+pitch[:] = ds.pitch.values
+pitch.attrs = ds.pitch.attrs
+ds['pitch'] = pitch
+
+r = ds['roll']
+roll = xr.DataArray(np.empty([r.values.size], dtype='f4'), dims=['profile'])
+roll[:] = r.values
+roll.attrs = r.attrs
+ds['roll'] = roll
+
+eswv = xr.DataArray(np.empty([ds.eastward_sea_water_velocity.shape[0],ds.eastward_sea_water_velocity.shape[1]], dtype='f4'), dims=['profile','z'])
+eswv[:] = ds.eastward_sea_water_velocity.values
+eswv.attrs = ds.eastward_sea_water_velocity.attrs
+ds['eastward_sea_water_velocity'] = eswv
+
+nswv = xr.DataArray(np.empty([ds.northward_sea_water_velocity.shape[0],ds.northward_sea_water_velocity.shape[1]], dtype='f4'), dims=['profile','z'])
+nswv[:] = ds.northward_sea_water_velocity.values
+nswv.attrs = ds.northward_sea_water_velocity.attrs
+ds['northward_sea_water_velocity'] = nswv
+
+uswv = xr.DataArray(np.empty([ds.upward_sea_water_velocity.shape[0],ds.upward_sea_water_velocity.shape[1]], dtype='f4'), dims=['profile','z'])
+uswv[:] = ds.upward_sea_water_velocity.values
+uswv.attrs = ds.upward_sea_water_velocity.attrs
+ds['upward_sea_water_velocity'] = uswv
+
+swve = xr.DataArray(np.empty([ds.sea_water_velocity_error.shape[0],ds.sea_water_velocity_error.shape[1]], dtype='f4'), dims=['profile','z'])
+swve[:] = ds.sea_water_velocity_error.values
+swve.attrs = ds.sea_water_velocity_error.attrs
+ds['sea_water_velocity_error'] = swve
+
+pga4 = xr.DataArray(np.empty([ds.percentage_good_ADCP_4_beam_solution.shape[0],ds.percentage_good_ADCP_4_beam_solution.shape[1]], dtype='f4'), dims=['profile','z'])
+pga4[:] = ds.percentage_good_ADCP_4_beam_solution.values
+pga4.attrs = ds.percentage_good_ADCP_4_beam_solution.attrs
+ds['percentage_good_ADCP_4_beam_solution'] = pga4
+
+pga3 = xr.DataArray(np.empty([ds.percentage_good_ADCP_3_beam_solution.shape[0],ds.percentage_good_ADCP_3_beam_solution.shape[1]], dtype='f4'), dims=['profile','z'])
+pga3[:] = ds.percentage_good_ADCP_3_beam_solution.values
+pga3.attrs = ds.percentage_good_ADCP_3_beam_solution.attrs
+ds['percentage_good_ADCP_3_beam_solution'] = pga3
+
+pgdr = xr.DataArray(np.empty([ds.percentage_good_data_rejected_because_of_EW.shape[0],ds.percentage_good_data_rejected_because_of_EW.shape[1]], dtype='f4'), dims=['profile','z'])
+pgdr[:] = ds.percentage_good_data_rejected_because_of_EW.values
+pgdr.attrs = ds.percentage_good_data_rejected_because_of_EW.attrs
+ds['percentage_good_data_rejected_because_of_EW'] = pgdr
+
+pga2 = xr.DataArray(np.empty([ds.percentage_good_ADCP_2_bad_beams.shape[0],ds.percentage_good_ADCP_2_bad_beams.shape[1]], dtype='f4'), dims=['profile','z'])
+pga2[:] = ds.percentage_good_ADCP_2_bad_beams.values
+pga2.attrs = ds.percentage_good_ADCP_2_bad_beams.attrs
+ds['percentage_good_ADCP_2_bad_beams'] = pga2
+
+ei = xr.DataArray(np.empty([ds.echo_intensity.shape[0],ds.echo_intensity.shape[1]], dtype='f4'), dims=['profile','z'])
+ei[:] = ds.echo_intensity.values
+ei.attrs = ds.echo_intensity.attrs
+ds['echo_intensity'] = ei
+
+ei1 = xr.DataArray(np.empty([ds.echo_intensity_beam1.shape[0],ds.echo_intensity_beam1.shape[1]], dtype='f4'), dims=['profile','z'])
+ei1[:] = ds.echo_intensity_beam1.values
+ei1.attrs = ds.echo_intensity_beam1.attrs
+ds['echo_intensity_beam1'] = ei1
+
+ei2 = xr.DataArray(np.empty([ds.echo_intensity_beam2.shape[0],ds.echo_intensity_beam2.shape[1]], dtype='f4'), dims=['profile','z'])
+ei2[:] = ds.echo_intensity_beam2.values
+ei2.attrs = ds.echo_intensity_beam2.attrs
+ds['echo_intensity_beam2'] = ei2
+
+ei3 = xr.DataArray(np.empty([ds.echo_intensity_beam3.shape[0],ds.echo_intensity_beam3.shape[1]], dtype='f4'), dims=['profile','z'])
+ei3[:] = ds.echo_intensity_beam3.values
+ei3.attrs = ds.echo_intensity_beam3.attrs
+ds['echo_intensity_beam3'] = ei3
+
+ei4 = xr.DataArray(np.empty([ds.echo_intensity_beam4.shape[0],ds.echo_intensity_beam4.shape[1]], dtype='f4'), dims=['profile','z'])
+ei4[:] = ds.echo_intensity_beam4.values
+ei4.attrs = ds.echo_intensity_beam4.attrs
+ds['echo_intensity_beam4'] = ei4
+
+corr = xr.DataArray(np.empty([ds.correlation.shape[0],ds.correlation.shape[1]], dtype='f4'), dims=['profile','z'])
+corr[:] = ds.correlation.values
+corr.attrs = ds.correlation.attrs
+ds['correlation'] = corr
+
+corr1 = xr.DataArray(np.empty([ds.correlation_beam1.shape[0],ds.correlation_beam1.shape[1]], dtype='f4'), dims=['profile','z'])
+corr1[:] = ds.correlation_beam1.values
+corr1.attrs = ds.correlation_beam1.attrs
+ds['correlation_beam1'] = corr1
+
+corr2 = xr.DataArray(np.empty([ds.correlation_beam2.shape[0],ds.correlation_beam2.shape[1]], dtype='f4'), dims=['profile','z'])
+corr2[:] = ds.correlation_beam2.values
+corr2.attrs = ds.correlation_beam2.attrs
+ds['correlation_beam2'] = corr2
+
+corr3 = xr.DataArray(np.empty([ds.correlation_beam3.shape[0],ds.correlation_beam3.shape[1]], dtype='f4'), dims=['profile','z'])
+corr3[:] = ds.correlation_beam3.values
+corr3.attrs = ds.correlation_beam3.attrs
+ds['correlation_beam3'] = corr3
+
+corr4 = xr.DataArray(np.empty([ds.correlation_beam4.shape[0],ds.correlation_beam4.shape[1]], dtype='f4'), dims=['profile','z'])
+corr4[:] = ds.correlation_beam4.values
+corr4.attrs = ds.correlation_beam4.attrs
+ds['correlation_beam4'] = corr4
+
+cas = xr.DataArray(np.empty([ds.CAS_current_flag.shape[0],ds.CAS_current_flag.shape[1]], dtype='f4'), dims=['profile','z'])
+cas[:] = ds.CAS_current_flag.values
+cas.attrs = ds.CAS_current_flag.attrs
+ds['CAS_current_flag'] = cas
+
+#  Convert date/time character string into porper NetCDF time thingie.
+
+dstr = ds.date_time_UTC.values
+time = np.empty([dstr.size])
+ntime = 0
+for x in dstr:
+        try:
+                y = int(x[0:4])
+                mo = int(x[4:6])
+                d = int(x[6:8])
+                h = int(x[8:10])
+                mi = int(x[10:12])
+                s = int(x[12:14])
+                dtime = datetime.datetime(y,mo,d,h,mi,s)
+                time[ntime] = cdftime.date2num(dtime)
+        except:
+                time[ntime] = time[ntime-1] + 0.05
+#        print(ntime,time[ntime])
+        ntime = ntime + 1
+
+
+#print (" time = ",time)
+
+tm = xr.DataArray(np.empty([dstr.size], dtype='f8'), dims=['profile'])
+tm[:] = time
+#tm.attrs = ds.date_time_UTC.attrs
+ds['time'] = tm
+ds.time.attrs['long_name'] = 'time'
+ds.time.attrs['standard_name'] = 'time'
+ds.time.attrs['units'] = start_time
+ds.time.attrs['calendar'] = 'Gregorian'
+ds.time.attrs['axis'] = 'T'
+
+print (" dir + dsout = ",dir+dsout)
+
+ds.to_netcdf(dir + dsout)
+
+decimate = "/usr/local/bin/ncks -O -x -v atf,sf,ba,bl,aa,db,np,td,reference_time,Julian_day,date_time_UTC " + home + dir + dsout + " " + home + dir + dsout
+
+print(" decimate = ",decimate)
+
+os.system(decimate)
+----
+
+Renaming the Files
+~~~~~~~~~~~~~~~~~~
+
+The new, CF-compliant files were renamed by appending +_mod+ to the original filename.  For example,
+the original filename +13PE15_75_LTA_001_0.nc+ will become +13PE15_75_LTA_001_0_mod.nc+.
+A subdirectory +ORIGINAL+ was also created in each of the directories
+to hold the original files.
+
+
+Create a *.list File
+~~~~~~~~~~~~~~~~~~~~
+
+Each dataset is received as a set of NetCDF files.  A subdirectory is
+created for each set, e.g. +GISR_G03_ADCP+ While in the subdirectory for a given set,
+run the command:
+
+-----
+ls > ../GISR_G03_ADCP.list
+-----
+
+The +GISR_G03_ADCP.list+ file is edited to remove its own name from itself, and then
+moved to the +data_adcp+ directory via:
+
+-----
+mv *.list ../data_adcp
+-----
+
+Create a *.txt File
+~~~~~~~~~~~~~~~~~~~
+
+Moving to the +data_adcp+ directory, edit the +createtxt_adcp.py+ script.  Add another
++id =+ line at the end of the existing such lines near the top of the file.
+In this example, we would add:
+
+-----
+id = "GISR_G03_ADCP"
+-----
+
+Now exit the file and run it via:
+
+-----
+./createtxt_adcp.py
+-----
+
+to create the file:
+
+-----
+GISR_G03_ADCP.txt
+-----
+
+which contains a series of lines of the form (without the column headers shown here for informational purposes):
+
+-----
+
+   Start        End          Lat     Lat   Lat     Lat     Lon      Lon       Lon      Lon       ID                                      No. of     No. of
+   Time         Time         Min     Max  Start    End     Min      Max      Start     End     String                                    Profiles  Vertical Cells
+
+22977.352338 22977.5991898 28.0352 28.942 28.942 28.0352 -90.5964 -90.5698 -90.5698 -90.5964 13PE15_75_LTA_001_0_mod.nc GISR_G03_ADCP        25       45
+22977.6328125 22981.7397454 26.288 27.9139 27.9139 26.8381 -94.0814 -90.5827 -90.5974 -92.2222 13PE15_75_LTA_002_0_mod.nc GISR_G03_ADCP     395       45
+22981.7756713 22987.8903241 26.1114 27.6119 26.8981 26.1141 -92.3381 -90.1222 -92.2386 -90.1313 13PE15_75_LTA_003_0_mod.nc GISR_G03_ADCP    588       45
+...
+-----
+
+The +createtxt_adcp.py+ Script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[[app-listing]]
+[source,python,numbered]
+.createtxt_adcp.py
+----
+#!/usr/bin/python2.7
+
+#  Combines NetCDF files containing separate CTD profiles into
+#  a single NetCDF file containing many profiles.
+
+import sys
+import numpy as np
+import netCDF4
+
+mv = -999.9
+
+id = "PE14-22_ADCP"
+id = "PS15-03_Sutton_ADCP"
+id = "PE15-01_ADCP"
+id = "R1.134.0730043-SCOPE_ADCP"
+id = "GISR_G05_ADCP_75Khz"
+id = "GISR_G05_ADCP_300Khz"
+id = "GISR_G03_ADCP"
+id = "PE13-30_ADCP"
+id = "PE13-08_ADCP"
+id = "PE15-07_ADCP"
+id = "PE15-01_ADCP"
+id = "PE14-22_ADCP"
+id = "PE14-20_ADCP"
+id = "PE14_10b_Felder_ADCP"
+id = "PE13-30_ADCP"
+id = "PE13-14_Felder_ADCP"
+
+inf = id + '.list'
+ouf = id + '.txt'
+dir = id + '/'
+print " dir = ",dir
+
+files = np.loadtxt(inf,dtype='string')
+
+print " files = ",files
+
+fo = open(ouf,"wb")
+#fo.write( "Something in the file\n")
+
+np = 0
+#  Loop over number of profiles.
+for f in files:
+
+        print "np = ",np," f = ",f
+	floc = '/home/baum/CTD_ERDDAP/datasets_adcp/' + dir + f
+	print " floc = ",floc
+	nc_in = netCDF4.Dataset(floc, 'r', format='NETCDF4')
+#	nc_in = netCDF4.Dataset(floc, 'r', format='NETCDF3_CLASSIC')
+
+
+# -------------------------------------------------------------------
+
+	v = nc_in.variables['northward_sea_water_velocity']
+	time_steps = v.shape[0]
+	vcells = v.shape[1]
+
+# --------------------------------------------------------------------
+
+	lat = nc_in.variables['latitude'][:]
+	latmin = min(lat)
+	latmax = max(lat)
+	latstart = lat[0]
+	latend = lat[-1]
+	print " latmin = ",latmin," latmax = ",latmax," latstart = ",latstart," latend = ",latend
+	lon = nc_in.variables['longitude'][:]
+	lonmin = min(lon)
+	lonmax = max(lon)
+	lonstart = lon[0]
+	lonend = lon[-1]	
+	time = nc_in.variables['time'][:]
+	timemin = min(time)
+	timemax = max(time)
+
+        nc_dict = nc_in.__dict__
+
+	featureType = nc_in.variables['trajectory']
+
+	name = id
+	name = name.replace("-", "_")
+
+	print timemin,timemax,latmin,latmax,latstart,latend,lonmin,lonmax,lonstart,lonend,f,name,time_steps,vcells
+	all = str(timemin) + " " + str(timemax) + " " + str(latmin) + " " + str(latmax) + " " + str(latstart) + " " + str(latend) + " " + str(lonmin) + " " + str(lonmax) + " " + str(lonstart) + " " + str(lonend) + " " + f + " " + name + " " + str(time_steps) + " " + str(vcells) + "\n"
+	fo.write(all)
+
+
+       	np = np + 1
+
+fo.close()
+----
+
+
+Copy the Dataset to the THREDDS Server Archive Location
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The files in each dataset must placed in a location reachable by the THREDDS server from which they will be made available.
+In this case we're putting them on +gcoos4+ in the subdirectory:
+
+-----
+/data/thredds/adcp
+-----
+
+So for our example dataset, our files would reside in:
+
+-----
+/data/thredds/adcp/GISR_G03_ADCP
+-----
+
+which contains:
+
+-----
+13PE15_75_LTA_001_0_mod.nc
+13PE15_75_LTA_002_0_mod.nc
+13PE15_75_LTA_003_0_mod.nc
+13PE15_75_LTA_003_1_mod.nc
+13PE15_75_LTA_003_2_mod.nc
+13PE15_75_STA_001_0_mod.nc
+13PE15_75_STA_002_0_mod.nc
+13PE15_75_STA_002_1_mod.nc
+13PE15_75_STA_002_2_mod.nc
+13PE15_75_STA_003_0_mod.nc
+13PE15_75_STA_003_1_mod.nc
+13PE15_75_STA_003_2_mod.nc
+13PE15_75_STA_003_3_mod.nc
+13PE15_75_STA_003_4_mod.nc
+13PE15_75_STA_003_5_mod.nc
+13PE15_75_STA_003_6_mod.nc
+13PE15_75_STA_003_7_mod.nc
+13PE15_75_STA_003_8_mod.nc
+-----
+
+Create a THREDDS Configuration File Entry for the Dataset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This step must be performed before creating the meta-NetCDF file for the dataset.  That step requires a THREDDS URL which is created in this step.
+
+Edit the THREDDS server configuration file located on gcoos4 at:
+
+-----
+/opt/tomcat8/content/thredds/catalog.xml
+-----
+
+and add:
+
+[source,xml]
+-----
+  <datasetScan name="GISR_G03_ADCP" ID="GISR_G03_ADCP" path="adcp/GISR_G03_ADCP" location="/data/thredds/adcp/GISR_G03_ADCP">
+    <metadata inherited="true">
+      <serviceName>all</serviceName>
+      <dataType>Station</dataType>
+    </metadata>
+    <filter>
+      <include wildcard="*.nc"/>
+    </filter>
+  </datasetScan>
+-----
+
+This will enter it in the list of TDS datafiles at the URL:
+
+http://gcoos4.tamu.edu:8080/thredds/catalog.html[+http://gcoos4.tamu.edu:8080/thredds/catalog.html+]
+
+The files for this specific example can be found at the URL:
+
+http://gcoos4.tamu.edu:8080/thredds/catalog/adcp/GISR_G03_ADCP/catalog.html[+http://gcoos4.tamu.edu:8080/thredds/catalog/adcp/GISR_G03_ADCP/catalog.html+]
+
+Note that in the XML +datasetScan+ configuration statement:
+
+* the +name+ string +GISR_G03_ADCP+ is the name that will be shown in the upper level THREDDS catalog listing;
+
+* the +path+ establishes the part of the URL string between +catalog+ and +catalog.html+, in this case +adcp/GISR_G03_ADCP+;
+
+* the +location+ string +/data/thredds/adcp/GISR_G03_ADCP+ is the full path the the subdirectory of the dataset stored on a disk drive; and
+
+* the +ID+ string +GISR_G03_ADCP+ is a unique identifier for the dataset within THREDDS.
+
+
+Create a Meta *.nc File
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Now we will use our +GISR_G03_ADCP.txt+ file to create a separate NetCDF file that contains the starting date/time,
+ending date/time, minimum lat, maximum lat, starting lat, ending lat, minimum lon, maximum lon, starting lon, ending lon,
+ID string, number of time steps/profiles and number of vertical cells for each dataset.
+
+The Python Script
+^^^^^^^^^^^^^^^^^
+
+This is done with the +txt2cdf_adcp.py+ script whose functionality is to:
+
+* read the input text file containing the required information, e.g. +GISR_G03_ADCP.txt+;
+
+* create and open for writing a NetCDF file containing the appropriate global and variable attributes,
+dimensions, variables and data; and
+
+* loop over all the individual CTD casts in each dataset, create or munge the data needed for each cast, and write it to the meta-NetCDF file.
+
+The Python script is:
+
+[[app-listing]]
+[source,python,numbered]
+.txt2cdf_adcp.py
+-----
+#!/usr/bin/python2.7
+
+#  Transmogrifies a columnar ASCII text file containing various CTD data into a NetCDF file.
+#
+#  Basic steps:
+#
+#  * Create output NetCDF file.
+#  * Create all required/recommended general attributes.
+#  * Create file-specific attributes.
+#  * Create dimensions and variables.
+#  * Open, read and parse input columnar ASCII file data.
+#  * Convert YYYY/MM/DD date format into "days since 1970-01-01" format.
+#  * Write data to output NetCDF file.
+
+import numpy as np
+import netCDF4
+from netcdftime import utime
+from datetime import datetime
+import datetime
+import sys
+import fileinput
+
+#urlbase = "barataria.tamu.edu:8080/thredds/"
+urlbase = "104.131.75.101:8080/thredds/"
+#urlbase = "gcoos4.tamu.edu:8080/thredds/"
+
+time_units = "days since 1950-01-01 00:00:00"
+
+#infile = "GISR_G05_ADCP_75Khz.txt"
+#infile = "GISR_G05_ADCP_300Khz.txt"
+infile = "GISR_G03_ADCP.txt"
+
+outfile = infile.split('.')[0] + '.nc'
+print " infile = ",infile," outfile = ",outfile
+
+nc = netCDF4.Dataset(outfile, 'w', format='NETCDF4')
+
+nc_dict = nc.__dict__
+
+nc.summary = "ADCP files from " + infile
+nc.time_coverage_end = "see time variables"
+#nc.time_coverage_resolution = ""
+nc.time_coverage_start = "see time variables"
+nc.title = "Shipboard ADCP velocity profiles"
+nc.uuid = "NA"
+
+if infile == 'GISR_G05_ADCP_300Khz.txt':
+        nc.principle_investigator = "DiMarco, Steven"
+        nc.organization = "GOMRI"
+        nc.consortia = "GISR"
+        nc.griidc_udi = "NA"
+        nc.dataset_id = "GISR_G05_ADCP_300Khz"
+elif infile == 'GISR_G03_ADCP.txt':
+        nc.principle_investigator = "DiMarco, Steven"
+        nc.organization = "GOMRI"
+        nc.consortia = "GISR"
+        nc.griidc_udi = "NA"
+        nc.dataset_id = "GISR_G03_ADCP"
+elif infile == 'PE13-08_ADCP.txt':
+        nc.principle_investigator = "Fredericq, Suzanne"
+        nc.organization = "GOMRI"
+        nc.consortia = "CWC"
+        nc.griidc_udi = "NA"
+        nc.dataset_id = "PE13-08_ADCP_1200kHz"
+else:
+	print " Input file not found. "
+
+#  Create the dimension station.
+nc.createDimension('station',None)
+
+stat = nc.createVariable('station',str,'station')
+stat.name = "station identification number"
+
+dap_url = nc.createVariable('dap_url',str,'station')
+dap_url.name = "THREDDS OpenDAP URL"
+http_url = nc.createVariable('http_url',str,'station')
+http_url.name = "THREDDS HTTP URL"
+
+otime = nc.createVariable('time','f8',('station',))
+otime.units = time_units
+otime.standard_name = "time"
+otime.long_name = "time"
+otime.calendar = "Julian"
+
+otimel = nc.createVariable('time_end','f8',('station',))
+otimel.units = time_units
+otimel.long_name = "finish_time"
+otimel.calendar = "Julian"
+
+ts = nc.createVariable('time_steps','i8',('station',))
+ts.long_name = "number_of_time_steps"
+
+cells = nc.createVariable('vertical_cells','i8',('station',))
+cells.long_name = "number_of_vertical_cells"
+
+olon = nc.createVariable('lon','f8',('station',))
+olon.standard_name = "longitude"
+olon.long_name = "first_longitude"
+olon.units = "degrees_east"
+olon.axis = "X"
+
+olonl = nc.createVariable('lon_end','f8',('station',))
+olonl.long_name = "last_longitude"
+olonl.units = "degrees_east"
+olonl.axis = "X"
+
+olonmin = nc.createVariable('lon_min','f8',('station',))
+olonmin.long_name = "minimum_longitude"
+olonmin.units = "degrees_east"
+olonmin.axis = "X"
+
+olonmax = nc.createVariable('lon_max','f8',('station',))
+olonmax.long_name = "maximum_longitude"
+olonmax.units = "degrees_east"
+olonmax.axis = "X"
+
+olat = nc.createVariable('lat','f8',('station',))
+olat.standard_name = "latitude"
+olat.long_name = "latitude"
+olat.units = "degrees_north"
+olat.axis = "Y"
+
+olatl = nc.createVariable('lat_end','f8',('station',))
+olatl.long_name = "last_latitude"
+olatl.units = "degrees_north"
+olatl.axis = "X"
+
+olatmin = nc.createVariable('lat_min','f8',('station',))
+olatmin.long_name = "minimum_latitude"
+olatmin.units = "degrees_north"
+olatmin.axis = "X"
+
+olatmax = nc.createVariable('lat_max','f8',('station',))
+olatmax.long_name = "maximum_latitude"
+olatmax.units = "degrees_north"
+olatmax.axis = "X"
+
+np = 0
+
+for line in fileinput.input(files=(infile)):
+
+
+#	if infile == 'GISR_G05_ADCP_75Khz.txt':
+#	if infile == 'GISR_G05_ADCP_300Khz.txt':
+	if infile == 'GISR_G03_ADCP.txt':
+
+		timemin = line.split()[0]
+		timemax = line.split()[1]
+		lat = line.split()[4]
+		latl = line.split()[5]
+		latmin = line.split()[2]
+		latmax = line.split()[3]
+		lon = line.split()[8]
+		lonl = line.split()[9]
+		lonmin = line.split()[6]
+		lonmax = line.split()[7]	
+		dap = "http://" + urlbase + "dodsC/adcp/" + line.split()[11] + "/"
+		http = "http://" + urlbase + "fileServer/adcp/" + line.split()[11] + "/"
+		station = line.split()[10]
+		dap = dap + station + ".html"
+		http = http + station
+		station_id = station + "_" + line.split()[11]
+
+	else:
+
+		print " Input file not found."
+
+	otime[np] = timemin
+	otimel[np] = timemax
+	stat[np] = station_id
+	http_url[np] = http
+	dap_url[np] = dap
+	otime[np] = timemin
+	olon[np] = lon
+	olonl[np] = lonl
+	olonmin[np] = lonmin
+	olonmax[np] = lonmax
+	olat[np] = lat
+	olatl[np] = latl
+	olatmin[np] = latmin
+	olatmax[np] = latmax
+	ts[np] = line.split()[12]
+	cells[np] = line.split()[13]
+
+       	np = np + 1
+
+nc.close()
+-----
+
+The Dimensions
+^^^^^^^^^^^^^^
+
+The dimensions used for the meta-NetCDF file for each dataset are:
+
+* +station+ - the number of stations/profiles in the dataset
+
+The Variables
+^^^^^^^^^^^^^
+
+The variables used for the meta-NetCDF file for each dataset are:
+
+* +station+ - the station/profile ID number
+
+* +http_url+ - the THREDDS URL from which the NetCDF file containing the ADCP data can be downloaded
+
+* +dap_url+ - the THREDDS URL from which the ADCP data can be obtained via the DAP protocol
+
+* +time+ - the time at which the first ADCP profile is taken
+
+* +time_end+ - the time at which the last ADCP profile is taken
+
+* +time_steps+ - the number of time steps/profiles
+
+* +vertical_cells+ - the number of vertical cells in the ADCP profile
+
+* +lon+ - the longitude of the first profile
+
+* +lon_end+ - the longitude of the last profile
+
+* +lon_min+ - the longitude of the westernmost profile
+
+* +lon_max+ - the longitude of the easternmost profile
+
+* +lat+ - the latitude of the first profile
+
+* +lat_end+ - the latitude of the last profile
+
+* +lat_min+ - the latitude of the southernmost profile
+
+* +lat_max+ - the latitude of the northernmost profile
+
+The Attributes
+^^^^^^^^^^^^^^
+
+The attributes used for the meta-NetCDF file for each dataset are:
+
+* +summary+
+
+* +title+
+
+* +principle_investigator+
+
+* +organizations+
+
+* +consortia+
+
+* +griidc_udi+ - the unique GRIIDC identification string for the dataset
+
+* +dataset_id+ - an ID to uniquely identify the dataset on the ERDDAP server
+
+Example Meta-NetCDF File
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The meta-NetCDF file for dataset +GISR_G03_ADCP+ is:
+
+-----
+netcdf GISR_G03_ADCP {
+dimensions:
+        station = UNLIMITED ; // (18 currently)
+variables:
+        string station(station) ;
+                station:name = "station identification number" ;
+        string dap_url(station) ;
+                dap_url:name = "THREDDS OpenDAP URL" ;
+        string http_url(station) ;
+                http_url:name = "THREDDS HTTP URL" ;
+        double time(station) ;
+                time:units = "hours since 1970-01-01 00:00:00" ;
+                time:standard_name = "time" ;
+                time:long_name = "time" ;
+                time:calendar = "Julian" ;
+        double time_end(station) ;
+                time_end:units = "hours since 1970-01-01 00:00:00" ;
+                time_end:long_name = "finish_time" ;
+                time_end:calendar = "Julian" ;
+        int64 time_steps(station) ;
+                time_steps:long_name = "number_of_time_steps" ;
+        int64 vertical_cells(station) ;
+                vertical_cells:long_name = "number_of_vertical_cells" ;
+        double lon(station) ;
+                lon:standard_name = "longitude" ;
+                lon:long_name = "first_longitude" ;
+                lon:units = "degrees_east" ;
+                lon:axis = "X" ;
+        double lon_end(station) ;
+                lon_end:long_name = "last_longitude" ;
+                lon_end:units = "degrees_east" ;
+                lon_end:axis = "X" ;
+        double lon_min(station) ;
+                lon_min:long_name = "minimum_longitude" ;
+                lon_min:units = "degrees_east" ;
+                lon_min:axis = "X" ;
+        double lon_max(station) ;
+                lon_max:long_name = "maximum_longitude" ;
+                lon_max:units = "degrees_east" ;
+                lon_max:axis = "X" ;
+        double lat(station) ;
+                lat:standard_name = "latitude" ;
+                lat:long_name = "latitude" ;
+                lat:units = "degrees_north" ;
+                lat:axis = "Y" ;
+        double lat_end(station) ;
+                lat_end:long_name = "last_latitude" ;
+                lat_end:units = "degrees_north" ;
+                lat_end:axis = "X" ;
+        double lat_min(station) ;
+                lat_min:long_name = "minimum_latitude" ;
+                lat_min:units = "degrees_north" ;
+                lat_min:axis = "X" ;
+        double lat_max(station) ;
+                lat_max:long_name = "maximum_latitude" ;
+                lat_max:units = "degrees_north" ;
+                lat_max:axis = "X" ;
+
+// global attributes:
+                :summary = "ADCP files from GISR_G03_ADCP.txt" ;
+                :time_coverage_end = "see time variables" ;
+                :time_coverage_start = "see time variables" ;
+                :title = "Shipboard ADCP velocity profiles" ;
+                :uuid = "NA" ;
+                :principle_investigator = "DiMarco, Steven" ;
+                :organization = "GOMRI" ;
+                :consortia = "GISR" ;
+                :griidc_udi = "NA" ;
+                :dataset_id = "GISR_G03_ADCP" ;
+data:
+
+ station = "13PE15_75_LTA_001_0_mod.nc_GISR_G03_ADCP", 
+    "13PE15_75_LTA_002_0_mod.nc_GISR_G03_ADCP", 
+    "13PE15_75_LTA_003_0_mod.nc_GISR_G03_ADCP",
+...
+ dap_url = 
+    "http://gcoos4.tamu.edu:8080/thredds/dodsC/adcp/GISR_G03_ADCP/13PE15_75_LTA_001_0_mod.nc.html", 
+    "http://gcoos4.tamu.edu:8080/thredds/dodsC/adcp/GISR_G03_ADCP/13PE15_75_LTA_002_0_mod.nc.html",
+...
+http_url = 
+    "http://gcoos4.tamu.edu:8080/thredds/fileServer/adcp/GISR_G03_ADCP/13PE15_75_LTA_001_0_mod.nc", 
+    "http://gcoos4.tamu.edu:8080/thredds/fileServer/adcp/GISR_G03_ADCP/13PE15_75_LTA_002_0_mod.nc",
+...
+time = 22977.352338, 22977.6328125, 22981.7756713, 22987.9007292, 
+    22994.0257292, 22977.3488889, 22977.6293403, 22979.6737963, 
+    22981.7154745, 22981.7722454, 22983.813912, 22985.8556134, 22987.8972569, 
+    22989.9388889, 22991.9806366, 22994.0222569, 22996.063912, 22998.1055903 ;
+
+ time_end = 22977.5991898, 22981.7397454, 22987.8903241, 22994.044456, 
+    22999.4717245, 22977.6128241, 22979.6702662, 22981.7120139, 
+    22981.7467245, 22983.8104514, 22985.8521412, 22987.8938079, 
+    22989.9354167, 22991.9771644, 22994.0479167, 22996.0604514, 
+    22998.1020949, 22999.4734491 ;
+
+ time_steps = 25, 395, 588, 588, 524, 77, 588, 588, 10, 588, 588, 588, 588, 
+    588, 588, 588, 588, 395 ;
+
+ vertical_cells = 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 
+    45, 45, 45 ;
+
+ lon = -90.5698, -90.5974, -92.2386, -90.1266, -88.7382, -90.5691, -90.5973, 
+    -93.384, -92.2228, -92.236, -91.5179, -91.1049, -90.1312, -89.797, 
+    -87.9608, -88.7363, -87.2903, -91.5445 ;
+
+ lon_end = -90.5964, -92.2222, -90.1313, -88.7329, -90.5678, -90.5968, 
+    -93.3839, -92.223, -92.2228, -91.5183, -91.1051, -90.132, -89.791, 
+    -87.9614, -88.7346, -87.2811, -91.5442, -90.5667 ;
+
+ lon_min = -90.5964, -94.0814, -92.3381, -90.1266, -92.1065, -90.5969, 
+    -93.3935, -94.0851, -92.2228, -92.3385, -91.5179, -91.1058, -90.1312, 
+    -89.9553, -89.2786, -88.7417, -91.5442, -92.107 ;
+
+lon_max = -90.5698, -90.5827, -90.1222, -87.9561, -87.22, -90.5691, 
+    -90.5817, -92.1959, -92.2221, -91.5183, -90.7976, -90.1207, -89.1358, 
+    -87.9614, -87.9549, -87.2196, -87.2903, -90.5667 ;
+
+ lat = 28.942, 27.9139, 26.8981, 26.0994, 26.972, 28.9528, 27.9265, 27.0324, 
+    26.8359, 26.8869, 26.5471, 27.4857, 26.1119, 27.3996, 28.1772, 26.9725, 
+    26.3111, 25.9157 ;
+
+ lat_end = 28.0352, 26.8381, 26.1141, 26.9736, 28.9824, 27.9863, 27.0313, 
+    26.8356, 26.8389, 26.5474, 27.4864, 26.1142, 27.3895, 28.1782, 26.9732, 
+    26.3013, 25.916, 28.9887 ;
+
+ lat_min = 28.0352, 26.288, 26.1114, 25.8999, 25.7966, 27.9863, 26.7258, 
+    26.2874, 26.8359, 26.5474, 26.2413, 26.1112, 25.899, 27.3837, 26.9732, 
+    25.8934, 25.7962, 25.9024 ;
+
+ lat_max = 28.942, 27.9139, 27.6119, 28.7206, 28.9824, 28.9528, 27.9265, 
+    27.0461, 26.8389, 27.437, 27.4889, 27.6138, 27.3895, 28.7225, 28.3485, 
+    26.9725, 26.6623, 28.9887 ;
+}
+-----
+
+ERDDAP Server
+-------------
+
+The meta-NetCDF files are now transferred to the machine running the ERDDAP
+(virtual) server, which is located at:
+
+http://104.131.75.101:8080/erddap/index.html[+http://104.131.75.101:8080/erddap/index.html+]
+
+These files are placed in the directory:
+
+-----
+/home/baum/CTD_ERDDAP/data
+-----
+
+and the configuration file for serving them is located at:
+
+-----
+/opt/tomcat7/content/erddap/datasets.xml
+-----
+
+An example configuration file for +BE-317+ is:
+

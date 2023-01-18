@@ -1,0 +1,2579 @@
+
+= HPC Software Notes
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Meta
+
+=== Courses
+
+* *High-Performance Computing with Python* - https://github.com/eth-cscs/PythonHPC[`https://github.com/eth-cscs/PythonHPC`]
+* *High Performance Computing for Weather and Climate* - https://github.com/ofuhrer/HPC4WC[`https://github.com/ofuhrer/HPC4WC`]
+* *Getting Started with Containers on HPC* - https://github.com/supercontainers/isc-tutorial[`https://github.com/supercontainers/isc-tutorial`]
+* *Practical Introduction to High Performance Computing* - https://github.com/cambiotraining/hpc-intro[`https://github.com/cambiotraining/hpc-intro`]
+* *Elements of High Performance Computing* - https://github.com/csc-training/elements-of-hpc[`https://github.com/csc-training/elements-of-hpc`]
+* *HPC Carpentry Lessons* - https://github.com/gu-eresearch/hpcCarpentryLessons[`https://github.com/gu-eresearch/hpcCarpentryLessons`]
+* *Argonne Training Program on Extreme-Scale Computing*
+** *ATPESC 2020* - https://extremecomputingtraining.anl.gov/agenda-2020/[`https://extremecomputingtraining.anl.gov/agenda-2020/`]
+** *ATPESC 2019 Docs* - https://extremecomputingtraining.anl.gov/archive/atpesc-2019/agenda-2019/[`https://extremecomputingtraining.anl.gov/archive/atpesc-2019/agenda-2019/`]
+** *ATPESC 2019 Videos* - https://www.youtube.com/channel/UCfwgjtIQB3puojz_N9ly_Ag/playlists?view=50&sort=dd&shelf_id=5[`https://www.youtube.com/channel/UCfwgjtIQB3puojz_N9ly_Ag/playlists?view=50&sort=dd&shelf_id=5`]
+
+=== Sites
+
+* *GPU Hackathons* - https://www.gpuhackathons.org/[`https://www.gpuhackathons.org/`]
+* *hgpu.org* - https://hgpu.org/[`https://hgpu.org/`]
+* *HPCWire* - https://www.hpcwire.com/[`https://www.hpcwire.com/`]
+* *Inside HPC* - https://insidehpc.com/[`https://insidehpc.com/`]
+* *The Next Platform* - https://www.nextplatform.com/[`https://www.nextplatform.com/`]
+
+=== Docs
+
+* *HPC and MPI*
+
+** *Survey of Methodologies, Approaches, and Challenges in Parallel Programming Using HPC Systems - https://www.hindawi.com/journals/sp/2020/4176794/[`https://www.hindawi.com/journals/sp/2020/4176794/`]
+
+** *HPC is dying, and MPI is killing it* - https://www.dursi.ca/post/hpc-is-dying-and-mpi-is-killing-it.html[`https://www.dursi.ca/post/hpc-is-dying-and-mpi-is-killing-it.html`]
+
+** *Objections, continued* - https://www.dursi.ca/post/objections-continued.html[`https://www.dursi.ca/post/objections-continued.html`]
+
+** *In praise of MPI collectives and MPI-IO* - https://www.dursi.ca/post/in-praise-of-mpi-collectives-and-mpi-io.html[`https://www.dursi.ca/post/in-praise-of-mpi-collectives-and-mpi-io.html`]
+
+== Languages
+
+=== Arkouda
+
+https://github.com/mhmerrill/arkouda[`https://github.com/mhmerrill/arkouda`]
+
+https://partee.io/2021/02/21/climate-model-response/[`https://partee.io/2021/02/21/climate-model-response/`]
+
+"Exploratory data analysis (EDA) is a prerequisite for all data science, as illustrated by the ubiquity of Jupyter notebooks, the preferred interface for EDA among data scientists. The operations involved in exploring and transforming the data are often at least as computationally intensive as downstream applications (e.g. machine learning algorithms), and as datasets grow, so does the need for HPC-enabled EDA. However, the inherently interactive and open-ended nature of EDA does not mesh well with current HPC usage models. Meanwhile, several existing projects from outside the traditional HPC space attempt to combine interactivity and distributed computation using programming paradigms and tools from cloud computing, but none of these projects have come close to meeting our needs for high-performance EDA.
+
+To fill this gap, we have developed a software package, called Arkouda, which allows a user to interactively issue massively parallel computations on distributed data using functions and syntax that mimic NumPy, the underlying computational library used in the vast majority of Python data science workflows. The computational heart of Arkouda is a Chapel interpreter that accepts a pre-defined set of commands from a client (currently implemented in Python) and uses Chapel's built-in machinery for multi-locale and multithreaded execution. Arkouda has benefited greatly from Chapel's distinctive features and has also helped guide the development of the language.
+
+In early applications, users of Arkouda have tended to iterate rapidly between multi-node execution with Arkouda and single-node analysis in Python, relying on Arkouda to filter a large dataset down to a smaller collection suitable for analysis in Python, and then feeding the results back into Arkouda computations on the full dataset. This paradigm has already proved very fruitful for EDA. Our goal is to enable users to progress seamlessly from EDA to specialized algorithms by making Arkouda an integration point for HPC implementations of expensive kernels like FFTs, sparse linear algebra, and graph traversal. With Arkouda serving the role of a shell, a data scientist could explore, prepare, and call optimized HPC libraries on massive datasets, all within the same interactive session.
+
+Arkouda is not trying to replace Pandas but to allow for some Pandas-style operation at a much larger scale. In our experience Pandas can handle dataframes up to about 500 million rows before performance becomes a real issue, this is provided that you run on a sufficently capable compute server. Arkouda breaks the shared memory paradigm and scales its operations to dataframes with over 200 billion rows, maybe even a trillion. In practice we have run Arkouda server operations on columns of one trillion elements running on 512 compute nodes. This yielded a >20TB dataframe in Arkouda."
+
+=== Chapel
+
+https://chapel-lang.org/docs/index.html[`https://chapel-lang.org/docs/index.html`]
+
+https://chapel-lang.org/[`https://chapel-lang.org/`]
+
+https://github.com/chapel-lang/chapel[`https://github.com/chapel-lang/chapel`]
+
+http://www.hpc-carpentry.org/hpc-chapel/[`http://www.hpc-carpentry.org/hpc-chapel/`]
+
+https://twitter.com/ChapelLanguage[`https://twitter.com/ChapelLanguage`]
+
+"Chapel is an emerging parallel programming language designed for productive scalable computing. Chapel’s primary goal is to make parallel programming far more productive, from multicore desktops and laptops to commodity clusters and the cloud to high-end supercomputers.
+
+First and foremost, Chapel is designed to support general parallel programming through the use of high-level language abstractions. Chapel supports a global-view programming model that raises the level of abstraction in expressing both data and control flow as compared to parallel programming models currently in use.
+
+A second principle in Chapel is to allow the user to optionally and incrementally specify where data and computation should be placed on the physical machine. Such control over program locality is essential to achieve scalable performance on distributed-memory architectures. Such control contrasts with shared-memory programming models which present the user with a simple flat memory model. 
+
+A third principle in Chapel is support for object-oriented programming. 
+Chapel supports objects in order to make these benefits available in a parallel language setting, and to provide a familiar coding paradigm for members of the mainstream programming community. Chapel supports traditional reference-based classes as well as value classes that are assigned and passed by value.
+
+Chapel’s fourth principle is support for generic programming and polymorphism. These features allow code to be written in a style that is generic across types, making it applicable to variables of multiple types, sizes, and precisions. The goal of these features is to support exploratory programming as in popular interpreted and scripting languages, and to support code reuse by allowing algorithms to be expressed without explicitly replicating them for each possible type. This flexibility at the source level is implemented by having the compiler create versions of the code for each required type signature rather than by relying on dynamic typing which would result in unacceptable runtime overheads for the HPC community."
+
+* *Chapel's home in the landscape of new scientific computing languages* - https://www.dursi.ca/post/new-computing-landscape-and-chapel.html[`https://www.dursi.ca/post/new-computing-landscape-and-chapel.html`]
+
+==== GPUAPI
+
+https://ahayashi.github.io/chapel-gpu/index.html[`https://ahayashi.github.io/chapel-gpu/index.html`]
+
+https://github.com/ahayashi/chapel-gpu[`https://github.com/ahayashi/chapel-gpu`]
+
+https://hgpu.org/?p=25215[`https://hgpu.org/?p=25215`]
+
+=====
+Two modules that facilitate GPU programming in Chapel:
+
+* `GPUIterator` - A Chapel iterator that facilitates invoking user-written GPU programs (e.g., CUDA/HIP/OpenCL) from Chapel programs. It is also designed to easily perform hybrid and/or distributed execution - i.e., CPU-only, GPU-only, X% for CPU + Y% for GPU on a single or multiple CPU+GPU node(s), which helps the user to explore the best configuration.
+* `GPUAPI` - Chapel-level GPU API that allows the user to perform basic operations such as GPU memory (de)allocations, device-to-host/host-to-device transfers, and so on. This module can be used either standalone or with the GPUIterator module.
+=====
+
+=== Fortran
+
+==== LFortran
+
+https://lfortran.org/[`https://lfortran.org/`]
+
+https://github.com/lfortran/lfortran[`https://github.com/lfortran/lfortran`]
+
+=====
+LFortran is a modern open-source (BSD licensed) interactive Fortran compiler built on top of LLVM. It can execute user’s code interactively to allow exploratory work (much like Python, MATLAB or Julia) as well as compile to binaries with the goal to run user’s code on modern architectures such as multi-core CPUs and GPUs.  The features include:
+
+* Full Fortran 2018 parser
+* Interactive, Jupyter support
+* Initial interoperation with GFortran
+* Clean, modular design, usable as a library
+* Create executables
+* The LLVM can be used to compile to binaries and for interactive usage. The C++ backend translates Fortran code to a readable C++ code. The x86 backend allows very fast compilation directly to x86 machine code.
+=====
+
+=== Futhark
+
+https://futhark-lang.org/[`https://futhark-lang.org/`]
+
+https://github.com/diku-dk/futhark[`https://github.com/diku-dk/futhark`]
+
+https://futhark-book.readthedocs.io/en/latest/[`https://futhark-book.readthedocs.io/en/latest/`]
+
+"Futhark is a small programming language designed to be compiled to efficient parallel code. It is a statically typed, data-parallel, and purely functional array language in the ML family, and comes with a heavily optimising ahead-of-time compiler that presently generates either GPU code via CUDA and OpenCL, or multi-threaded CPU code.
+
+Futhark is not designed for graphics programming, but can instead use the compute power of the GPU to accelerate data-parallel array computations. The language supports regular nested data-parallelism, as well as a form of imperative-style in-place modification of arrays, while still preserving the purity of the language via the use of a uniqueness type system.
+
+Futhark is not intended to replace existing general-purpose languages. The intended use case is that Futhark is only used for relatively small but compute-intensive parts of an application. The Futhark compiler generates code that can be easily integrated with non-Futhark code. For example, you can compile a Futhark program to a Python module that internally uses PyOpenCL to execute code on the GPU, yet looks like any other Python module from the outside."
+
+=== Julia
+
+==== AMDGPU.jl
+
+https://github.com/JuliaGPU/AMDGPU.jl[`https://github.com/JuliaGPU/AMDGPU.jl`]
+
+https://amdgpu.juliagpu.org/stable/[`https://amdgpu.juliagpu.org/stable/`]
+
+=====
+Julia support for programming AMD GPUs is currently provided by the AMDGPU.jl package. This package contains everything necessary to program for AMD GPUs in Julia, including:
+
+* An interface for working with the HSA runtime API, necessary for launching compiled kernels and controlling the GPU.
+* An interface for compiling and running kernels written in Julia through LLVM's AMDGPU backend.
+* An array type implementing the GPUArrays.jl interface, providing high-level array operations.
+=====
+
+==== CUDA.jl
+
+https://github.com/JuliaGPU/CUDA.jl[`https://github.com/JuliaGPU/CUDA.jl`]
+
+=====
+The CUDA.jl package is the main programming interface for working with NVIDIA CUDA GPUs using Julia. It features a user-friendly array abstraction, a compiler for writing CUDA kernels in Julia, and wrappers for various CUDA libraries.
+=====
+
+==== Dagger.jl
+
+https://github.com/JuliaParallel/Dagger.jl[`https://github.com/JuliaParallel/Dagger.jl`]
+
+=====
+At the core of Dagger.jl is a scheduler heavily inspired by Dask. It can run computations represented as directed-acyclic-graphs (DAGs) efficiently on many Julia worker processes and threads, as well as GPUs via DaggerGPU.jl.
+=====
+
+===== DaggerGPU.jl
+
+https://github.com/JuliaGPU/DaggerGPU.jl[`https://github.com/JuliaGPU/DaggerGPU.jl`]
+
+=====
+DaggerGPU.jl makes use of the Dagger.Processor infrastructure to dispatch Dagger kernels to NVIDIA and AMD GPUs, via CUDA.jl and AMDGPU.jl respectively.
+=====
+
+==== DistributedArrays.jl
+
+https://juliaparallel.github.io/DistributedArrays.jl/stable/[`https://juliaparallel.github.io/DistributedArrays.jl/stable/`]
+
+https://github.com/JuliaParallel/DistributedArrays.jl[`https://github.com/JuliaParallel/DistributedArrays.jl`]
+
+=====
+Large computations are often organized around large arrays of data. In these cases, a particularly natural way to obtain parallelism is to distribute arrays among several processes. This combines the memory resources of multiple machines, allowing use of arrays too large to fit on one machine. Each process can read and write to the part of the array it owns and has read-only access to the parts it doesn't own. This provides a ready answer to the question of how a program should be divided among machines.
+
+Julia distributed arrays are implemented by the DArray type. A DArray has an element type and dimensions just like an Array. A DArray can also use arbitrary array-like types to represent the local chunks that store actual data. The data in a DArray is distributed by dividing the index space into some number of blocks in each dimension.
+=====
+
+==== MPI.jl
+
+https://github.com/JuliaParallel/MPI.jl[`https://github.com/JuliaParallel/MPI.jl`]
+
+https://juliaparallel.github.io/MPI.jl/stable/[`https://juliaparallel.github.io/MPI.jl/stable/`]
+
+=====
+This is a basic Julia wrapper for the portable message passing system Message Passing Interface (MPI). Inspiration is taken from mpi4py, although we generally follow the C and not the C++ MPI API. 
+=====
+
+=== OpenCoarrays
+
+https://github.com/sourceryinstitute/opencoarrays[`https://github.com/sourceryinstitute/opencoarrays`]
+
+https://github.com/ljdursi/coarray-examples[`https://github.com/ljdursi/coarray-examples`]
+
+"OpenCoarrays supports Fortran 2018 compilers by providing a parallel application binary interface (ABI) that abstracts away the underlying parallel programming model, which can be the Message Passing Interface (MPI) or OpenSHMEM. Parallel Fortran 2018 programs may be written and compiled into object files once and then linked or re-linked to either MPI or OpenSHMEM without modifying or recompiling the Fortran source. Not a single line of source code need change to switch parallel programming models. The default programming model is MPI because it provides the broadest capability for supporting Fortran 2018 features. However, having the option to change parallel programming models at link-time may enhance portability and performance.
+
+OpenCoarrays provides a compiler wrapper (caf), parallel runtime libraries (libcaf_mpi and libcaf_openshmem), and a parallel executable file launcher (cafrun). The wrapper and launcher provide a uniform abstraction for compiling and executing parallel Fortran 2018 programs without direct reference to the underlying parallel programming model.
+
+The GNU Compiler Collection (GCC) Fortran front end (gfortran) has used OpenCoarrays since the GCC 5.1.0 release."
+
+=== Python
+
+https://wiki.python.org/moin/ParallelProcessing[`https://wiki.python.org/moin/ParallelProcessing`]
+
+==== aesara
+
+https://github.com/aesara-devs/aesara[`https://github.com/aesara-devs/aesara`]
+
+https://aesara.readthedocs.io/en/latest/
+
+=====
+Aesara is the successor Python library to Theano that allows one to define, optimize, and efficiently evaluate mathematical expressions involving multi-dimensional arrays.
+The features include:
+
+* A hackable, pure-Python codebase
+* Tight integration with NumPy 
+* Efficient symbolic differentiation
+* Speed and stability optimizations
+* Extensible graph framework suitable for rapid development of custom operators and symbolic optimizations
+* Implements an extensible graph transpilation framework that currently provides compilation via C, JAX, and Numba
+* Based on one of the most widely-used Python tensor libraries: Theano
+=====
+
+
+==== Bohrium
+
+https://bohrium.readthedocs.io/[`https://bohrium.readthedocs.io/`]
+
+https://github.com/bh107/bohrium[`https://github.com/bh107/bohrium`]
+
+=====
+Bohrium provides automatic acceleration of array operations in Python/NumPy, C, and C++ targeting multi-core CPUs and GP-GPUs. Forget handcrafting CUDA/OpenCL to utilize your GPU and forget threading, mutexes and locks to utilize your multi-core CPU, just use Bohrium.
+The features include:
+
+* Lazy Evaluation, Bohrium will lazy evaluate all Python/NumPy operations until it encounters a “Python Read” such a printing an array or having a if-statement testing the value of an array.
+* Views Bohrium supports NumPy views fully thus operating on array slices does not involve data copying.
+* Loop Fusion, Bohrium uses a fusion algorithm that fuses (or merges) array operations into the same computation kernel that are then JIT-compiled and executed. However, Bohrium can only fuse operations that have some common sized dimension and no horizontal data conflicts.
+* Lazy CPU/GPU Communication, Bohrium only moves data between the host and the GPU when the data is accessed directly by Python or a Python C-extension.
+* `python -m bohrium`, automatically makes import numpy use Bohrium.
+* Jupyter Support, you can use the magic command %%bohrium to automatically use Bohrium as NumPy.
+* Zero-copy interoperability with Numpy, Cython, PyOpenCL and PyCUDA
+
+To have Bohrium replacing NumPy automatically, you can use the `-m bohrium` argument when running Python.
+In order to choose which Bohrium backend to use, you can define the `BH_STACK` environment variable. Currently, three backends exist: `openmp`, `opencl`, and `cuda`.
+=====
+
+==== Cython
+
+https://cython.org/[`https://cython.org/`]
+
+"Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
+
+The Cython language is a superset of the Python language that additionally supports calling C functions and declaring C types on variables and class attributes. This allows the compiler to generate very efficient C code from Cython code."
+
+==== DaCe
+
+https://github.com/spcl/dace[`https://github.com/spcl/dace`]
+
+*Productivity, Portability, Performance: Data-Centric Python* - https://arxiv.org/abs/2107.00555[`https://arxiv.org/abs/2107.00555`]
+
+"DaCe is a parallel programming framework that takes code in Python/NumPy and other programming languages, and maps it to high-performance CPU, GPU, and FPGA programs, which can be optimized to achieve state-of-the-art. Internally, DaCe uses the Stateful DataFlow multiGraph (SDFG) data-centric intermediate representation: A transformable, interactive representation of code based on data movement. Since the input code and the SDFG are separate, it is posible to optimize a program without changing its source, so that it stays readable. On the other hand, transformations are customizable and user-extensible, so they can be written once and reused in many applications. With data-centric parallel programming, we enable direct knowledge transfer of performance optimization, regardless of the application or the target processor.
+
+DaCe generates high-performance programs for
+multi-core CPUs (tested on Intel and IBM POWER9),
+NVIDIA GPUs,
+AMD GPUs (with HIP),
+Xilinx FPGAs and
+Intel FPGAs."
+
+==== Entangle
+
+https://github.com/radiantone/entangle/wiki[`https://github.com/radiantone/entangle/wiki`]
+
+=====
+Entangle intends to be a lightweight, multi-functional parallel workflow framework. It's a great starting point to add functionality specific to your needs on top yet comes with a set of usable decorators out-of-the-box! Unlike other heavyweight frameworks, entangle is designed to be extended. Workflows often involve a variety of task types and infrastructure destinations and mixing and matching them to accomplish complex or specific workflows is the point of entangle.
+=====
+
+==== GraalPython
+
+https://www.graalvm.org/python/quickstart/[`https://www.graalvm.org/python/quickstart/`]
+
+https://www.graalvm.org/reference-manual/python/[`https://www.graalvm.org/reference-manual/python/`]
+
+"GraalVM is not just a Java Virtual Machine to run Java. It is also a high-performance multilingual runtime and provides support for a number of languages beyond Java, allowing different languages and libraries to interoperate with no performance penalty.
+
+Python is one of the supported languages and GraalVM provides the Python 3 runtime environment. The key to GraalVM’s polyglot support is language compliance, and a primary goal of the GraalVM Python runtime is to support SciPy and its constituent libraries, to work with other data science and machine learning libraries from the rich Python ecosystem.
+
+The Python runtime is yet experimental in GraalVM, but it already offers performance 5-6 times faster than CPython 3.8 (after warm-up) or 6-7x faster than Jython. Apart the performance benefits, GraalVM’s Python runtime enables the support for native extensions that Jython never supported, the possibility to create native platform binaries using the Native Image, a managed execution mode to run, for example, NumPy extensions in a safe manner, and many more."
+
+===== Installation and Use
+
+https://www.graalvm.org/python/[`https://www.graalvm.org/python/`]
+
+https://www.graalvm.org/python/quickstart/[`https://www.graalvm.org/python/quickstart/`]
+
+https://www.graalvm.org/docs/getting-started/linux/[`https://www.graalvm.org/docs/getting-started/linux/`]
+
+https://github.com/graalvm/graalvm-ce-builds/releases[`https://github.com/graalvm/graalvm-ce-builds/releases`]
+
+Get file, e.g.: `graalvm-ce-java8-linux-amd64-21.0.0.2.tar.gz`
+
+Unravel and move to '/opt':
+
+-----
+tar xzvf graalvm-ce-java8-linux-amd64-21.0.0.2.tar.gz
+mv graalvm-ce-java8-21.0.0.2 /opt
+-----
+
+Edit `.bashrc` and add:
+
+-----
+export PATH=/opt/graalvm-ce-java8-21.0.0.2/bin:$PATH
+export JAVA_HOME=/opt/graalvm-ce-java8-21.0.0.2
+[source .bashrc]
+-----
+
+The Python package is separately installed.  This should also install `llmv-toolchain`, but if
+not do so separately.
+
+-----
+gu install python
+[gu install llvm-toolchain]
+-----
+
+Create and activate a virtual environment:
+
+-----
+graalpython -m venv graalpy
+source graalpy/bin/activate
+-----
+
+==== JAX
+
+https://github.com/google/jax[`https://github.com/google/jax`]
+
+"JAX uses XLA to compile and run your NumPy programs on GPUs and TPUs. Compilation happens under the hood by default, with library calls getting just-in-time compiled and executed. But JAX also lets you just-in-time compile your own Python functions into XLA-optimized kernels using a one-function API, jit. Compilation and automatic differentiation can be composed arbitrarily, so you can express sophisticated algorithms and get maximal performance without leaving Python. You can even program multiple GPUs or TPU cores at once using pmap, and differentiate through the whole thing."
+
+===== Flax
+
+https://flax.readthedocs.io/en/latest/[`https://flax.readthedocs.io/en/latest/`]
+
+https://github.com/google/flax[`https://github.com/google/flax`]
+
+https://arxiv.org/abs/2211.06397[`https://arxiv.org/abs/2211.06397`]
+
+=====
+Flax is a high-performance neural network library and ecosystem for JAX that is designed for flexibility: Try new forms of training by forking an example and by modifying the training loop, not by adding features to a framework.
+
+Flax delivers an end-to-end, flexible, user experience for researchers who use JAX with neural networks. Flax exposes the full power of JAX. It is made up of loosely coupled libraries, which are showcased with end-to-end integrated guides and examples.
+=====
+
+==== Mars
+
+https://github.com/mars-project/mars[`https://github.com/mars-project/mars`]
+
+"Mars is a tensor-based unified framework for large-scale data computation which scales Numpy, Pandas and Scikit-learn."
+
+==== multiprocessing
+
+https://docs.python.org/3/library/multiprocessing.html[`https://docs.python.org/3/library/multiprocessing.html`]
+
+https://medium.com/swlh/5-step-guide-to-parallel-processing-in-python-ac0ecdfcea09[`https://medium.com/swlh/5-step-guide-to-parallel-processing-in-python-ac0ecdfcea09`]
+
+=====
+A package that supports spawning processes using an API similar to the threading module. The multiprocessing package offers both local and remote concurrency, effectively side-stepping the Global Interpreter Lock by using subprocesses instead of threads. Due to this, the multiprocessing module allows the programmer to fully leverage multiple processors on a given machine. It runs on both Unix and Windows.
+
+The multiprocessing module also introduces APIs which do not have analogs in the threading module. A prime example of this is the Pool object which offers a convenient means of parallelizing the execution of a function across multiple input values, distributing the input data across processes (data parallelism). The following example demonstrates the common practice of defining such functions in a module so that child processes can successfully import that module.
+=====
+
+==== Numba
+
+https://numba.pydata.org/[`https://numba.pydata.org/`]
+
+https://github.com/numba/numba[`https://github.com/numba/numba`]
+
+https://en.wikipedia.org/wiki/Numba[`https://en.wikipedia.org/wiki/Numba`]
+
+*5 Minute Guide to Numba* - https://numba.pydata.org/numba-doc/latest/user/5minguide.html[`https://numba.pydata.org/numba-doc/latest/user/5minguide.html`]
+
+*Python Speed-Up with Numba Compilation* - https://www.youtube.com/watch?v=bZ5G-RZoE6Q[`https://www.youtube.com/watch?v=bZ5G-RZoE6Q`]
+
+=====
+Numba translates Python functions to optimized machine code at runtime using the industry-standard LLVM compiler library. Numba-compiled numerical algorithms in Python can approach the speeds of C or FORTRAN.
+
+You don't need to replace the Python interpreter, run a separate compilation step, or even have a C/C++ compiler installed. Just apply one of the Numba decorators to your Python function, and Numba does the rest.
+=====
+
+==== Parallel Python
+
+https://www.parallelpython.com/[`https://www.parallelpython.com/`]
+
+=====
+Parallel Python is a python module which provides mechanism for parallel execution of python code on SMP (systems with multiple processors or cores) and clusters (computers connected via network).   The features include:
+
+* Parallel execution of python code on SMP and clusters
+* Easy to understand and implement job-based parallelization technique (easy to convert serial application in parallel)
+* Automatic detection of the optimal configuration (by default the number of worker processes is set to the number of effective processors)
+* Dynamic processors allocation (number of worker processes can be changed at runtime)
+* Low overhead for subsequent jobs with the same function (transparent caching is implemented to decrease the overhead)
+* Dynamic load balancing (jobs are distributed between processors at runtime)
+* Fault-tolerance (if one of the nodes fails tasks are rescheduled on others)
+* Auto-discovery of computational resources
+* Dynamic allocation of computational resources (consequence of auto-discovery and fault-tolerance)
+* SHA based authentication for network connections
+=====
+
+==== Parsl
+
+https://parsl-project.org/[`https://parsl-project.org/`]
+
+https://parsl.readthedocs.io/en/stable/[`https://parsl.readthedocs.io/en/stable/`]
+
+https://github.com/Parsl[`https://github.com/Parsl`]
+
+*Parsl: Pervasive parallel programming in Python* - https://arxiv.org/abs/1905.02158[`https://arxiv.org/abs/1905.02158`]
+
+*Scalable parallel programming in Python* - https://dl.acm.org/doi/10.1145/3332186.3332231[`https://dl.acm.org/doi/10.1145/3332186.3332231`]
+
+=====
+Parsl is a flexible and scalable parallel programming library for Python. Parsl augments Python with simple constructs for encoding parallelism. Developers annotate Python functions to specify opportunities for concurrent execution. These annotated functions, called apps, may represent pure Python functions or calls to external applications. Parsl further allows invocations of these apps, called tasks, to be connected by shared input/output data (e.g., Python objects or files) via which Parsl constructs a dynamic dependency graph of tasks to manage concurrent task execution where possible.
+
+Parsl includes an extensible and scalable runtime that allows it to efficiently execute Parsl programs on one or many processors. Parsl programs are portable, enabling them to be easily moved between different execution resources: from laptops to supercomputers. When executing a Parsl program, developers must define (or import) a Python configuration object that outlines where and how to execute tasks. Parsl supports various target resources including clouds (e.g., Amazon Web Services and Google Cloud), clusters (e.g., using Slurm, Torque/PBS, HTCondor, Cobalt), and container orchestration systems (e.g., Kubernetes). Parsl scripts can scale from several cores on a single computer through to hundreds of thousands of cores across many thousands of nodes on a supercomputer.
+=====
+
+==== Pyccel
+
+https://github.com/pyccel/pyccel[`https://github.com/pyccel/pyccel`]
+
+"Pyccel stands for Python extension language using accelerators.
+The aim of Pyccel is to provide a simple way to generate automatically, parallel low level code. 
+The main uses would to be to convert a Python code (or project) into a Fortran or C code, or
+accelerate Python functions by converting them to Fortran or C functions."
+
+==== PyCOMPSs
+
+https://pypi.org/project/pycompss/[`https://pypi.org/project/pycompss/`]
+
+=====
+PyCOMPSs is the Python binding of COMPSs, a programming model and runtime which aims to ease the development of parallel applications for distributed infrastructures, such as Clusters and Clouds. The Programming model offers a sequential interface but at execution time the runtime system is able to exploit the inherent parallelism of applications at task level. The framework is complemented by a set of tools for facilitating the development, execution monitoring and post-mortem performance analysis.
+
+A PyCOMPSs application is composed of tasks, which are methods annotated with decorators following the PyCOMPSs syntax. At execution time, the runtime builds a task graph that takes into account the data dependencies between tasks, and from this graph schedules and executes the tasks in the distributed infrastructure, taking also care of the required data transfers between nodes.
+=====
+
+===== dislib
+
+https://dislib.bsc.es/en/stable/index.html[`https://dislib.bsc.es/en/stable/index.html`]
+
+*ds-array: A Distributed Data Structure for Large Scale Machine Learning* - https://arxiv.org/abs/2104.10106[`https://arxiv.org/abs/2104.10106`]
+
+=====
+The Distributed Computing Library (dislib) provides distributed algorithms ready to use as a library. So far, dislib is highly focused on machine learning algorithms, and is greatly inspired by scikit-learn. However, other types of numerical algorithms might be added in the future. The main objective of dislib is to facilitate the execution of big data analytics algorithms in distributed platforms, such as clusters, clouds, and supercomputers.
+
+Dislib has been implemented on top of PyCOMPSs programming model.
+=====
+
+==== PyCUDA
+
+https://documen.tician.de/pycuda/[`https://documen.tician.de/pycuda/`]
+
+"PyCUDA gives you easy, Pythonic access to Nvidia’s CUDA parallel computation API."
+
+==== PyOpenCL
+
+https://mathema.tician.de/software/pyopencl/[`https://mathema.tician.de/software/pyopencl/`]
+
+"PyOpenCL gives you easy, Pythonic access to the OpenCL parallel computation API."
+
+==== PyKokkos
+
+https://github.com/kokkos/pykokkos[`https://github.com/kokkos/pykokkos`]
+
+=====
+PyKokkos is a framework for writing performance portable kernels in Python. At a high-level, PyKokkos translates type-annotated Python code into C++ Kokkos and automatically generating bindings for the translated C++ code. PyKokkos also makes use of Python bindings for constructing Kokkos Views.
+=====
+
+==== Pythran
+
+https://github.com/serge-sans-paille/pythran[`https://github.com/serge-sans-paille/pythran`]
+
+"Pythran is an ahead of time compiler for a subset of the Python language, with a focus on scientific computing. It takes a Python module annotated with a few interface description and turns it into a native Python module with the same interface, but (hopefully) faster.
+
+It is meant to efficiently compile scientific programs, and takes advantage of multi-cores and SIMD instruction units."
+
+==== Transonic
+
+https://transonic.readthedocs.io/en/latest/[`https://transonic.readthedocs.io/en/latest/`]
+
+"Transonic is a pure Python package (requiring Python >= 3.6) to easily accelerate modern Python-Numpy code with different accelerators (currently Cython, Pythran and Numba, but potentially later Cupy, PyTorch, JAX, Weld, Pyccel, Uarray, etc…)."
+
+==== WeldNumpy
+
+https://www.weld.rs/weldnumpy/[`https://www.weld.rs/weldnumpy/`]
+
+https://www.weld.rs/[`https://www.weld.rs/`]
+
+"WeldNumpy is a Weld-enabled library that provides a subclass of NumPy’s ndarray module, called weldarray, which supports automatic parallelization, lazy evaluation, and various other optimizations for data science workloads. This is achieved by implementing various NumPy operators in Weld’s IR. Thus, as you operate on a weldarray, it will internally build a graph of the operations, and pass them to weld’s runtime system to optimize and execute in parallel whenever required."
+
+=== SAC
+
+https://www.sac-home.org/doku.php[`https://www.sac-home.org/doku.php`]
+
+=====
+Single-Assignment C is an array programming language predominantly suited for application areas such as numerically intensive applications and signal processing. Its distinctive feature is that it combines high-level program specifications with runtime efficiency similar to that of hand-optimized low-level specifications. Key to the optimization process that facilitates these runtimes is the underlying functional model which also constitutes the basis for implicit parallelisation. This makes SAC ideally suited for harnessing the full potential of a wide variety of modern architectures ranging from a few symmetric cores with shared memory to massively parallel systems that host heterogeneous components including GPUs and FPGAs.
+=====
+
+=== Swift
+
+http://swift-lang.org/main/[`http://swift-lang.org/main/`]
+
+*Tutorial* - http://swift-lang.org/swift-tutorial/doc/tutorial.html[`http://swift-lang.org/swift-tutorial/doc/tutorial.html`]
+
+*User Guide* - http://swift-lang.org/guides/trunk/userguide/userguide.html[`http://swift-lang.org/guides/trunk/userguide/userguide.html`]
+
+*Site Configuration Guide* - http://swift-lang.org/guides/trunk/siteguide/siteguide.html[`http://swift-lang.org/guides/trunk/siteguide/siteguide.html`]
+
+*Interlanguage Parallel Scripting for Scientific Computing* - https://arxiv.org/abs/2107.02841[`https://arxiv.org/abs/2107.02841`]
+
+=====
+Swift is a data-flow oriented coarse grained scripting language that supports dataset typing and mapping, dataset iteration, conditional branching, and procedural composition.
+
+Swift programs (or workflows) are written in a language called Swift.
+
+Swift scripts are primarily concerned with processing (possibly large) collections of data files, by invoking programs to do that processing. Swift handles execution of such programs on remote sites by choosing sites, handling the staging of input and output files to and from the chosen sites and remote execution of programs.
+=====
+
+== Communications APIs
+
+=== Aluminum
+
+https://github.com/LLNL/Aluminum[`https://github.com/LLNL/Aluminum`]
+
+=====
+Aluminum provides a generic interface to high-performance communication libraries for both CPU and GPU platforms and GPU-friendly semantics.
+
+The features include:
+
+* Support for blocking and non-blocking collective and point-to-point operations
+* GPU-aware algorithms
+* GPU-centric communication semantics
+* Supported backends:
+** MPI: MPI and custom algorithms implemented on top of MPI
+** NCCL: Interface to Nvidia's NCCL 2 library (including point-to-point operations and collectives built on them)
+** HostTransfer: Provides GPU support even when your MPI is not CUDA-aware
+** MPI-CUDA: Experimental intra-node RMA support
+* Experimental support for AMD systems using HIP/ROCm and RCCL
+=====
+
+=== Argobots
+
+https://github.com/pmodels/argobots[`https://github.com/pmodels/argobots`]
+
+https://www.argobots.org/[`https://www.argobots.org/`]
+
+"Argobots, which was developed as a part of the Argo project, is a lightweight runtime system that supports integrated computation and data movement with massive concurrency. It will directly leverage the lowest-level constructs in the hardware and OS: lightweight notification mechanisms, data movement engines, memory mapping, and data placement strategies. 
+
+Argobots implements lightweight parallel work units, such as lightweight threads or tasklets, that can dynamically and efficiently adapt to the tug of requirements from applications and hardware resources. Threads and tasklets are efficiently scheduled based on power, resilience, memory locality, and capabilities. Threads and tasklets are executed by abstracted execution entities called execution streams. 
+
+Localized scheduling strategies such as those used in current runtime systems, while efficient for short execution, are unaware of global strategies and priorities. Adaptability and dynamic application behavior must be handled by scheduling strategies that can change over time or be customized for a particular algorithm or data structure. “Plugging” in a specialized scheduling strategy lets the OS/R handle the mechanism and utilize lightweight notification features while leaving the policy to higher levels of the system-software stack."
+
+=== Charm++
+
+http://charmplusplus.org/[`http://charmplusplus.org/`]
+
+"Charm++ is a parallel programming framework in C++ supported by an adaptive runtime system, which enhances user productivity and allows programs to run portably from small multicore computers (your laptop) to the largest supercomputers.
+
+It enables users to easily expose and express much of the parallelism in their algorithms while automating many of the requirements for high performance and scalability. It permits writing parallel programs in units that are natural to the domain, without having to deal with processors and threads."
+
+==== AMPI
+
+http://charm.cs.illinois.edu/research/ampi[`http://charm.cs.illinois.edu/research/ampi`]
+
+"AMPI implements MPI ranks as lightweight user-level migratable threads rather than operating system processes. Charm++'s runtime system takes care of scheduling multiple ranks per core in a message-driven manner, automatically overlapping communication and computation. The runtime system provides support for migrating ranks between nodes to balance the computational load, as well as for tolerating hard faults via checkpoint/restart-based schemes. AMPI defines extensions to the MPI standard that make using these features in existing applications easy."
+
+==== Charm4py
+
+https://charm4py.readthedocs.io/en/latest/[`https://charm4py.readthedocs.io/en/latest/`]
+
+"Charm4py is a distributed computing and parallel programming framework for Python, for the productive development of fast, parallel and scalable applications. It is built on top of Charm++, an adaptive runtime system that has seen extensive use in the scientific and high-performance computing (HPC) communities across many disciplines, and has been used to develop applications like NAMD that run on a wide range of devices: from small multi-core devices up to the largest supercomputers.
+
+=== Cylon
+
+https://github.com/cylondata/cylon[`https://github.com/cylondata/cylon`]
+
+https://cylondata.org/[`https://cylondata.org/`]
+
+*HPTMT: Operator-Based Architecture for Scalable High-Performance Data-Intensive Frameworks* - https://arxiv.org/abs/2107.12807[`https://arxiv.org/abs/2107.12807`]
+
+*A Fast, Scalable, Universal Approach For Distributed Data Aggregations* - https://arxiv.org/abs/2010.14596[`https://arxiv.org/abs/2010.14596`]
+
+*High Performance Data Engineering Everywhere* - https://arxiv.org/abs/2007.09589[`https://arxiv.org/abs/2007.09589`]
+
+=====
+Cylon is a fast, scalable distributed memory data parallel library for processing structured data. Cylon implements a set of relational operators to process data. While ”Core Cylon” is implemented using system level C/C++, multiple language interfaces (Python and Java ) are provided to seamlessly integrate with existing applications, enabling both data and AI/ML engineers to invoke data processing operators in a familiar programming language. By default it works with MPI for distributing the applications.
+
+Internally Cylon uses Apache Arrow to represent the data in a column format.
+=====
+
+=== Dask
+
+==== Dask-CUDA
+
+https://docs.rapids.ai/api/dask-cuda/nightly/index.html[`https://docs.rapids.ai/api/dask-cuda/nightly/index.html`]
+
+https://github.com/rapidsai/dask-cuda[`https://github.com/rapidsai/dask-cuda`]
+
+=====
+Dask-CUDA is a library extending Dask.distributed’s single-machine LocalCluster and Worker for use in distributed GPU workloads. It is a part of the RAPIDS suite of open-source software libraries for GPU-accelerated data science.
+=====
+
+==== Dask-ML
+
+https://ml.dask.org/[`https://ml.dask.org/`]
+
+"Dask-ML provides scalable machine learning in Python using Dask alongside popular machine learning libraries like Scikit-Learn, XGBoost, and others.
+
+Dask-ML addresses the problem of being compute bound by allowing you to continue to
+use the collections you already know - e.g. NumPy ndarray, pandas DataFrame, or XGBoost DMatrix - and
+use a Dask cluster to parallelize the workload across many machines.
+If a dataset becomes too large for the available RAM, it enables you to use on of
+Dask's high-level collections - e.g. Array, DataFrame, and Bag - combined with one of
+Dask-ML's estimators designed to work with those collections.
+
+In all cases Dask-ML endeavors to provide a single unified interface around the familiar NumPy, Pandas, and Scikit-Learn APIs."
+
+=== Flink
+
+https://flink.apache.org/[`https://flink.apache.org/`]
+
+https://github.com/apache/flink[`https://github.com/apache/flink`]
+
+https://en.wikipedia.org/wiki/Apache_Flink[`https://en.wikipedia.org/wiki/Apache_Flink`]
+
+"Apache Flink is an open-source, unified stream-processing and batch-processing framework developed by the Apache Software Foundation. The core of Apache Flink is a distributed streaming data-flow engine written in Java and Scala. Flink executes arbitrary dataflow programs in a data-parallel and pipelined (hence task parallel) manner. Flink's pipelined runtime system enables the execution of bulk/batch and stream processing programs. Furthermore, Flink's runtime supports the execution of iterative algorithms natively.
+
+Flink provides a high-throughput, low-latency streaming engine as well as support for event-time processing and state management. Flink applications are fault-tolerant in the event of machine failure and support exactly-once semantics. Programs can be written in Java, Scala, Python, and SQL and are automatically compiled and optimized into dataflow programs that are executed in a cluster or cloud environment.
+
+Flink does not provide its own data-storage system, but provides data-source and sink connectors to systems such as Amazon Kinesis, Apache Kafka, HDFS, Apache Cassandra, and ElasticSearch."
+
+* *Apache Flink vs Apache Spark* - https://data-flair.training/blogs/comparison-apache-flink-vs-apache-spark/[`https://data-flair.training/blogs/comparison-apache-flink-vs-apache-spark/`]
+
+* *Streaming Concepts and Introduction to Flink Series* - https://www.youtube.com/watch?v=ZU1r7uEAO7o[`https://www.youtube.com/watch?v=ZU1r7uEAO7o`]
+
+=== funcX
+
+https://funcx.org/[`https://funcx.org/`]
+
+https://funcx.readthedocs.io/en/latest/[`https://funcx.readthedocs.io/en/latest/`]
+
+https://github.com/funcx-faas/funcX[`https://github.com/funcx-faas/funcX`]
+
+*funcX: A Federated Function Serving Fabric for Science* - https://arxiv.org/abs/2005.04215[`https://arxiv.org/abs/2005.04215`]
+
+*Distributed statistical inference with pyhf enabled through funcX* - https://arxiv.org/abs/2103.02182[`https://arxiv.org/abs/2103.02182`]
+
+*Serverless supercomputing* - https://arxiv.org/abs/1908.04907[`https://arxiv.org/abs/1908.04907`]
+
+=====
+funcX is a distributed Function as a Service (FaaS) platform that enables flexible, scalable, and high performance remote function execution. Unlike centralized FaaS platforms, funcX allows users to execute functions on heterogeneous remote computers, from laptops to campus clusters, clouds, and supercomputers.
+
+funcX is composed of two core components:
+
+* The funcX cloud-hosted service provides an available, reliable, and secure interface for registering, sharing, and executing functions on remote endpoints. It implements a fire-and-forget model via which the cloud service is responsible for securely communicating with endpoints to ensure functions are successfully executed.
+* funcX endpoints transform existing laptops, clouds, clusters, and supercomputers into function serving systems. Endpoints are registered by installing the funcX_endpoint software and configuring it for the target system.
+=====
+
+=== HPX
+
+https://github.com/STEllAR-GROUP/hpx[`https://github.com/STEllAR-GROUP/hpx`]
+
+"HPX is a C++ Standard Library for Concurrency and Parallelism. It implements all of the corresponding facilities as defined by the C++ Standard. Additionally, in HPX we implement functionalities proposed as part of the ongoing C++ standardization process. We also extend the C++ Standard APIs to the distributed case.
+
+The goal of HPX is to create a high quality, freely available, open source implementation of a new programming model for conventional systems, such as classic Linux based Beowulf clusters or multi-socket highly parallel SMP nodes. At the same time, we want to have a very modular and well designed runtime system architecture which would allow us to port our implementation onto new computer system architectures. We want to use real-world applications to drive the development of the runtime system, coining out required functionalities and converging onto a stable API which will provide a smooth migration path for developers.
+
+The API exposed by HPX is not only modeled after the interfaces defined by the C++11/14/17/20 ISO standard, it also adheres to the programming guidelines used by the Boost collection of C++ libraries. We aim to improve the scalability of today's applications and to expose new levels of parallelism which are necessary to take advantage of the exascale systems of the future."
+
+==== hpxMP
+
+https://github.com/STEllAR-GROUP/hpxMP[`https://github.com/STEllAR-GROUP/hpxMP`]
+
+"hpxMP is a portable, scalable and flexible application programming interface using OpenMP specification that supports multi-platform shared memory multiprocessing programming in C/ C++. It
+maps OpenMP calls to their equivalent HPX functions. OpenMP runtime shared library such as libomp.so, libgomp.so can be replaced with this library when you are running an OpenMP application."
+
+=== Kokkos
+
+https://github.com/kokkos/kokkos[`https://github.com/kokkos/kokkos`]
+
+*Kokkos Kernels: Performance Portable Sparse/Dense Linear Algebra and Graph Kernels& - https://arxiv.org/abs/2103.11991[`https://arxiv.org/abs/2103.11991`]
+
+=====
+Kokkos Core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose it provides abstractions for both parallel execution of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use CUDA, HPX, OpenMP and Pthreads as backend programming models with several other backends in development.
+=====
+
+==== KokkosKernels
+
+https://github.com/kokkos/kokkos-kernels[`https://github.com/kokkos/kokkos-kernels`]
+
+=====
+KokkosKernels implements local computational kernels for linear algebra and graph operations, using the Kokkos shared-memory parallel programming model. "Local" means not using MPI, or running within a single MPI process without knowing about MPI. "Computational kernels" are coarse-grained operations; they take a lot of work and make sense to parallelize inside using Kokkos. KokkosKernels can be the building block of a parallel linear algebra library like Tpetra that uses MPI and threads for parallelism, or it can be used stand-alone in your application.
+=====
+
+=== libEnsemble
+
+https://github.com/Libensemble/libensemble[`https://github.com/Libensemble/libensemble`]
+
+*A Library to Coordinate the Concurrent Evaluation of Dynamic Ensembles of Calculations* - https://arxiv.org/abs/2104.08322[`https://arxiv.org/abs/2104.08322`]
+
+=====
+libEnsemble is a Python library to coordinate the concurrent evaluation of dynamic ensembles of calculations. The library is developed to use massively parallel resources to accelerate the solution of design, decision, and inference problems and to expand the class of problems that can benefit from increased concurrency levels.
+
+The user selects or supplies a generator function that produces input parameters for a simulator function that performs and monitors simulations. For example, the generator function may contain an optimization routine to generate new simulation parameters on-the-fly based on the results of previous simulations. Examples and templates of such functions are included in the library.
+
+libEnsemble employs a manager/worker scheme that can run on various communication media (including MPI, multiprocessing, and TCP); interfacing with user-provided executables is also supported. Each worker can control and monitor any level of work, from small subnode tasks to huge many-node simulations. An executor interface is provided to ensure that scripts are portable, resilient, and flexible; it also enables automatic detection of the nodes and cores in a system and can split up tasks automatically if resource data isn't supplied.
+=====
+
+=== libfabric
+
+https://ofiwg.github.io/libfabric/[`https://ofiwg.github.io/libfabric/`]
+
+https://github.com/ofiwg/libfabric[`https://github.com/ofiwg/libfabric`]
+
+https://downloads.openfabrics.org/OFED/[`https://downloads.openfabrics.org/OFED/`]
+
+"OpenFabrics Interfaces (OFI) is a framework focused on exporting fabric communication services to applications. OFI is best described as a collection of libraries and applications used to export fabric services. The key components of OFI are: application interfaces, provider libraries, kernel services, daemons, and test applications.
+
+Libfabric is a core component of OFI. It is the library that defines and exports the user-space API of OFI, and is typically the only software that applications deal with directly. It works in conjunction with provider libraries, which are often integrated directly into libfabric.
+
+The goal of OFI, and libfabric specifically, is to define interfaces that enable a tight semantic map between applications and underlying fabric services. Specifically, libfabric software interfaces have been co-designed with fabric hardware providers and application developers, with a focus on the needs of HPC users. Libfabric supports multiple interface semantics, is fabric and hardware implementation agnostic, and leverages and expands the existing RDMA open source community.
+
+Libfabric is designed to minimize the impedance mismatch between applications, including middleware such as MPI, SHMEM, and PGAS, and fabric communication hardware. Its interfaces target high-bandwidth, low-latency NICs, with a goal to scale to tens of thousands of nodes.
+
+Libfabric is supported by a variety of open source HPC middleware applications, including MPICH, Open MPI, Sandia SHMEM, Open SHMEM, Charm++, GasNET, Clang, UPC, and others. Additionally, several proprietary software applications, such as Intel MPI, and non-public application ports are known. Libfabric supports a variety of high-performance fabrics and networking hardware. It will run over standard TCP and UDP networks, high performance fabrics such as Omni-Path Architecture, InfiniBand, Cray GNI, Blue Gene Architecture, iWarp RDMA Ethernet, RDMA over Converged Ethernet (RoCE), with support for several networking and memory-CPU fabrics under active development."
+
+=== Mercury
+
+https://github.com/mercury-hpc/mercury[`https://github.com/mercury-hpc/mercury`]
+
+=====
+Mercury is an RPC framework specifically designed for use in HPC systems that allows asynchronous transfer of parameters and execution requests, as well as direct support of large data arguments. The network implementation is abstracted, allowing easy porting to future systems and efficient use of existing native transport mechanisms. Mercury's interface is generic and allows any function call to be serialized.
+
+Architectures supported by MPI implementations are generally supported by the network abstraction layer. The OFI libfabric plugin as well as the SM plugin are stable and provide the best performance in most workloads. Libfabric providers currently supported are: tcp, verbs, psm2, gni. MPI and BMI (tcp) plugins are still supported but gradually being moved as deprecated, therefore should only be used as fallback methods.
+=====
+
+=== MPI
+
+==== FPMAS
+
+https://github.com/FPMAS/FPMAS[`https://github.com/FPMAS/FPMAS`]
+
+=====
+FPMAS is an HPC (High Performance Computing) Multi-Agent simulation platform designed to run on massively parallel and distributed memory environments, such as computing clusters.
+
+The main advantage of FPMAS is that it is designed to abstract as much as possible MPI and parallel features to the final user. No distributed computing skills are required to run Multi-Agent simulations on hundreds of processor cores.
+
+Moreover, FPMAS offers powerful features to allow concurrent write operations accross distant processors. This allows users to easily write general purpose code without struggling with distributed computing issues, while still allowing an implicit large scale distributed execution.
+
+FPMAS also automatically handles load balancing accross processors to distribute the user defined Multi-Agent model on the available computing resources."
+=====
+
+==== HP2P
+
+https://github.com/cea-hpc/hp2p[`https://github.com/cea-hpc/hp2p`]
+
+=====
+HP2P (Heavy Peer To Peer) benchmark is a test which performs MPI Point-to-Point non-blocking communications between all MPI processes. Its goal is to measure the bandwidths and the latencies in a situation where the network is loaded. The benchmark can help to detect problems in a network like contentions or problems with switchs or links.
+=====
+
+==== mpibind
+
+https://github.com/LLNL/mpibind[`https://github.com/LLNL/mpibind`]
+
+=====
+mpibind is a memory-driven algorithm to map parallel hybrid applications to the underlying hardware resources transparently, efficiently, and portably. Unlike other mappings, its primary design point is the memory system, including the cache hierarchy. Compute elements are selected based on a memory mapping and not vice versa. In addition, mpibind embodies a global awareness of hybrid programming abstractions as well as heterogeneous systems with accelerators.
+=====
+
+==== mpiFileUtils
+
+https://github.com/hpc/mpifileutils[`https://github.com/hpc/mpifileutils`]
+
+https://mpifileutils.readthedocs.io/en/v0.11/[`https://mpifileutils.readthedocs.io/en/v0.11/`]
+
+=====
+mpiFileUtils provides both a library called libmfu and a suite of MPI-based tools to manage large datasets, which may vary from large directory trees to large files. High-performance computing users often generate large datasets with parallel applications that run with many processes (millions in some cases). However those users are then stuck with single-process tools like cp and rm to manage their datasets. This suite provides MPI-based tools to handle typical jobs like copy, remove, and compare for such datasets, providing speedups of up to 20-30x. It also provides a library that simplifies the creation of new tools or can be used in applications.
+=====
+
+==== oshmpi
+
+https://github.com/pmodels/oshmpi[`https://github.com/pmodels/oshmpi`]
+
+https://github.com/openshmem-org/tests-sos[`https://github.com/openshmem-org/tests-sos`]
+
+=====
+The OSHMPI project provides an OpenSHMEM 1.4 implementation on top of MPI-3. MPI is the standard communication library for HPC parallel programming. OSHMPI provides a lightweight OpenSHMEM implementation on top of the portable MPI-3 interface and thus can utilize various high-performance MPI libraries on HPC systems.
+=====
+
+==== SCR
+
+https://github.com/LLNL/scr[`https://github.com/LLNL/scr`]
+
+https://scr.readthedocs.io/en/latest/[`https://scr.readthedocs.io/en/latest/`]
+
+=====
+The Scalable Checkpoint / Restart (SCR) library enables MPI applications to utilize distributed storage on Linux clusters to attain high file I/O bandwidth for checkpointing, restarting, and output in large-scale jobs. With SCR, jobs run more efficiently, recompute less work upon a failure, and reduce load on critical shared resources such as the parallel file system.
+It provides the most benefit to large-scale jobs that write large datasets.
+
+SCR provides the following capabilities:
+
+* scalable checkpoint, restart, and output bandwidth,
+* asynchronous data transfers to the parallel file system,
+* guidance for the optimal checkpoint frequency,
+* automated tracking and restart from the most recent checkpoint,
+* automated job relaunch within an allocation after hangs or failures.
+
+SCR provides API bindings for C/C++, Fortran, and Python applications.
+=====
+
+==== ULFM
+
+https://fault-tolerance.org/[`https://fault-tolerance.org/`]
+
+https://arxiv.org/abs/2104.14246[`https://arxiv.org/abs/2104.14246`]
+
+=====
+The User Level Failure Mitigation (ULFM) proposal is developed by the MPI Forum’s Fault Tolerance Working Group to support the continued operation of MPI programs after crash (node failures) have impacted the execution. The key principle is that no MPI call (point-to-point, collective, RMA, IO, …) can block indefinitely after a failure, but must either succeed or raise an MPI error. In addition the design is centered around user needs and flexibility, the API should allow varied fault tolerant models to be built as external libraries.
+
+To use an ULFM implementation, an MPI application must change the default error handler on (at least) MPI_COMM_WORLD from MPI_ERRORS_ARE_FATAL to either MPI_ERRORS_RETURN or a custom MPI Errorhandler. 
+=====
+
+=== OCCA
+
+https://github.com/libocca/occa[`https://github.com/libocca/occa`]
+
+https://libocca.org/[`https://libocca.org/`]
+
+An open source library that aims to:
+
+* Make it easy to program different types of devices (e.g. CPU, GPU, FPGA)
+* Provide a unified API for interacting with backend device APIs (e.g. OpenMP, CUDA, HIP, OpenCL, Metal)
+* JIT compile backend kernels and provide a kernel language (a minor extension to C) to abstract programming for each backend
+
+OCCA uses OKL to extend the C language by using attributes for code transformations
+and applies restrictions for exposing loop-based parallelism.
+
+OCCA has a Python interface."
+
+=== OpenUCX
+
+https://www.openucx.org/[`https://www.openucx.org/`]
+
+https://hgpu.org/?p=24657[`https://hgpu.org/?p=24657`]
+
+"Unified Communication X (UCX) is an award winning, optimized production proven communication framework for modern, high-bandwidth and low-latency networks.
+
+UCX exposes a set of abstract communication primitives which utilize the best of available hardware resources and offloads. These include RDMA (InfiniBand and RoCE), TCP, GPUs, shared Memory, and network atomic operations.
+
+UCX facilitates rapid development by providing a high-level API, masking the low-level details, while maintaining high-performance and scalability.
+
+UCX implements best practices for transfer of messages of all sizes, based on accumulated experience gained from applications running on the world’s largest datacenters and supercomputers."
+
+==== ucx-py
+
+https://ucx-py.readthedocs.io/en/latest/[`https://ucx-py.readthedocs.io/en/latest/`]
+
+https://github.com/rapidsai/ucx-py[`https://github.com/rapidsai/ucx-py`]
+
+===== 
+UCX-Py is the Python interface for UCX, a low-level high-performance networking library. UCX and UCX-Py supports several transport methods including InfiniBand and NVLink while still using traditional networking protocols like TCP.
+=====
+
+=== PetscSF
+
+https://arxiv.org/abs/2102.13018[`https://arxiv.org/abs/2102.13018`]
+
+https://www.nextplatform.com/2021/03/01/rethinking-mpi-for-gpu-accelerated-supercomputers/[`https://www.nextplatform.com/2021/03/01/rethinking-mpi-for-gpu-accelerated-supercomputers/`]
+
+"PetscSF, the communication component of the Portable, Extensible Toolkit for Scientific Computation (PETSc), is being used to gradually replace the direct MPI calls in the PETSc library. PetscSF provides a simple application programming interface (API) for managing common communication patterns in scientific computations by using a star-forest graph representation. PetscSF supports several implementations whose selection is based on the characteristics of the application or the target architecture. An efficient and portable model for network and intra-node communication is essential for implementing large-scale applications. The Message Passing Interface, which has been the de facto standard for distributed memory systems, has developed into a large complex API that does not yet provide high performance on the emerging heterogeneous CPU-GPU-based exascale systems."
+
+=== Spark
+
+* *Spark in HPC clusters* - https://www.dursi.ca/post/spark-in-hpc-clusters.html[`https://www.dursi.ca/post/spark-in-hpc-clusters.html`]
+
+"Apache Spark is an open-source unified analytics engine for large-scale data processing. Spark provides an interface for programming entire clusters with implicit data parallelism and fault tolerance.
+
+Apache Spark has its architectural foundation in the resilient distributed dataset (RDD), a read-only multiset of data items distributed over a cluster of machines, that is maintained in a fault-tolerant way.
+Spark and its RDDs were developed in 2012 in response to limitations in the MapReduce cluster computing paradigm.
+Spark facilitates the implementation of both iterative algorithms, which visit their data set multiple times in a loop, and interactive/exploratory data analysis, i.e., the repeated database-style querying of data.  Among the class of iterative algorithms are the training algorithms for machine learning systems, which formed the initial impetus for developing Apache Spark.
+
+pache Spark requires a cluster manager and a distributed storage system. For cluster management, Spark supports standalone (native Spark cluster, where you can launch a cluster either manually or use the launch scripts provided by the install package. It is also possible to run these daemons on a single machine for testing), Hadoop YARN, Apache Mesos or Kubernetes.
+For distributed storage, Spark can interface with a wide variety, including Alluxio, Hadoop Distributed File System (HDFS), MapR File System (MapR-FS), Cassandra, OpenStack Swift, Amazon S3, Kudu, Lustre file system, or a custom solution can be implemented. Spark also supports a pseudo-distributed local mode, usually used only for development or testing purposes, where distributed storage is not required and the local file system can be used instead; in such a scenario, Spark is run on a single machine with one executor per CPU core."
+
+==== PySpark
+
+https://spark.apache.org/docs/latest/api/python/[`https://spark.apache.org/docs/latest/api/python/`]
+
+"PySpark is an interface for Apache Spark in Python. It not only allows you to write Spark applications using Python APIs, but also provides the PySpark shell for interactively analyzing your data in a distributed environment. PySpark supports most of Spark’s features such as Spark SQL, DataFrame, Streaming, MLlib (Machine Learning) and Spark Core."
+
+=== StarPU
+
+https://starpu.gitlabpages.inria.fr/[`https://starpu.gitlabpages.inria.fr/`]
+
+"StarPU is a software tool aiming to allow programmers to exploit the computing power of the available CPUs and GPUs, while relieving them from the need to specially adapt their programs to the target machine and processing units.
+
+At the core of StarPU is its runtime support library, which is responsible for scheduling application-provided tasks on heterogeneous CPU/GPU machines. In addition, StarPU comes with programming language support, in the form of an OpenCL front-end.
+
+StarPU's runtime and programming language extensions support a task-based programming model. Applications submit computational tasks, with CPU and/or GPU implementations, and StarPU schedules these tasks and associated data transfers on available CPUs and GPUs. The data that a task manipulates are automatically transferred among accelerators and the main memory, so that programmers are freed from the scheduling issues and technical details associated with these transfers."
+
+=== SYCL
+
+https://www.khronos.org/sycl/[`https://www.khronos.org/sycl/`]
+
+=====
+SYCL is a higher-level programming model to improve programming productivity on various hardware accelerators. It is a single-source domain-specific embedded language (DSEL) based on pure C++17.
+SYCL is a royalty-free, cross-platform abstraction layer that builds on the underlying concepts, portability and efficiency inspired by OpenCL that enables code for heterogeneous processors to be written in a “single-source” style using completely standard C++. SYCL enables single-source development where C++ template functions can contain both host and device code to construct complex algorithms that use hardware accelerators, and then re-use them throughout their source code on different types of data.
+=====
+
+==== DPC++
+
+https://intel.github.io/llvm-docs/[`https://intel.github.io/llvm-docs/`]
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html`]
+
+=====
+Shorthand for Data Parallel C++, it’s the new direct programming language of oneAPI—an Intel-led initiative to unify and simplify application development across diverse computing architectures.
+
+DPC++ is based on familiar (and industry-standard) C++, incorporates SYCL* specification 1.2.1 from The Khronos Group*, and includes language extensions developed using an open community process. Purposely designed as an open, cross-industry alternative to single-architecture, proprietary languages, DPC++ enables developers to more easily port their code across CPUs, GPUs, and FPGAs, and also tune performance for a specific accelerator.
+=====
+
+===== dpctl
+
+https://github.com/IntelPython/dpctl[`https://github.com/IntelPython/dpctl`]
+
+=====
+A lightweight Python package exposing a subset of SYCL functionalities.
+=====
+
+===== DPNP
+
+https://intelpython.github.io/dpnp/[`https://intelpython.github.io/dpnp/`]
+
+=====
+DPNP is a NumPy-like library accelerated with SYCL on Intel devices. It provides Python interfaces for many NumPy functions, and includes a subset of methods of dpnp.ndarray. Under the hood it is based on native C++ and oneMKL based kernels.
+=====
+
+==== hipSYCL
+
+https://github.com/illuhad/hipSYCL[`https://github.com/illuhad/hipSYCL`]
+
+=====
+A modern SYCL implementation targeting CPUs and GPUs, with a focus on leveraging existing toolchains such as CUDA or HIP. hipSYCL currently targets the following devices:
+
+* Any CPU via OpenMP
+* NVIDIA GPUs via CUDA
+* AMD GPUs via HIP/ROCm
+* Intel GPUs via oneAPI Level Zero and SPIR-V
+
+hipSYCL supports compiling source files into a single binary that can run on all these backends when building against appropriate clang distributions.
+
+The runtime architecture of hipSYCL consists of the main library hipSYCL-rt, as well as independent, modular plugin libraries for the individual backends
+=====
+
+=== UPC
+
+https://en.wikipedia.org/wiki/Unified_Parallel_C[`https://en.wikipedia.org/wiki/Unified_Parallel_C`]
+
+https://upc.lbl.gov/[`https://upc.lbl.gov/`]
+
+"Unified Parallel C (UPC) is an extension of the C programming language designed for high-performance computing on large-scale parallel machines, including those with a common global address space (SMP and NUMA) and those with distributed memory (e. g. clusters). The programmer is presented with a single shared, partitioned address space, where variables may be directly read and written by any processor, but each variable is physically associated with a single processor. UPC uses a single program, multiple data (SPMD) model of computation in which the amount of parallelism is fixed at program startup time, typically with a single thread of execution per processor.
+
+In order to express parallelism, UPC extends ISO C 99 with the following constructs:
+
+* An explicitly parallel execution model
+* A shared address space (shared storage qualifier) with thread-local parts (normal variables)
+* Synchronization primitives and a memory consistency model
+* Explicit communication primitives, e. g. upc_memput
+* Memory management primitives
+
+UPC combines the programmability advantages of the shared memory programming paradigm and the control over data layout and performance of the message passing programming paradigm."
+
+=== YAKL
+
+https://github.com/mrnorman/YAKL[`https://github.com/mrnorman/YAKL`]
+
+https://github.com/mrnorman/miniWeather[`https://github.com/mrnorman/miniWeather`]
+
+=====
+The YAKL API is similar to Kokkos in many ways, but is quite simplified and has much stronger Fortran interoperability and Fortran-like options. YAKL currently has backends for CPUs (serial), CUDA, HIP, SYCL (in progress), and OpenMP offload (in progress). 
+=====
+
+== MPI
+
+*MPIX Stream: An Explicit Solution to Hybrid MPI+X Programming* - https://arxiv.org/abs/2208.13707[`https://arxiv.org/abs/2208.13707`]
+
+=====
+We propose a new concept in MPI, called MPIX stream, to represent the general serial execution context that exists in X runtimes. MPIX streams can be directly mapped to threads or GPU execution streams. Passing thread context into MPI allows implementations to precisely map the execution contexts to network endpoints. Passing GPU execution context into MPI allows implementations to directly operate on GPU streams, lowering the CPU/GPU synchronization cost. 
+
+The prototype is available in the MPICH 4.1a1 release.
+=====
+
+== OpenMP
+
+*Testsuite status and compiler insight for OpenMP* (2022) - https://arxiv.org/abs/2208.13301[`https://arxiv.org/abs/2208.13301`]
+
+=====
+The OpenMP language continues to evolve with every new specification release, as does the need to validate and verify the new features that have been introduced. With the release of OpenMP 5.0 and OpenMP 5.1, plenty of new target offload and host-based features have been introduced to the programming model. While OpenMP continues to grow in maturity, there is an observable growth in the number of compiler and hardware vendors that support OpenMP. In this manuscript, we focus on evaluating the conformity and implementation progress of various compiler vendors such as Cray, IBM, GNU, Clang/LLVM, NVIDIA, Intel and AMD. We specifically address the 4.5, 5.0, and 5.1 versions of the specification.
+=====
+
+*Writing a portable GPU runtime with OpenMP 5.1* - https://arxiv.org/abs/2106.03219[`https://arxiv.org/abs/2106.03219`]
+
+*Validation and Verification Testsuite Status Update and Compiler Insight for OpenMP* - https://arxiv.org/abs/2208.13301[`https://arxiv.org/abs/2208.13301`]
+
+=====
+In this manuscript, we focus on evaluating the conformity and implementation progress of various compiler vendors such as Cray, IBM, GNU, Clang/LLVM, NVIDIA, Intel and AMD. We specifically address the 4.5, 5.0, and 5.1 versions of the specification. 
+=====
+
+=== BOLT
+
+https://www.bolt-omp.org/[`https://www.bolt-omp.org/`]
+
+" OpenMP is a directive-based parallel programming model for shared memory computers. Thanks to its simple incremental parallelization method, OpenMP has been widely used in many applications. While current OpenMP implementations based on OS-level threads (e.g., pthreads) perform well on computation-bound codes that can be evenly divided among threads, they are encountering some challenges observed in recent HPC trends. OpenMP applications are demanded to express more parallelism to fully utilize increasing CPU cores. Irregular or non-traditional applications use OpenMP task constructs to express fine-grained parallelism rather than traditional work sharing constructs.
+
+BOLT targets a high-performing OpenMP implementation, especially specialized for fine-grain parallelism. Unlike other OpenMP implementations, BOLT utilizes a lightweight threading model for its underlying threading mechanism. It adopts Argobots, a new holistic, low-level threading and tasking runtime, in order to overcome shortcomings of conventional OS-level threads. The BOLT implementation is based on the LLVM OpenMP runtime, and thus it can be used with GNU C/C++ Compilers, Clang/LLVM, and Intel C/C++ Compilers."
+
+=== Clacc
+
+https://csmd.ornl.gov/project/clacc[`https://csmd.ornl.gov/project/clacc`]
+
+"Clacc is developing open-source, production-quality, standard-conforming OpenACC compiler, runtime, and profiling support by extending Clang and LLVM.
+
+OpenACC support in Clang and LLVM will facilitate the programming of GPUs and other accelerators in DOE applications, and it will provide a popular compiler platform on which to perform research and development for related optimizations and tools (e.g., static analyzers, debuggers, editor extensions).
+
+A key Clacc design decision is to translate OpenACC to OpenMP in order to build upon the OpenMP support being developed for Clang and LLVM.  A benefit of this design is support for two compilation modes: traditional compilation mode translates OpenACC source to an executable, and source-to-source mode translates OpenACC source to OpenMP source."
+
+== BLAS/LAPACK ETC.
+
+=== blas-benchmark
+
+https://github.com/adrianjhpc/blas-benchmark[`https://github.com/adrianjhpc/blas-benchmark`]
+
+=====
+Benchmark to investigate the performance of the BLAS library.
+=====
+
+=== BLIS
+
+https://github.com/flame/blis[`https://github.com/flame/blis`]
+
+https://dl.acm.org/doi/10.1145/2764454[`https://dl.acm.org/doi/10.1145/2764454`]
+
+https://dl.acm.org/doi/10.1145/2755561[`https://dl.acm.org/doi/10.1145/2755561`]
+
+=====
+BLIS is a portable software framework for instantiating high-performance BLAS-like dense linear algebra libraries. The framework was designed to isolate essential kernels of computation that, when optimized, immediately enable optimized implementations of most of its commonly used and computationally intensive operations. BLIS is written in ISO C99 and available under a new/modified/3-clause BSD license. While BLIS exports a new BLAS-like API, it also includes a BLAS compatibility layer which gives application developers access to BLIS implementations via traditional BLAS routine calls. An object-based API unique to BLIS is also available.
+
+It is our belief that BLIS offers substantial benefits in productivity when compared to conventional approaches to developing BLAS libraries, as well as a much-needed refinement of the BLAS interface, and thus constitutes a major advance in dense linear algebra computation. While BLIS remains a work-in-progress, we are excited to continue its development and further cultivate its use within the community.
+=====
+
+=== CLBlast
+
+https://github.com/CNugteren/CLBlast[`https://github.com/CNugteren/CLBlast`]
+
+https://cnugteren.github.io/clblast/clblast.html[`https://cnugteren.github.io/clblast/clblast.html`]
+
+=====
+CLBlast is a modern, lightweight, performant and tunable OpenCL BLAS library written in C++11. It is designed to leverage the full performance potential of a wide variety of OpenCL devices from different vendors, including desktop and laptop GPUs, embedded GPUs, and other accelerators. CLBlast implements BLAS routines: basic linear algebra subprograms operating on vectors and matrices.
+=====
+
+=== Combinatorial BLAS
+
+https://github.com/PASSIONLab/CombBLAS[`https://github.com/PASSIONLab/CombBLAS`]
+
+*Combinatorial BLAS 2.0* - https://arxiv.org/abs/2106.14402[`https://arxiv.org/abs/2106.14402`]
+
+=====
+The Combinatorial BLAS (CombBLAS) is an extensible distributed-memory parallel graph library offering a small but powerful set of linear algebra primitives specifically targeting graph analytics.
+=====
+
+=== cuBLAS
+
+https://developer.nvidia.com/cublas[`https://developer.nvidia.com/cublas`]
+
+"The cuBLAS Library provides a GPU-accelerated implementation of the basic linear algebra subroutines (BLAS). cuBLAS accelerates AI and HPC applications with drop-in industry standard BLAS APIs highly optimized for NVIDIA GPUs. The cuBLAS library contains extensions for batched operations, execution across multiple GPUs, and mixed and low precision execution. Using cuBLAS, applications automatically benefit from regular performance improvements and new GPU architectures. The cuBLAS library is included in both the NVIDIA HPC SDK and the CUDA Toolkit.
+
+The cuBLAS library contains support for all 152 standard BLAS routines,
+half-precision and integer matrix multiplication, and
+CUDA streams for concurrent operations."
+
+=== FT-BLAS
+
+https://github.com/whiterkim/FT-BLAS[`https://github.com/whiterkim/FT-BLAS`]
+
+*FT-BLAS: A High Performance BLAS Implementation With Online Fault Tolerance* - https://arxiv.org/abs/2104.00897[`https://arxiv.org/abs/2104.00897`]
+
+=====
+A new implementation of BLAS routines that not only tolerates soft errors on the fly, but also provides comparable performance to modern state-of-the-art BLAS libraries on widely-used processors such as Intel Skylake and Cascade Lake. 
+=====
+
+=== MAGMA
+
+https://icl.cs.utk.edu/magma/[`https://icl.cs.utk.edu/magma/`]
+
+https://icl.cs.utk.edu/projectsfiles/magma/doxygen/[`https://icl.cs.utk.edu/projectsfiles/magma/doxygen/`]
+
+https://bitbucket.org/icl/magma/src/master/[`https://bitbucket.org/icl/magma/src/master/`]
+
+https://github.com/CEED/MAGMA[`https://github.com/CEED/MAGMA`]
+
+"The goal of the MAGMA project is to create a new generation of linear algebra libraries that achieves the fastest possible time to an accurate solution on heterogeneous architectures, starting with current multicore + multi-GPU systems. To address the complex challenges stemming from these systems' heterogeneity, massive parallelism, and the gap between compute speed and CPU-GPU communication speed, MAGMA's research is based on the idea that optimal software solutions will themselves have to hybridize, combining the strengths of different algorithms within a single framework. Building on this idea, the goal is to design linear algebra algorithms and frameworks for hybrid multicore and multi-GPU systems that can enable applications to fully exploit the power that each of the hybrid components offers.
+
+Designed to be similar to LAPACK in functionality, data storage, and interface, the MAGMA library allows scientists to easily port their existing software components from LAPACK to MAGMA, to take advantage of the new hybrid architectures. MAGMA users do not have to know CUDA in order to use the library.
+
+There are two types of LAPACK-style interfaces. The first one, referred to as the CPU interface, takes the input and produces the result in the CPU's memory. The second, referred to as the GPU interface, takes the input and produces the result in the GPU's memory. In both cases, a hybrid CPU/GPU algorithm is used. Also included is MAGMA BLAS, a complementary to CUBLAS routines.
+
+MAGMA provides implementations for CUDA, HIP, Intel Xeon Phi, and OpenCL."
+
+=== ReLAPACK
+
+https://github.com/HPAC/ReLAPACK[`https://github.com/HPAC/ReLAPACK`]
+
+=====
+ReLAPACK offers a collection of recursive algorithms for many of LAPACK's compute kernels. Since it preserves LAPACK's established interfaces, ReLAPACK integrates effortlessly into existing application codes. ReLAPACK's routines not only outperform the reference LAPACK but also improve upon the performance of tuned implementations, such as OpenBLAS and MKL.
+
+ReLAPACK builds on top of BLAS and unblocked kernels from LAPACK. There are many optimized and machine specific implementations of these libraries, which are commonly provided by hardware vendors or available as open source (e.g., OpenBLAS).
+=====
+
+=== SLATE
+
+https://bitbucket.org/icl/slate/src/master/[`https://bitbucket.org/icl/slate/src/master/`]
+
+=====
+Software for Linear Algebra Targeting Exascale (SLATE) is being developed as part of the Exascale Computing Project (ECP), which is a joint project of the U.S. Department of Energy's Office of Science and National Nuclear Security Administration (NNSA). SLATE will deliver fundamental dense linear algebra capabilities for current and upcoming distributed-memory systems, including GPU-accelerated systems as well as more traditional multi core-only systems.
+
+SLATE will provide coverage of existing LAPACK and ScaLAPACK functionality, including parallel implementations of Basic Linear Algebra Subroutines (BLAS), linear systems solvers, least squares solvers, and singular value and eigenvalue solvers. In this respect, SLATE will serve as a replacement for LAPACK and ScaLAPACK, which, after two decades of operation, cannot be adequately retrofitted for modern, GPU-accelerated architectures.
+
+SLATE is built on top of standards, such as MPI and OpenMP, and de facto-standard industry solutions such as NVIDIA CUDA and AMD HIP. SLATE also relies on high performance implementations of numerical kernels from vendor libraries, such as Intel MKL, IBM ESSL, NVIDIA cuBLAS, and AMD rocBLAS. SLATE interacts with these libraries through a layer of C++ APIs. This figure shows SLATE's position in the ECP software stack.
+=====
+
+=== xtensor-blas
+
+https://github.com/xtensor-stack/xtensor-blas[`https://github.com/xtensor-stack/xtensor-blas`]
+
+https://github.com/xtensor-stack/xtensor[`https://github.com/xtensor-stack/xtensor`]
+
+https://github.com/michael-lehn/FLENS[`https://github.com/michael-lehn/FLENS`]
+
+=====
+An extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the FLENS project.
+
+xtensor-blas currently provides non-broadcasting dot, norm (1- and 2-norm for vectors), inverse, solve, eig, cross, det, slogdet, matrix_rank, inv, cholesky, qr, svd in the xt::linalg namespace (check the corresponding xlinalg.hpp header for the function signatures). The functions, and signatures, are trying to be 1-to-1 equivalent to NumPy. Low-level functions to interface with BLAS or LAPACK with xtensor containers are also offered in the blas and lapack namespace.
+=====
+
+== I/O
+
+*The Petascale DTN Project* - https://arxiv.org/abs/2105.12880[`https://arxiv.org/abs/2105.12880`]
+
+=== ADIOS2
+
+https://github.com/ornladios/ADIOS2[`https://github.com/ornladios/ADIOS2`]
+
+https://adios2.readthedocs.io/en/latest/[`https://adios2.readthedocs.io/en/latest/`]
+
+=====
+ADIOS2 transports data as groups of self-describing variables and attributes across different media types (such as files, wide-area-networks, and remote direct memory access) using a common application programming interface for all transport modes. ADIOS2 can be used on supercomputers, cloud systems, and personal computers.
+=====
+
+=== Conduit
+
+https://llnl-conduit.readthedocs.io/en/latest/[`https://llnl-conduit.readthedocs.io/en/latest/`]
+
+https://github.com/LLNL/conduit[`https://github.com/LLNL/conduit`]
+
+=====
+Conduit is an open source project from Lawrence Livermore National Laboratory that provides an intuitive model for describing hierarchical scientific data in C++, C, Fortran, and Python. It is used for data coupling between packages in-core, serialization, and I/O tasks.
+=====
+
+=== DataTransferKit
+
+https://github.com/ORNL-CEES/DataTransferKit[`https://github.com/ORNL-CEES/DataTransferKit`]
+
+https://datatransferkit.readthedocs.io/en/latest/[`https://datatransferkit.readthedocs.io/en/latest/`]
+
+=====
+DataTransferKit is an open-source software library of parallel solution transfer services for multiphysics simulations. DTK uses a general operator design to provide scalable algorithms for solution transfer between shared volumes and surfaces.
+=====
+
+=== ParallellO
+
+https://github.com/NCAR/ParallelIO[`https://github.com/NCAR/ParallelIO`]
+
+=====
+The Parallel IO libraries (PIO) are high-level parallel I/O C and Fortran libraries for applications that need to do netCDF I/O from large numbers of processors on a HPC system.
+
+PIO provides a netCDF-like API, and allows users to designate some subset of processors to perform IO. Computational code calls netCDF-like functions to read and write data, and PIO uses the IO processors to perform all necessary IO.
+=====
+
+=== PDC
+
+https://github.com/hpc-io/pdc[`https://github.com/hpc-io/pdc`]
+
+https://sdm.lbl.gov/pdc/[`https://sdm.lbl.gov/pdc/`]
+
+=====
+Proactive Data Containers (PDC) software provides an object-centric API and a runtime system with a set of data object management services. These services allow placing data in the memory and storage hierarchy, performing data movement asynchronously, and providing scalable metadata operations to find data objects. PDC revolutionizes how data is stored and accessed by using object-centric abstractions to represent data that moves in the high-performance computing (HPC) memory and storage subsystems. PDC manages extensive metadata to describe data objects to find desired data efficiently as well as to store information in the data objects.
+=====
+
+=== PnetCDF
+
+https://parallel-netcdf.github.io/[`https://parallel-netcdf.github.io/`]
+
+https://github.com/Parallel-NetCDF/PnetCDF[`https://github.com/Parallel-NetCDF/PnetCDF`]
+
+=====
+PnetCDF is a high-performance parallel I/O library for accessing Unidata's NetCDF, files in classic formats, specifically the formats of CDF-1, 2, and 5. CDF-1 is the default NetCDF classic format. CDF-2 is an extended format created through using flag NC_64BIT_OFFSET to support 64-bit file offsets. The CDF-5 file format, an extension of CDF-2 and created through using flag NC_64BIT_DATA, supports unsigned data types and uses 64-bit integers to allow users to define large dimensions, attributes, and variables (> 2B array elements).
+
+In addition to the conventional netCDF read and write APIs, PnetCDF provides a new set of nonblocking APIs. Nonblocking APIs allow users to post multiple read and write requests first, and let PnetCDF to aggregate them into a large request, hence to achieve a better performance.
+=====
+
+==== NCMPI_VOL
+
+https://github.com/DataLib-ECP/ncmpi_vol[`https://github.com/DataLib-ECP/ncmpi_vol`]
+
+=====
+This software repository contains source codes implementing an HDF5 Virtual Object Layer (VOL) plugin that allows applications to use HDF5 APIs to read and write NetCDF classic files in parallel. This plugin is built on top of PnetCDF, a parallel I/O library that provides parallel access to NetCDF files.
+=====
+
+==== BTIO
+
+https://github.com/wkliao/BTIO[`https://github.com/wkliao/BTIO`]
+
+=====
+This software benchmarks the performance of PnetCDF and MPI-IO methods for the I/O pattern used by the NASA's NAS Parallel Benchmarks (NPB) suite.
+=====
+
+=== PODPAC
+
+https://podpac.org/index.html[`https://podpac.org/index.html`]
+
+=====
+PODPAC is a python library that builds on the scientific python ecosystem to enable simple, reproducible geospatial analyses that run locally or in the cloud.
+
+The goal of PODPAC is to enable the development of portable geospatial data pipelines that can be processed locally or in the cloud. PODPAC makes generation and distribution of processing pipelines intuitive and automatic from concept to application.
+=====
+
+== GUI Software
+
+=== Jupyter
+
+https://www.nature.com/articles/d41586-018-07196-1[`https://www.nature.com/articles/d41586-018-07196-1`]
+
+https://jupyter-workshop-2019.lbl.gov/agenda[`https://jupyter-workshop-2019.lbl.gov/agenda`]
+
+https://drive.google.com/file/d/16N44SPtKZyPKlcDWp8G_mJcQq-g_G0e2/view[`https://drive.google.com/file/d/16N44SPtKZyPKlcDWp8G_mJcQq-g_G0e2/view`]
+
+==== batchspawner
+
+https://github.com/jupyterhub/batchspawner[`https://github.com/jupyterhub/batchspawner`]
+
+https://blog.jupyter.org/jupyter-for-science-user-facilities-and-high-performance-computing-de178106872[`https://blog.jupyter.org/jupyter-for-science-user-facilities-and-high-performance-computing-de178106872`]
+
+https://drive.google.com/file/d/1YXuwwHSM1NqUKBkutv1YrJ3Fzsj2UnFN/view[`https://drive.google.com/file/d/1YXuwwHSM1NqUKBkutv1YrJ3Fzsj2UnFN/view`]
+
+=====
+A custom spawner for Jupyterhub that is designed for installations on clusters using batch scheduling software.
+=====
+
+===== wrapspawner
+
+https://github.com/jupyterhub/wrapspawner[`https://github.com/jupyterhub/wrapspawner`]
+
+=====
+Provides a mechanism to wrap the interface of a JupyterHub Spawner such that the Spawner class to use for single-user servers can be chosen dynamically. Subclasses may modify the class or properties of the child Spawner at any point before start() is called (e.g. from Authenticator pre_spawn hooks or options form processing) and that state will be preserved on restart. The start/stop/poll methods are not real coroutines, but simply pass through the Futures returned by the wrapped Spawner class.
+
+ProfilesSpawner leverages JupyterHub's Spawner "options form" feature to allow user-driven configuration of Spawner classes while permitting:
+
+* configuration of Spawner classes that don't natively implement options_form
+* administrator control of allowed configuration changes
+* runtime choice of which Spawner backend to launch
+=====
+
+==== jupyter-vcdat
+
+https://github.com/CDAT/jupyter-vcdat[`https://github.com/CDAT/jupyter-vcdat`]
+
+https://github.com/CDAT/vcdat[`https://github.com/CDAT/vcdat`]
+
+=====
+A Jupyter Lab extension that integrates vCDAT features directly in a notebook.
+=====
+
+==== Kale
+
+https://github.com/Jupyter-Kale/kale[`https://github.com/Jupyter-Kale/kale`]
+
+=====
+This is an ongoing research effort at Lawrence Berkeley National Laboratory, aimed at extending the Jupyter ecosystem with useful add-ons to enable a smooth interactive experience for scientific researchers running on clusters, HPC systems etc.
+=====
+
+===== vcluster
+
+https://github.com/Jupyter-Kale/vcluster[`https://github.com/Jupyter-Kale/vcluster`]
+
+=====
+This is a docker compose virtual cluster for Kale dev/test scenarios where we want to simulate an HPC environment.
+=====
+
+== Package Management
+
+=== EasyBuild
+
+https://easybuild.io/[`https://easybuild.io/`]
+
+=====
+EasyBuild is a software build and installation framework that allows you to manage (scientific) software on High Performance Computing (HPC) systems in an efficient way.
+=====
+
+==== easyblocks
+
+https://github.com/easybuilders/easybuild-easyblocks[`https://github.com/easybuilders/easybuild-easyblocks`]
+
+=====
+The easybuild-easyblocks package provides a collection of easyblocks for EasyBuild. Easyblocks are Python modules that implement the install procedure for a (group of) software package(s). Together with the EasyBuild framework, they allow to easily build and install supported software packages.
+=====
+
+==== RESIF
+
+https://github.com/ULHPC/sw[`https://github.com/ULHPC/sw`]
+
+https://dl.acm.org/doi/10.1145/3437359.3465600[`https://dl.acm.org/doi/10.1145/3437359.3465600`]
+
+https://dl.acm.org/doi/fullHtml/10.1145/3437359.3465600[`https://dl.acm.org/doi/fullHtml/10.1145/3437359.3465600`]
+
+=====
+Our scientific software stack is generated and deployed in an automated and consistent way through the RESIF framework, a wrapper on top of Easybuild and Lmod
+meant to efficiently handle user software generation.
+RESIF enables a 90% reduction of the number of custom configurations previously enforced by specific Slurm and MPI settings, while sustaining optimised builds coexisting for different dimensions of CPU and GPU architectures.
+The workflow for contributing back to the Easybuild community was also automated and a current work in progress aims at drastically decrease the building time of a complete software set generation.
+=====
+
+=== Spack
+
+https://spack.readthedocs.io/en/latest/[`https://spack.readthedocs.io/en/latest/`]
+
+https://www.nextplatform.com/2020/11/12/spack-packs-deployment-boost-for-top-supercomputers/[`https://www.nextplatform.com/2020/11/12/spack-packs-deployment-boost-for-top-supercomputers/`]
+
+=====
+"Spack is a package management tool designed to support multiple versions and configurations of software on a wide variety of platforms and environments. It was designed for large supercomputing centers, where many users and application teams share common installations of software on clusters with exotic architectures, using libraries that do not have a standard ABI. Spack is non-destructive: installing a new version does not break existing installations, so many configurations can coexist on the same system.
+
+Most importantly, Spack is simple. It offers a simple spec syntax so that users can specify versions and configuration options concisely. Spack is also simple for package authors: package files are written in pure Python, and specs allow package authors to maintain a single file for many different builds of the same package."
+=====
+
+==== uberenv
+
+https://uberenv.readthedocs.io/en/latest/[`https://uberenv.readthedocs.io/en/latest/`]
+
+=====
+Uberenv automates using a package manager to build and deploy software. It uses Spack on Unix-based systems (e.g. Linux and macOS).
+Uberenv is a python script that helps automate the usage of a package manager to build third-party dependencies for development and deployment.
+
+Uberenv is a single file python script (uberenv.py) that automates fetching Spack or Vcpkg, building and installing third party dependencies, and can optionally install top-level packages as well. To automate the full install process, Uberenv uses a target Spack or Vcpkg package along with extra settings such as compilers and external third party package details for common HPC platforms.
+=====
+
+
+== Visualization
+
+=== VTK-m
+
+https://m.vtk.org/[`https://m.vtk.org/`]
+
+=====
+VTK-m is a toolkit of scientific visualization algorithms for emerging processor architectures. VTK-m supports the fine-grained concurrency for data analysis and visualization algorithms required to drive extreme scale computing by providing abstract models for data and execution that can be applied to a variety of algorithms across many different processor architectures.
+=====
+
+== Checkpointing
+
+https://veloc.readthedocs.io/en/latest/[`https://veloc.readthedocs.io/en/latest/`]
+
+https://github.com/ECP-VeloC/VELOC[`https://github.com/ECP-VeloC/VELOC`]
+
+=====
+VeloC is a multi-level checkpoint-restart runtime for HPC supercomputing infrastructures and large-scale data centers. It aims to delivers high performance and scalability for complex heterogeneous storage hierarchies without sacrificing ease of use and flexibility.
+
+Checkpoint-Restart is primarily used as a fault-tolerance mechanism for tightly coupled HPC applications but is essential in many other use cases: suspend-resume, migration, debugging. Some applications need to save their state and revisit such previously saved states as part of the execution model (e.g. adjoint computations), which can be also addressed using the checkpoint-restart pattern.
+=====
+
+== GPU
+
+*Writing A Portable GPU Runtime with OpenMP 5.1* - https://arxiv.org/abs/2106.03219[`https://arxiv.org/abs/2106.03219`]
+
+*Benchmarking the Nvidia GPU Lineage* - https://arxiv.org/abs/2106.04979[`https://arxiv.org/abs/2106.04979`]
+
+*Not all GPUs are created equal* - https://arxiv.org/list/cs.DC/2208?skip=75&show=25[`https://arxiv.org/list/cs.DC/2208?skip=75&show=25`]
+
+=== GPU Frameworks
+
+==== Apache TVM
+
+https://tvm.apache.org/[`https://tvm.apache.org/`]
+
+https://github.com/apache/tvm[`https://github.com/apache/tvm`]
+
+=====
+Apache TVM is an open source machine learning compiler framework for CPUs, GPUs, and machine learning accelerators. It aims to enable machine learning engineers to optimize and run computations efficiently on any hardware backend.
+=====
+
+==== CUDA (NVIDIA)
+
+https://developer.nvidia.com/cuda-toolkit[`https://developer.nvidia.com/cuda-toolkit`]
+
+"NVIDIA CUDA (an acronym for Compute Unified Device Architecture) is a parallel computing platform and application programming interface (API) model created by Nvidia.[1] It allows software developers and software engineers to use a CUDA-enabled graphics processing unit (GPU) for general purpose processing – an approach termed GPGPU (general-purpose computing on graphics processing units). The CUDA platform is a software layer that gives direct access to the GPU's virtual instruction set and parallel computational elements, for the execution of compute kernels."
+
+==== oneAPI (Intel)
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi.html`]
+
+https://nazavode.github.io/blog/sycl/[`https://nazavode.github.io/blog/sycl/`]
+
+"Intel's oneAPI is an open, unified programming model built on standards to simplify development and deployment of data-centric workloads across CPUs, GPUs, FPGAs and other accelerators.
+
+The oneAPI specification extends existing developer programming models to enable a diverse set of hardware through language, a set of library APIs, and a low level hardware interface to support cross-architecture programming. To promote compatibility and enable developer productivity and innovation, the oneAPI specification builds upon industry standards and provides an open, cross-platform developer stack.
+
+At the core of the oneAPI specification is DPC++, an open, cross-architecture language built upon the ISO C++ and Khronos SYCL standards. DPC++ extends these standards and provides explicit parallel constructs and offload interfaces to support a broad range of computing architectures and processors, including CPUs and accelerator architectures. Other languages and programming models can be supported on the oneAPI platform via the Accelerator Interface.
+
+oneAPI provides libraries for compute and data intensive domains. They include deep learning, scientific computing, video analytics, and media processing."
+
+==== NVSHMEM
+
+https://developer.nvidia.com/nvshmem[`https://developer.nvidia.com/nvshmem`]
+
+https://docs.nvidia.com/hpc-sdk/nvshmem/api/docs/index.html[`https://docs.nvidia.com/hpc-sdk/nvshmem/api/docs/index.html`]
+
+https://arxiv.org/abs/2102.13018[`https://arxiv.org/abs/2102.13018`]
+
+https://github.com/lattice/quda[`https://github.com/lattice/quda`]
+
+=====
+NVSHMEM is a parallel programming interface based on OpenSHMEM that provides efficient and scalable communication for NVIDIA GPU clusters. NVSHMEM creates a global address space for data that spans the memory of multiple GPUs and can be accessed with fine-grained GPU-initiated operations, CPU-initiated operations, and operations on CUDA stream.
+
+Existing communication models, such as Message-Passing Interface (MPI), orchestrate data transfers using the CPU. In contrast, NVSHMEM uses asynchronous, GPU-initiated data transfers, eliminating synchronization overheads between the CPU and the GPU.
+
+=====
+
+==== ROCm (AMD)
+
+https://rocmdocs.amd.com/en/latest/[`https://rocmdocs.amd.com/en/latest/`]
+
+https://arxiv.org/abs/1910.00078[`https://arxiv.org/abs/1910.00078`]
+
+"AMD ROCm is the first open-source software development platform for HPC/Hyperscale-class GPU computing. AMD ROCm brings the UNIX philosophy of choice, minimalism and modular software development to GPU computing.
+A modular design lets any hardware vendor build drivers that support the ROCm stack. ROCm also integrates multiple programming languages and makes it easy to add support for other languages.
+ROCm even provides tools for porting vendor-specific CUDA code into a vendor-neutral ROCm format, which makes the massive body of source code written for CUDA available to AMD hardware and other hardware environments.
+
+Since the ROCm ecosystem is comprised of open technologies: frameworks (Tensorflow / PyTorch), libraries (MIOpen / Blas / RCCL), programming model (HIP), inter-connect (OCD) and up streamed Linux® Kernel support – the platform is continually optimized for performance and extensibility."
+
+===== rocBLAS
+
+https://github.com/ROCmSoftwarePlatform/rocBLAS[`https://github.com/ROCmSoftwarePlatform/rocBLAS`]
+
+"rocBLAS is the AMD library for BLAS on the ROCm platform. It is implemented in the HIP programming language and optimized for AMD GPUs."
+
+=== GPU Applications
+
+==== ArrayFire
+
+https://arrayfire.com/[`https://arrayfire.com/`]
+
+https://github.com/arrayfire/arrayfire[`https://github.com/arrayfire/arrayfire`]
+
+"ArrayFire is a general-purpose library that simplifies the process of developing software that targets parallel and massively-parallel architectures including CPUs, GPUs, and other hardware acceleration devices.
+
+ArrayFire provides software developers with a high-level abstraction of data which resides on the accelerator, the af::array object. Developers write code which performs operations on ArrayFire arrays which, in turn, are automatically translated into near-optimal kernels that execute on the computational device.
+
+ArrayFire is successfully used on devices ranging from low-power mobile phones to high-power GPU-enabled supercomputers. ArrayFire runs on CPUs from all major vendors (Intel, AMD, ARM), GPUs from the prominent manufacturers (NVIDIA, AMD, and Qualcomm), as well as a variety of other accelerator devices on Windows, Mac, and Linux."
+
+===== ArrayFire.jl
+
+https://github.com/JuliaGPU/ArrayFire.jl[`https://github.com/JuliaGPU/ArrayFire.jl`]
+
+"ArrayFire is a library for GPU and accelerated computing. ArrayFire.jl wraps the ArrayFire library for Julia, and provides a Julia interface."
+
+==== AutoDoc-GPU
+
+https://github.com/ccsb-scripps/AutoDock-GPU[`https://github.com/ccsb-scripps/AutoDock-GPU`]
+
+http://autodock.scripps.edu/[`http://autodock.scripps.edu/`]
+
+=====
+An OpenCL and Cuda accelerated version of AutoDock4.2.6. It leverages its embarrasingly parallelizable LGA by processing ligand-receptor poses in parallel over multiple compute units.
+
+AutoDock is a suite of automated docking tools. It is designed to predict how small molecules, such as substrates or drug candidates, bind to a receptor of known 3D structure.
+=====
+
+==== Compyle
+
+https://compyle.readthedocs.io/en/latest/[`https://compyle.readthedocs.io/en/latest/`]
+
+https://github.com/pypr/compyle[`https://github.com/pypr/compyle`]
+
+"Compyle allows users to execute a restricted subset of Python (almost similar to C) on a variety of HPC platforms. Currently we support multi-core execution using Cython, and OpenCL and CUDA for GPU devices.
+
+Users start with code implemented in a very restricted Python syntax, this code is then automatically transpiled, compiled and executed to run on either one CPU core, or multiple CPU cores or on a GPU. Compyle offers source-to-source transpilation, making it a very convenient tool for writing HPC libraries."
+
+==== cuDF
+
+https://github.com/rapidsai/cudf[`https://github.com/rapidsai/cudf`]
+
+https://rapids.ai/dask.html[`https://rapids.ai/dask.html`]
+
+A GPU DataFrame library for loading, joining, aggregating, filtering, and otherwise manipulating data
+that is based on the Apache Arrow columnar memory format.
+cuDF provides a pandas-like API that will be familiar to data engineers & data scientists, so they can use it to easily accelerate their workflows without going into the details of CUDA programming.
+
+It includes extremely high-performance functions to load CSV, JSON, ORC, Parquet and other file formats directly into GPU memory, eliminating one of the key bottlenecks in many data processing tasks. cuDF includes a variety of other functions supporting GPU-accelerated ETL, such as data subsetting, transformations, one-hot encoding, and more."
+
+There is a dask-cudf library that includes helper methods to use Dask and CuDF."
+
+==== cuML
+
+https://github.com/rapidsai/cuml[`https://github.com/rapidsai/cuml`]
+
+https://rapids.ai/dask.html[`https://rapids.ai/dask.html`]
+
+"A suite of libraries that implement machine learning algorithms and mathematical primitives functions that share compatible APIs with other RAPIDS projects.
+
+cuML enables data scientists, researchers, and software engineers to run traditional tabular ML tasks on GPUs without going into the details of CUDA programming. In most cases, cuML's Python API matches the API from scikit-learn.
+
+cuML also features multi-GPU and multi-node-multi-GPU operation, using Dask, for a growing list of algorithms."
+
+==== CuPy
+
+https://cupy.dev/[`https://cupy.dev/`]
+
+"A NumPy-compatible array library accelerated by CUDA.
+CuPy provides GPU accelerated computing with Python using
+CUDA-related libraries including cuBLAS, cuDNN, cuRand, cuSolver, cuSPARSE, cuFFT and NCCL to make full use of the GPU architecture.
+
+CuPy's interface is highly compatible with NumPy; in most cases it can be used as a drop-in replacement. All you need to do is just replace numpy with cupy in your Python code."
+
+==== cuSOLVER
+
+https://docs.nvidia.com/cuda/cusolver/index.html[`https://docs.nvidia.com/cuda/cusolver/index.html`]
+
+"The cuSolver library is a high-level package based on the cuBLAS and cuSPARSE libraries. 
+The intent of cuSolver is to provide useful LAPACK-like features, such as common matrix factorization and triangular solve routines for dense matrices, a sparse least-squares solver and an eigenvalue solver. In addition cuSolver provides a new refactorization library useful for solving sequences of matrices with a shared sparsity pattern. 
+
+cuSolver combines three separate components under a single umbrella. The first part of cuSolver is called cuSolverDN, and deals with dense matrix factorization and solve routines such as LU, QR, SVD and LDLT, as well as useful utilities such as matrix and vector permutations.
+
+Next, cuSolverSP provides a new set of sparse routines based on a sparse QR factorization. Not all matrices have a good sparsity pattern for parallelism in factorization, so the cuSolverSP library also provides a CPU path to handle those sequential-like matrices. For those matrices with abundant parallelism, the GPU path will deliver higher performance. The library is designed to be called from C and C++.
+
+The final part is cuSolverRF, a sparse re-factorization package that can provide very good performance when solving a sequence of matrices where only the coefficients are changed but the sparsity pattern remains the same." 
+
+==== FLAME GPU
+
+http://www.flamegpu.com/[`http://www.flamegpu.com/`]
+
+"FLAME GPU is a high performance Graphics Processing Unit (GPU) extension to the FLAME framework. It provides a mapping between a formal agent specifications with C based scripting and optimised CUDA code. This includes a number of key ABM building blocks such as multiple agent types, agent communication and birth and death allocation. The advantages of our contribution are three fold. Firstly Agent Based (AB) modellers are able to focus on specifying agent behaviour and run simulations without explicit understanding of CUDA programming or GPU optimisation strategies. Secondly simulation performance is significantly increased in comparison with desktop CPU alternatives. This allows simulation of far larger model sizes with high performance at a fraction of the cost of grid based alternatives. Finally massive agent populations can be visualised in real time as agent data is already located on the GPU hardware."
+
+==== NCCL
+
+https://developer.nvidia.com/nccl[`https://developer.nvidia.com/nccl`]
+
+https://github.com/NVIDIA/nccl[`https://github.com/NVIDIA/nccl`]
+
+"The NVIDIA Collective Communication Library (NCCL) implements multi-GPU and multi-node communication primitives optimized for NVIDIA GPUs and Networking. NCCL provides routines such as all-gather, all-reduce, broadcast, reduce, reduce-scatter as well as point-to-point send and receive that are optimized to achieve high bandwidth and low latency over PCIe and NVLink high-speed interconnects within a node and over NVIDIA Mellanox Network across nodes."
+
+==== ZMCintegral
+
+https://github.com/Letianwu/ZMCintegral[`https://github.com/Letianwu/ZMCintegral`]
+
+https://arxiv.org/abs/2104.10073[`https://arxiv.org/abs/2104.10073`]
+
+=====
+ZMCintegral (Numba backened) is an easy to use python package which uses Monte Carlo Evaluation Method to do numerical integrations on Multi-GPU devices. It supports integrations with up to 16 multi-variables, and it is capable of even more than 16 variables if time is not of the priori concern.
+=====
+
+== Cloud
+
+=== hpc-toolkit
+
+https://github.com/GoogleCloudPlatform/hpc-toolkit[`https://github.com/GoogleCloudPlatform/hpc-toolkit`]
+
+=====
+HPC Toolkit is an open-source software offered by Google Cloud which makes it easy for customers to deploy HPC environments on Google Cloud.
+
+HPC Toolkit allows customers to deploy turnkey HPC environments (compute, networking, storage, etc.) following Google Cloud best-practices, in a repeatable manner. The HPC Toolkit is designed to be highly customizable and extensible, and intends to address the HPC deployment needs of a broad range of customers.
+=====
+
+=== pywren
+
+https://pywren.io/[`https://pywren.io/`]
+
+"Pywren lets you run your existing python code at massive scale via AWS Lambda."
+
+==== numpywren
+
+https://github.com/Vaishaal/numpywren[`https://github.com/Vaishaal/numpywren`]
+
+https://arxiv.org/abs/1810.09679[`https://arxiv.org/abs/1810.09679`]
+
+"A scientific computing framework built on top of the serverless execution framework pywren. numpywren forgoes the traditional mpi computational model for scientific computing workloads. Instead of dealing with individual machines, host names, and processor grids numpywren works on the abstraction of "cores" and "memory". numpywren currently uses Amazon EC2 and Lambda services for computation, and use Amazon S3 as a distributed memory abstraction. Even with this coarse abstraction, numpywren can achieve close to peak FLOPS and network IO for difficult workloads such as matrix multiply and cholesky decomposition."
+
+== Containers
+
+=== Sarus
+
+https://sarus.readthedocs.io/en/stable/[`https://sarus.readthedocs.io/en/stable/`]
+
+https://github.com/eth-cscs/sarus[`https://github.com/eth-cscs/sarus`]
+
+"Sarus is a tool for High-Performance Computing (HPC) systems that provides a user-friendly way to instantiate feature-rich containers from Docker images. It has been designed to address the unique requirements of HPC installations, such as: native performance from dedicated hardware, improved security due to the multi-tenant nature of the systems, support for network parallel filesystems and diskless computing nodes, compatibility with a workload manager or job scheduler.
+
+Keeping flexibility, extensibility and community efforts in high regard, Sarus relies on industry standards and open source software. Consider for instance the use of runc, an OCI-compliant container runtime that is also used internally by Docker. Moreover, Sarus leverages the Open Containers Initiative (OCI) specifications to extend the capabilities of runc and enable multiple high-performance features. In the same vein, Sarus depends on a widely-used set of libraries, tools, and technologies to reap several benefits: reduce maintenance effort and lower the entry barrier for service providers wishing to install the software, or for developers seeking to contribute code."
+
+=== Singularity
+
+https://github.com/hpcng/singularity[`https://github.com/hpcng/singularity`]
+
+=====
+Singularity is an open source container platform designed to be simple, fast, and secure. Singularity is optimized for compute focused enterprise and HPC workloads, allowing untrusted users to run untrusted containers in a trusted way.
+=====
+
+==== Singularity Registry
+
+https://singularity-hpc.readthedocs.io/en/latest/[`https://singularity-hpc.readthedocs.io/en/latest/`]
+
+https://singularityhub.github.io/singularity-hpc/[`https://singularityhub.github.io/singularity-hpc/`]
+
+=====
+Singularity Registry HPC (shpc) allows you to install containers as modules. 
+=====
+
+== Filesystems
+
+=== Ceph
+
+https://en.wikipedia.org/wiki/Ceph_(software)[`https://en.wikipedia.org/wiki/Ceph_(software)`]
+
+https://docs.ceph.com/en/latest/[`https://docs.ceph.com/en/latest/`]
+
+https://ceph.io/en/[`https://ceph.io/en/`]
+
+=====
+An open-source software (software-defined storage) storage platform that implements object storage on a single distributed computer cluster, and provides 3-in-1 interfaces for object-, block- and file-level storage. Ceph aims primarily for completely distributed operation without a single point of failure, scalable to the exabyte level, and freely available. 
+
+Ceph replicates data and makes it fault-tolerant, using commodity hardware, Ethernet IP and requiring no specific hardware support. The Ceph’s system offers disaster recovery and data redundancy through techniques such as replication, erasure coding, snapshots and storage cloning. As a result of its design, the system is both self-healing and self-managing, aiming to minimize administration time and other costs.
+
+In this way, administrators have a single, consolidated system that avoids silos and collects the storage within a common management framework. Ceph consolidates several storage use cases and improves resource utilization. It also lets an organization deploy servers where needed. 
+=====
+
+=== DeltaFS
+
+https://www.pdl.cmu.edu/DeltaFS/[`https://www.pdl.cmu.edu/DeltaFS/`]
+
+https://github.com/pdlfs/deltafs[`https://github.com/pdlfs/deltafs`]
+
+=====
+A transient file system service featuring highly paralleled indexing on both file data and file system metadata.
+The features include:
+
+* Serverless design featuring zero dedicated metadata servers and no global file system namespace.
+* Application-owned metadata service harnessing compute nodes to handle metadata and achieve highly agile scalability.
+* Freedom from unjustified synchronization among HPC applications that do not need to use the file system to communicate.
+* Write-optimized LSM-based metadata representation with file system namespace snapshots as the basis of inter-job data sharing and workflow execution.
+* A special directory type with an embedded striped-down streaming Map-Reduce pipeline.
+* A file system as no more than a thin service composed by each application at runtime to provide a temporary view of a private namespace backed by a stack of immutable snapshots and a collection of shared data objects.
+* Simplified data center storage consisting of multiple independent underlying object stores, providing flat namespaces of data objects, and oblivious of file system semantics.
+
+DeltaFS assumes an underlying object storage service to store file system metadata and file data. This underlying object store may just be a shared parallel file system such as Lustre, GPFS, PanFS, and HDFS. However, a scalable object storage service is suggested to ensure high performance and currently DeltaFS supports Ceph RADOS.
+
+Distributed DeltaFS instances require an RPC library to communicate with each other. Currently, we use Mercury and Mercury itself supports multiple network backends, such as MPI, bmi on tcp, and cci on a variety of underlying network abstractions including verbs, tcp, sock, and raw eth.
+=====
+
+=== UnifyFS
+
+https://github.com/LLNL/UnifyFS[`https://github.com/LLNL/UnifyFS`]
+
+https://unifyfs.readthedocs.io/en/latest/[`https://unifyfs.readthedocs.io/en/latest/`]
+
+https://computing.llnl.gov/projects/unify[`https://computing.llnl.gov/projects/unify`]
+
+"Node-local burst buffers are becoming an indispensable hardware resource on large-scale supercomputers to buffer the bursty I/O from scientific applications. However, there is a lack of software support for burst buffers to be efficiently shared by applications within a batch-submitted job and recycled across different batch jobs. In addition, burst buffers need to cope with a variety of challenging I/O patterns from data-intensive scientific applications.
+
+UnifyFS is a user-level burst buffer file system under active development. UnifyFS supports scalable and efficient aggregation of I/O bandwidth from burst buffers while having the same life cycle as a batch-submitted job. While UnifyFS is designed for N-N write/read, UnifyFS compliments its functionality with the support for N-1 write/read. It efficiently accelerates scientific I/O based on scalable metadata indexing, co-located I/O delegation, and server-side read clustering and pipelining."
+
+=== Mochi
+
+https://mochi.readthedocs.io/en/latest/index.html[`https://mochi.readthedocs.io/en/latest/index.html`]
+
+"The objective of this project is to explore a software defined storage approach for composing storage services that provides new levels of functionality, performance, and reliability for science applications at extreme scale.
+
+Margo is a C library enabling the development of distributed HPC services. It relies on Mercury for RPC/RDMA, and Argobots for threading/tasking, hidding the complexity of these two libraries under a simple programming model.
+
+Thallium is a C++14 library wrapping Margo and enabling the development of the same sort of services using all the power of modern C++. It is the recommended library for C++ developers. Note that Thallium also provides C++ wrappers to Argobots.
+
+Argobots is used for threading/tasking in Mochi. Understanding its underlying programming model may not be necessary at first, for simple Margo or Thallium services, but may become useful to optimize performance or customize the scheduling and placement of threads and tasks in a Mochi service."
+
+== File Formats
+
+=== COG (Cloud Optimized GeoTIFF)
+
+https://www.cogeo.org/[`https://www.cogeo.org/`]
+
+https://medium.com/planet-stories/cloud-native-geospatial-part-2-the-cloud-optimized-geotiff-6b3f15c696ed[`https://medium.com/planet-stories/cloud-native-geospatial-part-2-the-cloud-optimized-geotiff-6b3f15c696ed`]
+
+"A Cloud Optimized GeoTIFF (COG) is a regular GeoTIFF file, aimed at being hosted on a HTTP file server, with an internal organization that enables more efficient workflows on the cloud. It does this by leveraging the ability of clients issuing HTTP GET range requests to ask for just the parts of a file they need."
+
+=== datacube
+
+https://xcube.readthedocs.io/en/latest/index.html[`https://xcube.readthedocs.io/en/latest/index.html`]
+
+https://github.com/meggart/DeepCubeGen[`https://github.com/meggart/DeepCubeGen`]
+
+=====
+xcube is an open-source Python package and toolkit that has been developed to provide Earth observation (EO) data in an analysis-ready form to users. xcube achieves this by carefully converting EO data sources into self-contained data cubes that can be published in the cloud.
+
+An xcube dataset contains one or more (geo-physical) data variables whose values are stored in cells of a common multi-dimensional, spatio-temporal grid. The dimensions are usually time, latitude, and longitude, however other dimensions may be present.
+
+All xcube datasets are structured in the same way following a common data model. They are also self-describing by providing metadata for the cube and all cube’s variables following the CF conventions.
+
+A xcube dataset’s in-memory representation in Python programs is an xarray.Dataset instance. Each dataset variable is represented by multi-dimensional xarray.DataArray that is arranged in non-overlapping, contiguous sub-regions called data chunks.
+=====
+
+=== N5
+
+https://github.com/saalfeldlab/n5[`https://github.com/saalfeldlab/n5`]
+
+"The N5 API specifies the primitive operations needed to store large chunked n-dimensional tensors, and arbitrary meta-data in a hierarchy of groups similar to HDF5.
+Other than HDF5, N5 is not bound to a specific backend. This repository includes a simple file-system backend. There are also an HDF5 backend, a Zarr backend, a Google Cloud backend, and an AWS-S3 backend.
+
+At this time, N5 supports:
+
+* arbitrary group hierarchies
+* arbitrary meta-data (stored as JSON or HDF5 attributes)
+* chunked n-dimensional tensor datasets
+* value-datatypes: [u]int8, [u]int16, [u]int32, [u]int64, float32, float64
+* compression: raw, gzip, zlib, bzip2, xz, and lz4 are included in this repository, custom compression schemes can be added
+
+Chunked datasets can be sparse, i.e. empty chunks do not need to be stored."
+
+=== netCDF/HDF
+
+* *HDF in the Cloud* - http://matthewrocklin.com/blog/work/2018/02/06/hdf-in-the-cloud[`http://matthewrocklin.com/blog/work/2018/02/06/hdf-in-the-cloud`]
+
+==== Hermes
+
+http://www.cs.iit.edu/\~scs/assets/projects/Hermes/Hermes.html[`http://www.cs.iit.edu/~scs/assets/projects/Hermes/Hermes.html`]
+
+https://github.com/HDFGroup/hermes[`https://github.com/HDFGroup/hermes`]
+
+"A heterogeneous aware, multi-tiered, dynamic, and distributed I/O buffering system that will significantly accelerate the I/O performance of HDF."
+
+==== HSDS
+
+https://github.com/HDFGroup/hsds[`https://github.com/HDFGroup/hsds`]
+
+"HSDS is a web service that implements a REST-based web service for HDF5 data stores. Data can be stored in either a POSIX files system, or using object based storage such as AWS S3, Azure Blob Storage, or OpenIO.  
+HSDS can be run a single machine using Docker or on a cluster using Kubernetes."
+
+=== openPMD
+
+https://github.com/openPMD/openPMD-api[`https://github.com/openPMD/openPMD-api`]
+
+=====
+openPMD is an open meta-data schema that provides meaning and self-description for data sets in science and engineering. See the openPMD standard for details of this schema.
+
+This library provides a reference API for openPMD data handling. Since openPMD is a schema (or markup) on top of portable, hierarchical file formats, this library implements various backends such as HDF5, ADIOS1, ADIOS2 and JSON. Writing & reading through those backends and their associated files is supported for serial and MPI-parallel workflows.
+=====
+
+=== Parquet
+
+https://github.com/apache/parquet-format[`https://github.com/apache/parquet-format`]
+
+"Parquet is a columnar storage format that supports nested data.
+Parquet metadata is encoded using Apache Thrift.
+
+Parquet is built to support very efficient compression and encoding schemes. Multiple projects have demonstrated the performance impact of applying the right compression and encoding scheme to the data. Parquet allows compression schemes to be specified on a per-column level, and is future-proofed to allow adding more encodings as they are invented and implemented."
+
+==== fastparquet
+
+https://fastparquet.readthedocs.io/en/latest/[`https://fastparquet.readthedocs.io/en/latest/`]
+
+"A Python interface to the Parquet file format."
+
+=== zarr
+
+https://zarr.readthedocs.io/en/stable/[`https://zarr.readthedocs.io/en/stable/`]
+
+https://github.com/zarr-developers/zarr-python[`https://github.com/zarr-developers/zarr-python`]
+
+=====
+Zarr is a format for the storage of chunked, compressed, N-dimensional arrays.
+=====
+
+==== rechunker
+
+https://rechunker.readthedocs.io/en/latest/[`https://rechunker.readthedocs.io/en/latest/`]
+
+=====
+Rechunker is a Python package which enables efficient and scalable manipulation of the chunk structure of chunked array formats such as Zarr and TileDB. Rechunker takes an input array (or group of arrays) stored in a persistent storage device (such as a filesystem or a cloud storage bucket) and writes out an array (or group of arrays) with the same data, but different chunking scheme, to a new location. Rechunker is designed to be used within a parallel execution framework such as Dask.
+=====
+
+==== z5
+
+https://github.com/constantinpape/z5[`https://github.com/constantinpape/z5`]
+
+=====
+C++ and Python wrapper for zarr and n5 file formats. Implements the file system specification of these formats.  This supports the Blosc, Zlib/Gzip, Bzip2, XZ and LZ4 compression codecs.
+=====
+
+==== zarr-python
+
+https://github.com/zarr-developers/zarr-python[`https://github.com/zarr-developers/zarr-python`]
+
+https://zarr.readthedocs.io/en/stable/[`https://zarr.readthedocs.io/en/stable/`]
+
+=====
+Zarr is a format for the storage of chunked, compressed, N-dimensional arrays.  The
+features include:
+
+* Create N-dimensional arrays with any NumPy dtype.
+* Chunk arrays along any dimension.
+* Compress and/or filter chunks using any NumCodecs codec.
+* Store arrays in memory, on disk, inside a Zip file, on S3, …
+* Read an array concurrently from multiple threads or processes.
+* Write to an array concurrently from multiple threads or processes.
+* Organize arrays into hierarchies via groups.
+=====
+
+== Data Compression
+
+=== ATC
+
+https://gitlab.kuleuven.be/u0118878/atc[`https://gitlab.kuleuven.be/u0118878/atc`]
+
+*ATC: an Advanced Tucker Compression library for multidimensional data* - https://arxiv.org/abs/2107.01384[`https://arxiv.org/abs/2107.01384`]
+
+=====
+ATC is a compression library for numerical data on grids of 3 dimensions or higher, aimed at optimizing compression rates, compression/decompression time, memory usage and error control. It mainly relies on the Tucker decomposition, which exploits correlations along each mode (dimension) but takes some time to compute. Furthermore, ATC controls the error of the resulting tensor in terms of the Euclidean/Frobenius norm, in contrast to some other compressors which enforce an elementwise error bound or use other error metrics.
+=====
+
+=== fpzip and zfp
+
+https://computing.llnl.gov/projects/floating-point-compression[`https://computing.llnl.gov/projects/floating-point-compression`]
+
+https://computing.llnl.gov/projects/fpzip[`https://computing.llnl.gov/projects/fpzip`]
+
+"High-precision numerical data from computer simulations, observations, and experiments is often represented in floating point and can easily reach terabytes to petabytes of storage. Moving such large data sets to and from disk, across the internet, between compute nodes, and even through the memory hierarchy presents a significant bottleneck. To address this problem, we have developed lossy and lossless high-speed data compressors that can greatly reduce the amount of data stored and moved.
+
+For lossless compression, where each and every bit of each floating-point number has to be exactly preserved without any loss in accuracy, our memory efficient streaming fpzip compressor usually provides 1.5x-4x data reduction, depending on data precision and smoothness.
+
+To achieve much higher compression ratios, lossy compression is needed, where small, often imperceptible or numerically negligible errors may be introduced. Our zfp compressor for floating-point and integer data often achieves compression ratios on the order of 100:1, i.e., to less than 1 bit per value of compressed storage.
+
+zfp frequently gives more accurate results than competing compressors (including our own fpzip). Its throughput of up to 2 GB/s per CPU core and 150 GB/s parallel throughput on an NVIDIA Volta GPU is also many times faster. zfp can achieve an exact bit rate, ensure that reconstructed values are within an absolute error tolerance, meet a specified precision requirement, or ensure fully lossless compression. zfp also comes with C and C++ compressed-array classes that support random access and that can be used in place of conventional C arrays or STL vectors, e.g., for numerical computations.
+
+zfp and fpzip were both designed for compressing logically regular 1D, 2D, 3D, or 4D arrays of single- or double-precision floating-point numbers that exhibit spatial correlation (e.g., regularly sampled continuous functions). They should not be used to compress unstructured data such as triangle mesh geometry, unorganized point sets, or streams of unrelated numbers. Think of fpzip as the floating-point analogue to PNG image compression and zfp as advanced JPEG for floating-point arrays."
+
+=== libpressio
+
+https://github.com/robertu94/libpressio[`https://github.com/robertu94/libpressio`]
+
+https://github.com/zarr-developers/numcodecs[`https://github.com/zarr-developers/numcodecs`]
+
+=====
+Pressio is latin for compression. LibPressio is a C++ library with C compatible bindings to abstract between different lossless and lossy compressors and their configurations. It solves the problem of having to having to write separate application level code for each lossy compressor that is developed. Instead, users write application level code using LibPressio, and the library will make the correct underlying calls to the compressors. It provides interfaces to represent data, compressors settings, and compressors.
+
+LibPressio has a low level and high level set of python bindings. The low level bindings mirror the C interface as closely as possible. Where as the higher level bindings are based on numcodecs and may lack new or developing features from the C api, but are much more ergonomic and pythonic.
+=====
+
+=== SZ
+
+https://szcompressor.org/[`https://szcompressor.org/`]
+
+=====
+SZ is a modular parametrizable lossy compressor framework for scientific data (floating point and integers). It has applications in simulations, AI and instruments. It is a production quality software and a research platform for lossy compression. SZ is open and transparent. Open because all interested researchers and students can study or contribute to it. Transparent because all performance improvements are detailed in publications.
+
+SZ can be used for classic use-cases: visualization, accelerating I/O, reducing memory and storage footprint and more advanced use-cases like compression of DNN models and training sets, acceleration of computation, checkpoint/restart, reducing streaming intensity and running efficiently large problems that cannot fit in memory. 
+=====
+
+==== cuSZ
+
+https://github.com/szcompressor/cuSZ[`https://github.com/szcompressor/cuSZ`]
+
+https://hgpu.org/?p=25075[`https://hgpu.org/?p=25075`]
+
+*Optimizing Error-Bounded Lossy Compression for Scientific Data on GPUs* - https://arxiv.org/abs/2105.12912[`https://arxiv.org/abs/2105.12912`]
+
+=====
+cuSZ is a CUDA implementation of the world-widely used SZ lossy compressor. It is the first error-bounded lossy compressor on GPUs for scientific data, which significantly improves SZ's throughput in GPU-based heterogeneous HPC systems.
+=====
+
+=== TTHRESH
+
+https://github.com/rballester/tthresh[`https://github.com/rballester/tthresh`]
+
+"An open-source C++ implementation of a compressor intended for Cartesian grid data of 3 or more dimensions, and leverages the higher-order singular value decomposition (HOSVD), a generalization of the SVD to 3 and more dimensions."
+
+=== TuckerMPI
+
+https://gitlab.com/tensors/TuckerMPI[`https://gitlab.com/tensors/TuckerMPI`]
+
+*TuckerMPI* - https://arxiv.org/abs/1901.06043[`https://arxiv.org/abs/1901.06043`]
+
+*Parallel Tensor Compression for Large-Scale Scientific Data* - https://arxiv.org/abs/1510.06689[`https://arxiv.org/abs/1510.06689`]
+
+=====
+A parallel C++/MPI software package for compressing distributed data. The approach is based on treating the data as a tensor, i.e., a multidimensional array, and computing its truncated Tucker decomposition, a higher-order analogue to the truncated singular value decomposition of a matrix. The result is a low-rank approximation of the original tensor-structured data. Compression efficiency is achieved by detecting latent global structure within the data, which we contrast to most compression methods that are focused on local structure.
+
+We test the software on 4.5 terabyte and 6.7 terabyte data sets distributed across 100s of nodes (1000s of MPI processes), achieving compression rates between 100-200,000× which equates to 99-99.999% compression (depending on the desired accuracy) in substantially less time than it would take to even read the same dataset from a parallel filesystem. Moreover, we show that our method also allows for reconstruction of partial or down-sampled data on a single node, without a parallel computer so long as the reconstructed portion is small enough to fit on a single machine, e.g., in the instance of reconstructing/visualizing a single down-sampled time step or computing summary statistics. 
+=====
+
+== ML
+
+=== SteamBrain
+
+https://github.com/KTH-HPC/StreamBrain[`https://github.com/KTH-HPC/StreamBrain`]
+
+https://hgpu.org/?p=25211[`https://hgpu.org/?p=25211`]
+
+=====
+StreamBrain is a framework that enables the practical deployment of neural networks that are based on the brain-like Bayesian Confidence Propagation Neural Network (BCPNN). More specifically, StreamBrain provides a domain-specific language (DSL), similar in concept to existing machine learning (ML) frameworks, that aims to allow the use of BCPNN networks on High-Performance Computing systems. The framework supports a variety of backends, such as CPUs (vectorized, OpenMP, and MPI), GPUs (CUDA), and even FPGAs. We provide a set of example training scripts to train for the classification of MNIST, Fashion MNIST, and STL-10.
+=====
+
+== Science/Engineering Applications
+
+=== Dawn
+
+https://github.com/MeteoSwiss-APN/dawn[`https://github.com/MeteoSwiss-APN/dawn`]
+
+=====
+Dawn is an optimizer and code generation library for geophysical fluid dynamics models, and GTClang is a DSL frontend using this toolchain. GTClang first translates the custom easy-to-understand language into a relatively simple Stencil Intermediate Representation (SIR). Dawn takes this SIR, performs an array of optimizations and subsequently generates code suitable for execution on different computing platforms.
+
+The features include:
+
+* GTClang translates an easy to understand but expressive DSL that is capable of modelling Finite Difference stencils as well as spare solvers into a relatively simple SIR. See the README.md in the GTClang subdirectory for an illustrative example
+* Dawn allows the user to generate fast performing code for several back-ends from the SIR.
+* Dawn exposes several APIs in different languages (C++, Python, Java) to parse and process the SIR.
+* Dawn is able to generate code to be run on Distributed Memory Machines based on MPI, Machines with access to GPUs based on CUDA as well as naive C++ code with close to no parallelism for debugging.
+* Dawn offers a wide range of optimization and static analysis passes to guarantee correctness as well as performance of the generated parallel program.
+=====
+
+=== Ginkgo
+
+https://ginkgo-project.github.io/[`https://ginkgo-project.github.io/`]
+
+https://arxiv.org/abs/2011.08879[`https://arxiv.org/abs/2011.08879`]
+
+https://arxiv.org/abs/2006.16852[`https://arxiv.org/abs/2006.16852`]
+
+"Ginkgo is a high-performance linear algebra library for manycore systems, with a focus on sparse solution of linear systems. It is implemented using modern C++ (you will need at least a C++14 compliant compiler to build it), with GPU kernels implemented in CUDA (for NVIDIA devices) and HIP (for AMD devices)."
+
+=== GridTools
+
+https://gridtools.github.io/gridtools/latest/index.html[`https://gridtools.github.io/gridtools/latest/index.html`]
+
+https://github.com/GridTools/gridtools[`https://github.com/GridTools/gridtools`]
+
+https://github.com/GridTools/gt4py[`https://github.com/GridTools/gt4py`]
+
+=====
+The GridTools (GT) framework is a set of libraries and utilities to develop performance portable applications in which stencil operations on grids are central. The focus of the project is on regular and block-structured grids as are commonly found in the weather and climate application field. In this context, GT provides a useful level of abstraction to enhance productivity and obtain excellent performance on a wide range of computer architectures. Additionally, it addresses the challenges that arise from integration into production code, such as the expression of boundary conditions, or conditional execution. The framework is structured such that it can be called from different weather models (numerical weather and climate codes) or programming interfaces, and can target various computer architectures. This is achieved by separating the GT core library in a user facing part (frontend) and architecture specific (backend) parts. The core library also abstracts various possible data layouts and applies optimizations on stages with multiple stencils. The core library is complemented by facilities to interoperate with other languages (such as C and Fortran), to aid code development and a communication layer.
+
+GridTools provides optimized backends for GPUs and manycore architectures. Stencils can be run efficiently on different architectures without any code change needed. Stencils can be built up by small composeable units called stages, using GridTools domain-specific language.
+=====
+
+=== HeFFTe
+
+https://bitbucket.org/icl/heffte/src/master/[`https://bitbucket.org/icl/heffte/src/master/`]
+
+http://icl.utk.edu/fft/[`http://icl.utk.edu/fft/`]
+
+=====
+The main objective of the FFT-ECP project is to design and implement a fast and robust 2-D and 3-D FFT library that targets large-scale heterogeneous systems with multi-core processors and hardware accelerators and to do so as a co-design activity with other ECP application developers. The work involves studying and analyzing current FFT software from vendors and open-source developers in order to understand, design, and develop a 3-D FFT-ECP library that could benefit from these existing optimized FFT kernels or will rely on new optimized kernels developed under this framework. We will also study ECP application needs and define a suitable modular implementation that provides high-performance software.
+=====
+
+=== kEDM
+
+https://github.com/keichi/kEDM[`https://github.com/keichi/kEDM`]
+
+=====
+kEDM (Kokkos-EDM) is a high-performance implementation of the Empirical Dynamical Modeling (EDM) framework. The goal of kEDM is to provide an optimized and parallelized implementation of EDM algorithms for HPC hardware (Intel Xeon, AMD EPYC, NVIDIA GPUs, Fujitsu A64FX, etc.) while ensuring compatibility with the reference implementation (cppEDM).
+=====
+
+=== Lettuce
+
+https://github.com/lettucecfd/lettuce[`https://github.com/lettucecfd/lettuce`]
+
+https://hgpu.org/?p=25240[`https://hgpu.org/?p=25240`]
+
+=====
+The lattice Boltzmann method (LBM) is an efficient simulation technique for computational fluid mechanics and beyond. It is based on a simple stream-and-collide algorithm on Cartesian grids, which is easily compatible with modern machine learning architectures. While it is becoming increasingly clear that deep learning can provide a decisive stimulus for classical simulation techniques, recent studies have not addressed possible connections between machine learning and LBM. Here, we introduce Lettuce, a PyTorch-based LBM code with a threefold aim. Lettuce enables GPU accelerated calculations with minimal source code, facilitates rapid prototyping of LBM models, and enables integrating LBM simulations with PyTorch’s deep learning and automatic differentiation facility.
+=====
+
+=== nekRS
+
+https://github.com/Nek5000/nekRS[`https://github.com/Nek5000/nekRS`]
+
+*NekRS, a GPU-Accelerated Spectral Element Navier-Stokes Solver* - https://arxiv.org/abs/2104.05829[`https://arxiv.org/abs/2104.05829`]
+
+=====
+nekRS is an open-source Navier Stokes solver based on the spectral element method targeting classical processors and hardware accelerators like GPUs. The code started as a fork of libParanumal tailored to our needs. For portable programming across different backends OCCA is used.
+
+Capabilities:
+
+* Incompressible and low Mach-number Navier-Stokes + scalar transport
+* CG-SEM using curvilinear conformal hexaheadral elements
+* 3rd/2nd order semi-implicit time integration + operator integration factor splitting
+* MPI+X hybrid parallelism supporting CUDA, HIP, OPENCL and CPU
+* Interface to Nek5000
+* Conjugate fluid-solid heat transfer
+* LES and RANS turbulence models
+* ALE formulation for moving mesh support
+* VisIt & Paraview support for data analysis and visualization
+=====
+
+=== OPS
+
+https://github.com/OP-DSL/OPS[`https://github.com/OP-DSL/OPS`]
+
+"OPS is an API with associated libraries and pre-processors to generate parallel executables for applications on multi-block structured grids."
+
+==== OpenSBLI
+
+https://opensbli.github.io/[`https://opensbli.github.io/`]
+
+https://arxiv.org/abs/2007.14933[`https://arxiv.org/abs/2007.14933`]
+
+https://github.com/opensbli/opensbli[`https://github.com/opensbli/opensbli`]
+
+"OpenSBLI is a Python-based modelling framework that is capable of expanding a set of differential equations written in Einstein notation, and automatically generating C code that performs the finite difference approximation to obtain a solution. This C code is then targetted with the OPS library towards specific hardware backends, such as MPI/OpenMP for execution on CPUs, and CUDA/OpenCL for execution on GPUs."
+
+=== PETSc
+
+https://www.mcs.anl.gov/petsc/[`https://www.mcs.anl.gov/petsc/`]
+
+https://arxiv.org/abs/2011.00715[`https://arxiv.org/abs/2011.00715`]
+
+"A suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It supports MPI, and GPUs through CUDA or OpenCL, as well as hybrid MPI-GPU parallelism.  PETSc (sometimes called PETSc/Tao) also contains the Tao optimization software library."
+
+=== Plasma
+
+https://bitbucket.org/icl/plasma/src/main/[`https://bitbucket.org/icl/plasma/src/main/`]
+
+=====
+PLASMA is a software package for solving problems in dense linear algebra using OpenMP. PLASMA provides implementations of state-of-the-art algorithms using cutting-edge task scheduling techniques. PLASMA currently offers a collection of routines for solving linear systems of equations, least squares problems, eigenvalue problems, and singular value problems.
+=====
+
+=== RefactorF4Acc
+
+https://github.com/wimvanderbauwhede/RefactorF4Acc[`https://github.com/wimvanderbauwhede/RefactorF4Acc`]
+
+https://arxiv.org/abs/1901.00416[`https://arxiv.org/abs/1901.00416`]
+
+"RefactorF4Acc is an automatic refactoring tool to make Fortran code acceleration-ready.
+The purpose is  to make legacy FORTRAN77 acceleration-ready. In the process it converts FORTRAN77 code into Fortran-95.
+In addition, RefactorF4Acc has a backend to translate modules to C/OpenCL."
+
+==== Autoparallel-Fortran
+
+https://github.com/wimvanderbauwhede/AutoParallel-Fortran[`https://github.com/wimvanderbauwhede/AutoParallel-Fortran`]
+
+"A domain specific, automatically parallelising source-to-source compiler for Fortran-95 that takes scientific Fortran as input and produces Fortran code parallelised using the OpenCL framework."
+
+=== SLATE
+
+https://bitbucket.org/icl/slate/src/master/[`https://bitbucket.org/icl/slate/src/master/`]
+
+=====
+Software for Linear Algebra Targeting Exascale (SLATE) is being developed as part of the Exascale Computing Project (ECP), which is a joint project of the U.S. Department of Energy's Office of Science and National Nuclear Security Administration (NNSA). SLATE will deliver fundamental dense linear algebra capabilities for current and upcoming distributed-memory systems, including GPU-accelerated systems as well as more traditional multi core-only systems.
+
+SLATE will provide coverage of existing LAPACK and ScaLAPACK functionality, including parallel implementations of Basic Linear Algebra Subroutines (BLAS), linear systems solvers, least squares solvers, and singular value and eigenvalue solvers. In this respect, SLATE will serve as a replacement for LAPACK and ScaLAPACK, which, after two decades of operation, cannot be adequately retrofitted for modern, GPU-accelerated architectures.
+
+SLATE is built on top of standards, such as MPI and OpenMP, and de facto-standard industry solutions such as NVIDIA CUDA and AMD HIP. SLATE also relies on high performance implementations of numerical kernels from vendor libraries, such as Intel MKL, IBM ESSL, NVIDIA cuBLAS, and AMD rocBLAS. SLATE interacts with these libraries through a layer of C++ APIs. This figure shows SLATE's position in the ECP software stack.
+=====
+
+=== STRUMPACK
+
+https://github.com/pghysels/STRUMPACK[`https://github.com/pghysels/STRUMPACK`]
+
+=====
+STRUMPACK - STRUctured Matrix PACKage - is a software library providing linear algebra routines and linear system solvers for sparse and for dense rank-structured linear systems. Many large dense matrices are rank structured, meaning they exhibit some kind of low-rank property, for instance in hierarchically defined sub-blocks. In sparse direct solvers based on LU factorization, the LU factors can often also be approximated well using rank-structured matrix compression, leading to robust preconditioners. The sparse solver in STRUMPACK can also be used as an exact direct solver, in which case it functions similarly as for instance SuperLU or superlu_dist. The STRUMPACK sparse direct solver delivers good performance and distributed memory scalability and provides excellent CUDA support.
+
+Currently, STRUMPACK has support for the Hierarchically Semi-Separable (HSS), Block Low Rank (BLR), Hierachically Off-Diagonal Low Rank (HODLR), Butterfly and Hierarchically Off-Diagonal Butterfly (HODBF) rank-structured matrix formats. Such matrices appear in many applications, e.g., the Boundary Element Method for discretization of integral equations, structured matrices like Toeplitz and Cauchy, kernel and covariance matrices etc. In the LU factorization of sparse linear systems arising from the discretization of partial differential equations, the fill-in in the triangular factors often has low-rank structure. Hence, the sparse linear solve algorithms in STRUMPACK exploit the different dense rank-structured matrix formats to compress the fill-in. This leads to purely algebraic, fast and scalable (both with problem size and compute cores) approximate direct solvers or preconditioners. These preconditioners are mostly aimed at large sparse linear systems which result from the discretization of a partial differential equation, but are not limited to any particular type of problem. STRUMPACK also provides preconditioned GMRES and BiCGStab iterative solvers.
+
+Apart from rank-structured compression, the STRUMPACK sparse solver also support compression of the factors using the ZFP library, a general purpose compression algorithm tuned for floating point data. This can be used with a specified precision, or with lossless compression.
+=====
+
+==== ButterflyPACK
+
+https://github.com/liuyangzhuan/ButterflyPACK[`https://github.com/liuyangzhuan/ButterflyPACK`]
+
+=====
+ButterflyPACK is a mathematical software for rapidly solving large-scale dense linear systems that exhibit off-diagonal rank-deficiency. These systems arise frequently from boundary element methods, or factorization phases in finite-difference/finite-element methods. ButterflyPACK relies on low-rank or butterfly formats under Hierarchical matrix, HODLR or other hierarchically nested frameworks to compress, factor and solve the linear system in quasi-linear time. The computationally most intensive phase, factorization, is accelerated via randomized linear algebras. The butterfly format, originally inspired by the butterfly data flow in fast Fourier Transform, is a linear algebra tool well-suited for compressing matrices arising from high-frequency wave equations or highly oscillatory integral operators. ButterflyPACK also provides preconditioned TFQMR iterative solvers.
+
+ButterflyPACK is written in Fortran 2003, it also has C++ interfaces. ButterflyPACK supports hybrid MPI/OpenMP programming models. In addition, ButterflyPACK can be readily invoked from the software STRUMPACK for solving dense and sparse linear systems.
+=====
+
+=== SuperLU_DIST
+
+https://github.com/xiaoyeli/superlu_dist[`https://github.com/xiaoyeli/superlu_dist`]
+
+=====
+SuperLU_DIST contains a set of subroutines to solve a sparse linear system A*X=B. It uses Gaussian elimination with static pivoting (GESP). Static pivoting is a technique that combines the numerical stability of partial pivoting with the scalability of Cholesky (no pivoting), to run accurately and efficiently on large numbers of processors.
+
+SuperLU_DIST is a parallel extension to the serial SuperLU library. It is targeted for the distributed memory parallel machines. SuperLU_DIST is implemented in ANSI C, with OpenMP for on-node parallelism and MPI for off-node communications. We are actively developing GPU acceleration capabilities.
+=====
+
+=== Trilinos
+
+https://trilinos.github.io/[`https://trilinos.github.io/`]
+
+"The Trilinos Project is a community of developers, users and user-developers focused on collaborative creation of algorithms and enabling technologies within an object-oriented software framework for the solution of large-scale, complex multi-physics engineering and scientific problems on new and emerging high-performance computing (HPC) architectures.
+
+Trilinos is also a collection of reusable scientific software libraries, known in particular for linear solvers, non-linear solvers, transient solvers, optimization solvers, and uncertainty quantification (UQ) solvers.
+
+Most Trilinos algorithms and software are built upon its abilities to construct and solve sparse problems, using sparse linear solvers. These solvers rely on a collection of data structure classes and functions (kernels) for parallel linear algebra, especially parallel sparse kernels.
+
+Trilinos is targeted for all major parallel architectures, including distributed memory using the Message Passing Interface (MPI), multicore using a variety of common approaches, accelerators using common and emerging approaches, and vectorization.
+
+Trilinos parallel functionality is written on top of libraries that support compile-time polymorphism, such that, as long as a given algorithm and problem size contain enough latent parallelism, the same Trilinos source code can be compiled and execution on any reasonable combination of distributed, multicore, accelerator and vectorizing computing devices."
+
+=== xSDK
+
+https://xsdk.info/[`https://xsdk.info/`]
+
+https://xsdk.info/packages/[`https://xsdk.info/packages/`]
+
+=====
+Rapid, efficient production of high-quality, sustainable extreme-scale scientific applications is best accomplished using a rich ecosystem of state-of-the art reusable libraries, tools, lightweight frameworks, and defined software methodologies, developed by a community of scientists who are striving to identify, adapt, and adopt best practices in software engineering. The vision of the xSDK is to provide infrastructure for and interoperability of a collection of related and complementary software elements—developed by diverse, independent teams throughout the high-performance computing (HPC) community—that provide the building blocks, tools, models, processes, and related artifacts for rapid and efficient development of high-quality applications.
+=====
+
+== Benchmarks
+
+*Introducing OpenMP Tasks into the HYDRO Benchmark* - https://arxiv.org/abs/2106.13465[`https://arxiv.org/abs/2106.13465`]
+
+https://journals.sagepub.com/doi/full/10.1177/1094342016668241[`https://journals.sagepub.com/doi/full/10.1177/1094342016668241`]
+
+=== BabelStream
+
+https://github.com/UoB-HPC/BabelStream[`https://github.com/UoB-HPC/BabelStream`]
+
+https://uob-hpc.github.io/BabelStream/[`https://uob-hpc.github.io/BabelStream/`]
+
+=====
+Measure memory transfer rates to/from global device memory on GPUs. This benchmark is similar in spirit, and based on, the STREAM benchmark for CPUs.
+Unlike other GPU memory bandwidth benchmarks this does not include the PCIe transfer time.
+There are multiple implementations of this benchmark in a variety of programming models.
+=====
+
+=== DLIO
+
+https://github.com/hariharan-devarajan/dlio_benchmark[`https://github.com/hariharan-devarajan/dlio_benchmark`]
+
+https://hgpu.org/?p=25107[`https://hgpu.org/?p=25107`]
+
+=====
+AI/O benchmark which represents Scientific Deep Learning Workloads. DLIO benchmark is aimed at emulating the behavior of scientific deep learning applications, as described in the previous section. The benchmark is delivered as an executable that can be configured for various I/O patterns. It uses a modular design to incorporate more data formats, datasets, and configuration parameters. It emulates modern scientific deep learning applications using Benchmark Runner, Data Generator, Format Handler, and I/O Profiler modules. These modules utilize state-of-the-art design patterns to build a transparent and extensible framework. The DLIO benchmark has been designed with the following goals in mind.
+=====
+
+=== DAMOV
+
+https://github.com/CMU-SAFARI/DAMOV[`https://github.com/CMU-SAFARI/DAMOV`]
+
+https://arxiv.org/abs/2105.03725[`https://arxiv.org/abs/2105.03725`]
+
+=====
+DAMOV is a benchmark suite and a methodical framework targeting the study of data movement bottlenecks in modern applications. It is intended to study new architectures, such as near-data processing.
+
+The DAMOV benchmark suite is the first open-source benchmark suite for main memory data movement-related studies, based on our systematic characterization methodology. This suite consists of 144 functions representing different sources of data movement bottlenecks and can be used as a baseline benchmark set for future data-movement mitigation research. The applications in the DAMOV benchmark suite belong to popular benchmark suites, including BWA, Chai, Darknet, GASE, Hardware Effects, Hashjoin, HPCC, HPCG, Ligra, PARSEC, Parboil, PolyBench, Phoenix, Rodinia, SPLASH-2, STREAM.
+
+The DAMOV framework is based on two widely-known simulators: ZSim and Ramulator. We consider a computing system that includes host CPU cores and PIM cores. The PIM cores are placed in the logic layer of a 3D-stacked memory (Ramulator's HMC model). With this simulation framework, we can simulate host CPU cores and general-purpose PIM cores to compare both for an application or parts of it.
+=====
+
+=== FBI
+
+https://bitbucket.org/icl/fbi/src/main/[`https://bitbucket.org/icl/fbi/src/main/`]
+
+=====
+The FFT Benchmarking Initiative (FBI) provides a framework for Fast Fourier Transform (FFT) benchmarks targeting exascale computing systems. It evaluates performance and scalability of distributed FFTs on different architectures. Furthermore, it analyzes the effect on applications that directly depend on FFTs. It can also stress and test the overall network of a supercomputer, give an indication on bisection bandwidth, noise, and other network and MPI collectives limitations that are of interest to many other ECP applications.
+=====
+
+=== H5bench
+
+https://github.com/hpc-io/h5bench[`https://github.com/hpc-io/h5bench`]
+
+https://h5bench.readthedocs.io/en/latest/[`https://h5bench.readthedocs.io/en/latest/`]
+
+=====
+H5bench is a suite of parallel I/O benchmarks or kernels representing I/O patterns that are commonly used in HDF5 applications on high performance computing systems. H5bench measures I/O performance from various aspects, including the I/O overhead, observed I/O rate, etc.
+=====
+
+=== hpcc
+
+https://github.com/icl-utk-edu/hpcc[`https://github.com/icl-utk-edu/hpcc`]
+
+http://icl.cs.utk.edu/hpcc/[`http://icl.cs.utk.edu/hpcc/`]
+
+=====
+HPC Challenge is a benchmark suite that measures a range memory access patterns.
+=====
+
+=== HPCG
+
+https://github.com/hpcg-benchmark/hpcg[`https://github.com/hpcg-benchmark/hpcg`]
+
+=====
+HPCG is a software package that performs a fixed number of multigrid preconditioned (using a symmetric Gauss-Seidel smoother) conjugate gradient (PCG) iterations using double precision (64 bit) floating point values.
+
+The HPCG rating is is a weighted GFLOP/s (billion floating operations per second) value that is composed of the operations performed in the PCG iteration phase over the time taken. The overhead time of problem construction and any modifications to improve performance are divided by 500 iterations (the amortization weight) and added to the runtime.
+=====
+
+=== hpcscan
+
+https://github.com/vetienne74/hpcscan[`https://github.com/vetienne74/hpcscan`]
+
+=====
+A tool for benchmarking algorithms/kernels that are found in many scientific applications on various architectures/systems.
+=====
+
+=== LULESH
+
+https://asc.llnl.gov/codes/proxy-apps/lulesh[`https://asc.llnl.gov/codes/proxy-apps/lulesh`]
+
+https://github.com/LLNL/maestrowf[`https://github.com/LLNL/maestrowf`]
+
+=====
+The Shock Hydrodynamics Challenge Problem was originally defined and implemented by LLNL as one of five challenge problems in the DARPA UHPC program and has since become a widely studied proxy application in DOE co-design efforts for exascale. It has been ported to a number of programming models and optimized for a number of advanced platforms.
+=====
+
+=== MG-CFD
+
+https://github.com/warwick-hpsc/MG-CFD-app-plain[`https://github.com/warwick-hpsc/MG-CFD-app-plain`]
+
+"A 3D unstructured multigrid, finite-volume computational fluid dynamics (CFD) mini-app for inviscid-flow. It has the goal of serving as a platform for evaluating emerging architectures, programming paradigms and algorithmic optimisations for this class of code."
+
+==== MG-CFD OP2
+
+https://github.com/warwick-hpsc/MG-CFD-app-OP2[`https://github.com/warwick-hpsc/MG-CFD-app-OP2`]
+
+"OP2 port of MG-CFD. Provides MPI, full OpenMP, SIMD, CUDA, OpenACC, OpenMP 4, and some pairings of them."
+
+==== Multi-GPU Programming Models
+
+https://github.com/NVIDIA/multi-gpu-programming-models[`https://github.com/NVIDIA/multi-gpu-programming-models`]
+
+=====
+This project implements the well known multi GPU Jacobi solver with different multi GPU Programming Models.
+=====
+
+=== NAS Parallel Benchmarks (NPB)
+
+https://www.nas.nasa.gov/software/npb.html[`https://www.nas.nasa.gov/software/npb.html`]
+
+=====
+The NAS Parallel Benchmarks (NPB) are a small set of programs designed to help evaluate the performance of parallel supercomputers. The benchmarks are derived from computational fluid dynamics (CFD) applications and consist of five kernels and three pseudo-applications in the original "pencil-and-paper" specification (NPB 1). The benchmark suite has been extended to include new benchmarks for unstructured adaptive meshes, parallel I/O, multi-zone applications, and computational grids. Problem sizes in NPB are predefined and indicated as different classes. Reference implementations of NPB are available in commonly-used programming models like MPI and OpenMP (NPB 2 and NPB 3). 
+=====
+
+=== NPBench
+
+https://hgpu.org/?p=24994[`https://hgpu.org/?p=24994`]
+
+=====
+A set of NumPy code samples representing a large variety of HPC applications. We use NPBench to test popular NumPy-accelerating compilers and frameworks on a variety of metrics. NPBench will guide both end-users and framework developers focusing on performance and will drive further use of Python in the high-performance scientific domains.
+=====
+
+=== OpenDwarfs
+
+https://github.com/BeauJoh/OpenDwarfs[`https://github.com/BeauJoh/OpenDwarfs`]
+
+https://dl.acm.org/doi/10.1007/s11265-015-1051-z[`https://dl.acm.org/doi/10.1007/s11265-015-1051-z`]
+
+https://openbenchmarking.org/test/pts/opendwarfs[`https://openbenchmarking.org/test/pts/opendwarfs`]
+
+https://arxiv.org/abs/1805.03841[`https://arxiv.org/abs/1805.03841`]
+
+https://www.researchgate.net/publication/333611168_Characterizing_and_Predicting_Scientific_Workloads_for_Heterogeneous_Computing_Systems[`https://www.researchgate.net/publication/333611168_Characterizing_and_Predicting_Scientific_Workloads_for_Heterogeneous_Computing_Systems`]
+
+"The OpenDwarfs project provides a benchmark suite consisting of different computation/communication idioms, i.e., dwarfs, for state-of-art multicore CPUs, GPUs, Intel MICs and Altera FPGAs. 
+
+=== Parallel Research Kernels
+
+https://github.com/ParRes/Kernels[`https://github.com/ParRes/Kernels`]
+
+https://www.youtube.com/watch?v=bXeDfA21-VA[`https://www.youtube.com/watch?v=bXeDfA21-VA`]
+
+https://www.researchgate.net/publication/282687430_The_Parallel_Research_Kernels[`https://www.researchgate.net/publication/282687430_The_Parallel_Research_Kernels`]
+
+https://slidetodoc.com/the-parallel-research-kernels-an-objective-tool-for/[`https://slidetodoc.com/the-parallel-research-kernels-an-objective-tool-for/`]
+
+=====
+This suite contains a number of kernel operations, called Parallel Research Kernels, plus a simple build system intended for a Linux-compatible environment. Most of the code relies on open standard programming models and thus can be executed on many computing systems.
+
+These programs should not be used as benchmarks. They are operations to explore features of a hardware platform, but they do not define fixed problems that can be used to rank systems. Furthermore they have not been optimimzed for the features of any particular system.
+=====
+
+=== SKaMPI
+
+https://github.com/coti/SKaMPI[`https://github.com/coti/SKaMPI`]
+
+https://arxiv.org/abs/2105.13395][`https://arxiv.org/abs/2105.13395`]
+
+=====
+SKaMPI is a benchmark for MPI libraries.
+=====
+
+=== SOLVE V&V
+
+https://crpl.cis.udel.edu/ompvvsollve/project/[`https://crpl.cis.udel.edu/ompvvsollve/project/`]
+
+https://github.com/SOLLVE/sollve_vv[`https://github.com/SOLLVE/sollve_vv`]
+
+=====
+As part of the Exascale Computing Project, the SOLLVE project for Scaling OpenMP Via LLVM for Exascale Performance and Portability is currently working on a framework that, through the use of simple test cases (e.g. unit tests, functional tests and micro-applications) allows to assess compiler implementations and compliance for developers and system architectures. This website summarizes this effort. It presents OpenMP Validation and Verification (OMPVV), which comprises not only the set of tests, but also the community around developing and ensuring the quality of these tests. This website contains publications and documentations, as well as different results that through the development of this project we have been obtaining.
+=====
+
+== Code Measurement, Profiling and Debugging
+
+=== Caliper
+
+https://github.com/LLNL/Caliper[`https://github.com/LLNL/Caliper`]
+
+https://software.llnl.gov/Caliper/[`https://software.llnl.gov/Caliper/`]
+
+=====
+Caliper is a library to integrate performance profiling capabilities into applications. To use Caliper, developers mark code regions of interest using Caliper's annotation API. Applications can then enable performance profiling at runtime with Caliper's configuration API. Alternatively, you can configure Caliper through environment variables or config files.
+
+Caliper can be used for lightweight always-on profiling or advanced performance engineering use cases, such as tracing, monitoring, and auto-tuning. It is primarily aimed at HPC applications, but works for any C/C++/Fortran program on Unix/Linux.
+Features include:
+
+* Low-overhead source-code annotation API
+* Configuration API to control performance measurements from within an application
+* Recording program metadata for analyzing collections of runs
+* Flexible key:value data model to capture application-specific features for performance analysis
+* Fully threadsafe implementation, support for parallel programming models like MPI
+* Synchronous (event-based) and asynchronous (sampling) performance data collection
+* Trace and profile recording
+* Connection to third-party tools, e.g. NVidia NVProf or Intel(R) VTune(tm)
+* Measurement and profiling functionality such as timers, PAPI hardware counters, and Linux perf_events
+* Memory allocation annotations: associate performance measurements with named memory regions
+=====
+
+=== Darshan
+
+https://www.mcs.anl.gov/research/projects/darshan/[`https://www.mcs.anl.gov/research/projects/darshan/`]
+
+=====
+A scalable HPC I/O characterization tool. Darshan is designed to capture an accurate picture of application I/O behavior, including properties such as patterns of access within files, with minimum overhead.  The name is taken from a Sanskrit word for “sight” or “vision”.
+Darshan can be used to investigate and tune the I/O behavior of complex HPC applications.  In addition, Darshan’s lightweight design makes it suitable for full time deployment for workload characterization of large systems.  We hope that such studies will help the storage research community to better serve the needs of scientific computing.
+=====
+
+=== Dimemas
+
+https://tools.bsc.es/dimemas[`https://tools.bsc.es/dimemas`]
+
+=====
+Dimemas is a performance analysis tool for message-passing programs. It enables the user to develop and tune parallel applications on a workstation, while providing an accurate prediction of their performance on the parallel target machine. The Dimemas simulator reconstructs the time behavior of a parallel application on a machine modeled by a set of performance parameters. Thus, performance experiments can be done easily. The supported target architecture classes include networks of workstations, single and clustered SMPs, distributed memory parallel computers, and even heterogeneous systems.
+=====
+
+=== Extra-P
+
+https://github.com/extra-p/extrap[`https://github.com/extra-p/extrap`]
+
+=====
+Extra-P is an automatic performance-modeling tool that supports the user in the identification of scalability bugs. A scalability bug is a part of the program whose scaling behavior is unintentionally poor, that is, much worse than expected. A performance model is a formula that expresses a performance metric of interest such as execution time or energy consumption as a function of one or more execution parameters such as the size of the input problem or the number of processors.
+
+Extra-P uses measurements of various performance metrics at different execution configurations as input to generate performance models of code regions (including their calling context) as a function of the execution parameters. All it takes to search for scalability issues even in full-blown codes is to run a manageable number of small-scale performance experiments, launch Extra-P, and compare the asymptotic or extrapolated performance of the worst instances to the expectations.
+
+Extra-P generates not only a list of potential scalability bugs but also human-readable models for all performance metrics available such as floating-point operations or bytes sent by MPI calls that can be further analyzed and compared to identify the root causes of scalability issues.
+=====
+
+=== MPE
+
+https://www.mcs.anl.gov/research/projects/perfvis/download/index.htm[`https://www.mcs.anl.gov/research/projects/perfvis/download/index.htm`]
+
+=====
+MPE is a software package for MPI (Message Passing Interface) programmers. The package provides users with a number of useful tools for their MPI programs. The latest version is called MPE2. Current available tools under MPE2 are the following:
+
+* A set of profiling libraries to collect information about the behavior of MPI programs. Linking the user MPI program with the libraries will generate logfile for postmortem visualization when the user program is executed.
+* Convenient compiler wrapper, mpecc and mpefc, are provided to compile/link with the related profiled libraries, e.g. "mpecc -mpilog" enables automatic MPI and user-defined MPE logging, "mpecc -mpicheck" enables collective and datatype checking of the user MPI program, and "mpecc -help" shows available options.
+* A SLOG-2 viewer, Jumpshot, for the various logfiles.
+* A set of CLOG-2 and SLOG-2 utilities programs.
+* An MPI collective and datatype checking library.
+* A shared-display parallel X graphics library.
+* A profiling wrapper generator for MPI interface.
+* Routines for sequentializing a section of code being executed in parallel.
+* Debugger setup routines. 
+=====
+
+=== PAPI
+
+https://bitbucket.org/icl/papi/wiki/Home[`https://bitbucket.org/icl/papi/wiki/Home`]
+
+https://bitbucket.org/icl/papi/wiki/Home[`https://bitbucket.org/icl/papi/wiki/Home`]
+
+=====
+The Performance Application Programming Interface (PAPI) provides tool designers and application engineers with a consistent interface and methodology for the use of low-level performance counter hardware found across the entire compute system (i.e. CPUs, GPUs, on/off-chip memory, interconnects, I/O system, energy/power, etc.). PAPI enables users to see, in near real time, the relations between software performance and hardware events across the entire computer system.
+=====
+
+=== Paraver
+
+https://tools.bsc.es/paraver[`https://tools.bsc.es/paraver`]
+
+=====
+Paraver was developed to respond to the need to have a qualitative global perception of the application behavior by visual inspection and then to be able to focus on the detailed quantitative analysis of the problems. Expressive power, flexibility and the capability of efficiently handling large traces are key features addressed in the design of Paraver. The clear and modular structure of Paraver plays a significant role towards achieving these targets.
+
+Paraver is a very flexible data browser that is part of the CEPBA-Tools toolkit. Its analysis power is based on two main pillars. First, its trace format has no semantics; extending the tool to support new performance data or new programming models requires no changes to the visualizer, just to capture such data in a Paraver trace. The second pillar is that the metrics are not hardwired on the tool but programmed. To compute them, the tool offers a large set of time functions, a filter module, and a mechanism to combine two time lines. This approach allows displaying a huge number of metrics with the available data. To capture the experts knowledge, any view or set of views can be saved as a Paraver configuration file. After that, re-computing the view with new data is as simple as loading the saved file. The tool has been demonstrated to be very useful for performance analysis studies, giving much more details about the applications behaviour than most performance tools.
+=====
+
+=== Scalasca
+
+https://www.scalasca.org/scalasca/about/about.html[`https://www.scalasca.org/scalasca/about/about.html`]
+
+=====
+Scalasca is a software tool that supports the performance optimization of parallel programs by measuring and analyzing their runtime behavior. The analysis identifies potential performance bottlenecks – in particular those concerning communication and synchronization – and offers guidance in exploring their causes. 
+
+Scalasca targets mainly scientific and engineering applications based on the programming interfaces MPI and OpenMP, including hybrid applications based on a combination of the two. The tool has been specifically designed for use on large-scale systems including IBM Blue Gene and Cray XT, but is also well suited for small- and medium-scale HPC platforms. The software is available for free download under the New BSD open-source license. 
+=====
+
+=== Score-P
+
+https://www.vi-hps.org/projects/score-p[`https://www.vi-hps.org/projects/score-p`]
+
+=====
+The Score-P measurement infrastructure is a highly scalable and easy-to-use tool suite for profiling and event tracing of HPC applications.
+
+Score-P offers the user a maximum of convenience by supporting a number of analysis tools. Currently, it works with Scalasca, Vampir, and Tau and is open for other tools. Score-P comes together with the new Open Trace Format Version 2, the Cube4 profiling format and the Opari2 instrumenter .
+=====
+
+=== STAT
+
+https://hpc.llnl.gov/software/development-environment-software/stat-stack-trace-analysis-tool[`https://hpc.llnl.gov/software/development-environment-software/stat-stack-trace-analysis-tool`]
+
+=====
+The Stack Trace Analysis Tool (STAT) is a highly scalable, lightweight debugger for parallel applications. STAT works by gathering stack traces from all of a parallel application's processes and merging them into a compact and intuitive form. The resulting output indicates the location in the code that each application process is executing, which can help narrow down a bug. Furthermore, the merging process naturally groups processes that exhibit similar behavior into process equivalence classes. A single representative of each equivalence can then be examined with a full-featured debugger like TotalView or DDT for more in-depth analysis.
+
+STAT has been ported to several platforms, including Linux clusters, IBM CORAL systems (i.e., IBM Power CPUs + NVIDIA GPUs), IBM's Blue Gene machines, and Cray systems. It works for Message Passing Interface (MPI) applications written in C, C++, and Fortran, supports threads, and supports CUDA. STAT has already demonstrated scalability over 1,000,000 MPI tasks and its logarithmic scaling characteristics position it well for even larger systems.
+=====
+
+=== TAU
+
+http://www.cs.uoregon.edu/research/tau/home.php[`http://www.cs.uoregon.edu/research/tau/home.php`]
+
+=====
+TAU Performance System is a portable profiling and tracing toolkit for performance analysis of parallel programs written in Fortran, C, C++, UPC, Java, Python.
+
+TAU (Tuning and Analysis Utilities) is capable of gathering performance information through instrumentation of functions, methods, basic blocks, and statements as well as event-based sampling. All C++ language features are supported including templates and namespaces. The API also provides selection of profiling groups for organizing and controlling instrumentation. The instrumentation can be inserted in the source code using an automatic instrumentor tool based on the Program Database Toolkit (PDT), dynamically using DyninstAPI, at runtime in the Java Virtual Machine, or manually using the instrumentation API.
+
+TAU's profile visualization tool, paraprof, provides graphical displays of all the performance analysis results, in aggregate and single node/context/thread forms. The user can quickly identify sources of performance bottlenecks in the application using the graphical interface. In addition, TAU can generate event traces that can be displayed with the Vampir, Paraver or JumpShot trace visualization tools. 
+=====
+
+=== Vampir
+
+https://vampir.eu/[`https://vampir.eu/`]
+
+=====
+An easy-to-use framework that enables developers to quickly display and analyze arbitrary program behavior at any level of detail. The tool suite implements optimized event analysis algorithms and customizable displays that enable fast and interactive rendering of very complex performance monitoring data.
+
+The combined handling and visualization of instrumented and sampled event traces generated by Score-P enables an outstanding performance analysis capability of highly-parallel applications. Current developments also include the analysis of memory and I/O behavior that often impacts an application's performance.
+
+Score-P is the primary code instrumentation and run-time measurement framework for Vampir and supports various instrumentation methods, including instrumentation at source level and at compile/link time.
+
+Vampir and Score-P provide a performance tool framework with special focus on highly-parallel applications. Performance data is collected from multi-process (MPI, SHMEM), thread-parallel (OpenMP, Pthreads), as well as accelerator-based paradigms (CUDA, OpenCL, OpenACC).
+=====
+
+== Scientific Workflow Environments
+
+*Advancing the State-of-the-art of Scientific Workflows* - https://arxiv.org/abs/2106.05177[`https://arxiv.org/abs/2106.05177`]
+
+=== CK
+
+https://github.com/ctuning/ck[`https://github.com/ctuning/ck`]
+
+https://en.wikipedia.org/wiki/Collective_Knowledge_(software)[`https://en.wikipedia.org/wiki/Collective_Knowledge_(software)`]
+
+Collective Knowledge framework (CK) helps to organize software projects as a database of reusable components with common automation actions and extensible meta descriptions based on FAIR principles (findability, accessibility, interoperability and reusability).
+
+Our goal is to help researchers and practitioners share, reuse and extend their knowledge in the form of portable workflows, automation actions and reusable artifacts with a common API, CLI, and meta description.
+
+CK is a small, portable, customizable and decentralized infrastructure helping researchers and practitioners:
+
+* share their code, data and models as reusable Python components and automation actions with unified JSON API, JSON meta information, and a UID based on FAIR principles
+* assemble portable workflows from shared components (such as multi-objective autotuning and Design space exploration)
+* automate, crowdsource and reproduce benchmarking of complex computational systems
+* unify predictive analytics (scikit-learn, R, DNN)
+* enable reproducible and interactive papers
+
+=== Maestro Workflow Conductor
+
+https://github.com/LLNL/maestrowf[`https://github.com/LLNL/maestrowf`]
+
+https://maestrowf.readthedocs.io/en/latest/[`https://maestrowf.readthedocs.io/en/latest/`]
+
+=====
+Maestro is an open-source HPC software tool that defines a YAML-based study specification for defining multi-step workflows and automates execution of software flows on HPC resources. The core design tenants of Maestro focus on encouraging clear workflow communication and documentation, while making consistent execution easier to allow users to focus on science.
+
+Maestro’s study specification helps users think about complex workflows in a step-wise, intent-oriented, manner that encourages modularity and tool reuse. Maestro’s development centers around a user-centric design approach and makes use of software design practices such as abstract interfacing and utilizing design patterns, forming the foundation of a vision for enabling a layered architecture to workflow tool design.
+=====
+
+=== Mextflow
+
+https://github.com/nextflow-io/nextflow[`https://github.com/nextflow-io/nextflow`]
+
+=====
+Nextflow is a bioinformatics workflow manager that enables the development of portable and reproducible workflows. It supports deploying workflows on a variety of execution platforms including local, HPC schedulers, AWS Batch, Google Cloud Life Sciences, and Kubernetes. Additionally, it provides support for manage your workflow dependencies through built-in support for Conda, Docker, Singularity, and Modules.
+=====
+
+=== Pegasus
+
+https://github.com/pegasus-isi/pegasus[`https://github.com/pegasus-isi/pegasus`]
+
+=====
+Pegasus WMS is a configurable system for mapping and executing scientific workflows over a wide range of computational infrastructures including laptops, campus clusters, supercomputers, grids, and commercial and academic clouds. Pegasus has been used to run workflows with up to 1 million tasks that process tens of terabytes of data at a time.
+
+Pegasus WMS bridges the scientific domain and the execution environment by automatically mapping high-level workflow descriptions onto distributed resources. It automatically locates the necessary input data and computational resources required by a workflow, and plans out all of the required data transfer and job submission operations required to execute the workflow. Pegasus enables scientists to construct workflows in abstract terms without worrying about the details of the underlying execution environment or the particulars of the low-level specifications required by the middleware (Condor, Globus, Amazon EC2, etc.). In the process, Pegasus can plan and optimize the workflow to enable efficient, high-performance execution of large workflows on complex, distributed infrastructures.
+=====
+
+=== Snakemake
+
+https://snakemake.github.io/[`https://snakemake.github.io/`]
+
+https://snakemake.readthedocs.io/en/stable/[`https://snakemake.readthedocs.io/en/stable/`]
+
+=====
+The Snakemake workflow management system is a tool to create reproducible and scalable data analyses. Workflows are described via a human readable, Python based language. They can be seamlessly scaled to server, cluster, grid and cloud environments, without the need to modify the workflow definition. Finally, Snakemake workflows can entail a description of required software, which will be automatically deployed to any execution environment.
+
+With Snakemake, data analysis workflows are defined via an easy to read, adaptable, yet powerful specification language on top of Python. Each rule describes a step in an analysis defining how to obtain output files from input files. Dependencies between rules are determined automatically.
+
+By integration with the Conda package manager and container virtualization , all software dependencies of each workflow step are automatically deployed upon execution. 
+
+Rapidly implement analysis steps via direct script and jupyter notebook integration. Easily create and employ re-usable tool wrappers and split your data analysis into well-separated modules. 
+
+Automatic, interactive, self-contained reports ensure full transparency from results down to used steps, parameters, code, and software. 
+=====
+
+=== WfCommons
+
+https://wfcommons.org/[`https://wfcommons.org/`]
+
+*WfCommons: A Framework for Enabling Scientific Workflow Research and Development* - https://arxiv.org/abs/2105.14352[`https://arxiv.org/abs/2105.14352`]
+
+== Workload managers
+
+=== Flux
+
+https://computing.llnl.gov/projects/flux-building-framework-resource-management[`https://computing.llnl.gov/projects/flux-building-framework-resource-management`\
+
+https://github.com/flux-framework[`https://github.com/flux-framework`]
+
+=====
+Flux is a next-generation resource and job management framework that expands the scheduler’s view beyond the single dimension of “nodes.” Instead of simply developing a replacement for SLURM and Moab, Flux offers a framework that enables new resource types, schedulers, and framework services to be deployed as data centers continue to evolve.
+
+A resource manager tracks and monitors the hardware deployed in the data center, and then arbitrates access as customers submit work they would like to run. The job-scheduling algorithms must not only determine when and where resources that meet the user-specified requirements will be available, but also implement an allocation policy. Job placement in both space and time is critical to achieving efficient execution and getting the most work done for the time, power, and money spent. Flux addresses this issue by making smarter placement decisions and by offering greater flexibility and more opportunity for adaptation than current resource management software. These solutions help scientific researchers and computing users more effectively harness the power of LC capabilities. For example, with a holistic view of the data center’s input/output (I/O) bandwidth capability and utilization, Flux avoids the “perfect storm” of I/O operations that can occur when a naïve scheduler places I/O-intensive work without regard to I/O availability.
+
+In Flux, each job is a complete instance of the framework, meaning the individual task can support parallel tools, monitoring, and even launch sub-jobs that are, like fractals, smaller images of the parent job. Because each job is a full Flux instance, users can customize Flux for use within their jobs. For example, a user desiring to launch many small, high-throughput jobs could submit a large, long-running parent job, and inside it load a specialized scheduler that is streamlined for high throughput. Panning outward in scale, schedulers operating at a larger granularity can move resources between child jobs as bottlenecks occur and employ pluggable schedulers for resource types that do not exist today.
+=====
+
+=== Slurm
+
+https://slurm.schedmd.com/[`https://slurm.schedmd.com/overview.html`]
+
+=====
+Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters. Slurm requires no kernel modifications for its operation and is relatively self-contained. As a cluster workload manager, Slurm has three key functions. First, it allocates exclusive and/or non-exclusive access to resources (compute nodes) to users for some duration of time so they can perform work. Second, it provides a framework for starting, executing, and monitoring work (normally a parallel job) on the set of allocated nodes. Finally, it arbitrates contention for resources by managing a queue of pending work. Optional plugins can be used for accounting, advanced reservation, gang scheduling (time sharing for parallel jobs), backfill scheduling, topology optimized resource selection, resource limits by user or bank account, and sophisticated multifactor job prioritization algorithms. 
+=====
+
+== Authentication/Security
+
+=== munge
+
+https://dun.github.io/munge/[`https://dun.github.io/munge/`]
+
+https://github.com/dun/munge[`https://github.com/dun/munge`]
+
+=====
+MUNGE (MUNGE Uid 'N' Gid Emporium) is an authentication service for creating and validating credentials. It is designed to be highly scalable for use in an HPC cluster environment. It allows a process to authenticate the UID and GID of another local or remote process within a group of hosts having common users and groups. These hosts form a security realm that is defined by a shared cryptographic key. Clients within this security realm can create and validate credentials without the use of root privileges, reserved ports, or platform-specific methods.
+=====

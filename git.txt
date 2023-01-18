@@ -1,0 +1,217 @@
+git
+===
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+How we use git.
+
+Useful Places
+-------------
+
+http://homes.cs.washington.edu/\~asampson/blog/git.html[+http://homes.cs.washington.edu/~asampson/blog/git.html+]
+
+Spinning Up
+-----------
+
+Starting on Github
+~~~~~~~~~~~~~~~~~~
+
+First, set up an account at:
+
+https://github.com/[+https://github.com/+]
+
+by choosing a username - in this case +skbaum+ - and then
+creating a repository by clicking on the +Repositories+ tab
+on the top of your github home page and then on the colorful
++New+ button.  Therein you will supply a repository name and
+an optional description, and choose whether to make the
+repository public or private.  You can also add one of a number
+of kinds of licenses.  We added a repository called
++asciidocs+.
+
+
+Starting on a Remote Computer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Global Configurations
+^^^^^^^^^^^^^^^^^^^^^
+
+After we have installed the git package, we need to configure
+it to recognize our github username with:
+
+-----
+git config --global user.name skbaum
+-----
+
+and to also give an email address via:
+
+-----
+git config --global user.email baum@stommel.tamu.edu
+-----
+
+Initializing a Project
+^^^^^^^^^^^^^^^^^^^^^^
+
+We will start by adding +thredds2.txt+ from the
++/home/baum/html+ directory on +rocks.tamu.edu+.
+Initialize a new project:
+
+-----
+cd html
+git init
+Initialized empty Git repository in /home/baum/html/.git/
+-----
+
+Now tell git to take a snapshot of the
++thredds2.txt+ file:
+
+Adding a File to the Project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-----
+git add thredds2.txt
+-----
+
+This is stored in a temporary staging area called the index
+until you permanently store the contents in the repository via:
+
+-----
+git commit
+-----
+
+where we are dropped into an editor and we must add a commit about
+this particular commit.
+
+Pushing the File to Github
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now we want to add our local copy to a github repository.  We
+start by creating an alias for our github repository, which we 
+created at:
+
+https://github.com/skbaum/asciidocs[+https://github.com/skbaum/asciidocs+]
+
+Create the alias via:
+
+-----
+git remote add asciidocs https://github.com/skbaum/asciidocs
+-----
+
+which creates the alias +asciidocs+ for that particular remote repository.
+
+Now try to +push+ the file to github via:
+
+-----
+[baum@rocks html]$ git push asciidocs
+
+To https://github.com/skbaum/asciidocs
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'https://github.com/skbaum/asciidocs'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+-----
+
+The error message means that there are bits in the remote repository that
+must first be added to the local repository before we can push anything new
+locally to the remote repository.  We do this via:
+
+-----
+git pull asciidocs master
+-----
+
+Now we can try the push again:
+
+-----
+git push asciidocs
+
+Counting objects: 12, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (8/8), done.
+Writing objects: 100% (11/11), 125.43 KiB | 0 bytes/s, done.
+Total 11 (delta 2), reused 0 (delta 0)
+To https://github.com/skbaum/asciidocs
+   78f03e8..48c3176  master -> master
+-----
+
+Changing a File and Recomitting and Pushing It
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If we edit our file +thredds2.txt+ and change something:
+
+-----
+vi thredds2.txt
+-----
+
+Now we must add the file again to the staging area:
+
+-----
+git add thredds2.txt
+-----
+
+and then commit it:
+
+-----
+git commit
+-----
+
+along with the required comment describing the change.  And
+then push it to github again:
+
+-----
+git push asciidocs
+
+Counting objects: 5, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 312 bytes | 0 bytes/s, done.
+Total 3 (delta 2), reused 0 (delta 0)
+To https://github.com/skbaum/asciidocs
+   abd8c2e..2b74c98  master -> master
+-----
+
+Gotchas
+-------
+
+git clone
+~~~~~~~~~
+
+This works unless there are submodules.  If there are submodules
+you have to use
+
+-----
+git clone --recursive
+-----
+
+git push
+~~~~~~~~
+
+This pushes everything except the tags.  If you want to push the
+tags, you have to use
+
+-----
+git push --tags
+-----
+
+git init
+~~~~~~~~
+
+This produces a repository that can push, pull, etc., although not
+one to which you can push.  If you want this bonus capability, you
+must use
+
+-----
+git init --bare
+-----

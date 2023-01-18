@@ -1,0 +1,1008 @@
+BP Forecasts on THREDDS Server
+==============================
+Steven K. Baum
+v0.5, 2013-02-18
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Executive Summary
+-----------------
+
+The trials and tribulations of serving Ping's BP Gulf of Mexico forecast
+dataset via THREDDS.
+
+Preface
+-------
+
+The details of putting various datasets on THREDDS.
+
+-----
+label: data2North
+GOM
+April-Oct. 2010 - /raid/zrong/data2North
+-----
+
+:numbered:
+
+BP Forecasts Dataset
+--------------------
+
+Location and Types of Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The files are located at:
+
+-----
+barataria.tamu.edu:/raid/data/crcm/gom
+-----
+
+They are in a series of directories:
+
+-----
+07262012
+07272012
+07282012
+07302012
+08012012
+08032012
+08052012
+08062012
+08072012
+08082012
+08092012
+08102012
+08122012
+08142012
+08162012
+08182012
+08202012
+08222012
+08242012
+08262012
+08272012
+08282012
+08292012
+08302012
+08312012
+09012012
+09022012
+09032012
+09042012
+-----
+
+A typical directory contains the following files:
+
+-----
+-rw-rw-r-- 1 guest guest        4012 Nov  2  2012 0726.units
+-rw-r--r-- 1 guest guest    10072884 Oct  4  2012 boundary.nc
+-rw-r--r-- 1 guest guest   102539244 Oct  4  2012 bp_grd.nc
+-rwxrwxr-x 1 guest guest         944 Oct 15  2012 change.sh
+-rwxrwxr-x 1 guest guest        4978 Nov  2  2012 check.sh
+-rw-r--r-- 1 guest guest  2874061488 Oct  4  2012 cpl_flx_0726.nc
+-rw-r--r-- 1 guest guest   186051620 Oct  4  2012 cpl_sst_0726.nc
+-rw-r--r-- 1 guest guest         884 Oct  4  2012 crcm.in
+-rw-r--r-- 1 guest guest        5947 Oct  4  2012 namelist.input
+-rw-r--r-- 1 guest guest      675468 Oct  4  2012 ocean_flt.nc
+-rw-r--r-- 1 guest guest  1045109964 Oct 12  2012 ocean_his_07262012_01.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_02.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_03.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_04.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_05.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_06.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_07.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_08.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_09.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_10.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_11.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_12.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_13.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_14.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_15.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_16.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_17.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_18.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_19.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_20.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_21.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_22.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_23.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_24.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_25.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_26.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_27.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_28.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_29.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_30.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_31.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_32.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_33.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_34.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_35.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_36.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_37.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_38.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_39.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_40.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_41.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_42.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_43.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_44.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_45.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_46.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_47.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_48.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_49.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_50.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_51.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_52.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_53.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_54.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_55.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_56.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_57.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_58.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_59.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_60.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_61.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_62.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_63.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_64.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_65.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_66.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_67.nc
+-rw-r--r-- 1 guest guest  1045109844 Oct 12  2012 ocean_his_07262012_68.nc
+-rw-r--r-- 1 guest guest       62873 Oct  4  2012 ocean.in
+-rw-r--r-- 1 guest guest  3526710868 Oct  4  2012 ocean_rst.nc
+-rw-r--r-- 1 guest guest   503412552 Oct  4  2012 restart.nc
+-rw-r--r-- 1 guest guest  1018832480 Oct  4  2012 sfc_fluxes.nc
+-rw-r--r-- 1 guest guest  1310830188 Oct  4  2012 wrfbdy_d01
+-rw-r--r-- 1 guest guest  1866347124 Oct  4  2012 wrfinput_d01
+-rw-r--r-- 1 guest guest   374880616 Oct  4  2012 wrflowinp_d01
+-rw-r--r-- 1 guest guest 43592049280 Oct  4  2012 wrfout_0726_d01_2012-07-26.nc
+-rw-r--r-- 1 guest guest 43592049280 Oct  4  2012 wrfout_0726_d01_2012-07-27.nc
+-rw-r--r-- 1 guest guest 38143047928 Oct  4  2012 wrfout_0726_d01_2012-07-28.nc
+-----
+
+The ocean_his*.nc Files
+~~~~~~~~~~~~~~~~~~~~~~~
+
+There are typically 68 +ocean_his*.nc+ files in each subdirectory, and
+they are each about 1 Gb in size.
+
+The NetCDF Header
+^^^^^^^^^^^^^^^^^
+
+The NetCDF header for the +ocean_his_07262012_01.nc+ file is:
+
+-----
+netcdf ocean_his_07262012_01 {
+dimensions:
+	xi_rho = 720 ;
+	xi_u = 719 ;
+	xi_v = 720 ;
+	xi_psi = 719 ;
+	eta_rho = 660 ;
+	eta_u = 660 ;
+	eta_v = 659 ;
+	eta_psi = 659 ;
+	N = 50 ;
+	s_rho = 50 ;
+	s_w = 51 ;
+	tracer = 3 ;
+	boundary = 4 ;
+	ocean_time = UNLIMITED ; // (1 currently)
+variables:
+	int ntimes ;
+		ntimes:long_name = "number of long time-steps" ;
+	int ndtfast ;
+		ndtfast:long_name = "number of short time-steps" ;
+	double dt ;
+		dt:long_name = "size of long time-steps" ;
+		dt:units = "second" ;
+	double dtfast ;
+		dtfast:long_name = "size of short time-steps" ;
+		dtfast:units = "second" ;
+	double dstart ;
+		dstart:long_name = "time stamp assigned to model
+initilization" ;
+		dstart:units = "seconds since 2012-07-26 00:00:00" ;
+		dstart:calendar = "julian" ;
+	int nHIS ;
+		nHIS:long_name = "number of time-steps between history
+records" ;
+	int ndefHIS ;
+		ndefHIS:long_name = "number of time-steps between the creation
+of history files" ;
+	int nRST ;
+		nRST:long_name = "number of time-steps between restart
+records" ;
+		nRST:cycle = "only latest two records are maintained" ;
+	double Falpha ;
+		Falpha:long_name = "Power-law shape barotropic filter
+parameter" ;
+	double Fbeta ;
+		Fbeta:long_name = "Power-law shape barotropic filter
+parameter" ;
+	double Fgamma ;
+		Fgamma:long_name = "Power-law shape barotropic filter
+parameter" ;
+	double nl_tnu2(tracer) ;
+		nl_tnu2:long_name = "nonlinear model Laplacian mixing
+coefficient for tracers" ;
+		nl_tnu2:units = "meter2 second-1" ;
+	double nl_visc2 ;
+		nl_visc2:long_name = "nonlinear model Laplacian mixing
+coefficient for momentum" ;
+		nl_visc2:units = "meter2 second-1" ;
+	double Akt_bak(tracer) ;
+		Akt_bak:long_name = "background vertical mixing coefficient
+for tracers" ;
+		Akt_bak:units = "meter2 second-1" ;
+	double Akv_bak ;
+		Akv_bak:long_name = "background vertical mixing coefficient
+for momentum" ;
+		Akv_bak:units = "meter2 second-1" ;
+	double Akk_bak ;
+		Akk_bak:long_name = "background vertical mixing coefficient
+for turbulent energy" ;
+		Akk_bak:units = "meter2 second-1" ;
+	double Akp_bak ;
+		Akp_bak:long_name = "background vertical mixing coefficient
+for length scale" ;
+		Akp_bak:units = "meter2 second-1" ;
+	double rdrg ;
+		rdrg:long_name = "linear drag coefficient" ;
+		rdrg:units = "meter second-1" ;
+	double rdrg2 ;
+		rdrg2:long_name = "quadratic drag coefficient" ;
+	double Zob ;
+		Zob:long_name = "bottom roughness" ;
+		Zob:units = "meter" ;
+	double Zos ;
+		Zos:long_name = "surface roughness" ;
+		Zos:units = "meter" ;
+	double Znudg ;
+		Znudg:long_name = "free-surface nudging/relaxation inverse
+time scale" ;
+		Znudg:units = "day-1" ;
+	double M2nudg ;
+		M2nudg:long_name = "2D momentum nudging/relaxation inverse
+time scale" ;
+		M2nudg:units = "day-1" ;
+	double M3nudg ;
+		M3nudg:long_name = "3D momentum nudging/relaxation inverse
+time scale" ;
+		M3nudg:units = "day-1" ;
+	double Tnudg(tracer) ;
+		Tnudg:long_name = "Tracers nudging/relaxation inverse time
+scale" ;
+		Tnudg:units = "day-1" ;
+	double FSobc_in(boundary) ;
+		FSobc_in:long_name = "free-surface inflow, nudging inverse
+time scale" ;
+		FSobc_in:units = "second-1" ;
+	double FSobc_out(boundary) ;
+		FSobc_out:long_name = "free-surface outflow, nudging inverse
+time scale" ;
+		FSobc_out:units = "second-1" ;
+	double M2obc_in(boundary) ;
+		M2obc_in:long_name = "2D momentum inflow, nudging inverse time
+scale" ;
+		M2obc_in:units = "second-1" ;
+	double M2obc_out(boundary) ;
+		M2obc_out:long_name = "2D momentum outflow, nudging inverse
+time scale" ;
+		M2obc_out:units = "second-1" ;
+	double Tobc_in(boundary, tracer) ;
+		Tobc_in:long_name = "tracers inflow, nudging inverse time
+scale" ;
+		Tobc_in:units = "second-1" ;
+	double Tobc_out(boundary, tracer) ;
+		Tobc_out:long_name = "tracers outflow, nudging inverse time
+scale" ;
+		Tobc_out:units = "second-1" ;
+	double M3obc_in(boundary) ;
+		M3obc_in:long_name = "3D momentum inflow, nudging inverse time
+scale" ;
+		M3obc_in:units = "second-1" ;
+	double M3obc_out(boundary) ;
+		M3obc_out:long_name = "3D momentum outflow, nudging inverse
+time scale" ;
+		M3obc_out:units = "second-1" ;
+	double rho0 ;
+		rho0:long_name = "mean density used in Boussinesq
+approximation" ;
+		rho0:units = "kilogram meter-3" ;
+	double gamma2 ;
+		gamma2:long_name = "slipperiness parameter" ;
+	int spherical ;
+		spherical:long_name = "grid type logical switch" ;
+		spherical:flag_values = 0, 1 ;
+		spherical:flag_meanings = "Cartesian spherical" ;
+	double xl ;
+		xl:long_name = "domain length in the XI-direction" ;
+		xl:units = "meter" ;
+	double el ;
+		el:long_name = "domain length in the ETA-direction" ;
+		el:units = "meter" ;
+	int Vtransform ;
+		Vtransform:long_name = "vertical terrain-following
+transformation equation" ;
+	int Vstretching ;
+		Vstretching:long_name = "vertical terrain-following stretching
+function" ;
+	double theta_s ;
+		theta_s:long_name = "S-coordinate surface control parameter" ;
+	double theta_b ;
+		theta_b:long_name = "S-coordinate bottom control parameter" ;
+	double Tcline ;
+		Tcline:long_name = "S-coordinate surface/bottom layer width" ;
+		Tcline:units = "meter" ;
+	double hc ;
+		hc:long_name = "S-coordinate parameter, critical depth" ;
+		hc:units = "meter" ;
+	double s_rho(s_rho) ;
+		s_rho:long_name = "S-coordinate at RHO-points" ;
+		s_rho:valid_min = -1. ;
+		s_rho:valid_max = 0. ;
+		s_rho:positive = "up" ;
+		s_rho:standard_name = "ocean_s_coordinate_g2" ;
+		s_rho:formula_terms = "s: s_rho C: Cs_r eta: zeta depth: h
+depth_c: hc" ;
+		s_rho:field = "s_rho, scalar" ;
+	double s_w(s_w) ;
+		s_w:long_name = "S-coordinate at W-points" ;
+		s_w:valid_min = -1. ;
+		s_w:valid_max = 0. ;
+		s_w:positive = "up" ;
+		s_w:standard_name = "ocean_s_coordinate_g2" ;
+		s_w:formula_terms = "s: s_w C: Cs_w eta: zeta depth: h
+depth_c: hc" ;
+		s_w:field = "s_w, scalar" ;
+	double Cs_r(s_rho) ;
+		Cs_r:long_name = "S-coordinate stretching curves at
+RHO-points" ;
+		Cs_r:valid_min = -1. ;
+		Cs_r:valid_max = 0. ;
+		Cs_r:field = "Cs_r, scalar" ;
+	double Cs_w(s_w) ;
+		Cs_w:long_name = "S-coordinate stretching curves at W-points"
+;
+		Cs_w:valid_min = -1. ;
+		Cs_w:valid_max = 0. ;
+		Cs_w:field = "Cs_w, scalar" ;
+	double h(eta_rho, xi_rho) ;
+		h:long_name = "bathymetry at RHO-points" ;
+		h:units = "meter" ;
+		h:coordinates = "lon_rho lat_rho" ;
+		h:field = "bath, scalar" ;
+	double f(eta_rho, xi_rho) ;
+		f:long_name = "Coriolis parameter at RHO-points" ;
+		f:units = "second-1" ;
+		f:coordinates = "lon_rho lat_rho" ;
+		f:field = "coriolis, scalar" ;
+	double pm(eta_rho, xi_rho) ;
+		pm:long_name = "curvilinear coordinate metric in XI" ;
+		pm:units = "meter-1" ;
+		pm:coordinates = "lon_rho lat_rho" ;
+		pm:field = "pm, scalar" ;
+	double pn(eta_rho, xi_rho) ;
+		pn:long_name = "curvilinear coordinate metric in ETA" ;
+		pn:units = "meter-1" ;
+		pn:coordinates = "lon_rho lat_rho" ;
+		pn:field = "pn, scalar" ;
+	double lon_rho(eta_rho, xi_rho) ;
+		lon_rho:long_name = "longitude of RHO-points" ;
+		lon_rho:units = "degree_east" ;
+		lon_rho:standard_name = "longitude" ;
+		lon_rho:field = "lon_rho, scalar" ;
+	double lat_rho(eta_rho, xi_rho) ;
+		lat_rho:long_name = "latitude of RHO-points" ;
+		lat_rho:units = "degree_north" ;
+		lat_rho:standard_name = "latitude" ;
+		lat_rho:field = "lat_rho, scalar" ;
+	double lon_u(eta_u, xi_u) ;
+		lon_u:long_name = "longitude of U-points" ;
+		lon_u:units = "degree_east" ;
+		lon_u:standard_name = "longitude" ;
+		lon_u:field = "lon_u, scalar" ;
+	double lat_u(eta_u, xi_u) ;
+		lat_u:long_name = "latitude of U-points" ;
+		lat_u:units = "degree_north" ;
+		lat_u:standard_name = "latitude" ;
+		lat_u:field = "lat_u, scalar" ;
+	double lon_v(eta_v, xi_v) ;
+		lon_v:long_name = "longitude of V-points" ;
+		lon_v:units = "degree_east" ;
+		lon_v:standard_name = "longitude" ;
+		lon_v:field = "lon_v, scalar" ;
+	double lat_v(eta_v, xi_v) ;
+		lat_v:long_name = "latitude of V-points" ;
+		lat_v:units = "degree_north" ;
+		lat_v:standard_name = "latitude" ;
+		lat_v:field = "lat_v, scalar" ;
+	double lon_psi(eta_psi, xi_psi) ;
+		lon_psi:long_name = "longitude of PSI-points" ;
+		lon_psi:units = "degree_east" ;
+		lon_psi:standard_name = "longitude" ;
+		lon_psi:field = "lon_psi, scalar" ;
+	double lat_psi(eta_psi, xi_psi) ;
+		lat_psi:long_name = "latitude of PSI-points" ;
+		lat_psi:units = "degree_north" ;
+		lat_psi:standard_name = "latitude" ;
+[root@barataria 07262012]# ncdump ocean_his_07262012_01.nc  | more
+netcdf ocean_his_07262012_01 {
+dimensions:
+	xi_rho = 720 ;
+	xi_u = 719 ;
+	xi_v = 720 ;
+	xi_psi = 719 ;
+	eta_rho = 660 ;
+	eta_u = 660 ;
+	eta_v = 659 ;
+	eta_psi = 659 ;
+	N = 50 ;
+	s_rho = 50 ;
+	s_w = 51 ;
+	tracer = 3 ;
+	boundary = 4 ;
+	ocean_time = UNLIMITED ; // (1 currently)
+variables:
+	int ntimes ;
+		ntimes:long_name = "number of long time-steps" ;
+	int ndtfast ;
+		ndtfast:long_name = "number of short time-steps" ;
+	double dt ;
+		dt:long_name = "size of long time-steps" ;
+		dt:units = "second" ;
+	double dtfast ;
+		dtfast:long_name = "size of short time-steps" ;
+		dtfast:units = "second" ;
+	double dstart ;
+		dstart:long_name = "time stamp assigned to model
+initilization" ;
+		dstart:units = "seconds since 2012-07-26 00:00:00" ;
+		dstart:calendar = "julian" ;
+	int nHIS ;
+		nHIS:long_name = "number of time-steps between history
+records" ;
+	int ndefHIS ;
+		ndefHIS:long_name = "number of time-steps between the creation
+of history files" ;
+	int nRST ;
+		nRST:long_name = "number of time-steps between restart
+records" ;
+		nRST:cycle = "only latest two records are maintained" ;
+	double Falpha ;
+		Falpha:long_name = "Power-law shape barotropic filter
+parameter" ;
+	double Fbeta ;
+		Fbeta:long_name = "Power-law shape barotropic filter
+parameter" ;
+	double Fgamma ;
+		Fgamma:long_name = "Power-law shape barotropic filter
+parameter" ;
+	double nl_tnu2(tracer) ;
+		nl_tnu2:long_name = "nonlinear model Laplacian mixing
+coefficient for tracers" ;
+		nl_tnu2:units = "meter2 second-1" ;
+	double nl_visc2 ;
+		nl_visc2:long_name = "nonlinear model Laplacian mixing
+coefficient for momentum" ;
+		nl_visc2:units = "meter2 second-1" ;
+	double Akt_bak(tracer) ;
+		Akt_bak:long_name = "background vertical mixing coefficient
+for tracers" ;
+		Akt_bak:units = "meter2 second-1" ;
+	double Akv_bak ;
+		Akv_bak:long_name = "background vertical mixing coefficient
+for momentum" ;
+		Akv_bak:units = "meter2 second-1" ;
+	double Akk_bak ;
+		Akk_bak:long_name = "background vertical mixing coefficient
+for turbulent energy" ;
+		Akk_bak:units = "meter2 second-1" ;
+	double Akp_bak ;
+		Akp_bak:long_name = "background vertical mixing coefficient
+for length scale" ;
+		Akp_bak:units = "meter2 second-1" ;
+	double rdrg ;
+		rdrg:long_name = "linear drag coefficient" ;
+		rdrg:units = "meter second-1" ;
+	double rdrg2 ;
+		rdrg2:long_name = "quadratic drag coefficient" ;
+	double Zob ;
+		Zob:long_name = "bottom roughness" ;
+		Zob:units = "meter" ;
+	double Zos ;
+		Zos:long_name = "surface roughness" ;
+		Zos:units = "meter" ;
+	double Znudg ;
+		Znudg:long_name = "free-surface nudging/relaxation inverse
+time scale" ;
+		Znudg:units = "day-1" ;
+	double M2nudg ;
+		M2nudg:long_name = "2D momentum nudging/relaxation inverse
+time scale" ;
+		M2nudg:units = "day-1" ;
+	double M3nudg ;
+		M3nudg:long_name = "3D momentum nudging/relaxation inverse
+time scale" ;
+		M3nudg:units = "day-1" ;
+	double Tnudg(tracer) ;
+		Tnudg:long_name = "Tracers nudging/relaxation inverse time
+scale" ;
+		Tnudg:units = "day-1" ;
+	double FSobc_in(boundary) ;
+		FSobc_in:long_name = "free-surface inflow, nudging inverse
+time scale" ;
+		FSobc_in:units = "second-1" ;
+	double FSobc_out(boundary) ;
+		FSobc_out:long_name = "free-surface outflow, nudging inverse
+time scale" ;
+		FSobc_out:units = "second-1" ;
+	double M2obc_in(boundary) ;
+		M2obc_in:long_name = "2D momentum inflow, nudging inverse time
+scale" ;
+		M2obc_in:units = "second-1" ;
+	double M2obc_out(boundary) ;
+		M2obc_out:long_name = "2D momentum outflow, nudging inverse
+time scale" ;
+		M2obc_out:units = "second-1" ;
+	double Tobc_in(boundary, tracer) ;
+		Tobc_in:long_name = "tracers inflow, nudging inverse time
+scale" ;
+		Tobc_in:units = "second-1" ;
+	double Tobc_out(boundary, tracer) ;
+		Tobc_out:long_name = "tracers outflow, nudging inverse time
+scale" ;
+		Tobc_out:units = "second-1" ;
+	double M3obc_in(boundary) ;
+		M3obc_in:long_name = "3D momentum inflow, nudging inverse time
+scale" ;
+		M3obc_in:units = "second-1" ;
+	double M3obc_out(boundary) ;
+		M3obc_out:long_name = "3D momentum outflow, nudging inverse
+time scale" ;
+		M3obc_out:units = "second-1" ;
+	double rho0 ;
+		rho0:long_name = "mean density used in Boussinesq
+approximation" ;
+		rho0:units = "kilogram meter-3" ;
+	double gamma2 ;
+		gamma2:long_name = "slipperiness parameter" ;
+	int spherical ;
+		spherical:long_name = "grid type logical switch" ;
+		spherical:flag_values = 0, 1 ;
+		spherical:flag_meanings = "Cartesian spherical" ;
+	double xl ;
+		xl:long_name = "domain length in the XI-direction" ;
+		xl:units = "meter" ;
+	double el ;
+		el:long_name = "domain length in the ETA-direction" ;
+		el:units = "meter" ;
+	int Vtransform ;
+		Vtransform:long_name = "vertical terrain-following
+transformation equation" ;
+	int Vstretching ;
+		Vstretching:long_name = "vertical terrain-following stretching
+function" ;
+	double theta_s ;
+		theta_s:long_name = "S-coordinate surface control parameter" ;
+	double theta_b ;
+		theta_b:long_name = "S-coordinate bottom control parameter" ;
+	double Tcline ;
+		Tcline:long_name = "S-coordinate surface/bottom layer width" ;
+		Tcline:units = "meter" ;
+	double hc ;
+		hc:long_name = "S-coordinate parameter, critical depth" ;
+		hc:units = "meter" ;
+	double s_rho(s_rho) ;
+		s_rho:long_name = "S-coordinate at RHO-points" ;
+		s_rho:valid_min = -1. ;
+		s_rho:valid_max = 0. ;
+		s_rho:positive = "up" ;
+		s_rho:standard_name = "ocean_s_coordinate_g2" ;
+		s_rho:formula_terms = "s: s_rho C: Cs_r eta: zeta depth: h
+depth_c: hc" ;
+		s_rho:field = "s_rho, scalar" ;
+	double s_w(s_w) ;
+		s_w:long_name = "S-coordinate at W-points" ;
+		s_w:valid_min = -1. ;
+		s_w:valid_max = 0. ;
+		s_w:positive = "up" ;
+		s_w:standard_name = "ocean_s_coordinate_g2" ;
+		s_w:formula_terms = "s: s_w C: Cs_w eta: zeta depth: h
+depth_c: hc" ;
+		s_w:field = "s_w, scalar" ;
+	double Cs_r(s_rho) ;
+		Cs_r:long_name = "S-coordinate stretching curves at
+RHO-points" ;
+		Cs_r:valid_min = -1. ;
+		Cs_r:valid_max = 0. ;
+		Cs_r:field = "Cs_r, scalar" ;
+	double Cs_w(s_w) ;
+		Cs_w:long_name = "S-coordinate stretching curves at W-points"
+;
+		Cs_w:valid_min = -1. ;
+		Cs_w:valid_max = 0. ;
+		Cs_w:field = "Cs_w, scalar" ;
+	double h(eta_rho, xi_rho) ;
+		h:long_name = "bathymetry at RHO-points" ;
+		h:units = "meter" ;
+		h:coordinates = "lon_rho lat_rho" ;
+		h:field = "bath, scalar" ;
+	double f(eta_rho, xi_rho) ;
+		f:long_name = "Coriolis parameter at RHO-points" ;
+		f:units = "second-1" ;
+		f:coordinates = "lon_rho lat_rho" ;
+		f:field = "coriolis, scalar" ;
+	double pm(eta_rho, xi_rho) ;
+		pm:long_name = "curvilinear coordinate metric in XI" ;
+		pm:units = "meter-1" ;
+		pm:coordinates = "lon_rho lat_rho" ;
+		pm:field = "pm, scalar" ;
+	double pn(eta_rho, xi_rho) ;
+		pn:long_name = "curvilinear coordinate metric in ETA" ;
+		pn:units = "meter-1" ;
+		pn:coordinates = "lon_rho lat_rho" ;
+		pn:field = "pn, scalar" ;
+	double lon_rho(eta_rho, xi_rho) ;
+		lon_rho:long_name = "longitude of RHO-points" ;
+		lon_rho:units = "degree_east" ;
+		lon_rho:standard_name = "longitude" ;
+		lon_rho:field = "lon_rho, scalar" ;
+	double lat_rho(eta_rho, xi_rho) ;
+		lat_rho:long_name = "latitude of RHO-points" ;
+		lat_rho:units = "degree_north" ;
+		lat_rho:standard_name = "latitude" ;
+		lat_rho:field = "lat_rho, scalar" ;
+	double lon_u(eta_u, xi_u) ;
+		lon_u:long_name = "longitude of U-points" ;
+		lon_u:units = "degree_east" ;
+		lon_u:standard_name = "longitude" ;
+		lon_u:field = "lon_u, scalar" ;
+	double lat_u(eta_u, xi_u) ;
+		lat_u:long_name = "latitude of U-points" ;
+		lat_u:units = "degree_north" ;
+		lat_u:standard_name = "latitude" ;
+		lat_u:field = "lat_u, scalar" ;
+	double lon_v(eta_v, xi_v) ;
+		lon_v:long_name = "longitude of V-points" ;
+		lon_v:units = "degree_east" ;
+		lon_v:standard_name = "longitude" ;
+		lon_v:field = "lon_v, scalar" ;
+	double lat_v(eta_v, xi_v) ;
+		lat_v:long_name = "latitude of V-points" ;
+		lat_v:units = "degree_north" ;
+		lat_v:standard_name = "latitude" ;
+		lat_v:field = "lat_v, scalar" ;
+	double lon_psi(eta_psi, xi_psi) ;
+		lon_psi:long_name = "longitude of PSI-points" ;
+		lon_psi:units = "degree_east" ;
+		lon_psi:standard_name = "longitude" ;
+		lon_psi:field = "lon_psi, scalar" ;
+	double lat_psi(eta_psi, xi_psi) ;
+		lat_psi:long_name = "latitude of PSI-points" ;
+		lat_psi:units = "degree_north" ;
+		lat_psi:standard_name = "latitude" ;
+		lat_psi:field = "lat_psi, scalar" ;
+	double mask_rho(eta_rho, xi_rho) ;
+		mask_rho:long_name = "mask on RHO-points" ;
+		mask_rho:flag_values = 0., 1. ;
+		mask_rho:flag_meanings = "land water" ;
+		mask_rho:coordinates = "lon_rho lat_rho" ;
+	double mask_u(eta_u, xi_u) ;
+		mask_u:long_name = "mask on U-points" ;
+		mask_u:flag_values = 0., 1. ;
+		mask_u:flag_meanings = "land water" ;
+		mask_u:coordinates = "lon_u lat_u" ;
+	double mask_v(eta_v, xi_v) ;
+		mask_v:long_name = "mask on V-points" ;
+		mask_v:flag_values = 0., 1. ;
+		mask_v:flag_meanings = "land water" ;
+		mask_v:coordinates = "lon_v lat_v" ;
+	double mask_psi(eta_psi, xi_psi) ;
+		mask_psi:long_name = "mask on psi-points" ;
+		mask_psi:flag_values = 0., 1. ;
+		mask_psi:flag_meanings = "land water" ;
+		mask_psi:coordinates = "lon_psi lat_psi" ;
+	double ocean_time(ocean_time) ;
+		ocean_time:long_name = "time since initialization" ;
+		ocean_time:units = "seconds since 2012-07-26 00:00:00" ;
+		ocean_time:calendar = "julian" ;
+		ocean_time:field = "time, scalar, series" ;
+	float zeta(ocean_time, eta_rho, xi_rho) ;
+		zeta:long_name = "free-surface" ;
+		zeta:units = "meter" ;
+		zeta:time = "ocean_time" ;
+		zeta:coordinates = "lon_rho lat_rho ocean_time" ;
+		zeta:field = "free-surface, scalar, series" ;
+		zeta:_FillValue = 1.e+37f ;
+	float ubar(ocean_time, eta_u, xi_u) ;
+		ubar:long_name = "vertically integrated u-momentum component"
+;
+		ubar:units = "meter second-1" ;
+		ubar:time = "ocean_time" ;
+		ubar:coordinates = "lon_u lat_u ocean_time" ;
+		ubar:field = "ubar-velocity, scalar, series" ;
+		ubar:_FillValue = 1.e+37f ;
+	float vbar(ocean_time, eta_v, xi_v) ;
+		vbar:long_name = "vertically integrated v-momentum component"
+;
+		vbar:units = "meter second-1" ;
+		vbar:time = "ocean_time" ;
+		vbar:coordinates = "lon_v lat_v ocean_time" ;
+		vbar:field = "vbar-velocity, scalar, series" ;
+		vbar:_FillValue = 1.e+37f ;
+	float u(ocean_time, s_rho, eta_u, xi_u) ;
+		u:long_name = "u-momentum component" ;
+		u:units = "meter second-1" ;
+		u:time = "ocean_time" ;
+		u:coordinates = "lon_u lat_u s_rho ocean_time" ;
+		u:field = "u-velocity, scalar, series" ;
+		u:_FillValue = 1.e+37f ;
+	float v(ocean_time, s_rho, eta_v, xi_v) ;
+		v:long_name = "v-momentum component" ;
+		v:units = "meter second-1" ;
+		v:time = "ocean_time" ;
+		v:coordinates = "lon_v lat_v s_rho ocean_time" ;
+		v:field = "v-velocity, scalar, series" ;
+		v:_FillValue = 1.e+37f ;
+	float w(ocean_time, s_w, eta_rho, xi_rho) ;
+		w:long_name = "vertical momentum component" ;
+		w:units = "meter second-1" ;
+		w:time = "ocean_time" ;
+		w:coordinates = "lon_rho lat_rho s_w ocean_time" ;
+		w:field = "w-velocity, scalar, series" ;
+		w:_FillValue = 1.e+37f ;
+	float temp(ocean_time, s_rho, eta_rho, xi_rho) ;
+		temp:long_name = "potential temperature" ;
+		temp:units = "Celsius" ;
+		temp:time = "ocean_time" ;
+		temp:coordinates = "lon_rho lat_rho s_rho ocean_time" ;
+		temp:field = "temperature, scalar, series" ;
+		temp:_FillValue = 1.e+37f ;
+	float salt(ocean_time, s_rho, eta_rho, xi_rho) ;
+		salt:long_name = "salinity" ;
+		salt:time = "ocean_time" ;
+		salt:coordinates = "lon_rho lat_rho s_rho ocean_time" ;
+		salt:field = "salinity, scalar, series" ;
+		salt:_FillValue = 1.e+37f ;
+	float dye_01(ocean_time, s_rho, eta_rho, xi_rho) ;
+		dye_01:long_name = "dye concentration, type 01" ;
+		dye_01:units = "kilogram meter-3" ;
+		dye_01:time = "ocean_time" ;
+		dye_01:coordinates = "lon_rho lat_rho s_rho ocean_time" ;
+		dye_01:field = "dye_01, scalar, series" ;
+		dye_01:_FillValue = 1.e+37f ;
+	float rho(ocean_time, s_rho, eta_rho, xi_rho) ;
+		rho:long_name = "density anomaly" ;
+		rho:units = "kilogram meter-3" ;
+		rho:time = "ocean_time" ;
+		rho:coordinates = "lon_rho lat_rho s_rho ocean_time" ;
+		rho:field = "density, scalar, series" ;
+		rho:_FillValue = 1.e+37f ;
+	float AKv(ocean_time, s_w, eta_rho, xi_rho) ;
+		AKv:long_name = "vertical viscosity coefficient" ;
+		AKv:units = "meter2 second-1" ;
+		AKv:time = "ocean_time" ;
+		AKv:coordinates = "lon_rho lat_rho s_w ocean_time" ;
+		AKv:field = "AKv, scalar, series" ;
+	float AKt(ocean_time, s_w, eta_rho, xi_rho) ;
+		AKt:long_name = "temperature vertical diffusion coefficient" ;
+		AKt:units = "meter2 second-1" ;
+		AKt:time = "ocean_time" ;
+		AKt:coordinates = "lon_rho lat_rho s_w ocean_time" ;
+		AKt:field = "AKt, scalar, series" ;
+	float AKs(ocean_time, s_w, eta_rho, xi_rho) ;
+		AKs:long_name = "salinity vertical diffusion coefficient" ;
+		AKs:units = "meter2 second-1" ;
+		AKs:time = "ocean_time" ;
+		AKs:coordinates = "lon_rho lat_rho s_w ocean_time" ;
+		AKs:field = "AKs, scalar, series" ;
+	float shflux(ocean_time, eta_rho, xi_rho) ;
+		shflux:long_name = "surface net heat flux" ;
+		shflux:units = "watt meter-2" ;
+		shflux:negative_value = "upward flux, cooling" ;
+		shflux:positive_value = "downward flux, heating" ;
+		shflux:time = "ocean_time" ;
+		shflux:coordinates = "lon_rho lat_rho ocean_time" ;
+		shflux:field = "surface heat flux, scalar, series" ;
+		shflux:_FillValue = 1.e+37f ;
+	float ssflux(ocean_time, eta_rho, xi_rho) ;
+		ssflux:long_name = "surface net salt flux, (E-P)*SALT" ;
+		ssflux:units = "meter second-1" ;
+		ssflux:negative_value = "upward flux, freshening (net
+precipitation)" ;
+		ssflux:positive_value = "downward flux, salting (net
+evaporation)" ;
+		ssflux:time = "ocean_time" ;
+		ssflux:coordinates = "lon_rho lat_rho ocean_time" ;
+		ssflux:field = "surface net salt flux, scalar, series" ;
+		ssflux:_FillValue = 1.e+37f ;
+	float latent(ocean_time, eta_rho, xi_rho) ;
+		latent:long_name = "net latent heat flux" ;
+		latent:units = "watt meter-2" ;
+		latent:negative_value = "upward flux, cooling" ;
+		latent:positive_value = "downward flux, heating" ;
+		latent:time = "ocean_time" ;
+		latent:coordinates = "lon_rho lat_rho ocean_time" ;
+		latent:field = "latent heat flux, scalar, series" ;
+		latent:_FillValue = 1.e+37f ;
+	float sensible(ocean_time, eta_rho, xi_rho) ;
+		sensible:long_name = "net sensible heat flux" ;
+		sensible:units = "watt meter-2" ;
+		sensible:negative_value = "upward flux, cooling" ;
+		sensible:positive_value = "downward flux, heating" ;
+		sensible:time = "ocean_time" ;
+		sensible:coordinates = "lon_rho lat_rho ocean_time" ;
+		sensible:field = "sensible heat flux, scalar, series" ;
+		sensible:_FillValue = 1.e+37f ;
+	float lwrad(ocean_time, eta_rho, xi_rho) ;
+		lwrad:long_name = "net longwave radiation flux" ;
+		lwrad:units = "watt meter-2" ;
+		lwrad:negative_value = "upward flux, cooling" ;
+		lwrad:positive_value = "downward flux, heating" ;
+		lwrad:time = "ocean_time" ;
+		lwrad:coordinates = "lon_rho lat_rho ocean_time" ;
+		lwrad:field = "longwave radiation, scalar, series" ;
+		lwrad:_FillValue = 1.e+37f ;
+	float EminusP(ocean_time, eta_rho, xi_rho) ;
+		EminusP:long_name = "bulk_flux surface net freswater flux,
+(E-P)" ;
+		EminusP:units = "meter second-1" ;
+		EminusP:negative_value = "upward flux, freshening (net
+precipitation)" ;
+		EminusP:positive_value = "downward flux, salting (net
+evaporation)" ;
+		EminusP:time = "ocean_time" ;
+		EminusP:coordinates = "lon_rho lat_rho ocean_time" ;
+		EminusP:field = "EminusP, scalar, series" ;
+		EminusP:_FillValue = 1.e+37f ;
+	float evaporation(ocean_time, eta_rho, xi_rho) ;
+		evaporation:long_name = "evaporation rate" ;
+		evaporation:units = "kilogram meter-2 second-1" ;
+		evaporation:negative_value = "downward flux, freshening
+(condensation)" ;
+		evaporation:positive_value = "upward flux, salting
+(evaporation)" ;
+		evaporation:time = "ocean_time" ;
+		evaporation:coordinates = "lon_rho lat_rho ocean_time" ;
+		evaporation:field = "evaporation, scalar, series" ;
+		evaporation:_FillValue = 1.e+37f ;
+	float rain(ocean_time, eta_rho, xi_rho) ;
+		rain:long_name = "rain fall rate" ;
+		rain:units = "kilogram meter-2 second-1" ;
+		rain:negative_value = "upward flux, salting (NOT POSSIBLE)" ;
+		rain:positive_value = "downward flux, freshening
+(precipitation)" ;
+		rain:time = "ocean_time" ;
+		rain:coordinates = "lon_rho lat_rho ocean_time" ;
+		rain:field = "rain, scalar, series" ;
+		rain:_FillValue = 1.e+37f ;
+	float swrad(ocean_time, eta_rho, xi_rho) ;
+		swrad:long_name = "solar shortwave radiation flux" ;
+		swrad:units = "watt meter-2" ;
+		swrad:negative_value = "upward flux, cooling" ;
+		swrad:positive_value = "downward flux, heating" ;
+		swrad:time = "ocean_time" ;
+		swrad:coordinates = "lon_rho lat_rho ocean_time" ;
+		swrad:field = "shortwave radiation, scalar, series" ;
+		swrad:_FillValue = 1.e+37f ;
+	float sustr(ocean_time, eta_u, xi_u) ;
+		sustr:long_name = "surface u-momentum stress" ;
+		sustr:units = "newton meter-2" ;
+		sustr:time = "ocean_time" ;
+		sustr:coordinates = "lon_u lat_u ocean_time" ;
+		sustr:field = "surface u-momentum stress, scalar, series" ;
+		sustr:_FillValue = 1.e+37f ;
+	float svstr(ocean_time, eta_v, xi_v) ;
+		svstr:long_name = "surface v-momentum stress" ;
+		svstr:units = "newton meter-2" ;
+		svstr:time = "ocean_time" ;
+		svstr:coordinates = "lon_v lat_v ocean_time" ;
+		svstr:field = "surface v-momentum stress, scalar, series" ;
+		svstr:_FillValue = 1.e+37f ;
+
+// global attributes:
+		:file = "ocean_his_0001.nc" ;
+		:format = "netCDF-3 classic file" ;
+		:Conventions = "CF-1.4" ;
+		:type = "ROMS/TOMS history file" ;
+		:title = "ROMS - BP Gulf forecasts" ;
+		:rst_file = "ocean_rst.nc" ;
+		:his_base = "ocean_his" ;
+		:flt_file = "ocean_flt.nc" ;
+		:grd_file = "bp_grd.nc" ;
+		:ini_file = "restart.nc" ;
+		:bry_file = "boundary.nc" ;
+		:script_file = "ocean.in" ;
+		:fpos_file = "floats.in" ;
+		:svn_url = "https://www.myroms.org/svn/src/trunk" ;
+		:svn_rev = "exported" ;
+		:code_dir =
+"/scratch/montuor/cpl/devel/crcm/build/crcm2/models/ocn/roms/568/src" ;
+		:header_dir =
+"/scratch/montuor/cpl/devel/crcm/run/BP/data/ocn" ;
+		:header_file = "bp_my25_mpd_flt_pasv.h" ;
+		:os = "Linux" ;
+		:cpu = "x86_64" ;
+		:compiler_system = "ifort" ;
+		:compiler_command =
+"/g/software/openmpi/1.4.3/intel/bin/mpif90" ;
+		:compiler_flags = "-heap-arrays -fp-model precise -convert
+big_endian  -ip -O2 -free -free -free" ;
+		:tiling = "008x008" ;
+		:history = "Fri Oct 12 14:53:38 2012: ncatted -a
+units,ocean_time,o,c,seconds since 2012-07-26 00:00:00
+ocean_his_07262012_01.nc\n",
+			"Fri Oct 12 14:51:30 2012: ncatted -a
+units,dstart,o,c,seconds since 2012-07-26 00:00:00
+ocean_his_07262012_01.nc\n",
+			"ROMS/TOMS, Version 3.5, Thursday - July 26, 2012 -
+10:30:51 AM" ;
+		:ana_file = "ROMS/Functionals/ana_btflux.h,
+ROMS/Functionals/ana_hmixcoef.h, ROMS/Functionals/ana_nudgcoef.h" ;
+		:CPP_options = "bp_my25_mpd_flt_pasv, ANA_BSFLUX, ANA_BTFLUX,
+ASSUMED_SHAPE, BULK_FLUXES, DIFF_GRID, DIURNAL_SRFLUX, DJ_GRADPS,
+DOUBLE_PRECISION,
+ EAST_FSCHAPMAN, EAST_M2FLATHER, EAST_M3NUDGING, EAST_M3RADIATION,
+EAST_TNUDGING, EAST_TRADIATION, EAST_VOLCONS, EMINUSP, FLOATS, KANTHA_CLAYSON,
+LONGWAVE_OUT, M
+ASKING, MIX_GEO_TS, MIX_S_UV, MPI, MY25_MIXING, NONLINEAR, NONLIN_EOS,
+NORTHERN_WALL, N2S2_HORAVG, POWER_LAW, PROFILE, K_GSCHEME, RADIATION_2D,
+!RST_SINGLE, SALI
+NITY, SOLAR_SOURCE, SOLVE3D, SOUTH_FSCHAPMAN, SOUTH_M2FLATHER,
+SOUTH_M3NUDGING, SOUTH_M3RADIATION, SOUTH_TNUDGING, SOUTH_TRADIATION,
+SOUTH_VOLCONS, SPLINES, TAMU
+_COUPLER, THREE_GHOST, T_PASSIVE, TS_MPDATA, TS_DIF2, UV_ADV, UV_COR,
+UV_U3HADVECTION, UV_C4VADVECTION, UV_QDRAG, UV_VIS2, VAR_RHO_2D, VISC_GRID,
+WESTERN_WALL" ;
+data:
+...
+-----
+
+The Time Problem
+^^^^^^^^^^^^^^^^
+
+The time variables is +ocean_time+. For the example file
++ocean_his_07262012_01.nc+ the dimension information for this is:
+
+-----
+	ocean_time = UNLIMITED ; // (1 currently)
+-----
+
+and the variable information is:
+
+-----
+	double ocean_time(ocean_time) ;
+		ocean_time:long_name = "time since initialization" ;
+		ocean_time:units = "seconds since 2012-07-26 00:00:00" ;
+		ocean_time:calendar = "julian" ;
+		ocean_time:field = "time, scalar, series" ;
+-----
+
+and the data is:
+
+-----
+ ocean_time = 0 ;
+-----
+
+The +ocean_time+ values for all the files are:
+
+-----
+ocean_his_07262012_01.nc          0
+...
+ocean_his_07262012_52.nc     183600
+ocean_his_07262012_53.nc     187200
+...
+ocean_his_07262012_68.nc     241200
+-----
+
+

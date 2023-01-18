@@ -1,0 +1,180 @@
+ASCIIDOC Documents
+==================
+Steven K. Baum
+v0.2, 2016-06-29
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+CAGES
+-----
+
+http://pong.tamu.edu/\~baum/cages.html[+http://pong.tamu.edu/~baum/cages.html+]
+
+=====
+How CAGES data were put into MySQL and PostgreSQL databases and tables and made
+available via ERDDAP.
+=====
+
+CTD Data
+--------
+
+http://pong.tamu.edu/\~baum/ctd.html[+http://pong.tamu.edu/~baum/ctd.html+]
+
+=====
+Notes on CTD data storage, display and processing software.
+=====
+
+CTD Files on ERDDAP
+-------------------
+
+http://pong.tamu.edu/\~baum/ctd_erddap.html[+http://pong.tamu.edu/~baum/ctd_erddap.html+]
+
+=====
+How NetCDF files containing CTD data have been made available via a combination of ERDDAP
+and THREDDS servers.
+=====
+
+Notes on Git
+------------
+
+http://pong.tamu.edu/\~baum/git.html[+http://pong.tamu.edu/~baum/git.html+]
+
+=====
+Notes on spinning up on using the git system.
+=====
+
+
+Jupyter
+-------
+
+http://pong.tamu.edu/\~baum/jupyter.html[+http://pong.tamu.edu/~baum/jupyter.html+]
+
+=====
+Overview and sources for the Jupyter interactive notebook system.
+=====
+
+Machines
+--------
+
+http://pong.tamu.edu/\~baum/machines.html[+http://pong.tamu.edu/~baum/machines.html+]
+
+=====
+Summary information about the various local computers.
+=====
+
+NAM and NARR Grids
+------------------
+
+http://pong.tamu.edu/\~baum/nam\_grid.html[+http://pong.tamu.edu/~baum/nam_grid.html+]
+
+=====
+Notes on the grids used in the GRIB files from NCEP simulations and NARR reanalysis products.
+=====
+
+NetCDF Attributes
+-----------------
+
+http://pong.tamu.edu/\~baum/netcdf_att.html[http://pong.tamu.edu/~baum/netcdf_att.html]
+
+=====
+Overview of the required/recommended/etc. attributes found in various standards for NetCDF
+headers.
+=====
+
+NetCDF Compliance
+-----------------
+
+http://pong.tamu.edu/\~baum/compliance.html[+http://pong.tamu.edu/~baum/compliance.html+]
+
+=====
+Compliance checkers for NetCDF files.
+=====
+
+NetCDF Recipes
+--------------
+
+http://pong.tamu.edu/\~baum/netcdf_recipes.html[http://pong.tamu.edu/~baum/netcdf_recipes.html]
+
+=====
+How to transmogrify NetCDF files using NCO, CDO, netCDF4-python and other useful tools.
+=====
+
+River Data
+----------
+
+http://pong.tamu.edu/\~baum/river.html[+http://pong.tamu.edu/~baum/river.html+]
+
+=====
+Notes on automating the acquisition of river discharge data.
+=====
+
+SOS
+---
+
+http://pong.tamu.edu/\~baum/sos.html[+http://pong.tamu.edu/~baum/sos.html+]
+
+======
+Information about the OGC Sensor Observation Service (SOS) and related software.
+======
+
+SSL Certificates
+----------------
+
+http://pong.tamu.edu/\~baum/cert.html[+http://pong.tamu.edu/~baum/cert.html+]
+
+=====
+How to obtain and install a signed SSL certificate for Centos/Apache at TAMU.
+=====
+
+THREDDS
+-------
+
+http://pong.tamu.edu/\~baum/thredds.html[+http://pong.tamu.edu/~baum/thredds.html+]
+
+=====
+Lengthy (and presently overcomplicated) tutorial on spinning up to use the THREDDS server.
+=====
+
+THREDDS Examples
+----------------
+
+http://pong.tamu.edu/\~baum/thredds\_examples.html[+http://pong.tamu.edu/~baum/thredds_examples.html+]
+
+=====
+Various real-world examples about how to do complex things with THREDDS.
+=====
+
+Unstructured Grids
+------------------
+
+http://pong.tamu.edu/\~baum/grids.html[+http://pong.tamu.edu/~baum/grids.html+]
+
+=====
+Notes on serving unstructured grids via NetCDF files and THREDDS servers.
+=====
+
+
+WAF
+---
+
+http://pong.tamu.edu/\~baum/waf.html[+http://pong.tamu.edu/~baum/waf.html+]
+
+=====
+Notes on the creation of Web Accessible Folders.
+=====
+
+Xarray Overview and Examples
+----------------------------
+
+http://pong.tamu.edu/\~baum/xarray.html[+http://pong.tamu.edu/~baum/xarray.html+]
+
+=====
+A brief tutorial on how to use the xarray extension to Numpy, and a lengthy example of
+how it is used to transform a NetCDF file containing ADCP data into CF compliance.
+=====
+
+
+

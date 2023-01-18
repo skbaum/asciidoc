@@ -1,0 +1,17 @@
+
+Delete the global attribute cdm_trajectory_variables:
+ncatted -a cdm_trajectory_variables,global,d,f,1.0 g01l01s01.nc
+
+Add the global attribute cdm_profile_variables:
+ncatted -a cdm_profile_variables,global,a,c,"lat,lon" g01l01s01.nc
+
+Change lat,lon to latitude,longitude:
+ncatted -a cdm_profile_variables,global,o,c,"latitude,longitude" g01l01s01.nc
+
+	int profile ;
+		profile:cf_role = "profile_id" ;
+
+
+time:units = "Days since 1-Jan-4713 BC 12:00 noon GMT" ;
+
+

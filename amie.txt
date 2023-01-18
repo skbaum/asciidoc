@@ -1,0 +1,4217 @@
+AMIE Notes
+==========
+Steven K. Baum
+0.1, Dec. 9, 2021
+:doctype: book
+:toc:
+:icons:
+:source-highlighter: coderay
+
+:numbered!:
+
+== HPRC AMIE Implementation
+
+=== Overview
+
+This document explains the development of the HPRC implementation of the *Account Management Information Exchange (AMIE)* software
+system that provides the capability for XSEDE to manage accounts and track resource usage among
+all member institutions.
+It provides a distributed accounting mechanism across all of its sites so that an individual users usage can be
+tracked across multiple resources. AMIE is also responsible for propagating *Distinguished Names* across the XSEDE sites.
+
+=== Summary for Interfacing with the Local Account Management Database
+
+All the information specific to the local user and project information is contained within
+the *local_info* database, the creation and contents of which are described in the
+xref:local_info[Setting Up DB Tables] section dealing with the creation of the various tables using PostgreSQL
+and the Python https://www.psycopg.org/docs/[psycopg2] interface to that database system.
+That section contains a description of the columns within the *local_info* as well as the details of how it
+was created.
+
+The general flow of the local AMIE implementation system is:
+
+* The Python script `dump_approvals.py` cycles through all queued AMIE packets, extracting
+project and user information that is inserted into the *local_info* table.
+The AMIE packets - e.g. `request_project_create`, `request_account_create`, etc. - that require local TAMU approval before further processing are entered
+in the *approval* table.  This script can and eventually will be run periodically via cron.
+
+* The Python script `approval.py` is run on the command line to enable each non-approved request
+in the *approval* table to be approved.  It also provides the capability of modifying the automatically
+generated local person ID.
+
+* The Python script `respond.py`
+creates and sends appropriate response packets to the NCSA for approved requests.
+This script also creates and modifies entries in various database tables to track the progress
+of the sequence for each packet type.  This script also can and eventually will be run
+periodically via cron.
+
+=== AMIE Links
+
+*XSEDE Research Software Portal*
+
+https://software.xsede.org/packaged-software/amie[`https://software.xsede.org/packaged-software/amie`]
+
+*XSEDE AMIE Software Repository*
+
+https://software.xsede.org/production/amie/[`https://software.xsede.org/production/amie/`]
+
+*XSEDE AMIE Github Repository*
+
+https://github.com/xsede/amieclient/[`https://github.com/xsede/amieclient/`]
+
+*Stanford AMIE Github Repository*
+
+https://github.com/stanford-rc/xsede-amie-python[`https://github.com/stanford-rc/xsede-amie-python`]
+
+=== Amie Documents
+
+The PDF documents available for download at the *XSEDE AMIE Software Repository* are listed below.
+All are contained within a tar file at that site.  A significant portion of the content of these
+documents has been included in this document to make access to the scattered and disparate PDF
+documents easier.
+
+*AMIE API Testing* - A 2-page overview of the seven kinds of initial packets handled by the AMIE client API.
+
+*AMIE Client API Routes Overview* - A 4-page overview of the AMIE transaction and and packet
+model, wherein the data is presented in JSON form via a RESTful API.
+
+*AMIE in XSEDE* - A 35-page document describing the sets of AMIE transactions used by
+XSEDE.  It describes the sequence of packets required by each type of transaction, and also
+the required and optional information for each type of packet.  A familiarity with the
+*AMIE Model* document is assumed.  These details are available within the
+xref:_transactions_originated_at_xdcdb[Transactions Originated at XDCDB] and
+xref:_transactions_originated_locally[Transactions Originated Locally] sections
+of this document.
+
+*AMIE Model* - A 5-page overview of the AMIE model wherein the terms are defined,
+the packet types listed, and a skeletal example is presented.  The contents of this document are contained 
+within the xref:_amie_model[AMIE Model] section below.
+
+*Implementing AMIE* - A 29-page document describing how to connect a local account
+management system to AMIE.  It describes a reference implementation database that is
+an intermediate database standing between AMIE and the local account management
+database.  This describes the tables that need to be created for the intermediate database
+using data definition language (DDL), leaving the choice of actual database to the user.
+The details of the actual PostgreSQL tables created using these guidelines can be found in the
+xref:_setting_up_db_tables[Setting Up DB Tables] section below.  There were some minor changes
+to the suggested tables as well as additional tables created for local use.
+
+*XSEDE Usage API User's Guide* - A 14-page document that describes the RESTful API used
+by an XSEDE Service Provider to report usage to XSEDE.
+
+== AMIE Model
+
+=== Overview
+
+The AMIE model consists of two sites and an agreed upon set of *transactions* that the two
+sites will use to send account management data to each other. A transaction consists of
+*packets* of data sent between the two sites. The site sending a packet is called the *local site*
+and the packet is known to the sending site as an *outgoing packet*. The receiving site is
+called the *remote site* and the packet received is known to the receiving site as an
+*incoming packet*. The site that creates the transaction (and sends the first packet) is also
+called the *originating site*.
+
+From the AMIE perspective, XSEDE consists of a number of local sites that exchange account
+management information with the XSEDE Central Database (XDCDB).
+
+This document is written from the perspective of a local site. The remote site is thus the XSEDE
+Central Database (XDCDB). Incoming packets are packets sent by XDCDB to the local site.
+Outgoing packets are packets sent to the XDCDB by the local site.
+
+=== Transactions
+
+Transactions have a number of properties. These are the *local site*, the *remote site*, the *originating
+site*, a *transaction id*, and a *state*. Once created, the first four properties do not change. The *state*
+changes over time.
+
+The *transaction id* is used to distinguish one transaction from another. The originating site
+chooses the *transaction id* without consulting the remote site. The only rule is that a transaction id
+created by one site may not be reused by that site for a different transaction. Hence a transaction is
+identified by the *originating site*, the *transaction id*, the *local site*, and the *remote site*.
+
+AMIE defines 3 states for a transaction: *in-progress*, *completed*, or *failed*. The initial state of a
+transaction is *in-progress*. It remains in that state until all packets have been processed. If all
+packets have been successfully processed, the transaction state becomes *completed*. If any of the
+packets causes a failure, the transaction state becomes *failed*.
+
+=== Packets
+
+Transactions also have packets which contain account management data. *Incoming packets* are
+those packets received from the remote site. *Outgoing packets* are those packets created by the
+local site to be sent to the remote site. Outgoing packets are created either when the transaction is
+created or as a reply to an incoming packet.
+
+AMIE does not specify a pre-defined set of transactions. It specifies a set of packets which can be
+used within transactions, but the sites must agree on the packets that are used within transactions
+as well as the ordering of those packets.
+
+A packet has a number of properties. These are *type*, *version*, *packet id*, and *state*. It also has a
+list of *expected replies*.
+
+Each packet has a *packet id* which is chosen by the site that creates the packet. It has to be unique
+within the set of *outgoing packets* for a given transaction3.
+
+Each packet has a *state*. AMIE defines 3 states for a packet: *in-progress*, *completed*, or *failed*.
+
+Each packet must also provide a list of *expected replies*. An expected reply is the type of packet
+that a site expects to receive from the remote site after the remote site has processed the packet.
+The expected reply list allows sites to determine which packets will be part of a transaction and the
+ordering of the packets within the transaction, rather than this being dictated by AMIE.
+
+=== Transaction Packet Sequences
+
+Each packet not only has data associated with it, but also, in most cases, an expected reply. The
+expected reply mechanism is used by AMIE implementations to specify packet sequences within
+transactions. For example, a `request_project_create` packet could specify that it expects a
+`notify_project_create` packet in reply, which could specify that it expects a `data_project_create`
+packet, which could specify that it expects an `inform_transaction_complete` packet in reply. The
+`inform_transaction_complete` packet is the only packet which can not have an expected reply. It
+would complete the sequence (and the transaction).
+
+=== Types of Transactions
+
+These are the three categories of transactions, all of which link to the appropriate sections below.
+
+* xref:_transactions_originated_at_xdcdb[transactions that originate from XDCDB],
+* xref:_transactions_originated_locally[transactions that originate locally], and
+* xref:_duplicate_people_transactions[duplicate people transactions].
+
+These are the transactions that originate from XDCDB, with all linked to their explanatory sections.
+
+* xref:_request_project_create_transaction[`request_project_create`]
+* xref:_request_account_create_transaction[`request_account_create`]
+* xref:_request_project_inactivate_transaction[`request_project_inactivate`]
+* xref:_request_project_reactivate_transaction[`request_project_reactivate`]
+* xref:_request_account_inactivate_transaction[`request_account_inactivate`]
+* xref:_request_account_reactivate_transaction[`request_account_reactivate`]
+* xref:_request_user_modify_transaction[`request_user_modify`]
+
+These are the transactions that originate locally, with all linked to their explanatory sections.
+
+* xref:_notify_project_create_transaction[`notify_project_create`]
+* xref:_notify_account_create_transaction[`notify_account_create`]
+* xref:_notify_project_inactivate_transaction[`notify_project_inactivate`]
+* xref:_notify_project_reactivate_transaction[`notify_project_reactivate`]
+* xref:_notify_account_inactivate_transaction[`notify_account_inactivate`]
+* xref:_notify_account_reactivate_transaction[`notify_account_reactivate`]
+* xref:_notify_project_usage_transaction[`notify_project_usage`]
+* xref:_notify_user_modify_transaction[`notify_user_modify`]
+
+These are the duplicate people transactions, with all linked to their explanatory sections.
+
+* xref:_notify_person_duplicate_transaction[`notify_person_duplicate`]
+* xref:_request_person_merge_transaction[`request_person_merge`]
+* xref:_notify_person_ids_transaction[`notify_person_ids`]
+
+=== Transactions Originated at XDCDB
+
+Transactions that originate at the XDCDB are requests made upon the local sites to create projects
+and accounts, or requests to modify information about a project, account, or a user. Often this will
+mean that an event occurred at one site that the XDCDB then asks the other sites to also perform.
+For example, one site creates a project and notifies the XDCDB about the project (using a
+transaction that originates at the local site). The XDCDB then would send requests to all of the
+other sites to create that project at their site (using transactions that originate at the XDCDB).
+
+For these types of transactions, local sites do not have to create a transaction. AMIE does this for
+them. Local sites need to process incoming packets and create the appropriate outgoing packets in
+reply to the incoming packets (including the packet data and the expected reply).
+
+==== `request_project_create` Transaction
+
+The purpose of this transaction is to ask a local site to create a project and an account for the PI of
+the project.
+The sequence of actions/packets is:
+
+. The XDCDB sends the project and account information in a `request_project_create`
+packet to the local site.
+. The local site:
+.. reads the `request_project_create` packet,
+.. creates the local project and account
+information, and then
+creates entries in the *local_info* table in the AMIE database,
+* `pi_person_id` - a locally generated ID string for the PI of a project
+* `project_id` - a locally generated ID string for the project
+* `remote_site_login` - a locally generated login name for the PI of a project
+* `grant_number` - the grant number of the project
+.. creates entries for the *transaction_tbl* table in the AMIE database from the information in the packet,
+* `trans_rec_id` - a unique ID number for a given transaction of any of the available transaction types listed in *type_des*
+* `originating_site_name` - the site from which the packet originates
+* `transaction_id` - an ID number chosen by the originating site that is used to distinguish on transaction from another
+* `local_site_name` - the site that sends the first packet in a transaction
+* `remote_site_name` - the site that receives the first packet in a transaction
+* `state_id` - a foreign key into the *state_des* table
+* `ts` - an automatically created time stamp
+.. creates entries for the *packet_tbl* table in the AMIE database from the information in the packet,
+* `packet_rec_id` - a unique ID number for a packet within a transaction for which there may be multiple packets
+* `trans_rec_id` - a unique ID number for a given transaction of any of the available transaction types listed in *type_des*
+* `packet_id` - the ID for a packet as specified by AMIE
+* `type_id` - a foreign key into the *type_des* table that specifies the packet type
+* `version` - the version of AMIE used for this packet
+* `state_id` - a foreign key into the *state_des* table that specifies the packet state
+* `outgoing_flag` - 1 for and outgoing and 0 for an incoming packet
+* `ts` - an auto-generated timestamp
+.. creates entries for the *data_tbl* table in the AMIE database from the information in the packet,
+* `packet_rec_id` - a unique ID number for a packet within a transaction for which there may be multiple packets
+* `tag` - the key for an entry in the dictionary in the `body` portion of the JSON packet
+* `subtag` - either `NULL` or the key for an entry in a dictionary that is the value for a 'body' key
+* `seq` - a sequence number for key values, which is 0 for single values and a sequence number starting at 0 for values that are lists or dictionaries with multiple entries
+* `value` - the value corresponding to the `tag` key in the dictionary
+.. creates entries for the *transaction_depends_tbl*
+* `trans_rec_id` - a foreign key into *transaction_tbl* that references the transaction that has dependencies
+* `depends_on_trans_rec_id` - a foreign key into *transaction_tbl* that references a transaction that must be completed
+before the `trans_rec_id` transaction can be processed
+.. sends the site-specific project and
+account information back to the XDCDB in a `notify_project_create` packet.
+. The XDCDB
+sends additional information about the project to the local site in a `data_project_create` packet.
+. The local site finishes the transaction by sending an `inform_transaction_complete`.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_project_create` | incoming
+| `notify_project_create` | outgoing
+| `data_project_create` | incoming
+| `inform_transaction_complete` | outgoing
+|===
+
+===== `request_project_create` Packet
+
+The `request_project_create` packet contains information to be used by a local site to create a
+project and an account for the PI on the project. The result of this request should be the creation of
+a local site project (with a local project ID) as well as an account for the PI (with a local person
+ID).
+
+*NOTE*: A `request_project_create` implies project reactivation. If the project had been inactivated
+(by a `request_project_inactivate`), the site must reactivate the project as well as performing the
+other actions required by this transaction. The only account that should be reactivated would be the
+account for the PI in the `request_project_create`.
+
+*NOTE*: The `PiGlobalID` is the internal ID for the PI within the XDCDB. It could be used to
+uniquely identify the PI.
+
+===== Locally Created Information
+
+Upon reception of a `notify_project_create` packet a local site needs to create values for
+the `ProjectID`, `PiPersonID` and `PiRemoteSiteLogin` tags for the return packet, as well as for identification
+purposes with future packet transactions involving the same project.
+
+At TAMU HPRC the values for these tags are created via the following procedures:
+
+* `ProjectID` - the concatenation of 'p.', the `GrantNumber` tag value in lower case, and '.000'.
+* `PiPersonID` - the concatenation of 'pi.', the `FirstName` first letter in lower case, the `LastName` first letter
+in lower case, and the `PiGlobalID` value
+* `PiRemoteSiteLogin` - this is set as identical to the `PiPersonID`
+
+===== `notify_project_create` Packet
+
+After having created a project and an account, the local site must reply with a
+`notify_project_create` packet. *This packet must contain*:
+
+* the local project ID, i.e. *ProjectID*,
+* the local ID for the PI, i.e. *PiPersonID*,
+which should be a locally unique identifier for the PI at the local site,
+* and the login at the local site
+for the PI, i.e. *PiRemoteSiteLogin*
+* the *GrantNumber* from the
+`request_project_create` packet,
+
+The `ResourceList` will only have one resource (and it will be a
+resource at the remote site).
+
+The following table lists the tags that can be included in the `notify_project_create` packet, although
+the only required tags are in *bold*.
+
+[[allocationtype]]
+The `AllocationType` must be one of the following:
+
+* `new` - Creates a new project and creates a new allocation on a specific resource.
+* `renewal` - A continuing award for an existing project.
+* `supplement` - Adds SUs to an existing allocation (without changing the start or end dates).
+* `extension` - Extends the end date of an allocation. An extension should only be received
+for an existing allocation.
+* `transfer` - Occurs as one of a pair of transactions – one negative, and one positive. A
+negative transfer for an unknown allocation is an error. Otherwise, the amount is deducted
+from the allocation. A positive transfer should be treated the same as a supplement.
+* `advance` - An allocation given in anticipation of a new or renewal allocation. It should
+be treated as a supplement.
+* `adjustment` - Modifies an existing allocation for other reasons. It should be handled as a
+transfer type; but unlike a transfer, there is only one transaction.
+
+.Allowable Tags for `notify_project_create` Packet
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *GrantNumber* | | | AST040002
+| *PfosNumber* | | | 120
+| *PiOrgCode* | | | 0017756
+| *PiPersonID* | | | 6751
+| *PiRemoteSiteLogin* | | | squinn
+| *ProjectID* | | | 1001
+| *ProjectTitle* | | | Planetary Motion
+| *ResourceList* | | | this_resource
+| *ServiceUnitsAllocated* | | | 99999
+| *StartDate* | | | 2003-12-16
+| `Abstract` |  |  | Some text...
+| `AcademicDegree` | *Degree* | 0 | MS
+| `AcademicDegree` | *Field* | 0 | Math
+| `AcademicDegree` | *Degree* | 1 | PhD 
+| `AcademicDegree` | *Field* | 1 | Math
+| xref:allocationtype[`AllocationType`] | | |
+| `EndDate` | | | 2013-12-31
+| `NsfStatusCode` | | | CN
+| `PiBusinessPhoneComment` | | | Business phone on campus
+| `PiBusinessPhoneExtension` | | | 7570
+| `PiBusinessPhoneNumber` | | | (217) 867-5309
+| `PiCity` | | | Champaign
+| `PiCountry` | | | USA
+| `PiDepartment` | | | N.C.S.A.
+| `PiDnList` | | 0 | /C=US/O=NCSA/CN=Steven James Quinn
+| `PiDnList` | | 1 | /C=US/O=PSC/CN=Steven James Quinn
+| `PiDnList` | | 2 | /C=US/O=SDSC/CN=Steven James Quinn
+| `PiFax`    | | | (217) 555-5555
+| `PiFirstName` | | | Steven
+| `PiGlobalID` | | | 70
+| `PiHomePhoneComment` | | | Has caller ID
+| `PiHomePhoneExtension` | | | none
+| `PiHomePhoneNumber` | | | (217) 222-0000
+| `PiLastName` | | | Quinn
+| `PiMiddleName` | | | James
+|===
+
+===== `notify_project_create` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_project_create':
+        grant_number = packet.GrantNumber
+        record_id = packet.RecordID
+        project_id = packet.ProjectID  # site project_id (if known)
+        resource = packet.ResourceList[0]  # xsede site resource name, eg, delta.ncsa.xsede.org
+        request_type = packet.RequestType
+        allocation_type = packet.AllocationType  # new, renewal, supplement, transfer, adjustment, advance, extension, ...
+        start_date = packet.StartDate
+        end_date = packet.EndDate
+        amount = packet.ServiceUnitsAllocated
+        abstract = packet.Abstract
+        project_title = packet.ProjectTitle
+        board_type = packet.BoardType
+        pfos_num = packet.PfosNumber
+
+        pi_person_id = packet.PiPersonID         # site person_id for the PI (if known)
+        pi_first_name = packet.PiFirstName
+        pi_middle_name = packet.PiMiddleName
+        pi_last_name = packet.PiLastName
+        pi_organization = packet.PiOrganization
+        pi_department = packet.PiDepartment
+        pi_email = packet.PiEmail
+        pi_phone_number = packet.PiBusinessPhoneNumber
+        pi_phone_extension = packet.PiBusinessPhoneExtension
+        pi_address1 = packet.PiStreetAddress
+        pi_address2 = packet.PiStreetAddress2
+        pi_city = packet.PiCity
+        pi_state = packet.PiState
+        pi_zipcode = packet.PiZip
+        pi_country = packet.PiCountry
+        pi_nsf_status_code = packet.NsfStatusCode
+        pi_requested_logins = packet.PiRequestedLoginList
+
+        pi_dn_list = packet.PiDnList
+
+        # SP: 
+        # - add code to find the PI from the local database (or create the person in the local database)
+        #   and set pi_person_id, pi_login
+        # - add code to create the project for the grant_number (if project doesn't exist), or apply the action specified by allocation_type
+        # - set the project_id to the local id for the project (if it isn't already set from the RPC)
+        # - set the project state to active (if it is inactive), as the XDCDB will not send RPCs for inactive projects
+        #
+        # NOTE: if the record_id is not null, you should track it (associate it with the packet_rec_id).
+        # If a second RPC gets sent with the same record_id, the second RPC should not be processed,
+        # but the data from the first RPC sent in the reply NPC
+
+        # construct a NotifyProjectCreate(NPC) packet.
+        npc = packet.reply_packet()
+        npc.ProjectID = project_id           # local project ID
+        npc.PiPersonID = pi_person_id        # local person ID for the pi
+
+        # send the NPC
+        amie_client.send_packet(npc)
+-----
+
+===== `data_project_create` Packet
+
+The XDCDB will reply with a data_project_create packet that contains all the DNs known by the
+XDCDB for the project PI.
+This packet will have the form:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| `DnList` | | 0 | /C=US/O=NCSA/CN=Steven James Quinn
+| `DnList` | | 1 | /C=US/O=PSC/CN=Steven James Quinn
+| `DnList` | | 2 | /C=US/O=SDSC/CN=Steven James Quinn
+| *PersonID* | | | 6751
+| *ProjectID* | | | afm
+|===
+
+===== `data_project_create` Section of `process_packets.py`
+
+-----
+    if packet_type == 'data_project_create':
+        person_id = packet.PersonID
+        project_id = packet.ProjectID
+        dn_list = packet.DnList
+
+        # the data_project_create(DPC) packet has two functions:
+        # 1. to let the site know that the project and PI account have been setup in the XDCDB
+        # 2. to provide any new DNs for the PI that were added after the RPC was sent
+        # NOTE: a DPC does *not* have the resource. You have to get the resource from the RPC for the trans_rec_id
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+-----
+
+===== `inform_transaction_complete` Packet
+
+The local site must then reply with an `inform_transaction_complete` to complete the transaction.
+
+==== `request_account_create` Transaction
+
+The purpose of this transaction is to ask a local site to create an account for a user on a project. The
+XDCDB sends the account information in a `request_account_create` packet. The local site creates
+the account and sends the site-specific account information back to the XDCDB in a
+`notify_account_create` packet. The XDCDB then sends additional information about the account to
+the local site in a `data_account_create` packet. The local site finishes the transaction by sending an
+`inform_transaction_complete`.
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_account_create` | incoming
+| `notify_acccount_create` | outgoing
+| `data_account_create` | incoming
+| `inform_transaction_complete` | outgoing
+|===
+
+Notes about edge cases that must eventually be dealt with:
+
+* Although the XDCDB will not send a `request_account_create` packet before it has sent a
+corresponding `request_project_create` packet, it may send it before the `request_project_create`
+transaction has completed. Local sites must be prepared to delay processing of
+`request_account_create` packets until they have completed the corresponding
+`request_project_create` transaction.
+
+* If the project is active, a `request_account_create` implies account reactivation. If the
+account had been inactivated (by a `request_account_inactivate`), the site must reactivate the
+account as well as performing the other actions required by this transaction. The site will not
+receive a request_account_reactivate in addition to this transaction.
+
+* If the project is inactive, a `request_account_create` may be sent to add a user to the project.
+The user should be added as inactive. A `request_account_inactivate` will follow upon completion
+of this transaction.
+
+===== `request_account_create` Packet
+
+The `request_account_create` packet contains the `GrantNumber` for the related project as well as the
+information about the user for whom the account is to be created. If the XDCDB has been notified
+of the local project ID in a previous `request_project_create` transaction, then the `ProjectID` will be
+the local site project ID. Otherwise the `ProjectID` will not be present. This implies that sites must
+maintain a mapping between local projects and the `GrantNumber`.
+
+*NOTE*: The `UserGlobalID` is the internal ID for the user within the XDCDB. It could be used to
+uniquely identify the user.
+
+The `request_account_create` packet contains the following entries.  The *bold* entries are required.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *GrantNumber* | | 0 | AST040002
+| *ResourceList* | | 0 | oh.ncsa.xsede
+| `SitePersonID` | *Site* | 0 | ANL
+| `SitePersonID` | *PersonID* | 0 | mshapiro
+| `SitePersonID` | *Site* | 1 | SDSC
+| `SitePersonID` | *PersonID* | 1 | 22998
+| `AcademicDegree` | *Degree* | 0 | MS
+| `AcademicDegree` | *Field* | 0 | Math
+| `AcademicDegree` | *Degree* | 1 | PhD
+| `AcademicDegree` | *Field* | 1 | Math
+| *UserFirstName* | | | Michael
+| *UserLastName* | | | Shapiro
+| *UserOrganization* | | | UIUC
+| *UserOrgCode* | | | 0017756
+| `NsfStatusCode` | |  | CN
+| `ProjectID` | |  | afm
+| ... | | |
+|===
+
+The `GrantNumber` must be used to tie the request_acount_create to the corresponding project since the `ProjectID`
+may not be present.
+
+===== Typical `notify_account_create` Packet Contents
+
+The header typically contains:
+
+-----
+expected_reply_list -> [{'type': 'notify_account_create', 'timeout': 30240}]
+packet_id -> 1
+trans_rec_id -> 111135727
+transaction_id -> 3
+remote_site_name -> TAMU
+local_site_name -> TGCDB
+originating_site_name -> TGCDB
+outgoing_flag -> 1
+packet_rec_id -> 222152621
+packet_timestamp -> 2022-03-09T20:29:45.177Z
+client_state -> None
+packet_state -> in-progress
+client_json -> None
+transaction_state -> in-progress
+-----
+
+The body typically contains:
+
+-----
+ProjectID -> TAMU-52738
+GrantNumber -> EVE226342
+UserPasswordAccessEnable -> 1
+ResourceList -> ['test-resource1.tamu.xsede']
+UserRequestedLoginList -> ['tzcoolman']
+AllocatedResource -> test-resource1.tamu.xsede
+UserGlobalID -> 104986
+UserEmail -> enzeliu@iu.edu
+UserFirstName -> enze
+UserMiddleName -> 
+UserLastName -> liu
+UserDepartment -> Schoolf of Medicine
+UserTitle -> 
+UserOrganization -> Indiana University
+UserOrgCode -> 0087312
+NsfStatusCode -> F
+UserDnList -> ['/C=US/O=National Center for Supercomputing Applications/CN=enze liu 1', '/C=US/O=Pittsburgh Supercomputing Center/CN=enze liu 1']
+SitePersonId -> [{'Site': 'XD-ALLOCATIONS', 'PersonID': 'tzcoolman'}, {'Site': 'X-PORTAL', 'PersonID': 'tzcoolman'}]
+AcademicDegree -> [{'Degree': 'PhD', 'Field': 'Bioinformatics'}]
+-----
+
+===== `notify_account_create` Packet
+
+After having created an account, the local site must reply with a `notify_account_create` packet.
+This packet must contain:
+
+* the local project ID `ProjectID` that has been previously created and which is included in the `request_account_create` packet,
+* the local ID for the account user `UserPersonID` which must be newly created,
+* the login at the local site for the user `UserRemoteSiteLogin` which must be newly created,
+* the `ResourceList` which is extracted from `request_account_create` packet.
+
+The table below lists the tags that
+could be included in this packet (the ones in *bold* must be included). However, in a reply to a
+`request_account_create`, if the user is already known to the XDCDB (based on the `UserPersonID`
+or the `UserGlobalID`), then all the `User` tags are ignored.
+
+The `UserGlobalID` is the internal ID for the user within the XDCDB.
+
+The `NsfStatusCode` must be a valid NSF Status Code (as defined in the XDCDB). The
+`UserOrgCode` must be a valid NSF organization code (as defined in the XDCDB). The
+`UserCountry` must be a valid NSF country code (as defined in the XDCDB). The `UserState` must
+be a valid state abbreviation (as defined in the XDCDB).
+
+An originating `notify_account_create` (i.e., one that is not sent in reply to a `request_account_create`) must specify
+the start date of the allocation to which the account will be associated.
+
+The `ResourceLogin` entry is of the same form as the `AcademicDegree` entry.  
+
+-----
+AcademicDegree -> [{'Degree': 'PhD', 'Field': 'Bioinformatics'}]
+ResourceLogin -> [{'Resource': 'test-resource1.tamu.xsede', 'Login': 'mshapiro'}]
+-----
+
+
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *ProjectID* | |  | afm
+| *ResourceList* | | 0 | viz.nist.xsede
+| `ResourceLogin` | *Resource* | 0 | portal.teragrid
+| `ResourceLogin` | *Login* | 0 | mshapiro
+| `AcademicDegree` | *Degree* | 0 | MS
+| `AcademicDegree` | *Field* | 0 | Math
+| `AcademicDegree` | *Degree* | 1 | PhD
+| `AcademicDegree` | *Field* | 1 | Math
+| `NsfStatusCode` | |  | CN
+| `RoleList` | | 0 | co_pi
+| `StartDate` | | | 2003-12-16
+| `UserBusinessPhoneComment` | | | Business phone on campus
+| `UserBusinessPhoneExtension` | | | 1514
+| `UserBusinessPhoneNumber` | | | (217) 244-0072
+| `UserCity` | | | Chammpaign
+| `UserCountry` | | | 9US
+| `UserDepartment` | | | N.C.S.A.
+| `UserDnList` | | | /C=US/O=NCSA/CN=Michael Shapiro
+| `UserDnList` | | | /C=US/O=SDSC/CN=Michael Shapiro
+| `UserEmail` | | | mshapiro@ncsa.uiuc.edu
+| `UserFax` | | | (217)-244-1987
+| `UserFirstName` | | | Michael
+| ... | | |
+|===
+
+===== `notify_account_create` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_account_create':
+        grant_number = packet.GrantNumber
+        project_id = packet.ProjectID  # site project_id
+        resource = packet.ResourceList[0]  # xsede site resource name, eg, delta.ncsa.xsede.org
+
+        user_person_id = packet.UserPersonID         # site person_id for the User (if known)
+        user_login = packet.UserRemoteSiteLogin  # login on resource for the User (if known)
+        user_first_name = packet.UserFirstName
+        user_middle_name = packet.UserMiddleName
+        user_last_name = packet.UserLastName
+        user_organization = packet.UserOrganization
+        user_department = packet.UserDepartment
+        user_email = packet.UserEmail
+        user_phone_number = packet.UserBusinessPhoneNumber
+        user_phone_extension = packet.UserBusinessPhoneExtension
+        user_address1 = packet.UserStreetAddress
+        user_address2 = packet.UserStreetAddress2
+        user_city = packet.UserCity
+        user_state = packet.UserState
+        user_zipcode = packet.UserZip
+        user_country = packet.UserCountry
+        user_nsf_status_code = packet.UserNsfStatusCode
+        user_requested_logins = packet.UserRequestedLoginList
+        user_dn_list = packet.UserDnList
+
+        # SP: add code to find the User from the local database (or create the person in the local database)
+        # then add an account for the User on the specified project (project_id) on the resource
+        # RACs are also used to reactivate accounts, so if the account already exists, just set it active
+
+        # construct a NotifyAccountCreate(NAC) packet.
+        nac = packet.reply_packet()
+        nac.ProjectID = project_id               # local project ID
+        nac.UserRemoteSiteLogin = user_login     # local login for the User on the resource
+        nac.UserPersonID = user_person_id        # local person ID for the User
+
+        # send the NAC
+        amie_client.send_packet(nac)
+-----
+
+===== `data_account_create` Packet
+
+The XDCDB will reply with a `data_account_create` packet that contains all the DNs known by the
+XDCDB for the user.
+
+The packet will contain the following:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | | | 21619
+| *ProjectID* | | | afm
+| `DnList` | | 0 | /C=US/O=NCSA/CN=Michael Shapiro
+| `DnList` | | 1 | /C=US/O=SDSC/CN=Michael Shapiro
+|===
+
+===== `inform_transaction_complete` Packet
+
+The local site must then reply with an `inform_transaction_complete` to complete the transaction.
+
+===== `data_account_create` Section of `process_packets.py`
+
+-----
+    if packet_type == 'data_account_create':
+        person_id = packet.PersonID
+        project_id = packet.ProjectID
+        dn_list = packet.DnList
+
+        # the data_account_create(DAC) packet has two functions:
+        # 1. to let the site know that the User account on the project has been setup in the XDCDB
+        # 2. to provide any new DNs for the User that were added after the RAC was sent
+        # NOTE: a DAC does *not* have the resource. You have to get the resource from the RAC for the trans_rec_id
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+-----
+
+==== `request_project_inactivate` Transaction
+
+The purpose of this transaction is to ask a local site to inactivate a project. The XDCDB sends the
+project information in a request_project_inactivate packet. The local site inactivates the project
+and all accounts on the project and sends a reply to the XDCDB in a notify_project_inactivate
+packet. The XDCDB finishes the transaction by sending an inform_transaction_complete.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_project_inactivate` | incoming
+| `notify_project_inactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `request_project_inactivate` Packet
+
+The `request_project_inactivate` packet contains information to be used by a local site to identify
+the project to be inactivated. The result of this request should be the inactivation of the project as
+well as inactivation of all accounts on the project.
+
+The contents of the packet are as follows, with required tags in *bold*.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *ProjectID* | |  | afm
+| *ResourceList* | | 0 | xx.ncsa.xsede
+| `Comment` | |  | Project out of funds
+| `AllocatedResource` | | | staff.xsede
+| `GrantNumber` | | | AST040009
+| `StartDate` | | | 2006-04-01
+| `EndDate` | | | 2007-03-31
+| `ServiceUnitsAllocated` | | | 50000
+| `ServiceUnitsRemaning` | | | -2345
+|===
+
+===== `notify_project_inactivate` Packet
+
+After having inactivated the project and all related accounts, the local site must reply with a
+`notify_project_inactivate` packet. This packet must contain the same project information as the
+incoming `request_project_inactivate`.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *ProjectID* | |  | afm
+| *ResourceList* | | 0 | xx.ncsa.xsede
+|===
+
+===== `request_project_inactivate` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_project_inactivate':
+        resource = packet.ResourceList[0]
+        project_id = packet.ProjectID
+
+        # SP: inactivate the project and all accounts on the project
+
+        npi = packet.reply_packet()
+        amie_client.send_packet(npi)
+-----
+
+===== `inform_transaction_complete` Packet
+
+The local site will then receive an `inform_transaction_complete` to complete the transaction.
+
+==== `request_project_reactivate` Transaction
+
+The purpose of this transaction is to ask a local site to reactivate a project that was previously
+inactivated. The XDCDB sends the project information in a `request_project_reactivate` packet.
+The local site reactivates the project and the account for the PI and sends a reply to the XDCDB in
+a `notify_project_reactivate` packet. The XDCDB finishes the transaction by sending an
+`inform_transaction_complete`.
+
+The sequence of packets is
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_project_reactivate` | incoming
+| `notify_project_reactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `request_project_reactivate` Packet
+
+The `request_project_reactivate` packet contains information to be used by a local site to reactivate
+a project and the account for the PI on the project. No other accounts should be reactivated.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| `PersonID` | |  | 21619
+| *ProjectID* | | | afm
+| `Comment` | |  | PI begged for more time.
+| *ResourceList* | | 0 | hc.ncsa.xsede
+| `AllocatedResource` | |  | staff.xsede
+| `GrantNumber` | |  | AST040009
+| `StartDate` | |  | 2006-04-01
+| `EndDate` | | | 2007-03-31
+| `ServiceUnitsAllocated` | | | 50000
+| `ServiceUnitsRemaining` | | | 12345
+|===
+
+===== `notify_project_reactivate` Packet
+
+After having reactivated a project, the local site must reply with a `notify_project_reactivate` packet.
+This packet must contain the same project information as the incoming `request_project_reactivate`.
+An inactive project can also be reactivated with a `request_project_create` packet.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *ProjectID* | | | afm
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+
+===== `request_project_reactivate` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_project_reactivate':
+        resource = packet.ResourceList[0]
+        project_id = packet.ProjectID
+        pi_person_id = packet.PersonID
+
+        # SP: reactivate the project and the PI account on the project (but no other accounts)
+
+        npr = packet.reply_packet()
+        amie_client.send_packet(npr)
+-----
+
+===== `inform_transaction_complete` Packet
+
+==== `request_account_inactivate` Transaction
+
+The purpose of this transaction is to ask a local site to inactivate an account for a user on a project.
+The XDCDB sends the account information in a `request_account_inactivate` packet. The local site
+inactivates the account and sends a reply to the XDCDB in a `notify_account_inactivate packet`.
+The XDCDB finishes the transaction by sending an `inform_transaction_complete`.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_account_inactivate` | incoming
+| `notify_account_inactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `request_account_inactivate` Packet
+
+The `request_account_inactivate` packet contains information to be used by a local site to inactivate
+an account on a project.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *ProjectID* | | | afm
+| `Comment` | |  | No longer on the project.
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+===== `notify_account_inactivate` Packet
+
+After having inactivated an account, the local site must reply with a `notify_account_inactivate`
+packet. This packet must contain the same account information as the incoming
+`request_account_inactivate`.
+
+*NOTE*: it is important that the site inactivate the account, rather than remove it. It is possible that
+the account could be reactivated in the future. Also, account inactivation does not imply user
+inactivation. The *PersonID* (as well as the related login on the resource) must be retained for this
+user, since the XDCDB will retain them as well.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *ProjectID* | | | afm
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+===== `request_account_inactivate` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_account_inactivate':
+        resource = packet.ResourceList[0]
+        project_id = packet.ProjectID
+        person_id = packet.PersonID
+
+        # SP:  inactivate the account on the project
+
+        nai = packet.reply_packet()
+        amie_client.send_packet(nai)
+-----
+
+===== `inform_transaction_complete` Packet
+
+==== `request_account_reactivate` Transaction
+
+The purpose of this transaction is to ask a local site to reactivate an account for a user on a project
+that was previously inactivated. The XDCDB sends the account information in a
+`request_account_reactivate` packet. The local site reactivates the account and sends a reply to the
+XDCDB in a `notify_account_reactivate` packet. The XDCDB finishes the transaction by sending
+an `inform_transaction_complete`.
+
+*NOTE*: this transaction is included in this documentation for completeness only. The XDCDB
+currently will reactivate accounts using the `request_account_create` transaction.
+
+The sequence of packets is
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_account_reactivate` | incoming
+| `notify_account_reactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `request_account_reactivate` Packet
+
+The `request_account_reactivate` packet contains information to be used by a local site to reactivate
+an account on a project.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *ProjectID* | | | afm
+| `Comment` | |  | Re-hired on the project.
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+===== `notify_account_reactivate` Packet
+
+After having reactivated an account, the local site must reply with a `notify_account_reactivate`
+packet. This packet must contain the same account information as the incoming
+`request_account_reactivate`.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *ProjectID* | | | afm
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+===== `inform_transaction_complete` Packet
+
+==== `request_user_modify` Transaction
+
+This transaction is used by the XDCDB to ask local sites to update all the information about a user.
+After a local site notifies the XDCDB with updates for a user, the XDCDB will send a
+request_user_modify packet to all the other sites with the updated information. After processing
+the updates, the local sites then send an inform_transaction_complete to the XDCDB to complete
+the transaction.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_user_modify` | incoming
+| `inform_transaction_complete` | outgoing
+|===
+
+===== `request_user_modify` Packet
+
+The *ActionType* will be one of `replace` or `delete`.
+
+For `replace`, if a tag is present, the value associated with the tag at the local site must be replaced
+with the value in the packet; if a tag is not present, then the value associated with the tag at the
+local site must be deleted (or replaced with a null value). An exception is made for the `DnList` tag.
+If the `DnList` tag is present, DNs listed must be added to the grid mapfile; DNs in the grid mapfile
+which are not listed must be preserved. If the `DnList` tag is not present, all DNs in the grid mapfile
+must be preserved.
+
+For `delete`, the only optional tag will be `DnList` which will specify DNs that must be deleted from
+the grid mapfile.  Only the specific DN strings listed
+should be deleted. Other DNs that some applications may consider to be
+equivalent, but are not listed should not be deleted.
+
+===== `inform_transaction_complete` Packet
+
+The local site must then reply with an `inform_transaction_complete` to complete the transaction.
+
+===== `request_user_modify` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_user_modify':
+        person_id = packet.person_id
+        if packet.Actiontype == 'delete':
+            inactive_dn_list = packet.DnList
+            # SP: inactivate the specified DNs for the user
+        else:
+            active_dn_list = packet.DnList
+            first_name = packet.FirstName
+            middle_name = packet.MiddleName
+            last_name = packet.LastName
+            organization = packet.Organization
+            department = packet.Department
+            email = packet.Email
+            bus_phone_number = packet.BusinessPhoneNumber
+            bus_phone_extension = packet.BusinessPhoneExtension
+            home_phone_number = packet.HomePhoneNumber
+            home_phone_extension = packet.HomePhoneExtension
+            fax = packet.Fax
+            address1 = packet.StreetAddress
+            address2 = packet.StreetAddress2
+            city = packet.City
+            state = packet.State
+            zipcode = packet.Zip
+            country = packet.Country
+            nsf_status_code = packet.NsfStatusCode
+
+            # SP: update the User info and DNs
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+-----
+
+=== Transactions Originated Locally
+
+Transactions that originate at a local site are notifications to the XDCDB of project and account
+creation, or modifications to information about a project, account, or a user. Often this will then
+cause the XDCDB to send requests to the other sites to do the same. For example, one XSEDE site
+creates a project and notifies the XDCDB about the project. The XDCDB then would send
+requests to all the other sites to create that project at their site.
+For these types of transactions, local sites will have to create a transaction and put an initial
+outgoing packet into the transaction. Then, when an incoming reply packet arrives, it would be
+processed and an outgoing packet generated in reply. Unless the incoming packet does
+not expect a reply, which is the case for `inform_transaction_complete` packets.
+
+The details of both transaction and packet creation as implementation specific, but a sketch of how these are done
+can be found in the *Implementing AMIE* document.
+
+==== Basic Structure of Local Site Transaction Applications
+
+The general form of all locally-originated transaction applications is shown in the Python code below
+for the specific case of the *notify_person_ids* transaction.
+
+
+
+
+
+-----
+#  Import the required modules.
+
+from configparser import ConfigParser
+from amieclient import AMIEClient
+from amieclient.packet import NotifyPersonIDs
+
+#  Create or obtain the information required by the specific packet type.
+
+PersonID = 'u.km91191'
+PrimaryPersonID = 'km91191'
+
+#  Obtain the AMIE configuration information required.
+
+amie_config = "/home/baum/AMIE/amie.ini"
+config_site = ConfigParser()
+config_site.read(amie_config)
+site_con = config_site['TAMU']
+amie_client = AMIEClient(site_name=site_con['site_name'],
+                         amie_url=site_con['amie_url'],
+                         api_key=site_con['api_key'])
+
+#  Create and populate the packet to be sent.
+#  The 'NotifyPersonIDs' here must match that in the 'from amieclient.packet import NotifyPersonIDs' importation line.
+
+npi = NotifyPersonIDs()
+npi.PersonID = PersonID
+npi.PrimaryPersonID = PrimaryPersonID
+npi.originating_site_name = 'TAMU'
+npi.ResourceList = ['test-resource1.tamu.xsede']
+
+#  Send the packet.
+amie_client.send_packet(npi)
+-----
+
+==== `notify_project_create` Transaction
+
+The purpose of this transaction is for a local site to notify the XDCDB of the creation of an
+XSEDE project and related account for the PI of the project. Projects are never created by
+XDCDB. They must first be created at one of the local sites. That site then notifies the XDCDB of
+the project.
+
+For any given project, one site must be designated as the originating site for the project. For
+example, a given site may be designated as the originating site for the peer-reviewed projects from
+a review board meeting. Which site is designated is an XSEDE policy decision that is outside the
+scope of this document.
+
+The local site creates the project and account and sends the site-specific project and account
+information to the XDCDB in a `notify_project_create` packet.
+The local site must first create a transaction before it can create the `notify_project_create` packet.
+The XDCDB then sends additional
+information about the project to the local site in a `data_project_create` packet. The local site
+finishes the transaction by sending an `inform_transaction_complete`.
+
+*NOTE*: A `notify_project_create` also implies project reactivation. If a site receives a
+`notify_project_create` packet for an inactive project, the site must reactivate the project in addition
+to performing the other actions required by this packet. In this case, the site will not receive a
+`request_project_reactivate`.
+
+The sequence of packets is
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_project_create` | outgoing
+| `data_project_create` | incoming
+| `inform_transaction_complete` | outgoing
+|===
+
+===== `notify_project_create` Packet
+
+After creating a project (and an account for the PI), the local site sends a `notify_project_create`
+packet to the XDCDB. This packet must contain the *GrantNumber* from the
+`request_project_create`, the local project ID (*ProjectID*), the local ID for the PI (*PiPersonID*)
+which should be a locally unique identifier for the PI at the local site, and the login at the local site
+for the PI (*PiRemoteSiteLogin*). The *ResourceList* must have a single item (even though it is a list).
+
+The table below lists the tags that could be included in this packet (the ones in *bold* must be
+included). If the PI is already known to the XDCDB (based on the *PiPersonID* or the `PiGlobalID`),
+then all the Pi tags are ignored, except *PiPersonID*, `PiGlobalID`, and *PiRemoteSiteLogin*.
+Otherwise the PI information is recorded at the XDCDB for the *PiPersonID*.
+
+The `PiGlobalID` is the internal ID for the PI within the XDCDB.
+
+The `NsfStatusCode` must be a valid NSF Status Code (as defined in the XDCDB). The `PiOrgCode`
+must be a valid NSF organization code (as defined in the XDCDB). The `PiCountry` must be a valid
+NSF country code (as defined in the XDCDB). The `PiState` must be a valid state abbreviation (as
+defined in the XDCDB).
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PiFirstName* | | | Steven
+| *PiLastName* | | | Quinn
+| *PiOrganization* | | | University of Illinois at Urbana-Champaign
+| *PiOrgCode* | | | 0017756
+| *PiPersonID* | | | 6751
+| *PiRemoteSiteLogin* | | | squinn
+| *ProjectID* | | | afm
+| *ProjectTitle* | | | Planetary Motion
+| *RecordID* | | | 123456
+| *ResourceList* | | 0 | staff.xsede
+| *ServiceUnitsAllocated* | | | 99999
+| `Sfos` | *Number* | 0 | 122
+| `Sfos` | *Number* | 1 | 124
+| *StartDate* | | | 2003-12-16
+| *AccountActivityTime* | | | 2003-12-16T08:00:00Z
+| `AcademicDegree` | *Degree* | 0 | MS
+| `AcademicDegree` | *Field* | 0 | Math
+| `AcademicDegree` | *Degree* | 1 | PhD
+| `AcademicDegree` | *Field* | 1 | Math
+| *BoardType* | |  | NRAC
+| `EndDate` | | | 2013-12-31
+| `GrantType` | | | Science Gateway
+| *GrantNumber* | | | AST040002
+| `NsfStatusCode` | |  | CN
+| *PfosNumber* | | | 120
+| `PiBusinessPhoneExtension` | | | 7570
+| `PiBusinessPhoneNumber` | | | (217) 244-0072
+| `PiCity` | | | Chammpaign
+| `PiCountry` | | | 9US
+| `PiDepartment` | | | N.C.S.A.
+| `PiDnList` | | 0 | /C=US/O=NCSA/CN=Steven James Quinn
+| `PiDnList` | | 1 | /C=US/O=PSC/CN=Steven James Quinn
+| `PiDnList` | | 2 | /C=US/O=SDSC/CN=Steven James Quinn
+| `PiDnList` | | 3 | /C=US/O=ANL/CN=Steven James Quinn
+| `PiEmail` | | | mshapiro@ncsa.uiuc.edu
+| `PiFax` | | | (217)-244-1987
+| `PiGlobalID` | | | 150
+| `PiHomePhoneExtension` | | | none
+| `PiHomePhoneNumber` | | | (217) 222-0000
+| `PiMiddleName` | | | James
+| `PiPosition` | | | Research Programmer
+| `PiRequestedLoginList` | | 0 | squinn
+| `PiState` | | | IL 
+| `PiStreetAddress` | | | 131 CAB
+| `PiStreetAddress2` | | | 605 E. Springfield Ave.
+| `PiTitle` | | | n/a
+| `PiUID` | | | 12456
+| `PiZip` | | | 61820
+| `ProjectGID` | | | 123
+| `RoleList` | | 0 | allocation_manager
+|===
+
+===== `data_project_create` Packet
+
+The XDCDB will reply with a `data_project_create` packet that contains all the DNs known by the
+XDCDB for the project PI.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| `DnList` | | 0 | /C=US/O=NCSA/CN=Steven James Quinn
+| `DnList` | | 1 | /C=US/O=PSC/CN=Steven James Quinn
+| `DnList` | | 2 | /C=US/O=SDSC/CN=Steven James Quinn
+| `DnList` | | 3 | /C=US/O=ANL/CN=Steven James Quinn
+| *ProjectID* | | | afm
+|===
+
+===== `inform_transaction_complete` Packet
+
+The local site must then reply with an `inform_transaction_complete` to complete the transaction.
+
+===== `notify_project_create` code in `amieclient`
+
+-----
+class NotifyProjectCreate(Packet):
+    _packet_type = 'notify_project_create'
+    _expected_reply = [{'type': 'data_project_create', 'timeout': 30240}]
+    _data_keys_required = [
+        'GrantNumber',
+        'PfosNumber',
+        'PiOrgCode',
+        'PiPersonID',
+        'PiRemoteSiteLogin',
+        'ProjectID',
+        'ProjectTitle',
+        'ResourceList',
+        'ServiceUnitsAllocated',
+        'StartDate'
+    ]
+    _data_keys_not_required_in_reply = [
+        'GrantNumber',
+        'PfosNumber',
+        'PiOrgCode',
+        'ProjectTitle',
+        'ResourceList',
+        'ServiceUnitsAllocated',
+        'StartDate'
+    ]
+    _data_keys_allowed = [
+        'Abstract',
+        'AcademicDegree',
+        'AllocationType',
+        'EndDate',
+        'NsfStatusCode',
+        'PiBusinessPhoneComment',
+        'PiBusinessPhoneExtension',
+        'PiBusinessPhoneNumber',
+        'PiCity',
+        'PiCountry',
+        'PiDepartment',
+        'PiDnList',
+        'PiEmail',
+        'PiFax',
+        'PiFirstName',
+        'PiGlobalID',
+        'PiHomePhoneComment',
+        'PiHomePhoneExtension',
+        'PiHomePhoneNumber',
+        'PiLastName',
+        'PiMiddleName',
+        'PiOrganization',
+        'PiPosition',
+        'PiRequestedLoginList',
+        'PiState',
+        'PiStreetAddress',
+        'PiStreetAddress2',
+        'PiTitle',
+        'PiUID',
+        'PiZip',
+        'ProjectGID',
+        'ResourceLogin',
+        'RoleList',
+        'Sfos',
+    ]
+----- 
+
+==== `notify_account_create` Transaction
+
+The purpose of this transaction is for a local site to notify the XDCDB of the creation of an
+account for an XSEDE project. Accounts are never created by XDCDB. They must first be created
+at one of the local sites. That site, then, notifies the XDCDB of the account.
+
+For any given account, one site must be designated as the originating site for the account. In
+principle, any site could create an account. In practice it may be the site that created the project
+which also creates the accounts for the project. Which site is designated is an XSEDE policy
+decision that is outside the scope of this document.
+
+The local site creates an account and sends the site-specific account information to the XDCDB in
+a `notify_account_create` packet. The XDCDB then sends additional information about the
+account to the local site in a `data_account_create packet`. The local site finishes the transaction by
+sending an `inform_transaction_complete`.
+
+The local site must first create a transaction before it can create
+the `notify_account_create` packet. It must also make
+sure that the related `notify_project_create` transaction has been completed. The transaction dependency mechanism
+(described in Implementing AMIE) can be used to delay the transmission of the `notify_account_create` until the
+completion of the related `notify_project_create` transaction.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_account_create` | outgoing
+| `data_account_create` | incoming
+| `inform_transaction_complete` | outgoing
+|===
+
+===== `notify_account_create` Packet
+
+After having created an account, the local site sends a `notify_account_create` packet to the
+XDCDB. This packet must contain the local project ID (*ProjectID*) and the local ID for the
+account user (*UserPersonID*) and the login at the local site for the user (*UserRemoteSiteLogin*).
+The table below lists the tags that could be included in this packet (the ones in *bold* must be
+included). However, if the user is already known to the XDCDB (based on the `UserPersonID` or
+the `UserGlobalID`), then all the `User` tags are ignored.
+
+The `UserGlobalID` is the internal ID for the user within the XDCDB.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *AccountActivityTime* | | | 2003-12-16T08:00:00Z
+| `AcademicDegree` | *Degree* | 0 | MS
+| `AcademicDegree` | *Field* | 0 | Math
+| `AcademicDegree` | *Degree* | 1 | PhD
+| `AcademicDegree` | *Field* | 1 | Math
+| *ProjectID* | |  | afm
+| *ResourceList* | | 0 | staff.xsede
+| *UserFirstName* | | | Michael
+| *UserLastName* | | | Shapiro
+| *UserOrganization* | | | University of Illinois at Urbana-Champaign
+| *UserOrgCode* | | | 0017756
+| *UserPersonID* | | | 21619
+| *UserRemoteSiteLogin* | | | mshapiro
+| `NsfStatusCode` | |  | CN
+| `RoleList` | | 0 | co_pi
+| `UserBusinessPhoneExtension` | | | 1514
+| `UserBusinessPhoneNumber` | | | (217) 244-0072
+| `UserCity` | | | Chammpaign
+| `UserCountry` | | | 9US
+| `UserDepartment` | | | N.C.S.A.
+| `UserDnList` | | | /C=US/O=NCSA/CN=Michael Shapiro
+| `UserDnList` | | | /C=US/O=SDSC/CN=Michael Shapiro
+| `UserEmail` | | | mshapiro@ncsa.uiuc.edu
+| `UserFax` | | | (217)-244-1987
+| `UserGlobalID` | | | 150
+| `UserHomePhoneExtension` | | | none
+| `UserHomePhoneNumber` | | | (217) 384-0000
+| `UserMiddleName` | | | J.
+| `UserPasswordAccessEnable` | | | 1
+| `UserPosition` | | | Research Programmer
+| `UserRequestedLoginList` | | 0 | mshapiro
+| `UserState` | | | IL
+| `UserStreetAddress` | | | 137 CAB
+| `UserStreetAddress2` | | | 605 E. Springfield Ave.
+| `UserTitle` | | | Senior Systems Engineer
+| `UserUID` | | | 12345
+| `UserZip` | | | 61820
+|===
+
+Further explanations of tags:
+
+* `NsfStatusCode` must be a valid NSF Status Code (as defined in the XDCDB)
+* `UserOrgCode` must be a valid NSF organization code (as defined in the XDCDB)
+* `UserCountry` must be a valid NSF country code (as defined in the XDCDB)
+* `UserState` must
+be a valid state abbreviation (as defined in the XDCDB).
+* `UserBusinessPhoneNumber` is required if the `UserBusinessPhoneExtension` is present
+* `UserHomePhoneNumber` is required if the `UserHomePhoneExtension` is present
+
+===== `data_account_create` Packet
+
+The XDCDB will reply with a `data_account_create` packet that contains all the DNs known by the
+XDCDB for the user.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| `DnList` | | 0 | /C=US/O=NCSA/CN=Michael Shapiro
+| `DnList` | | 1 | /C=US/O=SDSC/CN=Michael Shapiro
+| *PersonID* | | | 21619
+| *ProjectID* | | | afm
+|===
+
+===== `inform_transaction_complete` Packet
+
+The local site must then reply with an inform_transaction_complete to complete the transaction.
+
+===== `notify_project_inactivate` Transaction
+
+The purpose of this transaction is for a local site to notify the XDCDB of the inactivation of an
+XSEDE project.
+
+The local site inactivates a project and all accounts on the project and sends the site-specific
+project information to the XDCDB in a `notify_project_inactivate` packet. The XDCDB then
+finishes the transaction by sending an `inform_transaction_complete` packet.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_project_inactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `notify_project_inactivate` Packet
+
+After having inactivated a project, the local site sends a `notify_project_inactivate` packet to the
+XDCDB. This packet must contain the local project ID (*ProjectID*), a single resource
+(*ResourceList*) and the time that the account was inactivated (*AccountActivityTime*). The table
+below lists the tags that could be included in this packet (the ones in *bold* must be included).
+
+The allowable and mandatory tags in a `notify_project_inactivate` packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *AccountActivityTime* | |  | 2004-10-21T09:00:00Z
+| *ProjectID* | |  | afm
+| `Comment` | | | Project out of funds
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+===== `inform_transaction_complete` Packet
+
+==== `notify_project_reactivate` Transaction
+
+The purpose of this transaction is for a local site to notify the XDCDB of the reactivation of an
+XSEDE project.
+
+The local site reactivates a project and the account for the PI and sends the site-specific project
+information to the XDCDB in a `notify_project_reactivate` packet. The XDCDB then finishes the
+transaction by sending an `inform_transaction_complete`.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_project_reactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `notify_project_reactivate` Packet
+
+The allowable and mandatory tags in a `notify_project_reactivate` packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *AccountActivityTime* | |  | 2004-12-21T09:00:00Z
+| *ProjectID* | |  | afm
+| `Comment` | | | PI needs more time
+| *ResourceList* | | 0 | hc.ncsa.xsede
+|===
+
+*NOTE*: Projects can also be reactivated via `request_project_create` transactions.
+
+===== `inform_transaction_complete` Packet
+
+==== `notify_account_inactivate` Transaction
+
+The purpose of this transaction is for a local site to notify the XDCDB of the inactivation of an
+account for an XSEDE project.
+
+The local site inactivates an account and sends the site-specific account information to the
+XDCDB in a `notify_account_inactivate` packet. The XDCDB then finishes the transaction by
+sending an `inform_transaction_complete`.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_account_inactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `notify_acccount_inactivate` Packet
+
+After having inactivated an account, the local site sends a `notify_account_inactivate` packet to the
+XDCDB. This packet must contain the local project ID (*ProjectID*), the local ID for the account
+user (*PersonID*), and the allocated resource (*ResourceList*). The table below lists the tags that
+could be included in this packet (the ones in *bold* must be included).
+
+The mandatory and optional tags for the `notify_account_inactivate` packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *ProjectID* | |  | afm
+| `Comment` | | | No longer on the project
+| *ResourceList* | | 0 | staff.xsede
+|===
+
+===== `inform_transaction_complete` Packet
+
+==== `notify_account_reactivate` Transaction
+
+The purpose of this transaction is for a local site to notify the XDCDB of the reactivation of an
+account for an XSEDE project.
+
+The local site reactivates an account and sends the site-specific account information to the
+XDCDB in a `notify_account_reactivate` packet. The XDCDB then finishes the transaction by
+sending an `inform_transaction_complete`.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_account_reactivate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `notify_acccount_reactivate` Packet
+
+The mandatory and optional tags for the `notify_account_reactivate` packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *ProjectID* | |  | afm
+| `Comment` | | | Re-hired on the project
+| *ResourceList* | | 0 | staff.xsede
+|===
+
+*NOTE*: Accounts can also be reactivated via `notify_account_create` transactions.
+
+===== `inform_transaction_complete` Packet
+
+==== `compute_usage_record` Transaction
+
+The usage packet details found in the various PDF documents was superseded but the PDFs were not
+updated.  The following information was extracted from the source code file at:
+
+https://github.com/XSEDE/amieclient/blob/b96c3bc759b240dbaece5df8d0aa6b7130887dfb/amieclient/usage/record.py[`https://github.com/XSEDE/amieclient/blob/b96c3bc759b240dbaece5df8d0aa6b7130887dfb/amieclient/usage/record.py`]
+
+On a regular basis, the local sites must send usage information for XSEDE projects to the central
+database. The local site sends project usage information to the XDCDB in a `compute_usage_record`
+packet. The XDCDB processes the usage information and finishes the transaction by sending an
+`inform_transaction_complete` to the local site.
+
+===== Job Usage Packet Requirements
+
+The *mandatory* and `optional` tags for the `compute_usage_record` job usage packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *Username* | |  | pi.xy5678
+| *LocalProjectID* | |  | p.ini2222
+| *LocalRecordID* | | | 3147948595984
+| *Resource* | | | faster.tamu.xsede.org
+| *SubmitTime* | | | 2004-02-05T08:01:34Z
+| *StartTime* | | | 2004-02-05T08:02:33Z
+| *EndTime* | | | 2004-02-05T09:07:33Z
+| *Charge* | | | 7
+| *NodeCount* | | | 8
+| *CpuCoreCount* | | | 24
+| *JobName* | | | rastus1165
+| *MaxMemory* | | | 12345000
+| *Queue* | | | ux453932
+| `ParentRecordID` | | | THX8675309
+| `LocalReference` | | | GIGEM
+|===
+
+Further explanations of packet items are:
+
+* *Username* - the *PiPersonID*/*PersonID* from a previously processed `request_project_create`/`request_account_create`
+packet, i.e. `person_id` in the `local_info` table
+* *LocalProjectID* - the *ProjectID* from a previously processed `request_project_create` packet, i.e. `project_id` in the
+`local_info` table
+* *LocalRecordID* - a site-specific job ID, typically a Slurm job ID
+* *Resource* - the `AllocatedResource` as found in a previously processed `request_project_create`/`request_account_create`
+packet
+* *SubmitTime* - the time the job was submitted to the `Resource`
+* *StartTime* - the time the job started on the `Resource`
+* *EndTime* - the time the job finished on the `Resource`
+* *Charge* - the charge for the job
+* *NodeCount* - the number of nodes on which the job ran
+* *CpuCoreCount* - the number of CPU cores used by the job
+* *JobName* - essentially arbitrary local identifier not described in source code comments
+* *Memory* - the maximum memory used in a node
+* *Queue* - the name of the scheduler queue, e.g. Slurm, used to submit the job
+* `ParentRecordID` - an optional job ID of the parent job if this record is a sub job, typically a Slurm job ID
+* `LocalReference` - an optional key to locally identify this record
+
+===== Extracting Packet Requirements from Databases
+
+The information required for a `compute_usage_record` packet is found in the two tables
+`faster_job_table` and `job_processing` in the `slurm_acct_db` database, and in the table
+`local_info` in the `amiedb` database.  This information is combined and placed into the
+`usage_compute` table in the 'amiedb' database, from where it will be extracted and sent
+in packets.
+
+The translation table is:
+
+-----
+#                                                                                                  compute_usage_record
+#      usage_compute        faster_job_table            job_processing           local_info              packet
+#
+#     serial_no (bigint)      job_db_inx (bigint)    job_table_record_id int
+#     person_id (char)                                                        person_id (char)        Username
+#     project_id (char)                                                       project_id (char)       LocalProjectID
+#     uid (int)                                                               uid (int)                 
+#     local_record_id (char)  account (tinytext)                              slurm_acct (char)       LocalRecordID
+#     resource (char)                                                         cluster (char)          Resource
+#     charge (double)                                service_units (float)                            Charge
+#     cpu_core_count (int)                           num_cpus (int)                                   CpuCoreCount
+#     submit_time (ts)        time_submit (bigint)                                                    SubmitTime
+#     start_time (ts)         time_start (bigint)                                                     StartTime
+#     end_time (ts)           time_end (bigint)                                                       EndTime
+#     node_count              nodes_alloc (int)                                                       NodeCount
+#     job_name (char)         job_name (tinytext)                                                     JobName
+#     max_memory (bigint)     mem_req (bigint)                                                        Memory
+#     queue char                                                                                      Queue
+#     parent_record_id        OPTIONAL                                                                [ParentRecordID]
+#     local_reference         OPTIONAL                                                                [LocalReference]
+#     time_stamp
+-----
+
+===== The `usage_compute` Table
+
+The `usage_compute` table is a halfway-house for `compute_usage_record` packet transactions.
+The data required for these packets is periodically harvested from the `faster_job_table`, 
+`job_processing` and `local_info` tables and placed into this table.
+
+==== `adjustment_usage_record` Transaction
+
+The usage packet details found in the various PDF documents was superseded but the PDFs were not
+updated.  The following information was extracted from the source code file at:
+
+https://github.com/XSEDE/amieclient/blob/b96c3bc759b240dbaece5df8d0aa6b7130887dfb/amieclient/usage/record.py[`https://github.com/XSEDE/amieclient/blob/b96c3bc759b240dbaece5df8d0aa6b7130887dfb/amieclient/usage/record.py`]
+
+The packet is used to send credit/debit information.
+The credit types are `credit`,
+`refund` and `storage-credit`. Debit types are `debit`, `reservation`, and `storage-debit`.
+
+The *mandatory* and `optional` tags for the `adjustment_usage_record` packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *AdjustmentType* | | | credit
+| *Charge* | |  | 7
+| *StartTime* | |  | 2004-02-05T08:02:33Z
+| *LocalProjectID* | | | p.ini2222
+| *LocalRecordID* | | | p.ini2222-2004-02-05T08:02:33Z
+| *Resource* | | | faster.tamu.xsede.org
+| *Username* | | | pi.xy5678
+| `Comment` | | | Loren ipsum.
+| `LocalReference` | | | GIGEM-p.ini2222
+|===
+
+The field specifics are:
+
+* *AdjustmentType* - type of adjustment, i.e. `credit`, `refund`, `storage-credit`, `debit`, `reservation` or `storage-debit`
+* *Charge* - the amount of allocation units that should be deducted from the project allocation for this job
+* *StartTime* - the time for which this adjustment should be applied, i.e. the job refund time should be
+the same as the job submit time
+* *LocalProjectID* - the *ProjectID* from a previously processed `request_project_create` packet, i.e. `project_id` in the
+`local_info` table
+* *LocalRecordID* - the AMIE site record ID to make the record locally identifiable and unique for the resource
+* *Resource* - the `AllocatedResource` as found in a previously processed `request_project_create`/`request_account_create`
+packet
+* *Username* - the *PiPersonID*/*PersonID* from a previously processed `request_project_create`/`request_account_create`
+packet, i.e. `person_id` in the `local_info` table
+* `Comment` - an optional comment field
+* `LocalReference` - an optional key for locally identifying the record
+
+===== Pros and Cons of Project Activation/Inactivation Via Credits/Debits
+
+If a credit is received for project currently inactivated due to being out of funds, the credit
+may cause the project to be reactivated. A debit may similarly inactivate a project. In general,
+credits and debits should be sent and processed as soon as reasonably possible so that XDCDB and
+the services that rely on it, such as the TG User Portal and tgusage, can present accurate
+information.
+
+However, sites should note two implications of project reactivation via credits. First, small refunds
+on projects that are at or near their allocation limits may cause a "flip-flop" cycle of project
+reactivation by credits and inactivation as subsequent job charges put the project over its allocation
+limit. Similarly, refunds on inactivated projects that are near the end of an allocation period (i.e.,
+projects that may expire within a few days) may reactivate the project, only to have it inactivated
+when it expires.
+
+===== Best Practices for Credits/Refunds
+
+The following "best practices" for credits/refunds are recommended:
+
+* Sites should send credits/refunds for the largest appropriate amount in the fewest packets.
+    For example, send one `refund` NPU for 2000 SUs rather than 10 `refund` NPUs for 200 SUs.
+
+* For refunds on overspent projects that are very close to expiration, it may be practical to re-
+    activate the project locally until the expiration date has passed, then send up a "back-dated"
+    refund or credit to apply to the allocation. For grid allocations, sites should use their best
+    judgment in these situations, since the credit/debit reactivation/inactivation may affect a
+project's ability to run at another site.
+
+===== `inform_transaction_complete` Packet
+
+==== `storage_usage_record` Transaction
+
+The usage packet details found in the various PDF documents was superseded but the PDFs were not
+updated.  The following information was extracted from the source code file at:
+
+https://github.com/XSEDE/amieclient/blob/b96c3bc759b240dbaece5df8d0aa6b7130887dfb/amieclient/usage/record.py[`https://github.com/XSEDE/amieclient/blob/b96c3bc759b240dbaece5df8d0aa6b7130887dfb/amieclient/usage/record.py`]
+
+Here's a "temporary" dump of the source code info section in lieu of fancy formatted info.
+
+-----
+class StorageUsageRecord(UsageRecord):
+    record_type = 'storage'
+    """
+    A usage record for storage usage.
+
+    Args:
+        charge (str): The amount of allocation units that should be deducted
+                      from the project allocation for this job.  For storage
+                      this is usually gigabytes stored
+        collection_time (str): Time the storage use was collected
+        local_project_id (str): The Site Project ID for the job.  This must
+                                match the ProjectID provided by the site for
+                                the project with AMIE
+        local_record_id (str): Site Record ID.  Use to make the record
+                               identifiable to you locally
+        local_reference (str): An optional key to help you identify this
+                               record locally.  Included when the record
+                               load fails in the initial post or in the
+                               errors reported by the GET usage/status end
+                               point. This could be a primary key value
+                               from a local accounting system
+        resource (str): Resource the job ran on.  Must match the resource name
+                        used in AMIE
+        username (str): The local username of the user who ran the job. Must
+                        match the username used in AMIE
+        bytes_read (str): Number of bytes Read
+        bytes_stored (str): Number of bytes stored
+        bytes_written (str): Number of bytes written
+        collection_interval (str): How often the storage use will be calculated
+                                   in days
+        file_count (str): Number of files stored
+        files_read (str): Number of files read
+        files_written (str): Number of files written
+        media_type (str): Type of the storage (Tape, Disk, SSD, etc)
+        system_copies (str): Number of copies of the data the system keeps
+        user_copies (str): Number of copies of the data the user has chosen
+                           to keep
+    """
+-----
+
+==== `notify_user_modify` Transaction
+
+The purpose of this transaction is to update information about a user in the central database.
+
+If a local site has updated information about an XSEDE user, it sends the updates to the XDCDB
+in a `notify_user_modify` packet. The XDCDB updates the information about the user and finishes
+the transaction by sending an `inform_transaction_complete`.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_user_modify` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `notify_user_modify` Packet
+
+The mandatory and optional tags for the `notify_person_duplicate` package are
+shown in the following table.  The allowed values for
+`ActionType` are `replace`, `delete` and `add`.
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *ActionType* | |  | `replace`,`delete`,`add`
+| `AcademicDegree` | *Degree* | 0 | MS
+| `AcademicDegree` | *Field* | 0 | Math
+| `AcademicDegree` | *Degree* | 1 | PhD
+| `AcademicDegree` | *Field* | 1 | Math
+| *PersonID* | |  | 21619
+| `State` | | | IL
+| `StreetAddress` | | | 137 CAB
+| `StreetAddress2` | | | 605 E. Springfield Ave.
+| `Title` | | | Senior Systems Engineer
+| `Zip` | | | 61820
+| `BusinessPhoneComment` | | | Business phone on campus
+| `BusinessPhoneExtension` | | | 1514
+| `BusinessPhoneNumber` | | | (217) 244-0072
+| `City` | | | Champaign
+| `Country` | | | 9US
+| `Department` | | | N.C.S.A.
+| `DnList` | | 0 | /C=US/O=NCSA/CN=Michael Shapiro
+| `DnList` | | 1 | /C=US/O=SDSC/CN=Michael Shapiro
+| `Fax`    | | | (217) 244-1987
+| `FirstName` | | | Michael
+| `HomePhoneComment` | | | Has caller ID
+| `HomePhoneExtension` | | | none
+| `HomePhoneNumber` | | | (217) 384-0000
+| `LastName` | | | Shapiro
+| `MiddleName` | | | J.
+| `Organization` | | | University of Illinois at Urbana-Champaign
+| `OrgCode` | | | 0017756
+| `State` | | | IL
+|===
+
+===== `inform_transaction_complete` Packet
+
+=== Duplicate People Transactions
+
+Occasionally, multiple entries for the same person get created in the XDCDB50. The three
+transactions described in this section (`notify_person_duplicate`, `request_person_merge`, and
+`notify_person_ids`) are designed to automated the process of merging duplicate people into a single
+person.
+
+One implication of this design is that a person in the XDCDB now can have multiple local person
+IDs (one of which is the primary local person ID) and multiple usernames on any resource. The
+sites can use any of the local person IDs or usernames in the packets they send up
+(`notify_account_create`, `notify_project_usage`, etc). The XDCDB will only use the primary local
+person ID in packets sent to sites (`request_account_create`, `data_account_create`, etc), except for
+the `request_user_modify` (which will be sent for each local person ID, primary as well as non-
+primary).
+
+==== `notify_person_duplicate` Transaction
+
+The purpose of this transaction is to notify the central database that there are duplicate people in
+the database.
+
+A site sends the local IDs of two people that are duplicates to the XDCDB in a
+`notify_person_duplicate` packet. The XDCDB will merge the two people and finish the
+transaction by sending an `inform_transaction_complete` to the site.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_person_duplicate` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== `notify_person_duplicate` Packet
+
+The contents of the `notify_person_duplicate` package are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *GlobalID1* | |  | 125
+| *PersonID1* | |  | 21619
+| *GlobalID2* | |  | 133
+| *PersonID2* | |  | 21620
+|===
+
+The `PersonID1` and `PersonID2` values are the local person IDs for the two people. The `GlobalID1`
+and `GlobalID2` are the XDCDB internal ids for the two people. The XDCDB will merge the two
+people into a single person. The XDCDB makes the determination about how to merge the two
+people. One will be kept and the other deleted.
+
+Even though the `GlobalID`s and the `PersonID`s are specified as
+optional, one of `GlobalID1` and `PersonID1` must be
+specified, as well as one of `GlobalID2` and `PersonID2`.
+
+Once the merge is completed at the TGCDB, `request_person_merge` transactions will be sent to each site informing
+them of the person kept and the person deleted.
+
+===== `inform_transaction_complete` Packet
+
+==== `request_person_merge` Transaction
+
+The purpose of this transaction is to inform sites that the central database has merged two duplicate
+people into a single person.
+
+The XDCDB sends the IDs of the two people that were merged into a single person via a
+`request_person_merge` packet. The site finishes the transaction by sending an
+`inform_transaction_complete` to the XDCDB.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `request_person_merge` | incoming
+| `inform_transaction_complete` | outgoing
+|===
+
+===== `request_person_merge` Packet
+
+The contents of the `request_person_merge` Packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *KeepGlobalID* | |  | 1234
+| *KeepPersonID* | |  | 21620
+| `KeepPortalLogin` | | | mshapiro
+| *DeleteGlobalID* | |  | 431
+| *DeletePersonID* | |  | 21619
+| `DeletePortalLogin` | | | mshapiro2
+|===
+
+The `KeepPersonID` and `DeletePersonID` values are the local person IDs for the two people. The
+`KeepGlobalID` and `DeleteGlobalID` are the XDCDB internal person IDs for the two people. The
+`KeepPortalLogin` and the `DeletePortalLogin` are the portal usernames for the two people. The
+XDCDB has merged `DeleteGlobalID` into `KeepGlobalID` and deleted `DeleteGlobalID`. The
+accounts and usage for the deleted person are transferred to the kept person.
+
+The local site identifiers (local person ID, usernames on resources) from the deleted person are
+transferred to the kept person (which implies that the kept person now has multiple local IDs and
+multiple usernames). The local person ID for the kept person is the primary local person ID.
+
+The XDCDB will ensure that the kept person has a portal login. If the kept person has a portal
+login, then it will be retained. If not, but the deleted person did, then the portal login for the deleted
+person will be transferred to the kept person. The `KeepPortalLogin` (if present) indicates the portal
+login retained. The `DeletePortalLogin` (if present) indicates the portal login deleted.
+
+Sites can handle the merge locally as they wish. If they decide to keep both people as distinct
+people, they can use any of the local IDs and usernames to refer to the single (merged) person. If
+they wish to merge the people locally, they can notify the XDCDB of the local ID(s) and
+username(s) they wish the XDCDB to have for the single person via a `notify_person_id`
+transaction. The XDCDB will use the primary local person ID in all packets sent to sites (except
+for `request_user_modify` packets – one will be sent for each local person ID).
+
+*NOTE*: The XDCDB will not send this packet to a site if the XDCDB does not have a local person
+ID for both people (i.e., when the site has not added one of the people to their local accounting
+system.)
+
+===== `request_person_merge` Section of `process_packets.py`
+
+-----
+    if packet_type == 'request_person_merge':
+        keep_person_id = packet.KeepPersonID
+        delete_person_id = packet.DeletePersonID
+
+        # SP: merge delete_person_id into keep_person_id and remove delete_person_id from local accounting system
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+-----
+
+==== `notify_person_ids` Transaction
+
+===== Summary and Packet Sequence
+
+The purpose of this transaction is to notify the central database of the local site person ID(s) and
+username(s) to be associated with a person. It can be used after processing a `request_user_merge`
+or independently to change the local person ID or usernames at any time.
+
+A site sends a primary local ID (and possibly other IDs) as well as the username(s) on the site’s
+resources to be associated with the person. The XDCDB will assign the IDs and usernames to the
+specified person and finish the transaction by sending an `inform_transaction_complete` to the site.
+
+The sequence of packets is:
+
+[width=50%]
+[cols="2,1"]
+|===
+| `notify_person_ids` | outgoing
+| `inform_transaction_complete` | incoming
+|===
+
+===== Required and Optional Packet Contents
+
+The contents of the `request_person_merge` Packet are:
+
+[width=75%]
+[cols="3,2,1,9"]
+|===
+| tag  |   subtag  |  seq  |  value
+
+| *PersonID* | |  | 21619
+| *PrimaryPersonID* | |  | 21619
+| `PersonIdList` | | 0 | 21620
+| `PersonIdList` | | 1 | 21800
+| `RemoveResourceList` | | 0 | hc.ncsa.xsede
+| `ResourceLogin` | *Resource* | 0 | hc.ncsa.xsede
+| `ResourceLogin` | *Login* | 0 | mshapiro
+| `ResourceLogin` | UID | 0 | 21619
+| `ResourceLogin` | *Resource* | 1 | hc.ncsa.xsede
+| `ResourceLogin` | *Login* | 1 | mshapiro2
+| `ResourceLogin` | UID | 1 | 21620
+|===
+
+The `PersonID` is any local person ID that identifies the person in the TGCDGB. The
+`PrimaryPersonID` is the local person ID that is to be used as the primary. If a `PersonIdList` is
+provided, then these person IDs are also associated with the person. Any other person ID that the
+XDCDB has that are not the primary and not listed in the `PersonIdList` will be deleted.
+The `RemoveResourceList` lists resources from which all usernames for this person are to be
+deleted.
+
+The `ResourceLogin` lists usernames (and optional UIDs) to be associated with the person on the
+specified resources.
+
+The `ResourceLogin` only adds usernames (or updates the UID). It does not remove existing
+usernames. To remove existing usernames, the `RemoveResourceList` must be specified.
+
+===== The `npi.py` Python Script
+
+The latest version of this script can be found at:
+
+https://github.tamu.edu/baum/AMIE/blob/master/npi.py[`https://github.tamu.edu/baum/AMIE/blob/master/npi.py`]
+
+The `npi.py` script that locally creates and sends a `notify_person_ids` packet to NCSA
+contains the following functionality:
+
+* Prompts the interactive user to enter a last name and searches the *local_info* table for that name.
+** If no matches are found, it prompts the user to choose to quit or try another search.
+** If a match is found, more info about that user is extracted from *local_info* including the present local ID.
+** If multiple matches are found, nothing is done yet as of 4/26/2022.
+* Prompts the user to enter a replacement for the local ID.
+* Updates *local_info* with the replacement ID.
+* Updates *local_info* with a remote site login name that is identical to the replacement ID.
+* Creates a `notify_person_ids` packet.
+* Dumps an ASCII copy of the packet to the filesystem.
+* Finds the maximum `trans_rec_id` value in the *local_transaction* table and increments it by one.
+* Creates a new entry for this transaction with the incremented `trans_rec_id` value in *local_transaction*.
+* Sends the `notify_person_ids` packet to NCSA.
+
+== AMIE Client API
+
+To communicate with the AMIE REST API, create a client object and provide your site name and your API key.
+
+-----
+psc_client = amieclient.AMIEClient(site_name='PSC', api_key='amie_api_key')
+-----
+
+=== Replying to a Packet from a Transaction.
+
+-----
+#!/usr/bin/env python3
+
+"""
+This example demonstrates how to respond to a transaction in progress
+For this example, Transaction 12345 has an incoming RequestProjectCreate
+packet, which we will respond to with a NotifyProjectCreate.
+"""
+from amieclient import AMIEClient
+
+# Create the client
+psc_client = AMIEClient(site_name='PSC', api_key='some_secret_key')
+
+# Get the transaction you want
+transaction = psc_client.get_transaction(trans_rec_id='12345')
+
+# Get the most recent packet (? this may need a more robust method)
+project_creation_request = transaction.packets[-1]
+
+# The assumption here is that rpc is a RequestProjectCreate.
+# Here, you'd go ahead and do what you need to create the project.
+
+# SomeInternalSystem.create_project()
+
+# Once that's done, send a NotifyProjectCreate packet.
+# If nothing needs to be changed from the RequestProjectCreate packet,
+# you can use the packet's reply_to() method. This will create a packet that
+# automatically has the proper type and a reference to the preceeding packet.
+# The AMIE service will extrapolate the needed information from the
+# RequestProjectCreate packet.
+
+project_created = project_creation_request.reply_to()
+
+psc_client.send_packet(project_created)
+
+# You can also create a client as a context manager, if you want.
+# This complete example would look like
+with AMIEClient('psc', 'some_secret_key') as client_too:
+    transaction = client_too.get_transaction(transaction_id='12345')
+    project_creation_request = transaction.packets[-1]
+    # Do something...
+    project_created = project_creation_request.reply_to()
+    client_too.send_packet(project_created)
+-----
+
+
+
+== AMIE Client API Routes Overview
+
+The AMIE Client API offers a new interface with which to interact with AMIE, instead of XML documents moving (via
+SSH or AMQP) between sites and the central AMIE server.
+
+The AMIE Client API continues to use the same transaction and packet model from the legacy AMIE implementation,
+but the packet data is presented in JSON form via a RESTful API.
+
+The main form of interacting with the AMIE Client API is to periodically check whether there are new in-progress
+packets for your site. A response can then be posted in reply to an existing packet. Each response will trigger the
+next packet to be generated, until the transaction is complete.
+
+The AMIE Client API removes the requirement for the sites to each maintain their own database of what packets
+they’re seen, and adds client_state and client_json attributes to the packets to allow the sites to categorize packets
+differently from the way the central service views them, if so desired.
+
+All routes require XA-SITE and XA-API-KEY headers in the request, to authenticate.  The string:
+
+`GET https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/`
+
+will return all in-progress packets for the site, in JSON format.  Site must provide
+XA-SITE and XA-API-KEY headers in the request.
+
+The result will be in the form:
+
+-----
+To be completed.
+-----
+
+The string:
+
+`GET https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/<packet_rec_id>`
+
+will return the JSON representation of the specified packet.
+
+The string:
+
+`POST https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/`
+
+allows the client to post a packet to AMIE.
+The JSON representation of the packet must be in the body of the request.
+
+The AMIE Client API will attempt to automatically fill in any fields that it can infer; when posting in reply to a
+particular packet (such as replying to an RPC with an NPC) only the bare minimum of fields need to be
+explicitly specified.
+
+The string for posting a reply to a particular `packet_rec_id` is:
+
+`POST https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/<packet_rec_id>/reply`
+
+The JSON representation of the packet must be in the body of the request.
+
+This is equivalent to POSTing to `https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/` with
+`“in_reply_to”:<packet_rec_id>` in the header of the posted JSON.
+
+The following sets the `client_state` attribute on the packet to the desired state.
+
+`PUT https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/<packet_rec_id>/client_state/<state>`
+
+The following sets the `client_json` field for the packet to the JSON contained in the body
+of the request.
+
+`PUT https://a3mdev.xsede.org/packets/:site_name/:packet_id/client_json`
+
+The following deletes the `client_json` field for the given packet.
+
+== AMIE API Testing
+
+=== Test Scenarios
+
+There are seven different kinds of initial packets from the AMIE client API.
+
+-----
+request_project_create
+request_project_inactivate
+request_project_reactivate
+request_account_create
+request_account_inactivate
+request_user_modify
+request_person_merge
+-----
+
+Under normal circumstances, external events transpire to trigger packet
+generatation - a request for your resource(s) is
+approved in XRAS, a new user is added to a project, a project runs out
+of funds, etc. For testing purposes, you can tell the
+test API to generate the packets you'd like to receive by initiating a
+"test scenario" -- a predetermined series of packets
+which are generated as earlier packets in the scenario are handled.
+
+Together, these four scenarios will let you interact with all of the
+packet types that you will encounter through the AMIE
+client API.
+
+Since all packet types except `request_project_create` (RPC) require a project 
+or person to have been sent to your site, in
+order to test all packet types, each scenario begins with an RPC.
+
+By default, all of your active resources will be added to the
+project. If no active resources are present for your site, a fake
+resource (`test-resource-1.<your-site>.xsedexi`") will be created for
+the purpose of the test data. A random XSEDE user will
+be selected to be the PI.
+
+=== Creating a Test Scenario
+
+==== Initiate the Test Scenario
+
+A test scenario is initiated via:
+
+-----
+curl -H "XA-Site: <your-site>" -H "XA-API-Key: <your-api-key>" \
+   -X POST \
+   https://a3mdev.xsede.org/amie-apie-test/test/<your-site>/scenarios?type=request_project_reactivate
+-----
+
+At TAMU this will be:
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <tamu-key>" \
+   -X POST \
+   https://a3mdev.xsede.org/amie-apie-test/test/TAMU/scenarios?type=request_project_reactivate
+-----
+
+which when sent to the originating site obtains the following reply:
+
+-----
+{"message":"Test scenario initiated","result":null}
+-----
+
+==== Obtaining a Test Packet
+
+A packet can now be obtained via the general form:
+
+-----
+curl -H "XA-Site: <your-site>" -H "XA-API-Key: <your-api-key>" \
+    https://a3mdev.xsede.org/amie-api-test/packets/<your-site>
+-----
+
+which for TAMU is:
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <tamu-key>" https://a3mdev.xsede.org/amie-api-test/packets/TAMU
+-----
+
+After the test scenario has been initiated, a `request_project_create` packet will be creating at the
+remote site and sent to the TAMU remote site.
+
+-----
+[test packet contents]
+-----
+
+
+
+
+If we put this result into the file `test.json` via:
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <tamu-key>" https://a3mdev.xsede.org/amie-api-test/packets/TAMU > test.json
+-----
+
+we can pretty-print the result via:
+
+-----
+python3 -m json.tool test.json
+-----
+
+and obtain:
+
+-----
+[pretty-printed test packet contents]
+-----
+
+==== Obtain Test Packet Using `packet_rec_id`
+
+If a `packet_rec_id` is known, the packet for it can be obtained via:
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <tamu-key>" -X GET https://a3mdev.xsede.org/amie-api-test/packets/TAMU/216027820
+-----
+
+This will retrieve exactly the same test packet as was obtained above.
+
+==== Posting a Packet to AMIE
+
+A client can post a packet to AMIE via:
+
+-----
+POST https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/
+-----
+
+The JSON representation of the packet must be in the body of the request.
+The AMIE Client API will attempt to automatically fill in any fields that it can infer; when posting in reply to a
+particular packet (such as replying to an RPC with an NPC) only the bare minimum of fields need to be
+explicitly specified.
+
+==== Posting a Reply to a Specific Packet
+
+A reply to a particular `packet_rec_id` can be made via:
+
+-----
+POST https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/<packet_rec_id>/reply
+-----
+
+This is the simple route for posting a reply to a particular `packet_rec_id`. The JSON representation of the packet
+must be in the body of the request.
+This is equivalent to POSTing to:
+
+-----
+https://a3mdev.xsede.org/amie-api-test/packets/<SITE>/
+-----
+
+with `in_reply_to: <packet_rec_id>`
+
+in the header of the posted JSON.  Example JSON to post is:
+
+-----
+{
+  "type": "notify_project_create",
+  "header": {
+  },
+  "body": {
+    "PiPersonID": 12345,
+    "ProjectID": "MDA102",
+    "PiRemoteSiteLogin": "shapiro"
+  }
+}
+-----
+
+
+
+==== Resetting the Test Data
+
+The test data can be reset via:
+
+-----
+POST https://a3mdev.xsede.org/amie-api-test/test/<yoursite>/reset
+-----
+
+which for TAMU is:
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <tamu-key>" -X POST https://a3mdev.xsede.org/amie-api-test/test/TAMU/reset
+-----
+
+which obtains the reply:
+
+-----
+{"message":"Reset site data for TAMU","result":null}
+-----
+
+Attempting to get another packet at this point will obtain only:
+
+-----
+{"message":null,"result":[]}
+-----
+
+We must reactivate again via:
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <tamu-key>" \
+   -X POST \
+   https://a3mdev.xsede.org/amie-apie-test/test/TAMU/scenarios?type=request_project_reactivate
+-----
+
+At this point we can request another packet, which will differ from the previous packet due to the reset.
+
+
+
+
+== Examples
+
+=== Example of Type `project_reactivate`
+
+
+-----
+curl -H "XA-Site: TAMU" -H "XA-API-Key: <key>" -X POST https://a3mdev.xsede.org/amie-api-test/test/TAMU/scenarios?type=request_project_reactivate
+-----
+
+
+== Example Programs
+
+There are three programs in the client program distribution available on Github.
+
+=== `create_new_packet.py`
+
+-----
+#!/usr/bin/env python3
+
+"""
+This example demonstrates how to create and send along a new packet."""
+from amieclient import AMIEClient
+from amieclient.packet import RequestProjectCreate
+
+from datetime import datetime, timedelta
+
+# Create the packet
+rpc = RequestProjectCreate()
+rpc.AllocationType = 'extremely high most important'
+rpc.GrantNumber = '3'
+rpc.PfosNumber = '3'
+rpc.PiFirstName = 'Jessica'
+rpc.PiLastName = 'Scienceperson'
+rpc.PiOrganization = 'PSC'
+rpc.PiOrgCode = '12345'
+rpc.EndDate = datetime.now() + timedelta(days=90)
+rpc.StartDate = datetime.now()
+rpc.ResourceList = ['IDK, somthing pretty fast']
+rpc.ServiceUnitsAllocated = '3'
+
+# Send the packet
+with AMIEClient('psc', 'some_secret_key') as c:
+    c.send_packet(rpc)
+-----
+
+=== `reply_to_transaction.py`
+
+-----
+#!/usr/bin/env python3
+
+"""
+This example demonstrates how to respond to a transaction in progress
+For this example, Transaction 12345 has an incoming RequestProjectCreate
+packet, which we will respond to with a NotifyProjectCreate.
+"""
+from amieclient import AMIEClient
+
+# Create the client
+psc_client = AMIEClient(site_name='PSC', api_key='some_secret_key')
+
+# Get the transaction you want
+transaction = psc_client.get_transaction(trans_rec_id='12345')
+
+# Get the most recent packet (? this may need a more robust method)
+project_creation_request = transaction.packets[-1]
+
+# The assumption here is that rpc is a RequestProjectCreate.
+# Here, you'd go ahead and do what you need to create the project.
+
+# SomeInternalSystem.create_project()
+
+# Once that's done, send a NotifyProjectCreate packet.
+# If nothing needs to be changed from the RequestProjectCreate packet,
+# you can use the packet's reply_packet() method. This will create a packet that
+# automatically has the proper type and a reference to the preceeding packet.
+# The AMIE service will extrapolate the needed information from the
+# RequestProjectCreate packet.
+
+project_created = project_creation_request.reply_packet()
+
+psc_client.send_packet(project_created)
+
+# You can also create a client as a context manager, if you want.
+# This complete example would look like
+with AMIEClient('psc', 'some_secret_key') as client_too:
+    transaction = client_too.get_transaction(transaction_id='12345')
+    project_creation_request = transaction.packets[-1]
+    # Do something...
+    project_created = project_creation_request.reply_packet()
+    client_too.send_packet(project_created)
+-----
+
+=== `process_packets.py`
+
+-----
+from configparser import ConfigParser
+from amieclient import AMIEClient
+
+# NOTE: functionality that is required to be implemented by Service Providers 
+# are marked with comments that begin with the prefix SP:
+
+# For more information on the configparser library, please see the python docs:
+# https://docs.python.org/3.5/library/configparser.html
+config = ConfigParser()
+config.read('config.ini')
+
+site_config = config['NCSA']
+
+amie_client = AMIEClient(site_name=site_config['site_name'],
+                         amie_url=site_config['amie_url'],
+                         api_key=site_config['api_key'])
+
+packets = amie_client.list_packets().packets
+
+for packet in packets:
+    packet_type = packet.packet_type
+    packet_rec_id = packet.packet_rec_id
+    trans_rec_id = packet.trans_rec_id
+
+    if packet_type == 'request_project_create':
+        grant_number = packet.GrantNumber
+        record_id = packet.RecordID
+        project_id = packet.ProjectID  # site project_id (if known)
+        resource = packet.ResourceList[0]  # xsede site resource name, eg, delta.ncsa.xsede.org
+        request_type = packet.RequestType
+        allocation_type = packet.AllocationType  # new, renewal, supplement, transfer, adjustment, advance, extension, ...
+        start_date = packet.StartDate
+        end_date = packet.EndDate
+        amount = packet.ServiceUnitsAllocated
+        abstract = packet.Abstract
+        project_title = packet.ProjectTitle
+        board_type = packet.BoardType
+        pfos_num = packet.PfosNumber
+
+#  This is created on site to correspond to the information from AMIE.
+
+        pi_person_id = packet.PiPersonID         # site person_id for the PI (if known)
+
+#  These all come from the packet returned by an AMIE packets request.
+
+        pi_first_name = packet.PiFirstName
+        pi_middle_name = packet.PiMiddleName
+        pi_last_name = packet.PiLastName
+        pi_organization = packet.PiOrganization
+        pi_department = packet.PiDepartment
+        pi_email = packet.PiEmail
+        pi_phone_number = packet.PiBusinessPhoneNumber
+        pi_phone_extension = packet.PiBusinessPhoneExtension
+        pi_address1 = packet.PiStreetAddress
+        pi_address2 = packet.PiStreetAddress2
+        pi_city = packet.PiCity
+        pi_state = packet.PiState
+        pi_zipcode = packet.PiZip
+        pi_country = packet.PiCountry
+        pi_nsf_status_code = packet.NsfStatusCode
+        pi_requested_logins = packet.PiRequestedLoginList
+        pi_dn_list = packet.PiDnList
+
+        # SP: 
+        # - add code to find the PI from the local database (or create the person in the local database)
+        #   and set pi_person_id, pi_login
+        # - add code to create the project for the grant_number (if project doesn't exist), or apply the action specified by allocation_type
+        # - set the project_id to the local id for the project (if it isn't already set from the RPC)
+        # - set the project state to active (if it is inactive), as the XDCDB will not send RPCs for inactive projects
+        #
+        # NOTE: if the record_id is not null, you should track it (associate it with the packet_rec_id).
+        # If a second RPC gets sent with the same record_id, the second RPC should not be processed,
+        # but the data from the first RPC sent in the reply NPC
+
+        # construct a NotifyProjectCreate(NPC) packet.
+        npc = packet.reply_packet()
+        npc.ProjectID = project_id           # local project ID
+        npc.PiPersonID = pi_person_id        # local person ID for the pi
+
+        # send the NPC
+        amie_client.send_packet(npc)
+
+    if packet_type == 'data_project_create':
+        person_id = packet.PersonID
+        project_id = packet.ProjectID
+        dn_list = packet.DnList
+
+        # the data_project_create(DPC) packet has two functions:
+        # 1. to let the site know that the project and PI account have been setup in the XDCDB
+        # 2. to provide any new DNs for the PI that were added after the RPC was sent
+        # NOTE: a DPC does *not* have the resource. You have to get the resource from the RPC for the trans_rec_id
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+
+    if packet_type == 'request_account_create':
+        grant_number = packet.GrantNumber
+        project_id = packet.ProjectID  # site project_id
+        resource = packet.ResourceList[0]  # xsede site resource name, eg, delta.ncsa.xsede.org
+
+        user_person_id = packet.UserPersonID         # site person_id for the User (if known)
+        user_login = packet.UserRemoteSiteLogin  # login on resource for the User (if known)
+        user_first_name = packet.UserFirstName
+        user_middle_name = packet.UserMiddleName
+        user_last_name = packet.UserLastName
+        user_organization = packet.UserOrganization
+        user_department = packet.UserDepartment
+        user_email = packet.UserEmail
+        user_phone_number = packet.UserBusinessPhoneNumber
+        user_phone_extension = packet.UserBusinessPhoneExtension
+        user_address1 = packet.UserStreetAddress
+        user_address2 = packet.UserStreetAddress2
+        user_city = packet.UserCity
+        user_state = packet.UserState
+        user_zipcode = packet.UserZip
+        user_country = packet.UserCountry
+        user_nsf_status_code = packet.UserNsfStatusCode
+        user_requested_logins = packet.UserRequestedLoginList
+        user_dn_list = packet.UserDnList
+
+        # SP: add code to find the User from the local database (or create the person in the local database)
+        # then add an account for the User on the specified project (project_id) on the resource
+        # RACs are also used to reactivate accounts, so if the account already exists, just set it active
+
+        # construct a NotifyAccountCreate(NAC) packet.
+        nac = packet.reply_packet()
+        nac.ProjectID = project_id               # local project ID
+        nac.UserRemoteSiteLogin = user_login     # local login for the User on the resource
+        nac.UserPersonID = user_person_id        # local person ID for the User
+
+        # send the NAC
+        amie_client.send_packet(nac)
+
+    if packet_type == 'data_account_create':
+        person_id = packet.PersonID
+        project_id = packet.ProjectID
+        dn_list = packet.DnList
+
+        # the data_account_create(DAC) packet has two functions:
+        # 1. to let the site know that the User account on the project has been setup in the XDCDB
+        # 2. to provide any new DNs for the User that were added after the RAC was sent
+        # NOTE: a DAC does *not* have the resource. You have to get the resource from the RAC for the trans_rec_id
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+
+    if packet_type == 'request_user_modify':
+        person_id = packet.person_id
+        if packet.Actiontype == 'delete':
+            inactive_dn_list = packet.DnList
+            # SP: inactivate the specified DNs for the user
+        else:
+            active_dn_list = packet.DnList
+            first_name = packet.FirstName
+            middle_name = packet.MiddleName
+            last_name = packet.LastName
+            organization = packet.Organization
+            department = packet.Department
+            email = packet.Email
+            bus_phone_number = packet.BusinessPhoneNumber
+            bus_phone_extension = packet.BusinessPhoneExtension
+            home_phone_number = packet.HomePhoneNumber
+            home_phone_extension = packet.HomePhoneExtension
+            fax = packet.Fax
+            address1 = packet.StreetAddress
+            address2 = packet.StreetAddress2
+            city = packet.City
+            state = packet.State
+            zipcode = packet.Zip
+            country = packet.Country
+            nsf_status_code = packet.NsfStatusCode
+
+            # SP: update the User info and DNs
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+
+    if packet_type == 'request_person_merge':
+        keep_person_id = packet.KeepPersonID
+        delete_person_id = packet.DeletePersonID
+
+        # SP: merge delete_person_id into keep_person_id and remove delete_person_id from local accounting system
+
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+
+
+
+    if packet_type == 'request_project_inactivate':
+        resource = packet.ResourceList[0]
+        project_id = packet.ProjectID
+
+        # SP: inactivate the project and all accounts on the project
+
+        npi = packet.reply_packet()
+        amie_client.send_packet(npi)
+
+    if packet_type == 'request_account_inactivate':
+        resource = packet.ResourceList[0]
+        project_id = packet.ProjectID
+        person_id = packet.PersonID
+
+        # SP:  inactivate the account on the project
+
+        nai = packet.reply_packet()
+        amie_client.send_packet(nai)
+
+    if packet_type == 'request_project_reactivate':
+        resource = packet.ResourceList[0]
+        project_id = packet.ProjectID
+        pi_person_id = packet.PersonID
+
+        # SP: reactivate the project and the PI account on the project (but no other accounts)
+
+        npr = packet.reply_packet()
+        amie_client.send_packet(npr)
+
+    if packet_type == 'inform_transaction_complete':
+        # construct the InformTransactionComplete(ITC) success packet
+        itc = packet.reply_packet()
+        itc.StatusCode = 'Success'
+        itc.DetailCode = '1'
+        itc.Message = 'OK'
+
+        # send the ITC
+        amie_client.send_packet(itc)
+-----
+
+== Setting Up DB Tables
+
+[[local_info]]
+=== The *local_info* Table
+
+==== Creating the *local_info* Table
+
+The *local_info* table contains information about the persons and accounts created locally at the prompting
+of remote packet requests.  It also keeps track of any changes made to these persons and accounts by
+later packet requests.  The columns are:
+
+* `first_name` - the first name of the PI or user as contained in the original request packet
+* `last_name` - the last name of the PI or user as contained in the original request packet
+* `email` - the email of the PI or user as contained in the original request packet
+* `person_id` - the locally created user ID
+* `project_id` - the locally created project ID
+* `remote_site_login` - the locally create login name for the user
+* `grant_number` - the grant number in the original request packet
+* `slurm_acct` - the local Slurm account number
+* `service_units` - the number of service units in the original request packet
+* `start_date` - the starting date in the original request packet
+* `end_date` - the ending date in the original request packet
+* `proj_stat` - the status of the project, i.e. active or inactive
+* `acct_stat` - the status of the user account, i.e. active or inactive
+* `uid` - the local user ID (UID) of the user
+* `gid` - the local group ID (GID) of the user
+
+This table is initially populated via the information contained within
+`request_project_create` and `request_account_create` packets.  Table entries
+can be modified via other packet type requests after their initial creation.
+
+The *local_info* table is created via:
+
+[source,sql]
+-----
+CREATE TABLE local_info (first_name varchar, last_name varchar, email varchar, person_id varchar PRIMARY KEY,project_id varchar,remote_site_login varchar, grant_number varchar, slurm_acct varchar, service_units varchar, start_date timestamp, end_date timestamp, proj_stat varchar, acct_stat varchar, uid integer, gid integer);
+-----
+
+The result is:
+
+-----
+\d local_info;
+                            Table "public.local_info"
+      Column       |            Type             | Collation | Nullable | Default 
+-------------------+-----------------------------+-----------+----------+---------
+ first_name        | character varying           |           |          | 
+ last_name         | character varying           |           |          | 
+ email             | character varying           |           |          | 
+ person_id         | character varying           |           | not null | 
+ project_id        | character varying           |           |          | 
+ remote_site_login | character varying           |           |          | 
+ grant_number      | character varying           |           |          | 
+ slurm_acct        | character varying           |           |          | 
+ service_units     | character varying           |           |          | 
+ start_date        | timestamp without time zone |           |          | 
+ end_date          | timestamp without time zone |           |          | 
+ proj_stat         | character varying           |           |          | 
+ acct_stat         | character varying           |           |          | 
+ uid               | integer                     |           |          | 
+ gid               | integer                     |           |          | 
+Indexes:
+    "local_info_pkey" PRIMARY KEY, btree (person_id)
+-----
+
+==== Populating the *local_info* Table
+
+The Python code for populating the *local_info* PostgreSQL table via the use of the `psycopg2` module is contained within
+the `dump_approvals.py` script.
+
+[source,python]
+-----
+sql = "INSERT INTO local_info \
+ (first_name,last_name,email,person_id,project_id,remote_site_login,grant_number, \
+ slurm_acct,service_units,start_date,end_date,proj_stat,acct_stat,uid,gid) \
+ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (person_id) DO NOTHING;"
+data = \ 
+ (first_name,last_name,email,person_id,project_id,remote_site_login,grant_number,slurm_acct(), \
+ service_units_allocated,start_date,end_date,proj_stat,acct_stat,uid,gid)
+try:
+    conn = psycopg2.connect(host='localhost',database=dbase,user=dbuser,password=pw)
+except:
+    print(" Error connecting to database ",dbase," when processing '",type_id,"' packet.")
+cur = conn.cursor()
+try:
+    cur.execute(sql, data)
+    conn.commit()
+    cur.close()
+    conn.close()
+except:
+    print_psycopg2_exception(err)
+-----
+
+=== The *approval* Table
+
+This table is for storing information about incoming transaction requests for the purpose of enabling
+manual approval of each request before reponse packets are sent.  The columns are:
+
+* `trans_rec_id` - the transaction record ID
+* `type_id` - the type of request
+* `person_id` - the locally created ID of the person
+* `project_id` - the locally created ID of the project
+* `ts_received` - a timestamp for when the original request packet was received, i.e. when it processed by cron running `dump_approvals.py`
+* `ts_approved` - a timestamp for when the request was approved via manually running `approval.py`
+* `ts_reply` - a timestamp for when the reply packet was sent post-approval via `respond.py` running in cron
+* `reply_status` - a 0 for no reply or a 1 for a successful reply
+
+-----
+CREATE TABLE approval (trans_rec_id integer PRIMARY KEY, type_id varchar(35), person_id varchar, project_id varchar, approval_status varchar, ts_received timestamp, ts_approved timestamp, ts_reply timestamp, reply_status varchar);
+-----
+
+The resulting table is:
+
+-----
+\d approval;
+                            Table "public.approval"
+     Column      |            Type             | Collation | Nullable | Default
+-----------------+-----------------------------+-----------+----------+---------
+ trans_rec_id    | integer                     |           | not null |
+ type_id         | character varying(35)       |           |          |
+ person_id       | character varying           |           |          |
+ project_id      | character varying           |           |          |
+ approval_status | character varying           |           |          |
+ ts_received     | timestamp without time zone |           |          |
+ ts_approved     | timestamp without time zone |           |          |
+ ts_reply        | timestamp without time zone |           |          |
+ reply_status    | character varying           |           |          |
+Indexes:
+    "approval_pkey" PRIMARY KEY, btree (trans_rec_id)
+-----
+
+=== The *local_transaction* Table
+
+The *local_transaction* table keeps track of all locally originated AMIE requests.  To avoid
+conflict with the NCSA transaction number system that has the form `1111*****`, we are arbitrarily starting
+our transaction number at `888800001`.
+This also enables us to keep track of what number to use for the next transaction, which will be the largest number
+in the `trans_rec_id` column plus one.  The columns are:
+
+* `trans_rec_id` - the locally created transaction record ID
+* `type_id` - the type of packet
+* `person_id` - the locally created person ID
+* `project_id` - the locally created project ID
+* `ts` - a timestamp for when the locally created packet was created and sent
+
+The table was created with:
+
+[source,sql]
+-----
+CREATE TABLE local_transaction (trans_rec_id integer, type_id varchar, person_id varchar, project_id varchar, ts timestamp);
+-----
+
+The table details are:
+
+-----
+ \d local_transaction;
+                      Table "public.local_transaction"
+    Column    |            Type             | Collation | Nullable | Default 
+--------------+-----------------------------+-----------+----------+---------
+ trans_rec_id | integer                     |           |          | 
+ type_id      | character varying           |           |          | 
+ person_id    | character varying           |           |          | 
+ project_id   | character varying           |           |          | 
+ ts           | timestamp without time zone |           |          |
+-----
+
+=== The *archive_merge* Table
+
+==== Creating the *archive_merge* Table
+
+[source,sql]
+-----
+CREATE TABLE archive_merge (trans_rec_id integer,d_first varchar,d_last varchar,d_email varchar,d_pid varchar,d_proj_id varchar,k_first varchar,k_last varchar,k_email varchar,k_pid varchar,k_proj_id varchar,k_grant_no varchar,time_merge timestamp);
+-----
+
+The result is:
+
+-----
+\d archive_merge;
+                        Table "public.archive_merge"
+    Column    |            Type             | Collation | Nullable | Default
+--------------+-----------------------------+-----------+----------+---------
+ trans_rec_id | integer                     |           |          |
+ d_first      | character varying           |           |          |
+ d_last       | character varying           |           |          |
+ d_email      | character varying           |           |          |
+ d_pid        | character varying           |           |          |
+ d_proj_id    | character varying           |           |          |
+ k_first      | character varying           |           |          |
+ k_last       | character varying           |           |          |
+ k_email      | character varying           |           |          |
+ k_pid        | character varying           |           |          |
+ k_proj_id    | character varying           |           |          |
+ k_grant_no   | character varying           |           |          |
+ time_merge   | timestamp without time zone |           |          |
+-----
+
+=== The `usage_compute` Table
+
+This table will contain the information needed to send an `AdjustmentUsageRecord` packet.
+This will require information from three tables in two databases:
+
+* the `local_info` table in the `amiedb` database
+* the `faster_job_table` table in the `slurm_acct_db` database
+* the `job_processing` table in the `slurm_acct_db` database
+
+The steps will be:
+
+* grab the information needed from the `faster_job_table` and `job_processing` tables
+* link the `slurm_acct_db` database info to the `local_info` table via the Slurm account number, which is:
+** `account` in the `faster_job_table` table
+** `slurm_acct` in the `local_info` table
+* extract the `person_id`, `project_id`, `uid` and `resource` (i.e. `cluster`) from the `local_info` table
+* write all the required information to the `usage_compute` table in the `amiedb` database
+* read the entries in the `usage_compute` table and create `AdjustmentUsageRecord` packets to send
+
+The `usage_compute` table is created via:
+
+[source,sql]
+-----
+CREATE TABLE usage_compute (serial_no bigint,
+person_id varchar,project_id varchar,uid int,local_record_id varchar,resource varchar,submit_time timestamp,start_time timestamp,end_time timestamp,charge double precision,node_count integer,cpu_core_count integer,job_name varchar,max_memory bigint,queue varchar,parent_record_id varchar,local_reference varchar,time_stored timestamp,time_sent timestamp);
+-----
+
+The details of the variables and types are:
+
+-----
+\d usage_compute;
+      Column      |            Type             | Collation | Nullable | Default 
+------------------+-----------------------------+-----------+----------+---------
+ serial_no        | bigint                      |           |          |
+ person_id        | character varying           |           |          | 
+ project_id       | character varying           |           |          |
+ uid              | integer                     |           |          | 
+ local_record_id  | character varying           |           |          | 
+ resource         | character varying           |           |          | 
+ submit_time      | timestamp without time zone |           |          | 
+ start_time       | timestamp without time zone |           |          | 
+ end_time         | timestamp without time zone |           |          | 
+ charge           | double precision            |           |          | 
+ node_count       | integer                     |           |          | 
+ cpu_core_count   | integer                     |           |          | 
+ job_name         | character varying           |           |          | 
+ max_memory       | bigint                      |           |          | 
+ queue            | character varying           |           |          | 
+ parent_record_id | character varying           |           |          | 
+ local_reference  | character varying           |           |          |
+ time_stored      | timestamp without time zone |           |          |
+ time_sent        | timestamp without time zone |           |          |
+-----
+
+==== Populating the `usage_compute` Table from `faster_job_table` and `job_processing` in *slurm_acct_db*
+
+The details of the tables are show in the next two sections.
+These tables are linked via the identical `job_table_record_id` (for `job_processing`) and
+`job_db_inx` (for `faster_job_table`) columns.
+They can be combined via an `INNER JOIN`.
+
+The `INNER JOIN` syntax for PostgreSQL for the information required from
+the Slurm database for the `usage_compute` packet.
+
+-----
+SELECT job_db_inx,time_submit,time_start,time_end,service_units,nodes_alloc,
+  cpus_req,id_job,mem_req
+FROM faster_job_table
+  INNER JOIN job_processing
+  ON faster_job_table.job_db_inx = job_processing.job_table_record_id;
+-----
+
+An example of using `INNER JOIN` from a C++ program.
+
+-----
+SELECT job_db_inx,id_job,id_array_job,id_user,mem_req,timelimit,time_start,time_end,
+  time_suspended,tres_req,account,partition,time_submit,cpus_req,nodes_alloc,state,
+  tres_alloc,partition,(service_units)
+  FROM faster_job_table
+  INNER JOIN job_processing
+  ON faster_job_table.job_db_inx = job_processing.job_table_record_id;
+-----
+
+===== The Details of `faster_job_table`
+
+The variables and data types of `faster_job_table` in *slurm_acct_db* are:
+
+-----
+describe faster_job_table;
++--------------------+---------------------+------+-----+------------+----------------+
+| Field              | Type                | Null | Key | Default    | Extra          |
++--------------------+---------------------+------+-----+------------+----------------+
+| job_db_inx         | bigint(20) unsigned | NO   | PRI | NULL       | auto_increment |
+| mod_time           | bigint(20) unsigned | NO   |     | 0          |                |
+| deleted            | tinyint(4)          | NO   |     | 0          |                |
+| account            | tinytext            | YES  |     | NULL       |                |
+| admin_comment      | text                | YES  |     | NULL       |                |
+| array_task_str     | text                | YES  |     | NULL       |                |
+| array_max_tasks    | int(10) unsigned    | NO   |     | 0          |                |
+| array_task_pending | int(10) unsigned    | NO   |     | 0          |                |
+| constraints        | text                | YES  |     | ''         |                |
+| cpus_req           | int(10) unsigned    | NO   |     | NULL       |                |
+| derived_ec         | int(10) unsigned    | NO   |     | 0          |                |
+| derived_es         | text                | YES  |     | NULL       |                |
+| exit_code          | int(10) unsigned    | NO   |     | 0          |                |
+| flags              | int(10) unsigned    | NO   |     | 0          |                |
+| job_name           | tinytext            | NO   |     | NULL       |                |
+| id_assoc           | int(10) unsigned    | NO   | MUL | NULL       |                |
+| id_array_job       | int(10) unsigned    | NO   | MUL | 0          |                |
+| id_array_task      | int(10) unsigned    | NO   |     | 4294967294 |                |
+| id_block           | tinytext            | YES  |     | NULL       |                |
+| id_job             | int(10) unsigned    | NO   | MUL | NULL       |                |
+| id_qos             | int(10) unsigned    | NO   | MUL | 0          |                |
+| id_resv            | int(10) unsigned    | NO   | MUL | NULL       |                |
+| id_wckey           | int(10) unsigned    | NO   | MUL | NULL       |                |
+| id_user            | int(10) unsigned    | NO   | MUL | NULL       |                |
+| id_group           | int(10) unsigned    | NO   |     | NULL       |                |
+| het_job_id         | int(10) unsigned    | NO   | MUL | NULL       |                |
+| het_job_offset     | int(10) unsigned    | NO   |     | NULL       |                |
+| kill_requid        | int(11)             | NO   |     | -1         |                |
+| state_reason_prev  | int(10) unsigned    | NO   |     | NULL       |                |
+| mcs_label          | tinytext            | YES  |     | ''         |                |
+| mem_req            | bigint(20) unsigned | NO   |     | 0          |                |
+| nodelist           | text                | YES  |     | NULL       |                |
+| nodes_alloc        | int(10) unsigned    | NO   | MUL | NULL       |                |
+| node_inx           | text                | YES  |     | NULL       |                |
+| partition          | tinytext            | NO   |     | NULL       |                |
+| priority           | int(10) unsigned    | NO   |     | NULL       |                |
+| state              | int(10) unsigned    | NO   |     | NULL       |                |
+| timelimit          | int(10) unsigned    | NO   |     | 0          |                |
+| time_submit        | bigint(20) unsigned | NO   |     | 0          |                |
+| time_eligible      | bigint(20) unsigned | NO   | MUL | 0          |                |
+| time_start         | bigint(20) unsigned | NO   |     | 0          |                |
+| time_end           | bigint(20) unsigned | NO   | MUL | 0          |                |
+| time_suspended     | bigint(20) unsigned | NO   |     | 0          |                |
+| gres_used          | text                | NO   |     | ''         |                |
+| wckey              | tinytext            | NO   |     | ''         |                |
+| work_dir           | text                | NO   |     | ''         |                |
+| system_comment     | text                | YES  |     | NULL       |                |
+| track_steps        | tinyint(4)          | NO   |     | NULL       |                |
+| tres_alloc         | text                | NO   |     | ''         |                |
+| tres_req           | text                | NO   |     | ''         |                |
++--------------------+---------------------+------+-----+------------+----------------+
+50 rows in set (0.001 sec)
+-----
+
+===== The Details of `job_processing`
+
+The variables and data types of the `job_processing` table in *slurm_acct_db* are:
+
+-----
+describe job_processing;
++---------------------+----------------------+------+-----+---------------------+-------------------+
+| Field               | Type                 | Null | Key | Default             | Extra             |
++---------------------+----------------------+------+-----+---------------------+-------------------+
+| job_table_record_id | int(10) unsigned     | NO   | PRI | NULL                |                   |
+| state               | smallint(5) unsigned | NO   |     | 0                   |                   |
+| update_time         | timestamp            | NO   |     | current_timestamp() | on update         |
+| service_units       | float                | YES  |     | NULL                |                   |
+| num_cpus            | int(11)              | NO   |     | -1                  |                   |
+| trans_id            | int(10) unsigned     | YES  |     | NULL                |                   |
++---------------------+----------------------+------+-----+---------------------+-------------------+
+6 rows in set (0.001 sec)
+-----
+
+Sample values are:
+
+-----
+select * from job_processing;
++---------------------+-------+---------------------+---------------+----------+----------+
+| job_table_record_id | state | update_time         | service_units | num_cpus | trans_id |
++---------------------+-------+---------------------+---------------+----------+----------+
+|                   1 |     7 | 2022-07-21 15:31:10 |         4.542 |       32 |     NULL |
+|                   2 |     7 | 2022-07-21 15:31:10 |         4.471 |       32 |     NULL |
++---------------------+-------+---------------------+---------------+----------+----------+
+-----
+
+==== Matching the Variables Between Tables
+
+The following table shows the correspondence - where appropriate - between the variable names in
+`faster_job_table` and the variable names in `usage_compute`.
+
+The procedure will be:
+
+* find the starting line number from the `usage_compute_count` table and start reading lines
+from the inner joined (`job_db_inx` and `job_table_record_id`) `faster_job_table` and `job_processing` tables
+* read the `account` column value from a line in `faster_job_table` that corresponds to a value in
+the `slurm_acct` column of `local_info`
+* use the `slurm_acct` value to obtain the `person_id`, `project_id`, `uid` and `cluster` values from `local_info` and insert them into
+the `usage_compute` table
+* extract the remainder of the required information
+from `faster_job_table` and insert it into the `usage_compute` table
+
+Notes:
+
+* There are more columns in `usage_compute` than required/optional values for the packet.
+The `usage_compute` variable names that correspond to the required/optional packet information are
+following by the packet variable name in square brackets, e.g. `[UserName]`.
+* The `usage_compute` variables corresponding to optional packet variables are enclosed
+in parentheses, e.g. (`parent_record_id`).
+
+
+[width=85%]
+[cols="3,2,1,9,6,15"]
+|===
+| `usage_compute` variable name  |   PostgreSQL datatype  |  `faster_job_table` variable name  |  MySQL datatype  | typical value |  description
+
+| `serial_no` | bigint | `job_db_inx` (`job_table_record_id`) | | 1 | synchronized with `faster_job_table` (`job_processing`)
+| `person_id` [`UserName`] | varchar | (in `local_info`)  |  | `pi.dm55572` | `person_id` in the `local_info` table
+| `project_id` [`LocalProjectID`]| varchar | (in `local_info`) | | `p.sta226239.000` | `project_id` for `person_id`
+| `uid` | integer | (in `local_info`) | | 50019 | `uid` for `person_id`
+| `local_record_id` [`LocalRecordID`] | varchar | `id_job` | int(10)  | 5773 | the Slurm job ID 
+| `resource` [`Resource`] | varchar | (`cluster` column in `local_info` ) | -  | `faster.tamu.xsede.org` | the local resource, e.g. `faster.tamu.xsede.org`
+| `submit_time` [`SubmitTime`] | timestamp | `time_submit` | bigint(20) | 1644789908 | job submission time 
+| `start_time` [`StartTime`] | timestamp | `time_start` | bigint(20) | 1644789908 | job start time
+| `end_time` [`EndTime`] | timestamp | `time_end` | bigint(20) | 1644790419 | job end time
+| `charge` [`Charge`] | double precision | `gres_used` | text | | charge for job
+| `node_count` [`NodeCount`] | integer | `nodes_alloc` | int(10) | 1 | number of nodes used 
+| `cpu_core_count` [`CpuCoreCount`] | integer | `cpus_req` | int(10) | 1 | number of CPU cores used
+| `job_name` [`JobName`] | varchar | `job_name` | tinytext | `bash` | unclear from docs
+| `max_memory` [`Memory`] | bigint | `mem_req` | bigint(20) | 0 | max. memory used in node
+| `queue` [`Queue`] | varchar | ? |  | | the queue to which the job was submitted
+| (`parent_record_id`) [`ParentRecordID`] | varchar | | - | - | OPTIONAL ID of parent job
+| (`local_reference`) [`LocalReference`] | varchar | | - | - | OPTIONAL local key for ID purposes
+| `time_stored` | timestamp | | - | 2022-11-18 00:00:00 | time entry added to table
+| `time_sent` | timestamp | | - | 2022-11-18 07:00:00 | time entry packet sent
+|===
+
+=== Creating and Populating the *state_des* Table
+
+The *state_des* table defines the various states for transactions and packets. This table is complete.
+No local implementation is required, other than to use this table to set the states for transactions
+and packets. The states are a superset of those required by AMIE. The `state_name` values are
+`in-progress`, `completed`, `failed`, `on-hold`, and `rejected`. The first 3 are used by AMIE.
+
+AMIE will
+only process transactions and packets that are `in-progress`.
+An exception to this rule is for incoming packets that have been marked as `failed`. If a site resends a packet, AMIE
+will reject it as a duplicate packet, unless the corresponding incoming packet has been marked as `failed`. In that case
+AMIE will replace the incoming packet with the newer version.
+
+The `state_id` column in the *transaction_tbl* table is a foreign key into *state_des*.
+This is handled by adding `PRIMARY KEY` to the `CREATE TABLE` statement.
+
+Create the table *state_des* and populate it.
+
+[source,sql]
+-----
+CREATE TABLE state_des (state_id varchar(16) PRIMARY KEY);
+INSERT INTO state_des(state_id) VALUES('in-progress');
+INSERT INTO state_des(state_id) VALUES('completed');
+INSERT INTO state_des(state_id) VALUES('failed');
+INSERT INTO state_des(state_id) VALUES('on-hold');
+INSERT INTO state_des(state_id) VALUES('rejected');
+-----
+
+Check the contents:
+
+-----
+SELECT * FROM state_des;
+  state_id   
+--------------
+ in-progress
+ completed
+ failed
+ on-hold
+ rejected
+(5 rows)
+-----
+
+Check the table specs.
+
+-----
+\ state_des;
+                     Table "public.state_des"
+  Column  |         Type          | Collation | Nullable | Default 
+----------+-----------------------+-----------+----------+---------
+ state_id | character varying(16) |           | not null | 
+Indexes:
+    "state_des_pkey" PRIMARY KEY, btree (state_id)
+Referenced by:
+    TABLE "packet_tbl" CONSTRAINT "packet_tbl_state_id_fkey" FOREIGN KEY (state_id) REFERENCES state_des(state_id)
+    TABLE "transaction_tbl" CONSTRAINT "transaction_tbl_state_id_fkey" FOREIGN KEY (state_id) REFERENCES state_des(state_id)
+-----
+
+=== Creating and Populating the *type_des* Table
+
+The type_des table defines all the AMIE packet types. This table is complete. No local
+implementation is required, other than to use this table to set packet types.
+The `type_name` values are seen in the code below used to populate the
+*type_des* table.
+
+The `type_id` column of the *packet_tbl* table is a foreign key into *state_des*.
+This is handled by adding `PRIMARY KEY` to the `CREATE TABLE` statement.
+
+[source,sql]
+-----
+CREATE TABLE type_des (type_id varchar(35) PRIMARY KEY);
+INSERT INTO type_des(type_id) VALUES('data_account_create');
+INSERT INTO type_des(type_id) VALUES('data_project_create');
+INSERT INTO type_des(type_id) VALUES('notify_account_create');
+INSERT INTO type_des(type_id) VALUES('notify_account_inactivate');
+INSERT INTO type_des(type_id) VALUES('notify_account_reactivate');
+INSERT INTO type_des(type_id) VALUES('notify_person_duplicate');
+INSERT INTO type_des(type_id) VALUES('notify_person_ids');
+INSERT INTO type_des(type_id) VALUES('notify_project_create');
+INSERT INTO type_des(type_id) VALUES('notify_project_inactivate');
+INSERT INTO type_des(type_id) VALUES('notify_project_modify');
+INSERT INTO type_des(type_id) VALUES('notify_project_reactivate');
+INSERT INTO type_des(type_id) VALUES('notify_project_resources');
+INSERT INTO type_des(type_id) VALUES('notify_project_usage');
+INSERT INTO type_des(type_id) VALUES('notify_user_create');
+INSERT INTO type_des(type_id) VALUES('notify_user_modify');
+INSERT INTO type_des(type_id) VALUES('notify_user_reactivate');
+INSERT INTO type_des(type_id) VALUES('notify_user_suspend');
+INSERT INTO type_des(type_id) VALUES('request_account_create');
+INSERT INTO type_des(type_id) VALUES('request_account_inactivate');
+INSERT INTO type_des(type_id) VALUES('request_account_reactivate');
+INSERT INTO type_des(type_id) VALUES('request_person_merge');
+INSERT INTO type_des(type_id) VALUES('request_project_create');
+INSERT INTO type_des(type_id) VALUES('request_project_inactivate');
+INSERT INTO type_des(type_id) VALUES('request_project_modify');
+INSERT INTO type_des(type_id) VALUES('request_project_reactivate');
+INSERT INTO type_des(type_id) VALUES('request_project_resources');
+INSERT INTO type_des(type_id) VALUES('request_user_create');
+INSERT INTO type_des(type_id) VALUES('request_user_modify');
+INSERT INTO type_des(type_id) VALUES('request_user_reactivate');
+INSERT INTO type_des(type_id) VALUES('request_user_suspend');
+INSERT INTO type_des(type_id) VALUES('inform_transaction_complete');
+-----
+
+Check on the properties via:
+
+-----
+\d type_des;
+                     Table "public.type_des"
+ Column  |         Type          | Collation | Nullable | Default 
+---------+-----------------------+-----------+----------+---------
+ type_id | character varying(35) |           | not null | 
+Indexes:
+    "type_des_pkey" PRIMARY KEY, btree (type_id)
+Referenced by:
+    TABLE "expected_reply_tbl" CONSTRAINT "expected_reply_tbl_type_id_fkey" FOREIGN KEY (type_id) REFERENCES type_des(type_id)
+    TABLE "packet_tbl" CONSTRAINT "packet_tbl_type_id_fkey" FOREIGN KEY (type_id) REFERENCES type_des(type_id)
+-----
+
+Check the contents of *type_des* via:
+
+-----
+select * from type_des;
+-----
+
+=== The *transaction_tbl* Table
+
+Transactions have a number of properties. These are the *local site*, the *remote site*, the *originating site*,
+a *transaction id*, and a *state*. Once created, the first four properties do not change. The *state*
+changes over time.
+
+The *transaction id* is used to distinguish one transaction from another. The originating site
+chooses the *transaction id* without consulting the remote site. The only rule is that a transaction id
+created by one site may not be reused by that site for a different transaction. Hence a transaction is
+identified by the *originating site*, the *transaction id*, the *local site*, and the *remote site*.
+
+AMIE defines 3 states for a transaction: *in-progress*, *completed*, or *failed*. The initial state of a
+transaction is *in-progress*. It remains in that state until all packets have been processed. If all
+packets have been successfully processed, the transaction state becomes *completed*. If any of the
+packets causes a failure, the transaction state becomes *failed*.  Both *completed* and *failed* are
+final states.
+
+The *transaction_tbl* contains the properties for the transaction.  The columns are:
+
+* `trans_rec_id` - an auto-generated key for this table
+* `originating_site_name` - the site originating the transaction (read from packet)
+* `transaction_id` - an integer with up to 38 digits chosen by the originating site (read from packet) 
+* `local_site_name` - the site that sends the first packet in a transaction
+* `remote_site_name` - the site that receives the first packet in a transaction
+* `state_id` - a foreign key into the *state_des* table
+* `ts` - an auto-generated timestamp
+
+The local site is only responsible for creating transactions when it is the
+originating site, i.e. when it is the one to send the first packet. AMIE will create the transaction
+when an incoming packet is the first packet for the transaction.
+
+
+==== Creating the *transaction_tbl* Table
+
+The `state_id` column is a foreign key into the `state_des` table.  This is handled
+via adding `REFERENCES state_des` to the `state_id varchar(10)` part of `CREATE TABLE`.
+
+The *transaction_depends_tbl* table exports two foreign keys - `trans_rec_id` and
+`depends_on_trans_rec_id` - into this table.
+This is handled via adding `PRIMARY KEY` to the `transaction_id integer` part of the
+`CREATE TABLE` statement.
+
+[source,sql]
+-----
+CREATE TABLE transaction_tbl (trans_rec_id integer PRIMARY KEY, originating_site_name varchar(16), transaction_id integer, local_site_name varchar(16), remote_site_name varchar(16), state_id varchar(16) REFERENCES state_des, ts timestamp);
+
+\d transaction_tbl;
+
+                            Table "public.transaction_tbl"
+        Column         |            Type             | Collation | Nullable | Default 
+-----------------------+-----------------------------+-----------+----------+---------
+ trans_rec_id          | integer
+ originating_site_name | character varying(16)       |           |          | 
+ transaction_id        | integer                     |           | not null | 
+ local_site_name       | character varying(16)       |           |          | 
+ remote_site_name      | character varying(16)       |           |          | 
+ state_id              | character varying(16)       |           |          | 
+ ts                    | timestamp without time zone |           |          | 
+Indexes:
+    "transaction_tbl_pkey" PRIMARY KEY, btree (transaction_id)
+Foreign-key constraints:
+    "transaction_tbl_state_id_fkey" FOREIGN KEY (state_id) REFERENCES state_des(state_id)
+Referenced by:
+    TABLE "packet_tbl" CONSTRAINT "packet_tbl_trans_rec_id_fkey" FOREIGN KEY (trans_rec_id) REFERENCES transaction_tbl(transaction_id)
+    TABLE "transaction_depends_tbl" CONSTRAINT "transaction_depends_tbl_depends_on_trans_rec_id_fkey" FOREIGN KEY (depends_on_trans_rec_id) REFERENCES transaction_tbl(transaction_id)
+    TABLE "transaction_depends_tbl" CONSTRAINT "transaction_depends_tbl_trans_rec_id_fkey" FOREIGN KEY (trans_rec_id) REFERENCES transaction_tbl(transaction_id)
+-----
+
+==== Populating the *transaction_tbl* Table
+
+The Python code for placing an entry into *transaction_tbl* is:
+
+[source,python]
+-----
+try:
+    statement = """INSERT INTO transaction_tbl (trans_rec_id,originating_site_name, \
+                   transaction_id,local_site_name,remote_site_name,state_id,ts) \
+                   VALUES (%s, %s, %s, %s, %s, %s, %s);"""
+    data = (trans_rec_id, originating_site_name, transaction_id, local_site_name, \
+            remote_site_name, state_id, ts)
+    conn = psycopg2.connect(host=host,database=database,user=user,password=pw)
+    cursor = conn.cursor()
+    cursor.execute(statement, data)
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print(" Inserted trans_rec_id ",trans_rec_id," into the 'transaction_tbl' table.")
+except:
+    print(" Transaction transrec_rec_id ",trans_rec_id," already exists in 'transaction_tbl'.")
+-----
+
+
+=== Creating *transaction_depends_tbl* Table
+
+The *transaction_depends_tbl* is a list of transaction dependencies, i.e. which transactions must
+be completed before AMIE can process a transaction.
+This allows multiple transactions to be prepared
+when the data is ready without having to wait for one transaction to complete before loading the
+data.
+
+The `trans_sec_id` column is a foreign key into the *transaction_tbl* table.
+It references the transaction that
+has dependencies.
+
+The `depends_on_trans_rec_id` column is also a foreign key into the *transaction_tbl* table.
+This references a transaction that must be completed before the `trans_rec_id` transaction can be
+processed.
+
+These are handled via adding `REFERENCES transaction_tbl` to both parts of the
+`CREATE TABLE` statement.
+
+One use of this table would be to create one transaction for creating a project as well as
+transactions for creating accounts for that project. The account transaction would depend on the
+project transaction and would not be processed until the project transaction competed.
+
+The table is created via the following PostgreSQL command.
+
+-----
+CREATE TABLE transaction_depends_tbl (trans_rec_id integer REFERENCES transaction_tbl, depends_on_trans_rec_id integer REFERENCES transaction_tbl);
+
+\d transaction_depends_tbl;
+
+               Table "public.transaction_depends_tbl"
+         Column          |  Type   | Collation | Nullable | Default 
+-------------------------+---------+-----------+----------+---------
+ trans_rec_id            | integer |           |          | 
+ depends_on_trans_rec_id | integer |           |          | 
+Foreign-key constraints:
+    "transaction_depends_tbl_depends_on_trans_rec_id_fkey" FOREIGN KEY (depends_on_trans_rec_id) REFERENCES transaction_tbl(transaction_id)
+    "transaction_depends_tbl_trans_rec_id_fkey" FOREIGN KEY (trans_rec_id) REFERENCES transaction_tbl(transaction_id)
+-----
+
+=== Creating *packet_tbl* Table
+
+Transactions have packets which contain account management data. *Incoming packets* are
+those packets received from the remote site. *Outgoing packets* are those packets created by the
+local site to be sent to the remote site. Outgoing packets are created either when the transaction is
+created or as a reply to an incoming packet.
+
+AMIE does not specify a pre-defined set of transactions. It specifies a set of packets which can be
+used within transactions, but the sites must agree on the packets that are used within transactions
+as well as the ordering of those packets.
+
+A packet has a number of properties. These are *type*, *version*, *packet id*, and *state*. It also has a
+list of *expected replies*.
+
+Each packet has a *packet id* which is chosen by the site that creates the packet. It has to be unique
+within the set of *outgoing packets* for a given transaction.
+A local site can choose a packet id for an outgoing packet independently from the packet ids used by the remote site
+for the same transaction. In other words, the packet ids for outgoing packets are independent of the packet ids for
+incoming packets.
+
+
+Each packet has a state. AMIE defines 3 states for a packet: *in-progress*, *completed*, or *failed*.
+
+Each packet must also provide a list of *expected replies*. An expected reply is the type of packet
+that a site expects to receive from the remote site after the remote site has processed the packet.
+The expected reply list allows sites to determine which packets will be part of a transaction and the
+ordering of the packets within the transaction, rather than this being dictated by AMIE.
+
+Every transaction is ended by an inform_transaction_complete packet. This packet indicates
+success or failure of the transaction (and the reason). A success inform_transaction_complete can
+only be sent if it is listed as one of the *expected replies*. A failure can be sent at any time.
+
+The *packet_tbl* contains the columns:
+
+* `packet_rec_id` - an auto-generated key for the packet
+* `trans_rec_id` - a foreign key into the *transaction_tbl* table that specifies the transaction to which the packet belongs
+* `packet_id` - the packet ID that AMIE specifies
+* `type_id` - a foreign key into the *type_des* table that specifies the packet type
+* `version` - the AMIE version for this packet
+* `state_id` - a foreign key into the `state_des` table that specifies the packet state
+* `outgoing_flag` - 1 for an outgoing packet and 0 for an incoming packet
+* `ts` - an auto-generated timestamp for when the packet inserted into the database
+
+The foreign keys in this table are:
+
+* `trans_rec_id` into *transaction_tbl*
+* `type_id` into *type_des*
+* `state_id` into *state_des*
+
+These are all handled via the `REFERENCES` in the `CREATE TABLE` statement.
+
+-----
+CREATE TABLE packet_tbl (packet_rec_id varchar(16) PRIMARY KEY, trans_rec_id integer REFERENCES transaction_tbl, packet_id varchar(16), type_id varchar(35) REFERENCES type_des, version varchar(12), state_id varchar(16) REFERENCES state_des, outgoing_flag integer, ts timestamp);
+
+\d packet_tbl;
+                          Table "public.packet_tbl"
+    Column     |            Type             | Collation | Nullable | Default 
+---------------+-----------------------------+-----------+----------+---------
+ packet_rec_id | character varying(16)       |           | not null | 
+ trans_rec_id  | integer                     |           |          | 
+ packet_id     | character varying(16)       |           |          | 
+ type_id       | character varying(35)       |           |          | 
+ version       | character varying(12)       |           |          | 
+ state_id      | character varying(16)       |           |          | 
+ outgoing_flag | integer                     |           |          | 
+ ts            | timestamp without time zone |           |          | 
+Indexes:
+    "packet_tbl_pkey" PRIMARY KEY, btree (packet_rec_id)
+Foreign-key constraints:
+    "packet_tbl_state_id_fkey" FOREIGN KEY (state_id) REFERENCES state_des(state_id)
+    "packet_tbl_trans_rec_id_fkey" FOREIGN KEY (trans_rec_id) REFERENCES transaction_tbl(transaction_id)
+    "packet_tbl_type_id_fkey" FOREIGN KEY (type_id) REFERENCES type_des(type_id)
+-----
+
+=== Creating *expected_reply_tbl* Table
+
+The *expected_reply_tbl* provides a list of replies for outgoing packets that are expected to be sent
+back by the remote site after processing the packet.
+
+* The `packet_rec_id` column is a foreign key into
+the *packet_tbl* that references the outgoing packet expecting a reply.
+* The `type_id` column is a
+foreign key into the type_des table which specifies the packet type of the reply.
+* The `timeout`
+column is the number of minutes that the remote site has to send the reply.
+
+-----
+CREATE TABLE expected_reply_tbl (packet_rec_id varchar(16) REFERENCES packet_tbl, type_id varchar(35) REFERENCES type_des, timeout integer);
+
+\d expected_reply_tbl;
+                   Table "public.expected_reply_tbl"
+    Column     |         Type          | Collation | Nullable | Default 
+---------------+-----------------------+-----------+----------+---------
+ packet_rec_id | character varying(16) |           |          | 
+ type_id       | character varying(35) |           |          | 
+ timeout       | integer               |           |          | 
+Foreign-key constraints:
+    "expected_reply_tbl_packet_rec_id_fkey" FOREIGN KEY (packet_rec_id) REFERENCES packet_tbl(packet_rec_id)
+    "expected_reply_tbl_type_id_fkey" FOREIGN KEY (type_id) REFERENCES type_des(type_id)
+-----
+
+=== The *data_tbl* Table
+
+The *data_tbl* contains the data values associated with a packet. The data is essentially tag-values
+pairs, except that it must also support lists of such values as well as structured data. The columns
+`tag`, `subtag`, `seq`, and `value` represent the data. The `packet_rec_id` is a foreign key into *packet_tbl*.
+
+==== Creating *data_tbl* Table
+
+[source,sql]
+-----
+CREATE TABLE data_tbl (person_id varchar, project_id varchar, packet_rec_id varchar(16) REFERENCES packet_tbl, tag varchar(40), subtag varchar(40), seq integer, value varchar(120));
+\d data_tbl;
+                         Table "public.data_tbl"
+    Column     |          Type          | Collation | Nullable | Default 
+---------------+------------------------+-----------+----------+---------
+ person_id     | character varying      |           |          | 
+ project_id    | character varying      |           |          | 
+ packet_rec_id | character varying(16)  |           |          | 
+ tag           | character varying(40)  |           |          | 
+ subtag        | character varying(40)  |           |          | 
+ seq           | integer                |           |          | 
+ value         | character varying(120) |           |          | 
+Foreign-key constraints:
+    "data_tbl_packet_rec_id_fkey" FOREIGN KEY (packet_rec_id) REFERENCES packet_tbl(packet_rec_id)
+-----
+
+The old *data_tbl* format was:
+
+-----
+                        Table "public.data_tbl"
+    Column     |         Type           | Collation | Nullable | Default 
+---------------+------------------------+-----------+----------+---------
+ packet_rec_id | character varying(16)  |           |          | 
+ tag           | character varying(40)  |           |          | 
+ subtag        | character varying(40)  |           |          | 
+ seq           | integer                |           |          | 
+ value         | character varying(120) |           |          | 
+Indexes:
+    "data_unique" UNIQUE CONSTRAINT, btree (packet_rec_id, tag, subtag, seq, value)
+Foreign-key constraints:
+    "data_tbl_packet_rec_id_fkey" FOREIGN KEY (packet_rec_id) REFERENCES packet_tbl(packet_rec_id)
+-----
+
+==== Updating and Preventing Duplicate Entries
+
+===== Adding Constraints
+
+The following modification was made to *data_tbl* to handle the problem of dealing with
+duplicate entries.  
+
+-----
+alter table data_tbl add constraint data_unique unique (packet_rec_id,tag,subtag,seq,value);
+-----
+
+===== Removing Constraints
+
+The previous constraint can be removed via:
+
+-----
+alter table data_tbl drop constraint data_unique;
+-----
+
+===== New Entries for a Given `packet_rec_id`
+
+
+
+===== Upserting
+
+Upserting is defined as updating or ignoring records that already exist and inserting new ones.
+
+https://towardsdatascience.com/postgresql-how-to-upsert-safely-easily-and-fast-246040514933[`https://towardsdatascience.com/postgresql-how-to-upsert-safely-easily-and-fast-246040514933`]
+
+If we have a *data_tbl* entry with the following values:
+
+-----
+('222152614', 'PiLastName', 'NULL', 0, 'Shahfar')
+-----
+
+we can modify it despite the addition of the uniqueness constraint via:
+
+-----
+INSERT INTO data_tbl (packet_rec_id,tag,subtag,seq,value) 
+VALUES
+        ('222152614', 'PiLastName', 'NULL', 0, 'Yossarian')
+ON CONFLICT (packet_rec_id,tag,subtag,seq,value)
+DO UPDATE SET
+        value = EXCLUDED.value;
+-----
+
+==== Populating *data_tbl* Table
+
+===== Handling List and Dictionary Items
+
+The *data_tbl* contains the data values associated with a packet. The data is essentially tag-values
+pairs, except that it must also support lists of such values as well as structured data. The columns
+_tag_, _subtag_, _seq_, and _value_ represent the data. The `packet_rec_id` is a foreign key into *packet_tbl*.
+
+A simple item within the JSON file such as:
+
+-----
+'PfosNumber': '20400'
+-----
+
+can be represented as
+
+-----
+PfosNumber, null, 0, 20400
+-----
+
+where `null` is the PostgreSQL NULL value which is `NULL` (without single or double quotes),
+and `0` indicates that this is the first - and only - item in this non-list.
+
+List items can be those with or without subtags.
+An example of a list with subtags is:
+
+-----
+'AcademicDegree': [{'Field': 'Nuclear Physics', 'Degree': 'PhD'}]
+-----
+
+which can be represented as:
+
+-----
+AcademicDegree, Field, 0, 'Nuclear Physics'
+AcademicDegree, Degree, 1, 'PhD'
+-----
+
+where the subtags are given in the second column and the sequence numbers in the third column.
+
+An example of a list without subtags is:
+
+-----
+'PiDnList': ['/C=US/O=Pittsburgh Supercomputing Center/CN=Zachary Matheson',
+  '/C=US/O=National Center for Supercomputing Applications/CN=Zachary Matheson']
+-----
+
+which can be represented as:
+
+-----
+PiDnList, null, 0, /C=US/O=Pittsburgh Supercomputing Center/CN=Zachary Matheson
+PiDnList, null, 1, /C=US/O=National Center for Supercomputing Applications/CN=Zachary Matheson
+-----
+
+since there are no subtags in this list.
+
+==== The Code
+
+[source,python]
+-----
+        for key in body:
+            if (isinstance(body[key],str)):
+                tag = key
+                subtag = 'NULL'
+                seq = 0
+                value = body[key]
+                amiedb_data_tbl(packet_rec_id,tag,subtag,seq,value)
+            else:
+                seq = 0
+                tag = key
+                for item in body[key]:
+                    if (isinstance(item,dict)):
+                        seq = 0
+                        for key2 in item:
+                            subtag = key2
+                            value = item[key2]
+                            amiedb_data_tbl(packet_rec_id,tag,subtag,seq,value)
+                            seq = seq + 1
+                    else:
+                        subtag = 'NULL'
+                        value = body[key][seq]
+                        amiedb_data_tbl(packet_rec_id,tag,subtag,seq,value)
+                        seq = seq + 1
+-----
+
+=== PostgreSQL Foreign Keys
+
+https://stackoverflow.com/questions/28558920/postgresql-foreign-key-syntax/28560619[`https://stackoverflow.com/questions/28558920/postgresql-foreign-key-syntax/28560619`]
+
+Create a simple table where `PRIMARY KEY` indicates which column will be the foreign key.
+
+-----
+CREATE TABLE students 
+( 
+  student_id SERIAL PRIMARY KEY,
+  player_name TEXT
+);
+-----
+
+Create another table, defining the foreign key in the first table via `REFERENCES students`.
+
+-----
+    CREATE TABLE tests 
+    ( 
+       subject_id SERIAL,
+       subject_name text,
+       highestStudent_id integer REFERENCES students
+    );
+-----
+
+== Creating a Transaction
+
+-----
+begin trans
+# create the transaction record
+insert transaction_tbl (originating_site_name, local_site_name, remote_site_name, transaction_id, state_id)
+select “X”, ”X”, ”Y”, 99, state_id
+from state_des
+where state_name = “in-progress”
+
+# get the auto-generated trans_rec_id from the previous insert into a variable (@trid)
+@trid = … this is implementation dependent …
+
+# create the outgoing packet record
+insert packet_tbl (trans_rec_id, type_id, packet_id, version, state_id, outgoing_flag)
+select @trid, td.type_id, 1, “1.0”, sd.state_id, 1
+from type_des td, state_des sd
+where td.type_name = “request_project_create”
+and sd.state_name = “in-progress”
+
+# get the auto-generated packet_rec_id from the previous insert into a variable (@prid)
+@prid = … this is implementation dependent …
+
+# insert a notify_project_create expected reply
+insert expected_reply_tbl (packet_rec_id, type_id, timeout)
+select @prid, type_id, 36000
+from type_des
+where type_name = “notify_project_create”
+
+# insert the data for a request_project_create packet
+insert data_tbl (packet_rec_id, tag, subtag, seq, value)
+
+                     values (@prid, “Abstract”, NULL, 0, “This project …”)
+
+ … additional inserts as specified by the request_project_create packet (above) …
+commit trans
+-----
+
+== XSEDE Central Database (XDCDB) API
+
+https://a3mdev.xsede.org/xdcdb-api-test[`https://a3mdev.xsede.org/xdcdb-api-test`]
+
+The API is presently designed to support three agents: xref:spacct[`spacct`],
+xref:userinfo[`userinfo`] and xref:xdusage[`xdusage`]. The API acts on behalf of these agents to make queries in the XSEDE Central Database (XDCDB) and return the results of those queries to the agent. 
+
+xref:local_info[Setting Up DB Tables]
+
+[[spacct]]
+=== `spacct`
+
+==== `GET /spacct/auth_test`
+
+https://a3mdev.xsede.org/xdcdb-api-test[`https://a3mdev.xsede.org/xdcdb-api-test`]
+
+If the authorization information provided in the HTTP request header is valid the
+response will be:
+
+-----
+  200 OK
+  {
+    "message": null,
+    "result": null
+  }
+-----
+
+If the information is not valid, it will be:
+
+-----
+401 Unauthorized
+  {
+    "message": null,
+    "result": null
+  }
+-----
+
+==== `GET /spacct/v1/users/resource/<resource>`
+
+This lists all active users (`"status": "active"`) and inactive users (`"status": "inactive"`) where
+the inactivation occurred less than 365 days ago.
+Note that:
+
+* `grace=0` will show only active users
+* `grace` defaults to the MyProxy single sign-on inactive grace period
+* a user can have multiple usernames (see `personId 5552` entry below)
+* a user can have multiple sitePersonIds (see `personId 14506` entry below)
+* a user can have no active DNs (see `personId 46294` entry below)
+
+An example is:
+
+-----
+GET /spacct/v1/users/resource/comet.sdsc.xsede?grace=365
+{
+    "message": null,
+    "result": {
+        "resource": "comet.sdsc.xsede",
+        "site": "SDSC",
+        "users": [
+            {
+                "activeDNs": [
+                    "/C=US/O=National Center for Supercomputing Applications/CN=Neal Stephen McKenney",
+                    "/C=US/O=Pittsburgh Supercomputing Center/CN=Neal Stephen McKenney"
+                ],
+                "firstName": "Neal",
+                "inactiveDNs": [],
+                "lastName": "McKenney",
+                "personId": 70440,
+                "portalLogin": "nmckenne",
+                "sitePersonIds": [
+		   "108837"
+		],
+                "status": "active",
+                "statusTime": "2018-10-08T13:29:05.495+00:00",
+                "usernames": [
+                    "nmckenne"
+                ]
+            },
+	    {
+                "activeDNs": [
+                    "/C=US/O=National Center for Supercomputing Applications/CN=Walter Landry",
+                    "/C=US/O=Pittsburgh Supercomputing Center/CN=Walter Landry",
+                    "/DC=EDU/DC=UTEXAS/DC=TACC/O=MYPROXY/CN=tg458568"
+                ],
+                "firstName": "Walter",
+                "inactiveDNs": [
+                    "/C=US/O=Pittsburgh Supercomputing Center/OU=PSC Kerberos Certification Authority/CN=wlandry/UID=wlandry/emailAddress=wlandry@PSC.EDU",
+                    "/C=US/O=National Center for Supercomputing Applications/OU=People/CN=Walter Landry",
+                    "/DC=EDU/DC=UTEXAS/DC=TACC/O=UT-AUSTIN/O=TACC MICS CA/CN=Walter Landry",
+                    "/DC=EDU/DC=TENNESSEE/DC=NICS/O=National Institute for Computational Sciences/CN=Walter Landry"
+                ],
+                "lastName": "Landry",
+                "personId": 5552,
+                "portalLogin": "wlandry",
+                "sitePersonIds": [
+		   "6769"
+		],
+                "status": "active",
+                "statusTime": "2019-06-14T18:06:09.378+00:00",
+                "usernames": [
+                    "wlandry",
+                    "ux450362"
+                ]
+            },
+            {
+                "activeDNs": [],
+                "firstName": "zhanglab",
+                "inactiveDNs": [],
+                "lastName": "Community User",
+                "personId": 46294,
+                "portalLogin": "zhanglab",
+                "sitePersonIds": [
+		   "95139"
+		],
+                "status": "active",
+                "statusTime": "2016-11-18T15:43:26.390+00:00",
+                "usernames": [
+                    "zhanglab"
+                ]
+            },
+            {
+                "activeDNs": [
+                    "/C=US/O=National Center for Supercomputing Applications/CN=Buddhadev Maiti 1",
+                    "/C=US/O=Pittsburgh Supercomputing Center/CN=Buddhadev Maiti 1",
+                    "/DC=EDU/DC=UTEXAS/DC=TACC/O=MYPROXY/CN=tg866565",
+                    "/C=US/O=Pittsburgh Supercomputing Center/CN=Buddhadev Maiti",
+                    "/C=US/O=National Center for Supercomputing Applications/CN=Buddhadev Maiti"
+                ],
+                "firstName": "Buddhadev",
+                "inactiveDNs": [
+                    "/C=US/O=National Center for Supercomputing Applications/OU=People/CN=Buddhadev Maiti",
+                    "/DC=EDU/DC=TENNESSEE/DC=NICS/O=National Institute for Computational Sciences/CN=Buddhadev Maiti"
+                ],
+                "lastName": "Maiti",
+                "personId": 14506,
+                "portalLogin": "bmaiti",
+                "sitePersonIds": [
+                    "122417",
+                    "78708"
+                ],
+                "status": "active",
+                "statusTime": "2020-04-10T13:58:53.140-07:00",
+                "usernames": [
+                    "bmaiti20"
+                ]
+            },
+        ]
+    }
+}
+-----
+
+==== `GET /spacct/v1/projects/resource/<resource>?active_only`
+
+-----
+GET /spacct/v1/projects/resource/osn.osn.xsede.org?active_only
+{
+    "message": null,
+    "result": {
+        "projects": [
+            {
+                "chargeNumber": "TG-BIO210048",
+                "projectState": "active",
+                "proposalNumber": "BIO210048",
+                "roles": [
+                    {
+                        "firstName": "Aaron",
+                        "lastName": "Turkewitz",
+                        "portalLogin": "apturkew",
+                        "role": "pi",
+                        "sitePersonId": "2a1e33df-21e0-47e2-98ea-733fd1d5e949",
+                        "userNames": [
+                            "apturkew@xsede.org"
+                        ]
+                    },
+                    {
+                        "firstName": "Lev",
+                        "lastName": "Tsypin",
+                        "portalLogin": "ltsypin",
+                        "role": "co_pi",
+                        "sitePersonId": "6a7ae711-bf5d-4747-8581-2a655beb9cf1",
+                        "userNames": [
+                            "ltsypin@xsede.org"
+                        ]
+                    }
+                ],
+                "siteProjectId": "BIO210048_Aaron_Turkewitz"
+            },
+            {
+                "chargeNumber": "TG-PHY200093",
+                "projectState": "active",
+                "proposalNumber": "PHY200093",
+                "roles": [
+                    {
+                        "firstName": "Peter",
+                        "lastName": "Jacobs",
+                        "portalLogin": "pmjacobs",
+                        "role": "pi",
+                        "sitePersonId": "263011e2-128e-4146-9c27-ff864211e84c",
+                        "userNames": [
+                            "pmjacobs@xsede.org"
+                        ]
+                    },
+                    {
+                        "firstName": "Chun",
+                        "lastName": "Shen",
+                        "portalLogin": "chunshen",
+                        "role": "allocation_manager",
+                        "sitePersonId": "77b2cd64-99e7-40c9-aa67-1b024d4723a3",
+                        "userNames": [
+                            "chunshen@xsede.org"
+                        ]
+                    }
+                ],
+                "siteProjectId": "PHY200093_Peter_Jacobs"
+            }
+        ],
+        "resource": "osn.osn.xsede.org",
+        "site": "OSN"
+    }
+}
+-----
+
+[[userinfo]]
+=== `userinfo`
+
+==== `GET /userinfo/auth_test`
+
+If the authorization information provided in the HTTP request headers is valid,
+the response will be:
+
+-----
+200 OK
+  {
+    "message": null,
+    "result": null
+  }
+-----
+
+If it is not valid, it will be:
+
+-----
+  401 Unauthorized
+  {
+    "message": null,
+    "result": null
+  }
+-----
+
+==== `GET /userinfo/v1/people/by_username/<resource>/<username>`
+
+This route maps usernames (i.e. logins) on XSEDE resources to people and returns person
+information.
+An example to get infomration for the login `tg455671` on `stampede.tacc.xsede` is:
+
+-----
+GET /userinfo/v1/people/by_username/stampede.tacc.xsede/tg455671
+{
+    "message": null,
+    "result": {
+        "person_id": 148,
+        "last_name": "Navarro",
+        "first_name": "John-Paul",
+        "middle_name": null,
+        "organization": "Argonne National Laboratory",
+        "department": "Mathematics & Computer Science Division",
+        "street1": "9700 S. Cass Ave.",
+        "street2": "TCS, Building 240",
+        "city": "Lemont",
+        "state": "Illinois",
+        "zipcode": "60439-4844",
+        "country": "United States",
+        "email": "navarro@mcs.anl.gov",
+        "phone": "630-252-1233",
+        "status": "inactive"
+    }
+}
+-----
+
+An example to get information for the person with portal login `mshapiro` is:
+
+-----
+
+-----
+
+[[xdusage]]
+=== `xdusage`
+
+
+== Python
+
+=== Dictionary
+
+Create a dictionary.
+
+-----
+d = {1: 'Geeks', 2: 'For', 3: 'Geeks'}
+print(d)
+{1: 'Geeks', 2: 'For', 3: 'Geeks'}
+-----
+
+Adding item to dictionary.
+
+-----
+d[4] = 'Nerds'
+print(d)
+{1: 'Geeks', 2: 'For', 3: 'Geeks', 4: 'Nerds'}
+-----
+
+Access dictionary element using key.
+
+-----
+x = d[2]
+print(x)
+For
+-----
+
+Access dictionary element using 'get'.
+
+-----
+x = d.get(2)
+print(x)
+For
+-----
+
+Delete a key value using 'del`.
+
+-----
+del d[4]
+print(d)
+{1: 'Geeks', 2: 'For', 3: 'Geeks'}
+-----
+
+
+
+=== JSON
+
+https://towardsdatascience.com/how-do-i-extract-nested-data-in-python-4e7bed37566a[`https://towardsdatascience.com/how-do-i-extract-nested-data-in-python-4e7bed37566a`]
+
+Convert from Python to JSON.
+
+-----
+x = {"name": "John", "age": 30, "city": "New York"}
+y = json.dumps(x)
+print(y)
+{"name": "John", "age": 30, "city": "New York"}
+-----
+
+Convert from JSON to Python.
+
+-----
+x =  '{ "name":"John", "age":30, "city":"New York"}'
+y = json.loads(x)
+print(y)
+{'name': 'John', 'age': 30, 'city': 'New York'}
+-----
+
+== Potential Upgrade Pathways
+
+=== *SpyQL*
+
+https://github.com/dcmoura/spyql[`https://github.com/dcmoura/spyql`]
+
+https://news.ycombinator.com/item?id=31004563[`https://news.ycombinator.com/item?id=31004563`]
+
+https://medium.com/geekculture/postgres-jsonb-usage-and-performance-analysis-cdbd1242a018[`https://medium.com/geekculture/postgres-jsonb-usage-and-performance-analysis-cdbd1242a018`]
+
+https://github.com/simdjson/simdjson[`https://github.com/simdjson/simdjson`]
+
+https://github.com/Devansh3712/PySQL[`https://github.com/Devansh3712/PySQL`]
+
+https://github.com/PyMySQL/PyMySQL[`https://github.com/PyMySQL/PyMySQL`]
+
+https://github.com/cube2222/octosql[`https://github.com/cube2222/octosql`]
+
+=====
+SpyQL is a query language that combines the simplicity and structure of SQL
+with the power and readability of Python.
+With the SpyQL command-line tool you can make SQL-like SELECTs powered by Python on top of text data (e.g. CSV and JSON). Data can come from files but also from data streams, such as Kafka, or from databases such as PostgreSQL. Basically, data can come from any command that outputs text.
+More, data can be generated by a Python iterator.
+
+SpyQL also allows you to easily convert between text data formats:
+
+* FROM: CSV, JSON, TEXT and Python iterators (YES, you can use a list comprehension as the data source
+* TO: CSV, JSON, SQL (INSERT statements), pretty terminal printing, and terminal plotting.
+
+The JSON format is JSON lines, where each line has a valid JSON object or array. Piping with jq allows SpyQL to handle any JSON input (more on the examples section).
+=====

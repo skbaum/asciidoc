@@ -1,0 +1,675 @@
+Hardware Notes
+==============
+Steven K. Baum
+v1.7, 2015-03-02
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Articles
+--------
+
+*The Latest in Microcontrollers: 11 Cutting-Edge Boards That Are Driving
+Diversity* (4/24/15) -
+http://makezine.com/magazine/make-43/a-smorgas-board-for-your-computing-pleasure/[+http://makezine.com/magazine/make-43/a-smorgas-board-for-your-computing-pleasure/+]
+
+*Amateur Clockmaking, Machine Shop..and Other Stuff* -
+https://www.youtube.com/channel/UCworsKCR-Sx6R6-BnIjS2MA/featured[+https://www.youtube.com/channel/UCworsKCR-Sx6R6-BnIjS2MA/featured+]
+
+*Multiple Marble Machine Mayhem* -
+http://hackaday.com/2012/04/18/multiple-marble-machine-mayhem/[+http://hackaday.com/2012/04/18/multiple-marble-machine-mayhem/+]
+
+*Scratch-built bar top MAME cabinet* -
+http://hackaday.com/2015/04/07/scratch-built-bar-top-mame-cabinet/[+http://hackaday.com/2015/04/07/scratch-built-bar-top-mame-cabinet/+]
+
+* *Flying off the screen: Observations from the golden age of the American
+video game arcade* - Ernest Hilbert -
+http://www.everseradio.com/flying-off-the-screen-observations-from-the-golden-age-of-the-american-video-game-arcade/[+http://www.everseradio.com/flying-off-the-screen-observations-from-the-golden-age-of-the-american-video-game-arcade/+]
+
+*Remote controlled wildlife camera with Raspberry Pi* -
+http://hackaday.com/2015/04/08/remote-controlled-wildlife-camera-with-raspberry-pi/[+http://hackaday.com/2015/04/08/remote-controlled-wildlife-camera-with-raspberry-pi/+]
+
+*****
+If you are interested in local wildlife, you may want to consider this
+wildlife camera project. [Arnis] has been using his to film
+foxes and mice. The core components of this build are a Raspberry Pi and an
+infrared camera module specifically made for the Pi. The system runs on a
+20,000 mAh battery, which [Arnis] claims results in around 18 hours of battery
+life.
+*****
+
+*Building super small Linux computers from scratch* (online) -
+http://hackaday.com/2015/04/10/building-super-small-linux-computers-from-scratch/[+http://hackaday.com/2015/04/10/building-super-small-linux-computers-from-scratch/+]
+
+*****
+Conventional wisdom says small, powerful embedded Linux like the Raspberry Pi,
+Beaglebone, or the Intel Edison are inherently manufactured devices, and
+certainly not something the homebrew tinkerer can produce at home. [hak8or] is
+doing just that, producing not one, but two
+https://github.com/hak8or/Embedded-Linux-System[completely different tiny Linux
+computers at home].
+*****
+
+*Mycodo* -
+http://kylegabriel.com/projects/2015/04/mushroom-cultivation-revisited.html[+http://kylegabriel.com/projects/2015/04/mushroom-cultivation-revisited.html+]
+
+*****
+In 2009 I created my first automated mushroom cultivator using an ATMega328
+and networked Linux computer. It monitored and regulated the temperature and
+humidity of a growth chamber with the use of a humidifier and heater attached
+to individually-controlled 120-VAC relays, with a simple web control
+interface. In 2012 I redesigned the software to run entirely on the Raspberry
+Pi (RPi) and documented the build shortly after. Although the system worked,
+it was still very basic and lacked some crucial features I desired. Over the
+past couple months I’ve been redesigning both the hardware and the software.
+I’m writing to present the third milestone in development.
+*****
+
+* Cultivating the Fungus Amongus -
+http://hackaday.com/2015/04/11/cultivating-the-fungus-amongus/[+http://hackaday.com/2015/04/11/cultivating-the-fungus-amongus/+]
+
+Hardware
+--------
+
+Macro
+~~~~~
+
+Apexx 5 -
+http://www.boxxtech.com/products/apexx-5[+http://www.boxxtech.com/products/apexx-5+]
+
+*****
+Configurable with up to two Intel XEON processors for a total of 36 cores (72
+threads) and up to 5 GPUs, the APEXX 5 is the most powerful workstation that
+can tear through rendering and simulation tasks with ease.  Starting from
+$10,430.
+*****
+
+Basement Supercomputing Hardware -
+http://www.basement-supercomputing.com/index.php/products/hikashop-menu-for-products-listing[+http://www.basement-supercomputing.com/index.php/products/hikashop-menu-for-products-listing+]
+
+Raspberry Pi
+~~~~~~~~~~~~
+
+http://www.raspberrypi.org/[+http://www.raspberrypi.org/+]
+
+* *RPiTX Turns Raspberry Pi Into Versatile Radio Transmitter* - http://hackaday.com/2015/11/04/rpitx-turns-rasberry-pi-into-versatile-radio-transmitter/[+http://hackaday.com/2015/11/04/rpitx-turns-rasberry-pi-into-versatile-radio-transmitter/+]
+
+* *Monitor your local network with Raspberry Pi* - http://rigaspapas.com/blog/monitor-your-local-network-with-raspberry-pi/[+http://rigaspapas.com/blog/monitor-your-local-network-with-raspberry-pi/+]
+
+* *Taking the Raspberry Pi 2 for a Test Drive with GNU Radio* -
+http://www.rs-online.com/designspark/electronics/eng/blog/taking-the-raspberry-pi-2-for-a-test-drive-with-gnu-radio-2[+http://www.rs-online.com/designspark/electronics/eng/blog/taking-the-raspberry-pi-2-for-a-test-drive-with-gnu-radio-2+]
+
+* *Transmitting FM, AM, SSB, SSTV and FSQ with Just a Raspberry Pi* - https://github.com/matt-desmarais/SentryTurret/[+https://github.com/matt-desmarais/SentryTurret/+]
+
+* SentryTurrent - https://github.com/matt-desmarais/SentryTurret/[+https://github.com/matt-desmarais/SentryTurret/+]
+
+Raspberry Pi Compute Module Development Kit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The compute module contains the guts of a Raspberry Pi (the BCM2835 processor
+and 512Mbyte of RAM) as well as a 4Gbyte eMMC Flash device (which is the
+equivalent of the SD card in the Pi). This is all integrated on to a small
+67.6x30mm board which fits into a standard DDR2 SODIMM connector (the same
+type of connector as used for laptop memory*). The Flash memory is connected
+directly to the processor on the board, but the remaining processor interfaces
+are available to the user via the connector pins. You get the full flexibility
+of the BCM2835 SoC, which means that many more GPIOs and interfaces are
+available as compared to the Raspberry Pi, and designing the module into a
+custom system should be relatively straightforward as we’ve put all the tricky
+bits onto the module itself.
+
+The Compute Module IO Board is a simple, open-source breakout board that you
+can plug a Compute Module into. It provides the necessary power to the module,
+and gives you the ability to program the module’s Flash memory, access the
+processor interfaces in a slightly more friendly fashion (pin headers and
+flexi connectors, much like the Pi) and provides the necessary HDMI and USB
+connectors so that you have an entire system that can boot Raspbian (or the OS
+of your choice). This board provides both a starting template for those who
+want to design with the Compute Module, and a quick way to start experimenting
+with the hardware and building and testing a system before going to the
+expense of fabricating a custom board.
+ 
+The Compute Module IO Board has a 22-way 0.5mm FFC for two camera ports, with
+CAM0 being a 2-lane interface and CAM1 being the full 4-lane interface. To
+attach a standard Raspberry Pi Camera to the Compute module IO Board a small
+camera adaptor board is used to adapt the 22W FFC to the Pi 15W FFC. The
+Compute Module also has 2 MIPI serial display interfaces (DSI); a small camera
+adaptor board included in the kit is used to adapt the 22W FFC to the Pi 15W
+FFC.
+
+http://www.element14.com/community/community/raspberry-pi/raspberry-pi-compute-module[+http://www.element14.com/community/community/raspberry-pi/raspberry-pi-compute-module+]
+
+STAK
+^^^^
+
+Each STAK OS image is custom compiled for your device and only includes the
+libraries and modules YOU need. This means STAK OS is fast.
+
+http://nextthing.co/stak.html[+http://nextthing.co/stak.html+]
+
+https://github.com/NextThingCo/rpi-buildroot[+https://github.com/NextThingCo/rpi-buildroot+]
+
+Arduino
+~~~~~~~
+
+Projects
+^^^^^^^^
+
+*Turning The Arduino Uno Into An Apple ][* - Damian Peckett -
+http://dpeckett.com/turning-the-arduino-uno-into-an-apple[+http://dpeckett.com/turning-the-arduino-uno-into-an-apple+]
+
+*How To: Control circuits and homebuilt servos using an Arduino* - http://electronicsforu.com/newelectronics/video/detailvideo.asp?id=2684[+http://electronicsforu.com/newelectronics/video/detailvideo.asp?id=2684+]
+
+Software
+^^^^^^^^
+
+* Arduino-Makefile - https://github.com/sudar/Arduino-Makefile[+https://github.com/sudar/Arduino-Makefile+]
+
+*****
+Makefile for Arduino sketches. It defines the workflows for compiling code, flashing it to Arduino and even communicating through Serial.
+*****
+
+* Arduino Studio - http://labs.arduino.org/Arduino+Studio[+http://labs.arduino.org/Arduino+Studio+]
+
+*****
+Arduino Studio is a new open source development environment for the Arduino Programming Language. Instead of a monolithic architecture and a centralized development model, Arduino Studio take advantage of Adobe Brackets Editor's pluggable system. We are working hard to allow users to exploit Arduino Studio as stand-alone, web/cloud-based and on-board embedded editor. Just one editor for all the environments.
+Arduino Studio is now available as an alpha release, in-bundle distribution for Linux, Mac OS X and Windows or as a easy-to-install Brackets Extension. 
+*****
+
+* Low Power Library - http://www.rocketscream.com/blog/2011/07/04/lightweight-low-power-arduino-library/[+http://www.rocketscream.com/blog/2011/07/04/lightweight-low-power-arduino-library/+]
+
+*****
+We have just release the 1st revision of our low power library for Arduino.
+Please bear in mind that, most of the Arduino boards (official and also compatible) that is currently available in market (except some brilliant design from JeeLabs and Wiblocks, but there might be more out there that we are not aware of) are not low power by design. Low power design requires both hardware and software implementation. Our Mini Ultra 8 MHz (Arduino compatible) board is designed to be low power and is basically the testing platform for this library. Using the library on any Arduino boards (official or compatible) may and may not yield the best result.
+*****
+
+Instantiations
+^^^^^^^^^^^^^^
+
+* Zero -
+http://www.arduino.cc/en/Main/ArduinoBoardZero[+http://www.arduino.cc/en/Main/ArduinoBoardZero+]
+
+
+*****
+Arduino Zero is a simple and powerful 32-bit extension of the
+platform established by Arduino UNO. The Zero board aims to provide creative
+individuals with the potential to realize truly innovative ideas for smart
+IoT devices, wearable technology, high-tech automation, crazy robotics, and
+projects not yet imagined. The board is powered by Atmel’s SAMD21 MCU, which
+features a 32-bit ARM Cortex® M0+ core.
+*****
+
+* JeeNode - http://www.digitalsmarties.net/products/jeenode[+http://www.digitalsmarties.net/products/jeenode+]
+
+*****
+The JeeNode is a compact wireless board with an Atmel 8-bit RISC microprocessor. JeeNodes are compatible with the Arduino platform and can be programmed under Windows, Mac OS X, or Linux using sketches created with the Arduino IDE.
+*****
+
+* Microview - https://www.sparkfun.com/products/12923[+https://www.sparkfun.com/products/12923+]
+
+*****
+The MicroView is the first chip-sized Arduino compatible module that lets you
+see what your Arduino is thinking using a built-in OLED display. With the
+on-board 64x48 pixel OLED, you can use the MicroView to display sensor data,
+emails, pin status, and more. It also fits nicely into a breadboard to make
+prototyping easy. The MicroView also has a full-featured Arduino library to
+make programming the module easy.
+*****
+
+* ZB2 - http://wiblocks.luciani.org/ZB2/ZB2-index.html[+http://wiblocks.luciani.org/ZB2/ZB2-index.html+]
+
+*****
+The ZB2 is the second generation Wiblocks board that integrates an Arduino compatible design and a MaxStream XBee radio module. The ZB2 updates include addition of a real-time clock (DS1337) with battery backup, an optional 5V 100mA boost converter (SMD-KIT) and an extended I/O connector. The new I/O connector is backwards compatible with all the ZB1/NB1x boards and peripherals. 
+*****
+
+* PICOBEE - http://wiblocks.luciani.org/PICO/PICOBEE-index.html[+http://wiblocks.luciani.org/PICO/PICOBEE-index.html+]
+
+*****
+The PICOBEE is an Arduino compatible design that integrates a real-time clock and an XBee. The board size is 2.1" x 2.2".
+*****
+
+* Tessel - https://tessel.io/[+https://tessel.io/+]
+
+* Light Blue Bean -
+https://punchthrough.com/bean/[+https://punchthrough.com/bean/+]
+
+*****
+The LightBlue Bean is a low energy Bluetooth Arduino microcontroller. Using
+Bluetooth 4.0, it is programmed wirelessly, runs on a coin cell battery, and
+is perfect for smartphone controlled projects.
+*****
+
+* Espruino - http://www.espruino.com/[+http://www.espruino.com/+]
+
+*****
+Unlike other boards that run JavaScript, Espruino fits everything it needs
+into single chip. This makes it affordable, reliable, and power efficient -
+allowing it to run for years on a battery.
+
+Espruino plugs in to your computer by USB and appears as a serial device. No
+drivers, and no special software. Just run a terminal application and start
+writing code right away.
+*****
+
+* Flutter Wireless -
+http://www.flutterwireless.com/[+http://www.flutterwireless.com/+]
+
+*****
+Flutter is a programmable processor core for electronics projects, designed
+for hobbyists, students, and engineers.
+Featuring a fast ARM processor, powerful long-range wireless communication,
+built-in battery charging, and an onboard security chip, Flutter is an ideal
+choice for robotics, wireless sensor networks, consumer electronics, and
+educational platforms.
+*****
+
+* Moteino MEGA -
+https://lowpowerlab.com/shop/index.php?\_route_=moteinomega[+https://lowpowerlab.com/shop/index.php?_route_=moteinomega+]
+
+*****
+MoteinoMEGA is a low cost wireless Arduino based on the Atmel ATMega1284P
+microcontroller.
+*****
+
+* RFduino - http://www.rfduino.com/[+http://www.rfduino.com/+]
+
+* TRE -
+http://arduino.cc/en/Main/ArduinoBoardTre[+http://arduino.cc/en/Main/ArduinoBoardTre+]
+
+*****
+The first Arduino board manufactured in the U.S. 
+Thanks to the 1-GHz Sitara AM335x processor, Arduino developers get up to 100
+times more performance with the Sitara-processor-based TRE than they do on the
+Arduino Leonardo or Uno. This performance opens the doors to more advanced
+Linux-powered applications. The Sitara-processor-based Linux Arduino can run
+high-performance desktop applications, processing-intensive algorithms or
+high-speed communications. 
+*****
+
+Misc
+~~~~
+
+Electric Imp
+^^^^^^^^^^^^
+
+For manufacturers seeking to bring products and services online, Electric Imp provides a complete end-to-end solution that makes it simple to connect nearly any device to the Internet quickly, securely and seamlessly. The Electric Imp connectivity platform, featuring fully integrated hardware, software, OS, APIs, cloud services and security, can effectively enhance your devices with greater functionality, efficiency and performance.
+
+https://www.electricimp.com/product/[+https://www.electricimp.com/product/+]
+
+GreenArrays
+^^^^^^^^^^^
+
+Multi-computer chips from GreenArrays offer an unrivaled combination of great
+computing power, small size, low energy consumption, and high value. They are
+simple, practical, versatile, and affordable. These chips change the game,
+enabling new embedded applications in a massively parallel world.
+
+http://www.greenarraychips.com/[+http://www.greenarraychips.com/+]
+
+MIPS Creator CI20
+^^^^^^^^^^^^^^^^^
+
+A high-performance, fully-featured Linux and Android development platform.
+It incorporates an Ingenic JZ4780 SoC which includes a 1.2GHz dual core MIPS32
+processor and Imagination PowerVR SGX540 GPU. The CI20 board provides
+comprehensive connectivity, multimedia capabilities and substantial RAM and
+flash. CI20 is preloaded with Debian7, and other distros are being packaged to
+be available for download soon.
+
+http://store.imgtec.com/us/product/mips-creator-ci20/[+http://store.imgtec.com/us/product/mips-creator-ci20/+]
+
+http://www.elinux.org/MIPS_Creator_CI20[+http://www.elinux.org/MIPS_Creator_CI20+]
+
+http://www.linuxlinks.com/article/20150315065922453/MIPSCI20-Software.html[+http://www.linuxlinks.com/article/20150315065922453/MIPSCI20-Software.html+]
+
+Red Pitaya
+^^^^^^^^^^
+
+Red Pitaya is an open source measurement and control tool replacing many expensive laboratory instruments at a surprising price tag.
+This powerful exotic tool is at the heart of a revolutionary Red Pitaya Ecosystem, which facilitates discovering, experiencing, learning, developing and sharing a variety of applications. 
+
+https://store.open-electronics.org/index.php?route=product%2Fproduct&product_id=460&utm_content=buffercabc7&utm_medium=social&utm_source=facebook.com&utm_campaign=buffer[+https://store.open-electronics.org/index.php?route=product%2Fproduct&product_id=460&utm_content=buffercabc7&utm_medium=social&utm_source=facebook.com&utm_campaign=buffer+]
+
+Wunder Bar
+^^^^^^^^^^
+
+The WunderBar by relayr is a revolutionary IoT (Internet of Things) starter
+kit that includes six different sensors and a master module. This kit enables
+hardware and software developers to quickly and easily prototype their ideas
+and create apps to interact with the physical world. The kit works right out
+of the box and is energy efficient, fast, and secure.
+
+https://relayr.io/wunderbar[+https://relayr.io/wunderbar+]
+
+https://shop.localmotors.com/products/wunderbar-by-relayr[+https://shop.localmotors.com/products/wunderbar-by-relayr+]
+
+BeagleBone Black -
+http://beagleboard.org/BLACK[+http://beagleboard.org/BLACK+]
+
+*****
+BeagleBone Black is a low-cost, community-supported development platform for
+developers and hobbyists. Boot Linux in under 10 seconds and get started on
+development in less than 5 minutes with just a single USB cable.
+*****
+
+Element14 -
+http://www.element14.com/community/welcome[+http://www.element14.com/community/welcome+]
+
+FUNcube Dongle -
+http://www.funcubedongle.com/[+http://www.funcubedongle.com/+]
+
+* WSPR using a FUNCube Dongle PRO+ -
+http://nerdsville.blogspot.co.uk/2013/03/wspr-using-funcube-dongle-pro.html[+http://nerdsville.blogspot.co.uk/2013/03/wspr-using-funcube-dongle-pro.html+]
+
+* TV Broadcasts from Outer Space -
+http://hackaday.com/2015/04/09/tv-broadcasts-from-outer-space/[+http://hackaday.com/2015/04/09/tv-broadcasts-from-outer-space/+]
+
+Intel Edison -
+http://www.intel.com/content/www/us/en/do-it-yourself/edison.html[+http://www.intel.com/content/www/us/en/do-it-yourself/edison.html+]
+
+IQaudIO - http://iqaudio.com/[+http://iqaudio.com/+]
+
+*****
+A range of audio accessories for the Raspberry Pi and other single board
+devices. Developed by audio enthusiasts for audio enthusiasts.
+*****
+
+Konekt - http://konekt.io/[+http://konekt.io/+]
+
+littleBits
+^^^^^^^^^^
+
+The easiest way to prototype and learn with
+electronics.  It's an ever-growing library of electronic
+modules that snap together with magnets so you
+can invent anything.
+
+http://littlebits.cc/[+http://littlebits.cc/+]
+
+bitLab
+++++++
+
+The bitLab truly makes our electronics platform infinite. Think of it as an
+app store for hardware.
+
+http://littlebits.cc/bitlab[+http://littlebits.cc/bitlab+]
+
+cloudBit
+++++++++
+
+The cloudBit is the easiest way to create internet­-connected devices. You can
+now snap the internet to anything! Retrofit your thermostat to control it
+remotely, or set up a sound-triggered alarm system that texts you alerts--the
+possibilities are endless. No programming, soldering or wiring required.
+
+http://littlebits.cc/bits/cloudbit[+http://littlebits.cc/bits/cloudbit+]
+
+
+Little Machine Shop -
+http://www.littlemachineshop.com/default.php[+http://www.littlemachineshop.com/default.php+]
+
+LowPowerLab - http://lowpowerlab.com/[+http://lowpowerlab.com/+]
+
+Nordic nRF24L01+ -
+https://www.nordicsemi.com/eng/Products/2.4GHz-RF/nRF24L01-Evaluation-Kit[+https://www.nordicsemi.com/eng/Products/2.4GHz-RF/nRF24L01-Evaluation-Kit+]
+
+* Nordic nRF24L01+ with Arduino -
+https://medium.com/@nowir3s/nordic-nrf24l01-with-arduino-b822dbac7e74[+https://medium.com/@nowir3s/nordic-nrf24l01-with-arduino-b822dbac7e74+]
+
+NVIDIA Jetson -
+http://www.nvidia.com/object/jetson-tk1-embedded-dev-kit.html[+http://www.nvidia.com/object/jetson-tk1-embedded-dev-kit.html+]
+
+*****
+The NVIDIA Jetson TK1 development kit gives you everything you need to unlock
+the power of the GPU for embedded applications. It's built around the
+revolutionary NVIDIA® Tegra® K1 SOC and uses the same NVIDIA Kepler™ computing
+core designed into supercomputers around the world. This gives you a fully
+functional NVIDIA CUDA® platform that will let you quickly develop and deploy
+compute-intensive systems for computer vision, robotics, medicine, and more.
+*****
+
+* http://elinux.org/Jetson_TK1[+http://elinux.org/Jetson_TK1+]
+
+* http://devblogs.nvidia.com/parallelforall/embedded-machine-learning-cudnn-deep-neural-network-library-jetson-tk1/[+http://devblogs.nvidia.com/parallelforall/embedded-machine-learning-cudnn-deep-neural-network-library-jetson-tk1/+]
+
+* http://www.phoronix.com/scan.php?page=search&q=Jetson+TK1[+http://www.phoronix.com/scan.php?page=search&q=Jetson+TK1+]
+
+Odroid -
+http://www.hardkernel.com/main/main.php[+http://www.hardkernel.com/main/main.php+]
+
+Othermill -
+https://othermachine.co/othermill/features/[+https://othermachine.co/othermill/features/+]
+
+*****
+The Othermill is a portable, precise milling machine that allows you to create
+2D and 3D objects out of durable materials, such as wood, metal, and plastic,
+using digital designs. We believe that everyone should be able to use
+professional tools, so we’ve designed easy-to-use software and provided the
+tools and materials you need to get started. 
+*****
+
+RTL-SDR Dongles -
+http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/[+http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/+]
+
+Seeed - http://www.seeedstudio.com/depot/[+http://www.seeedstudio.com/depot/+]
+
+Shapeoko - http://www.shapeoko.com/[+http://www.shapeoko.com/+]
+
+Spark - http://www.spark.io/[+http://www.spark.io/+]
+
+* Photon - A $19 Wi-Fi development kit for creating connected products with
+improved capability and reliability.
+
+Tindie - https://www.tindie.com/[+https://www.tindie.com/+]
+
+* Raspberry Pi -
+https://www.tindie.com/browse/raspberry-pi/[+https://www.tindie.com/browse/raspberry-pi/+]
+
+* Arduino -
+https://www.tindie.com/browse/arduino/[+https://www.tindie.com/browse/arduino/+]
+
+* IoT -
+https://www.tindie.com/browse/iot-home/[+https://www.tindie.com/browse/iot-home/+]
+
+* Audio -
+https://www.tindie.com/browse/sound/[+https://www.tindie.com/browse/sound/+]
+
+* Robots and Drones -
+https://www.tindie.com/browse/robots-drones/[+https://www.tindie.com/browse/robots-drones/+]
+
+WeMo -
+http://www.belkin.com/us/Products/home-automation/c/wemo-home-automation/[+http://www.belkin.com/us/Products/home-automation/c/wemo-home-automation/+]
+
+XBee - http://www.digi.com/xbee/[+http://www.digi.com/xbee/+]
+
+* Projects - http://gallery.digi.com/[+http://gallery.digi.com/+]
+
+Yosemite -
+https://code.facebook.com/posts/1616052405274961/introducing-yosemite-the-first-open-source-modular-chassis-for-high-powered-microservers-/[+https://code.facebook.com/posts/1616052405274961/introducing-yosemite-the-first-open-source-modular-chassis-for-high-powered-microservers-/+]
+
+*****
+The first open source modular chassis for high-powered microservers.
+*****
+
+FPGA
+----
+
+Articles
+~~~~~~~~
+
+*How FPGAs work, and why you'll buy one* -
+http://yosefk.com/blog/how-fpgas-work-and-why-youll-buy-one.html[+http://yosefk.com/blog/how-fpgas-work-and-why-youll-buy-one.html+]
+
+*Open Tooling for FPGAs* -
+http://curtis.io/others-work/open-tooling-for-fpgas[+http://curtis.io/others-work/open-tooling-for-fpgas+]
+
+*Designing Hardware/Software Systems for Embedded High-Performance Computing* - http://arxiv.org/abs/1508.06832[+http://arxiv.org/abs/1508.06832+]
+
+*****
+In this work, we propose an architecture and methodology to design hardware/software systems for high-performance embedded computing on FPGA. The hardware side is based on a many-core architecture whose design is generated automatically given a set of architectural parameters. Both the architecture and the methodology were evaluated running dense matrix multiplication and sparse matrix-vector multiplication on a ZYNQ-7020 FPGA platform. The results show that using a system-level design of the system avoids complex hardware design and still provides good performance results.
+*****
+
+*ThreadPoolComposer - An Open-Source FPGA Toolchain for Software Developers* - http://arxiv.org/abs/1508.06821[+http://arxiv.org/abs/1508.06821+]
+
+*****
+This extended abstract presents ThreadPoolComposer, a high-level synthesis-based development framework and meta-toolchain that provides a uniform programming interface for FPGAs portable across multiple platforms.
+*****
+
+*Using System Hyper Pipelining (SHP) to Improve the Performance of a Coarse-Grained Reconfigurable Architecture (CGRA) Mapped on an FPGA* - http://arxiv.org/abs/1508.07139[+http://arxiv.org/abs/1508.07139+]
+
+*****
+The well known method C-Slow Retiming (CSR) can be used to automatically convert a given CPU into a multithreaded CPU with independent threads. These CPUs are then called streaming or barrel processors. System Hyper Pipelining (SHP) adds a new flexibility on top of CSR by allowing a dynamic number of threads to be executed and by enabling the threads to be stalled, bypassed and reordered. SHP is now applied on the programming elements (PE) of a coarse-grained reconfigurable architecture (CGRA). By using SHP, more performance can be achieved per PE. Fork-Join operations can be implemented on a PE using the flexibility provided by SHP to dynamically adjust the number of threads per PE. Multiple threads can share the same data locally, which greatly reduces the data traffic load on the CGRA's routing structure. The paper shows the results of a CGRA using SHP-ed RISC-V cores as PEs implemented on a FPGA.
+*****
+
+*SparkCL: A Unified Programming Framework for Accelerators on Heterogeneous Clusters* - http://arxiv.org/abs/1505.01120[+http://arxiv.org/abs/1505.01120+]
+
+*****
+We introduce SparkCL, an open source unified programming framework based on Java, OpenCL and the Apache Spark framework. The motivation behind this work is to bring unconventional compute cores such as FPGAs/GPUs/APUs/DSPs and future core types into mainstream programming use. The framework allows equal treatment of different computing devices under the Spark framework and introduces the ability to offload computations to acceleration devices. The new framework is seamlessly integrated into the standard Spark framework via a Java-OpenCL device programming layer which is based on Aparapi and a Spark programming layer that includes new kernel function types and modified Spark transformations and actions. The framework allows a single code base to target any type of compute core that supports OpenCL and easy integration of new core types into a Spark cluster.
+*****
+
+*FPGA-Based Design of Numerical Algorithms for Kernel Density Estimation Using High Level Synthesis Approach* - http://arxiv.org/abs/1505.02100[+http://arxiv.org/abs/1505.02100+]
+
+*****
+FPGA technology can offer significantly higher performance at much lower power than is available from CPUs and GPUs in many computational problems. Unfortunately, programming for FPGA (using hardware description languages, HDL) is a difficult and not-trivial task and is not intuitive for C/C++/Java programmers. To bring the gap between programming effectiveness and difficulty the High Level Synthesis (HLS) approach is promoting by many FPGA vendors. Nowadays, time-intensive calculations are mainly performed on GPU/CPU architectures, but can also be successfully performed using HLS approach. In the paper we implement a selected numerical algorithm (bandwidth selection for kernel density estimators, KDE) using HLS and show techniques which were used to optimise the final FPGA implementation.
+*****
+
+Products
+~~~~~~~~
+
+Atlys Spartan-6 FPGA Development Board -
+http://www.digilentinc.com/Products/Detail.cfm?NavPath=2,400,836&Prod=ATLYS[+http://www.digilentinc.com/Products/Detail.cfm?NavPath=2,400,836&Prod=ATLYS+]
+
+DE0-Nano -
+http://www.terasic.com.tw/cgi-bin/page/archive.pl?No=593[+http://www.terasic.com.tw/cgi-bin/page/archive.pl?No=593+]
+
+Mojo -
+https://embeddedmicro.com/products/mojo-v3.html[+https://embeddedmicro.com/products/mojo-v3.html+]
+
+Papilio FPGAs -
+http://store.gadgetfactory.net/fpga/[+http://store.gadgetfactory.net/fpga/+]
+
+Pipistrello -
+http://pipistrello.saanlima.com/index.php[+http://pipistrello.saanlima.com/index.php+]
+
+*****
+Pipistrello is a FPGA development board for Xilinx Spartan-6 parts in 324 BGA
+package, desiged by Saanlima Electronics.
+*****
+
+Scarab miniSpartan -
+http://www.scarabhardware.com/shop/[+http://www.scarabhardware.com/shop/+]
+
+* DIY FPGA-based HDMI ambient lighting -
+* http://zerocharactersleft.blogspot.com/2015/04/diy-fpga-based-hdmi-ambient-lighting.html[+http://zerocharactersleft.blogspot.com/2015/04/diy-fpga-based-hdmi-ambient-lighting.html+]
+
+Software
+~~~~~~~~
+
+FloPoCo
+^^^^^^^
+
+FloPoCo is a generator of arithmetic cores (Floating-Point Cores, but not
+only) for FPGAs (but not only). 
+
+http://flopoco.gforge.inria.fr/[+http://flopoco.gforge.inria.fr/+]
+
+FPGALink
+^^^^^^^^
+
+The aim of the FPGALink project is to provide a hardware abstraction layer for
+hardware involving an FPGA connected to a computer over USB, to abstract core
+functionality like FPGA-programming and subsequent host-FPGA communication. It
+doesn't matter whether the hardware uses an AVR, an FX2LP or an ARM-based
+micro for its USB interface. It doesn't matter whether the FPGA is from Xilinx
+or Altera or Lattice or whomever. It doesn't matter whether the interface
+between them is a fast 43MiB/s parallel synchronous interface, a much slower
+EPP interface or some sort of USART connection. The cross-platform,
+cross-language host-side API is the same, and the FPGA-side (VHDL or Verilog)
+FIFO interface is the same, so you can easily port your design to a new FPGA
+devkit or to your own custom PCB.
+
+https://github.com/makestuff/libfpgalink/wiki/FPGALink[+https://github.com/makestuff/libfpgalink/wiki/FPGALink+]
+
+migen
+^^^^^
+
+Despite being faster than schematics entry, hardware design with Verilog and
+VHDL remains tedious and inefficient for several reasons. The event-driven
+model introduces issues and manual coding that are unnecessary for synchronous
+circuits, which represent the lion's share of today's logic designs. Counter-
+intuitive arithmetic rules result in steeper learning curves and provide a
+fertile ground for subtle bugs in designs. Finally, support for procedural
+generation of logic (metaprogramming) through "generate" statements is very
+limited and restricts the ways code can be made generic, reused and organized.
+
+To address those issues, we have developed the Migen FHDL library that
+replaces the event-driven paradigm with the notions of combinatorial and
+synchronous statements, has arithmetic rules that make integers always behave
+like mathematical integers, and most importantly allows the design's logic to
+be constructed by a Python program. This last point enables hardware designers
+to take advantage of the richness of the Python language - object oriented
+programming, function parameters, generators, operator overloading, libraries,
+etc. - to build well organized, reusable and elegant designs.
+
+Other Migen libraries are built on FHDL and provide various tools such as a
+system-on-chip interconnect infrastructure, a dataflow programming system, a
+more traditional high-level synthesizer that compiles Python routines into
+state machines with datapaths, and a simulator that allows test benches to be
+written in Python.
+
+https://github.com/m-labs/migen[+https://github.com/m-labs/migen+]
+
+MyHDL
+^^^^^
+
+MyHDL turns Python into a hardware description and verification language,
+providing hardware engineers with unprecedented power.
+
+http://www.myhdl.org/[+http://www.myhdl.org/+]
+
+UrJTAG
+^^^^^^
+
+UrJTAG aims to create an enhanced, modern tool for communicating over JTAG
+with flash chips, CPUs, and many more. It takes on the well proven openwince
+jtag tools code. Future plans include conversion of the code base into a
+library that can be used with other applications. A flexible remote
+communication protocol that can be used over almost any type of serial link
+(including TCP/IP) is in the works. 
+
+http://urjtag.org/[+http://urjtag.org/+]
+
+xc3sprog
+^^^^^^^^
+
+A suite of utilities for programming Xilinx FPGAs, CPLDs, and EEPROMs with the
+Xilinx Parallel Cable and other JTAG adapters under Linux. 
+
+http://xc3sprog.sourceforge.net/[+http://xc3sprog.sourceforge.net/+]
+
+Chips
+-----
+
+CC3000 Series
+~~~~~~~~~~~~~
+
+http://www.ti.com/ww/en/simplelink_embedded_wi-fi/home.html?DCMP=PPC_Google_TI&k_clickid=541da8ad-e297-2529-ba43-000058c8015d[+http://www.ti.com/ww/en/simplelink_embedded_wi-fi/home.html?DCMP=PPC_Google_TI&k_clickid=541da8ad-e297-2529-ba43-000058c8015d+]
+
+
+* CC3000 -
+http://www.ti.com/product/cc3000[+http://www.ti.com/product/cc3000+]
+
+*****
+The TI CC3000 module is a self-contained wireless network processor that
+simplifies the implementation of Internet connectivity. TI’s SimpleLink Wi-Fi
+solution minimizes the software requirements of the host microcontroller (MCU)
+and is thus the ideal solution for embedded applications using any low-cost
+and low-power MCU.
+*****
+
+
+

@@ -1,0 +1,154 @@
+Rasdaman Array Database 
+=======================
+Steven K. Baum
+v0.1, 2016-08-07
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Installation
+------------
+
+http://www.rasdaman.org/wiki/InstallFromRPM[+http://www.rasdaman.org/wiki/InstallFromRPM+]
+
+Initialize Rasdaman Repo
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+As root:
+
+-----
+curl "http://download.rasdaman.org/packages/rpm/stable/CentOS/7/x86_64/rasdaman.repo" -o /etc/yum.repos.d/rasdaman.repo
+yum clean all
+yum update
+-----
+
+Check to see if the Rasdaman repo is recognized.
+
+-----
+yum search rasdaman
+
+============================================================== N/S matched: rasdaman ===============================================================
+rasdaman.x86_64 : Rasdaman extends standard relational database systems with the ability to store and retrieve multi-dimensional raster data
+
+  Name and summary matches only, use "search all" for everything.
+-----
+
+
+Initialize Repository and Install Rasdaman
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+yum install epel-release
+yum install rasdaman
+source /etc/profile.d/rasdaman.sh
+-----
+
+Check the Installation
+~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+/opt/rasdaman/bin/rasql -q 'select c from RAS_COLLECTIONNAMES as c' --out string
+
+/opt/rasdaman/bin/rasql: rasdaman query tool v1.0, rasdaman v9.2.1-g889dbfd -- generated on 08.03.2016 06:43:50.
+opening database RASBASE at localhost:7001...ok
+Executing retrieval query...ok
+Query result collection has 4 element(s):
+  Result object 1: rgb
+  Result object 2: mr
+  Result object 3: mr2
+  Result object 4: mean_summer_airtemp
+/opt/rasdaman/bin/rasql done.
+-----
+
+Check that +petascope+ is properly initialized at:
+
+-----
+http://localhost:8080/rasdaman/ows
+-----
+
+Updating
+~~~~~~~~
+
+-----
+yum update
+service rasdaman restart
+service tomcat restart
+-----
+
+Administration
+~~~~~~~~~~~~~~
+
+-----
+service rasdaman start
+service rasdaman stop
+service rasdaman status
+
+rasdaman is running
+-----
+
+Using Rasdaman
+--------------
+
+Query Language Guide (125 pp. PDF) - http://www.rasdaman.org/browser/manuals_and_examples/manuals/doc-guides/ql-guide.pdf[+http://www.rasdaman.org/browser/manuals_and_examples/manuals/doc-guides/ql-guide.pdf+]
+
+Rview Guide (46 pp. PDF) - http://www.rasdaman.org/export/001146b422d530432809e5b81d24578b442fb2f8/manuals_and_examples/manuals/doc-guides/rview-guide.pdf[+http://www.rasdaman.org/export/001146b422d530432809e5b81d24578b442fb2f8/manuals_and_examples/manuals/doc-guides/rview-guide.pdf+]
+
+
+
+Command-Line Utilities
+~~~~~~~~~~~~~~~~~~~~~~
+
+wcst_import.sh
+^^^^^^^^^^^^^^
+
+http://www.rasdaman.org/wiki/WCSTImportGuide[+http://www.rasdaman.org/wiki/WCSTImportGuide+]
+
+=====
+WCSTImport is a utility application in the rasdaman software suite that allows importing of georeferenced datasets into a WCS service supporting the Transaction Extension.
+Its primary functionality is allowing the ingestion of archives of georeferenced files.
+This utility introduces two concepts:
+
+1. *Recipe* - A recipe is a class implementing the BaseRecipe that based on a set of parameters (ingredients) can import a set of files into WCS forming a well defined structure (image, regular timeseries, irregular timeseries etc)
+
+2. *Ingredients* - An ingredients file is a json file containing a set of parameters that define how the recipe should behave (e.g. the WCS endpoint, the CRS resolver etc are all ingredients) 
+=====
+
+One of the prerequisites for this utility is the Python interface to GDAL.
+The default version on CentOS 7 is GDAL 1.11.4, which seems to lack a couple of
++*.h+ files the Python interface demands.  So we downloaded GDAL 2.1.1 from:
+
+http://trac.osgeo.org/gdal/wiki/DownloadSource[+http://trac.osgeo.org/gdal/wiki/DownloadSource+]
+
+and then unpacked it.  We configured it with:
+
+-----
+./configure --prefix=/usr --libdir=/usr/lib64 --with-python=/opt/anaconda3/bin/python --with-poppler --with-armadillo --with-rasdaman=/opt/rasdaman >& conf.log &
+-----
+
+and then built and installed it with:
+
+-----
+make >& make.log &
+su
+make install >& inst.log &
+-----
+
+Now we can install the Python interface as well as other prerequisites.
+
+-----
+pip3 install python-dateutil lxml python-magic
+pip3 install gdal
+pip3 install glob2
+-----
+
+
+NetCDF and HDF Files
+~~~~~~~~~~~~~~~~~~~~
+
+http://www.rasdaman.org/wiki/FAQ#Dataformats[+http://www.rasdaman.org/wiki/FAQ#Dataformats+]
+
+Rasdaman must be explicitly compiled with NetCDF and/or HDF.

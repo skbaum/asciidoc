@@ -1,0 +1,94 @@
+Flask
+=====
+Steven K. Baum
+v0.1, 2016-12-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Installation
+------------
+
+Install Flask via:
+
+-----
+pip install Flask
+-----
+
+This may vary depending on which Python distribution the Flask distribution
+is installed in.  In the example below it was installed in the Python 3 distribution
+on barataria and thus installed via "pip3 install Flask".  It is already installed there
+so this can be skipped.
+
+Running Flask Using mod_wsgi
+----------------------------
+
+Creating the Files in the HTTP HTML Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Create the file hello.wsgi with the contents:
+
+-----
+import sys
+from hello import app as application
+-----
+
+This is the file that points the WSGI machinery to whatever Python
+file contains the substantial code.  In this case the "hello" indicates
+that it should look for the file "hello.py" in the same directory.
+
+Create the file hello.py with the contents:
+
+-----
+#!/usr/bin/python3
+from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "Hello World!"
+
+if __name__ == "__main__":
+    app.run()
+-----
+
+Note that the first line in this file will change if your Python binary
+directory is elsewhere.  This is the file into which more complicated things than
+"Hello World!" will be placed.
+
+Put these files in the directory:
+
+-----
+/var/www/html/flask
+-----
+
+Configuring Apache
+~~~~~~~~~~~~~~~~~~
+
+Edit the httpd.conf file and add:
+
+-----
+Alias /flask /var/www/html/flask/hello.wsgi
+WSGIPythonPath /var/www/html/flask
+
+<Directory /var/www/html/flask>
+  SetHandler wsgi-script
+  Options ExecCGI
+</Directory>
+-----
+
+Restart Apache and point your browser to:
+
+-----
+http://pong.tamu.edu/flask
+-----
+
+to receive the "Hello World!" message.
+
+The Apache server should be restarted whenever you create a new
+alias for a flask program.
+

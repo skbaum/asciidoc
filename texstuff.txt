@@ -1,0 +1,586 @@
+
+Ancillary TeX Programs
+======================
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+Examples
+--------
+
+LaTeX Font Catalog - https://tug.org/FontCatalogue/alphfonts.html[`https://tug.org/FontCatalogue/alphfonts.html`]
+
+Show of Beautiful TeX Typography - https://tex.stackexchange.com/questions/1319/showcase-of-beautiful-typography-done-in-tex-friends[`https://tex.stackexchange.com/questions/1319/showcase-of-beautiful-typography-done-in-tex-friends`]
+
+TeXample - https://texample.net/[`https://texample.net/`]
+
+The Beauty of LaTeX - http://nitens.org/taraborelli/latex[`http://nitens.org/taraborelli/latex`]
+
+Asciidoctor
+-----------
+
+Asciidoctor Diagram
+~~~~~~~~~~~~~~~~~~~
+
+https://github.com/asciidoctor/asciidoctor-diagram[`https://github.com/asciidoctor/asciidoctor-diagram`]
+
+Asciidoctor Diagram is a set of Asciidoctor extensions that enable you to add diagrams, which you describe using plain text, to your AsciiDoc document.
+
+The extensions supports the AsciiToSVG, BlockDiag (BlockDiag, SeqDiag, ActDiag, NwDiag), Bytefield-SVG, Ditaa, dpic, Erd, Gnuplot, GraphViz, Mermaid, Msc, Nomnoml, Pikchr, PlantUML, Shaape, State Machine Cat, SvgBob, Symbolator, Syntrax, UMLet, Vega, Vega-Lite and WaveDrom syntax.
+
+Each extension runs the diagram processor to generate an SVG, PNG, or TXT file from the input text. The generated file is then inserted into your converted document.
+
+Asciidoctor LaTeX
+~~~~~~~~~~~~~~~~~
+
+https://github.com/asciidoctor/asciidoctor-latex[`https://github.com/asciidoctor/asciidoctor-latex`]
+
+This defines an extended syntax for the AsciiDoc markup language (AsciiDoc-LaTeX) that closely parallels LaTeX for inline and display mathematical formulas and for environments. Documents written in this extended markup language can be converted into HTML or LaTeX.
+
+Magic Book Project
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/magicbookproject/magicbook[`https://github.com/magicbookproject/magicbook`]
+
+"The Magic Book Project is an open source project funded by New York University's Interactive Telecommunications Program. It aims to be the best free tool for creating print and digital books from a single source."
+
+biblatex
+--------
+
+https://github.com/plk/biblatex[`https://github.com/plk/biblatex`]
+
+This provides advanced bibliographic facilities for use with LaTeX.
+The package is a complete reimplementation of the bibliographic facilities provided by LaTeX. A custom backend Biber is used by default which processes BibTeX format data files and them performs all sorting, label generation (and a great deal more).
+
+Biblatex does not use the backend to format the bibliography information as with traditional BibTeX: instead of being implemented in BibTeX style files, the formatting of the bibliography is entirely controlled by TeX macros.
+
+This package supports subdivided bibliographies, multiple bibliographies within one document with different sorting, separate lists of bibliographic information such as abbreviations of various fields. Bibliographies may be subdivided into parts and / or segmented by topics.
+
+Just like the bibliography styles, all citation commands may be freely defined.
+
+With Biber as the backend, features such as customisable sorting, multiple bibliographies with different sorting, customisable labels, dynamic data modification and custom data models are available.
+
+biber
+~~~~~
+
+http://biblatex-biber.sourceforge.net/[`http://biblatex-biber.sourceforge.net/`]
+
+The back end processor for biblatex.
+
+bookish
+-------
+
+https://github.com/parrt/bookish[`https://github.com/parrt/bookish`]
+
+"Bookish is an xml-ish + some markdown format for books and articles that it can convert to HTML and latex.
+It also does some really fancy magic to convert full latex equations (or even latex chunks) to SVG images for display inline (tricky to get vertical alignment correct.)
+Bookish is mostly XML-like but uses markdown for the more common things like italics and code fonts."
+
+Codebraid
+---------
+
+https://github.com/gpoore/codebraid[`https://github.com/gpoore/codebraid`]
+
+"Codebraid is a Python program that enables executable code in Pandoc Markdown documents. Using Codebraid can be as simple as adding a class to your code blocks' attributes, and then running codebraid rather than pandoc to convert your document from Markdown to another format. codebraid supports almost all of pandoc's options and passes them to pandoc internally.
+
+Codebraid provides two options for executing code. It includes a built-in code execution system that currently supports Python 3.5+, Julia, Rust, R, Bash, JavaScript, and SageMath. Code can also be executed using Jupyter kernels, with support for rich output like plots."
+
+ConTeXt
+-------
+
+https://wiki.contextgarden.net/Main_Page[`https://wiki.contextgarden.net/Main_Page`]
+
+https://en.wikipedia.org/wiki/ConTeXt[`https://en.wikipedia.org/wiki/ConTeXt`]
+
+"ConTeXt is a general-purpose document processor. Like LaTex, it is derived from TeX. It is especially suited for structured documents, automated document production, very fine typography, and multi-lingual typesetting. It is based in part on the TeX typesetting system, and uses a document markup language for manuscript preparation. The typographical and automated capabilities of ConTeXt are extensive, including interfaces for handling microtypography, multiple footnotes and footnote classes, and manipulating OpenType fonts and features. Moreover, it offers extensive support for colors, backgrounds, hyperlinks, presentations, figure-text integration, and conditional compilation. It gives the user extensive control over formatting while making it easy to create new layouts and styles without learning the low-level TeX macro language. 
+
+ConTeXt may be compared and contrasted with LaTeX, but the primary thrust of the two are rather distinct. ConTeXt from the ground up is a typography and typesetting system meant to provide users easy and consistent access to advanced typographical control—important for general-purpose typesetting tasks. The original vision of LaTeX is to insulate the user from typographical decisions—a useful approach for submitting e.g. articles for a scientific journal. LaTeX has evolved from that original vision; at the same time, ConTeXt's unified design avoids the package clashes that can happen with LaTeX."
+
+MetaFun
+~~~~~~~
+
+https://wiki.contextgarden.net/MetaFun_-_MetaPost_in_ConTeXt[`https://wiki.contextgarden.net/MetaFun_-_MetaPost_in_ConTeXt`]
+
+"MetaFun is ConTeXt extension the MetaPost language. It provides a tight integration of both TeX and MetaPost. MetaPost can used behind the scenes for some graphic trickery. This integration is also helpful for drawing figures in MetaPost and use them in the document."
+
+docx2tex
+--------
+
+https://github.com/transpect/docx2tex[`https://github.com/transpect/docx2tex`]
+
+Converts Microsoft Word's DOCX to LaTeX.
+
+Engrafo
+-------
+
+https://github.com/arxiv-vanity/engrafo[`https://github.com/arxiv-vanity/engrafo`]
+
+Engrafo converts LaTeX documents into beautiful responsive web pages using LaTeXML.
+It is a set of stylesheets and scripts for LaTeXML output. It makes the design responsive so you can read it on phones, and adds various interactive bits like footnote tooltips.
+
+arXiv Vanity
+~~~~~~~~~~~~
+
+https://github.com/arxiv-vanity/arxiv-vanity[`https://github.com/arxiv-vanity/arxiv-vanity`]
+
+Renders papers from arXiv as responsive web pages so you don't have to squint at a PDF.
+
+JLaTeXMath
+----------
+
+https://github.com/opencollab/jlatexmath[`https://github.com/opencollab/jlatexmath`]
+
+A Java library to display mathematical formulas written in LaTeX. JLaTeXMath is the best Java library to display LaTeX code.
+This library is used by numerous important projects like
+https://www.scilab.org/[Scilab],
+https://www.geogebra.org/[Geogebra],
+https://www.freeplane.org/wiki/index.php/Home[Freeplane],
+https://www.mathpiper.org/[Mathpiper],
+https://en.wikipedia.org/wiki/CaRMetal[CaRMetal], etc.
+Most LaTeX commands are available.
+
+jupyter_latex_envs
+------------------
+
+https://github.com/jfbercher/jupyter_latex_envs[`https://github.com/jfbercher/jupyter_latex_envs`]
+
+An extension for Jupyter notebook enables the use of some LaTeX commands and environments markdown cells.
+
+KaTeX
+-----
+
+https://github.com/KaTeX/KaTeX[+https://github.com/KaTeX/KaTeX+]
+
+A fast, easy-to-use JavaScript library for TeX math rendering on the web.
+
+* KaTeX renders its math synchronously and doesn't need to reflow the page.
+* KaTeX's layout is based on Donald Knuth's TeX, the gold standard for math typesetting
+* KaTeX has no dependencies and can easily be bundled with your website resources
+* KaTeX produces the same output regardless of browser or environment, so you can pre-render expressions using Node.js and send them as plain HTML
+* KaTeX is compatible with all major browsers, including Chrome, Safari, Firefox, Opera, Edge, and IE 11
+* KaTeX supports much (but not all) of LaTeX and many LaTeX packages
+
+latex2html
+----------
+
+https://github.com/latex2html/latex2html[`https://github.com/latex2html/latex2html`]
+
+A LaTeX to HTML translator written in Perl that:
+
+* breaks up a document into one or more components as specified by the user,
+* provides optional iconic navigation panels on every page which contain links to other parts of the document,
+* handles inlined equations, right-justified numbered equations, tables, or figures and any arbitrary environment,
+* can produce output suitable for browsers that support inlined images or character based browsers (as specified by the user),
+* handles definitions of new commands, environments, and theorems even when these are defined in external style files,
+* handles footnotes, tables of contents, lists of figures and tables, bibliographies, and can generate an Index,
+* translates cross-references into hyperlinks and extends the LaTeX cross-referencing mechanism to work not just within a document but between documents which may reside in remote locations,
+* translates accent and special character commands to the equivalent HTML character codes where possible,
+* recognizes hypertext links (to multimedia resources or arbitrary internet services such as sound/video/ftp/http/news) and links which invoke arbitrary program scripts, all expressed as LaTeX commands,
+* recognizes conditional text which is intended only for the hypertext version, or only for the paper (PDF) version,
+* can include raw HTML in a LaTeX document (e.g. in order to specify interactive forms),
+* can deal sensibly with all the commands and environments commonly used with LaTeX as summarized at the back of the LaTeX blue book [1], and many of the packages described in the LaTeX Companion, and others.
+* will try to translate any document with embedded LaTeX commands irrespective of whether it is complete or syntactically legal.
+
+latex2mathml
+------------
+
+https://github.com/roniemartinez/latex2mathml[`https://github.com/roniemartinez/latex2mathml`]
+
+Pure Python library for LaTeX to MathML conversion.
+
+latex-css
+---------
+
+https://github.com/vincentdoerig/latex-css[`https://github.com/vincentdoerig/latex-css`]
+
+A minimal, almost class-less CSS library which makes any website look like a LaTeX document.
+
+latexdraw
+---------
+
+https://github.com/latexdraw/latexdraw[`https://github.com/latexdraw/latexdraw`]
+
+https://ci.inria.fr/malai/job/latexdraw4/lastSuccessfulBuild/artifact/target/[`https://ci.inria.fr/malai/job/latexdraw4/lastSuccessfulBuild/artifact/target/`]
+
+https://github.com/latexdraw/latexdraw/wiki/Manual[`https://github.com/latexdraw/latexdraw/wiki/Manual`]
+
+A vector drawing editor for LaTeX.
+
+Latexify.jl
+-----------
+
+https://github.com/korsbo/Latexify.jl[`https://github.com/korsbo/Latexify.jl`]
+
+A package for generating LaTeX maths from julia objects.
+
+This package utilises Julias homoiconicity to convert expressions to LaTeX-formatted strings. Latexify.jl supplies functionalities for converting a range of different Julia objects, including:
+
+* Expressions,
+* Strings,
+* Numbers (including rationals and complex),
+* Symbolic expressions from SymEngine.jl,
+* ParameterizedFunctions and ReactionNetworks from DifferentialEquations.jl
+
+as well as arrays or dicts of supported types.
+
+LaTeX.js
+--------
+
+https://github.com/michael-brade/LaTeX.js[`https://github.com/michael-brade/LaTeX.js`]
+
+https://latex.js.org/[`https://latex.js.org/`]
+
+A LaTeX to HTML5 translator written in JavaScript using PEG.js. latex.js for LaTeX is similar in spirit to marked for Markdown.
+
+LaTeX.js tries to be absolutely and uncompromisingly exact and compatible with LaTeX. The generated HTML is exactly what is meant to be output, down to the last space. The CSS makes it look like LaTeX output—except where impossible in principle.
+
+LaTeXML
+-------
+
+https://dlmf.nist.gov/LaTeXML/[`https://dlmf.nist.gov/LaTeXML/`]
+
+A program, written in Perl, that attempts to faithfully mimic TeX’s behavior, but produces XML instead of dvi. The document model of the target XML makes explicit the model implied by LaTeX. The processing and model are both extensible; you can define the mapping between TeX constructs and the XML fragments to be created. A postprocessor, latexmlpost converts this XML into other formats such as HTML or XHTML, with options to convert the math into MathML (currently only presentation) or images.
+
+lolviz
+------
+
+https://github.com/parrt/lolviz[`https://github.com/parrt/lolviz`]
+
+"A simple Python data-structure visualization tool that started out as a List Of Lists (lol) visualizer but now handles arbitrary object graphs, including function call stacks! lolviz tries to look out for and format nicely common data structures such as lists, dictionaries, linked lists, and binary trees. This package is primarily for use in teaching and presentations with Jupyter notebooks, but could also be used for debugging data structures. Useful for devoting machine learning data structures, such as decision trees, as well."
+
+LuaTeX
+------
+
+http://www.luatex.org/[`http://www.luatex.org/`]
+
+http://wiki.luatex.org/index.php/Main_Page[`http://wiki.luatex.org/index.php/Main_Page`]
+
+https://en.wikipedia.org/wiki/LuaTeX[`https://en.wikipedia.org/wiki/LuaTeX`]
+
+https://www.overleaf.com/learn/latex/Articles/An_Introduction_to_LuaTeX_(Part_1):_What_is_it%E2%80%94and_what_makes_it_so_different%3F[`https://www.overleaf.com/learn/latex/Articles/An_Introduction_to_LuaTeX_(Part_1):_What_is_it%E2%80%94and_what_makes_it_so_different%3F`]
+
+"LuaTeX is an extended version of pdfTeX using Lua as an embedded scripting language. The LuaTeX project's main objective is to provide an open and configurable variant of TeX while at the same time offering downward compatibility. From the user perspective we have pdfTeX as stable and more or less frozen 8 bit engine, XeTeX as unicode input and font aware engine using libraries for font handling, and LuaTeX as engine that is programmable and delegates as much as possible to Lua, with the objective to keep the core engine lean and mean.
+
+The main objective of the project is to provide a version of TeX where all internals are accessible from Lua. In the process of opening up TeX much of the internal code is rewritten. Instead of hard coding new features in TeX itself, users (or macro package writers) can write their own extensions. LuaTeX offers support for OpenType fonts with external modules."
+
+MathJax
+-------
+
+https://www.mathjax.org/[`https://www.mathjax.org/`]
+
+https://github.com/mathjax/MathJax[`https://github.com/mathjax/MathJax`]
+
+https://en.wikipedia.org/wiki/MathJax[`https://en.wikipedia.org/wiki/MathJax`]
+
+"A JavaScript display engine for mathematics that works in all browsers. 
+
+MathJax uses CSS with web fonts or SVG, instead of bitmap images or Flash, so equations scale with surrounding text at all zoom levels. 
+
+MathJax is highly modular on input and output. Use MathML, TeX, and ASCIImath as input and produce HTML+CSS, SVG, or MathML as output. 
+
+MathJax works with screenreaders & provides expression zoom and interactive exploration. You also can copy equations into Office, LaTeX, wikis, and other software......"
+
+MetaPost
+--------
+
+http://www.tug.org/metapost.html[`http://www.tug.org/metapost.html`]
+
+https://en.wikipedia.org/wiki/MetaPost[`https://en.wikipedia.org/wiki/MetaPost`]
+
+http://www.tlhiv.org/mppreview/[`http://www.tlhiv.org/mppreview/`]
+
+"MetaPost refers to both a programming language and the interpreter of the MetaPost programming language. Both are derived from Donald Knuth's Metafont language and interpreter. MetaPost produces vector graphic diagrams from a geometric/algebraic description. The language shares Metafont's declarative syntax for manipulating lines, curves, points and geometric transformations."
+
+Asymptote
+~~~~~~~~~
+
+https://asymptote.sourceforge.io/[`https://asymptote.sourceforge.io/`]
+
+https://en.wikipedia.org/wiki/Asymptote_(vector_graphics_language)[`https://en.wikipedia.org/wiki/Asymptote_(vector_graphics_language)`]
+
+https://artofproblemsolving.com/wiki/?title=Asymptote_(Vector_Graphics_Language)[`https://artofproblemsolving.com/wiki/?title=Asymptote_(Vector_Graphics_Language)`]
+
+https://web.archive.org/web/20091202232015/http://www.piprime.fr/asymptote/[`https://web.archive.org/web/20091202232015/http://www.piprime.fr/asymptote/`]
+
+"Asymptote is a descriptive vector graphics language — developed by Andy Hammerlindl, John C. Bowman (University of Alberta), and Tom Prince — which provides a natural coordinate-based framework for technical drawing.
+
+Asymptote typesets labels and equations with LaTeX, producing high-quality PostScript, PDF, SVG, or 3D PRC output.[2] It is inspired by MetaPost, but has a C++-like syntax. It provides a language for typesetting mathematical figures, just as TeX/LaTeX provides a language for typesetting equations. It is mathematically oriented (e.g. rotation of vectors by complex multiplication), and uses the simplex method and deferred drawing to solve overall size constraint issues between fixed-sized objects (labels and arrowheads) and objects that should scale with figure size. Asymptote fully generalizes MetaPost path construction algorithms to three dimensions,[3] and compiles commands into virtual machine code for speed without sacrificing portability. High-level graphics commands are implemented in the Asymptote language itself, allowing them to be easily tailored to specific applications. It also appears to be the first software package to lift TeX into three dimensions.[4][5] This allows Asymptote to be used as a 3D vector file format.
+
+Asymptote is also notable for having a graphical interface coded in Python (and the Tk widget set), xasy.py — this allows an inexperienced user to quickly draw up objects and save them as .asy source code which can then be examined or edited by hand."
+
+Overleaf
+--------
+
+https://github.com/overleaf/overleaf[`https://github.com/overleaf/overleaf`]
+
+An open-source online real-time collaborative LaTeX editor. 
+
+Pandoc
+------
+
+https://pandoc.org/[`https://pandoc.org/`]
+
+https://github.com/jgm/pandoc[`https://github.com/jgm/pandoc`]
+
+https://en.wikipedia.org/wiki/Pandoc[`https://en.wikipedia.org/wiki/Pandoc`]
+
+"Pandoc is a Haskell library for converting from one markup format to another, and a command-line tool that uses this library.
+
+Pandoc can convert between numerous markup and word processing formats, including, but not limited to, various flavors of Markdown, HTML, LaTeX and Word docx.
+
+Pandoc’s enhanced version of Markdown includes syntax for tables, definition lists, metadata blocks, footnotes, citations, math, and much more."
+
+PGF/TikZ
+--------
+
+https://ctan.org/pkg/pgf[`https://ctan.org/pkg/pgf`]
+
+https://www.overleaf.com/learn/latex/TikZ_package[`https://www.overleaf.com/learn/latex/TikZ_package`]
+
+https://en.wikibooks.org/wiki/LaTeX/PGF/TikZ[`https://en.wikibooks.org/wiki/LaTeX/PGF/TikZ`]
+
+https://en.wikipedia.org/wiki/PGF/TikZ[`https://en.wikipedia.org/wiki/PGF/TikZ`]
+
+PGF is a macro package for creating graphics. It is platform- and format-independent and works together with the most important TeX backend drivers, including pdfTeX and dvips. It comes with a user-friendly syntax layer called TikZ. 
+Its usage is similar to pstricks and the standard picture environment. PGF works with plain (pdf-)TeX, (pdf-)LaTeX, and ConTeXt. Unlike pstricks, it can produce either PostScript or PDF output.
+
+plasTeX
+-------
+
+http://plastex.github.io/plastex/[`http://plastex.github.io/plastex/`]
+
+https://github.com/plastex/plastex[`https://github.com/plastex/plastex`]
+
+"plasTeX is a LaTeX document processing framework written entirely in Python. It currently comes bundled with a HTML5 renderer (including multiple themes), a simple text renderer and several less developped renderers targetting Man pages, DocBook and EPUB, as well as a way to simply dump the document to a generic form of XML. Other renderers can be added.
+
+plasTeX differs from other tools like LaTeX2HTML , TeX4ht , TtH , etc. in that the parsing and rendering of the document are completely separated. This separation makes it possible to render the document in multiple output formats. It also allows the parser to create a cleaner document object, so that the rendering process is easier."
+
+Pollen
+------
+
+https://docs.racket-lang.org/pollen/[`https://docs.racket-lang.org/pollen/`]
+
+https://github.com/mbutterick/pollen[`https://github.com/mbutterick/pollen`]
+
+https://docs.racket-lang.org/quad/[`https://docs.racket-lang.org/quad/`]
+
+"Pollen is a publishing system that helps authors make functional and beautiful digital books.
+Pollen gives you access to a full programming language (Racket) with a text-based syntax that makes it easy to embed code within your documents."
+
+PyLaTeX
+-------
+
+https://github.com/JelteF/PyLaTeX[`https://github.com/JelteF/PyLaTeX`]
+
+A Python library for creating and compiling LaTeX files or snippets. The goal of this library is being an easy, but extensible interface between Python and LaTeX.
+
+pylatexenc
+----------
+
+https://github.com/phfaist/pylatexenc[`https://github.com/phfaist/pylatexenc`]
+
+Simple LaTeX parser providing latex-to-unicode and unicode-to-latex conversion.
+
+PythonTeX
+---------
+
+https://github.com/gpoore/pythontex[`https://github.com/gpoore/pythontex`]
+
+https://ctan.org/pkg/pythontex[`https://ctan.org/pkg/pythontex`]
+
+"PythonTeX executes code in LaTeX documents and allows the output
+to be included in the original document. It supports Python as well
+as Bash, JavaScript, Julia, Octave, Perl, R, Raku (Perl 6), Ruby,
+Rust, and SageMath. PythonTeX also provides syntax highlighting
+for typeset code in LaTeX documents via the Pygments syntax highlighter."
+
+speedata Publisher
+------------------
+
+https://github.com/speedata/publisher[`https://github.com/speedata/publisher`]
+
+https://www.overleaf.com/learn/latex/Articles/An_Introduction_to_LuaTeX_(Part_1):_What_is_it%E2%80%94and_what_makes_it_so_different%3F[`https://www.overleaf.com/learn/latex/Articles/An_Introduction_to_LuaTeX_(Part_1):_What_is_it%E2%80%94and_what_makes_it_so_different%3F`]
+
+The speedata Publisher is a full featured and mature database publishing software. It generates PDF files from XML data and XML layout instructions. It is used to make product catalogs and other documents with high demands on the layout.
+
+Its built-in layout description language allows you to create almost arbitrary layouts, while keeping the job as simple as possible.
+
+This uses LuaTeX purely as the PDF-generation engine within its XML-based workflow, and does not use LaTeX itself.
+
+Skribilo
+--------
+
+https://www.nongnu.org/skribilo/[`https://www.nongnu.org/skribilo/`]
+
+=====
+Skribilo is a free document production tool that takes a structured document representation as its input and renders that document in a variety of output formats: HTML and Info for on-line browsing, and Lout and LaTeX for high-quality hard copies.
+
+The input document can use Skribilo's markup language to provide information about the document's structure, which is similar to HTML or LaTeX and does not require expertise. Alternatively, it can use a simpler, “markup-less” format that borrows from Emacs' outline mode and from other conventions used in emails, Usenet and text.
+
+Last but not least, Skribilo can be thought of as a complete document programming framework for the Scheme programming language that may be used to automate a variety of document generation tasks.
+=====
+
+Tectonic
+--------
+
+https://tectonic-typesetting.github.io/en-US/[`https://tectonic-typesetting.github.io/en-US/`]
+
+A modernized, complete, self-contained TeX/LaTeX engine, powered by XeTeX and TeXLive and written in Rust.
+The features include:
+
+*Tectonic automatically downloads support files so you don’t have to install a full LaTeX system in order to start using it. If you start using a new LaTeX package, Tectonic just pulls down the files it needs and continues processing. The underyling “bundle” technology allows for completely reproducible document compiles.
+* Tectonic has sophisticated logic and automatically loops TeX and BibTeX as needed, and only as much as needed. In its default mode it doesn’t write TeX’s intermediate files and always produces a fully-processed document. 
+* The tectonic command-line program is quiet and never stops to ask for input.
+* Thanks to the power of XeTeX, Tectonic can use modern OpenType fonts and is fully Unicode-enabled.
+* The Tectonic engine has been extracted into a completely self-contained library so that it can be embedded in other applications.Tectonic can be used as a GitHub Action to typeset your documents whenever a change to them is made.
+
+
+tex4ht
+------
+
+https://tug.org/tex4ht/[`https://tug.org/tex4ht/`]
+
+"A system for converting documents written in TeX/LaTeX/ConTeXt/etc. to HTML, various XML
+flavors, braille, etc., optionally using MathML."
+
+make4ht
+~~~~~~~
+
+https://github.com/michal-h21/make4ht[`https://github.com/michal-h21/make4ht`]
+
+"A build system for the TeX4ht TeX to XML converter. It provides a command line
+tool that drives the conversion process. It also provides a library that can
+be used to create customized conversion tools. An example of such a tool is 
+tex4ebook, a tool for conversion from TeX to ePub and other e-book formats."
+
+tex4ebook
+~~~~~~~~~
+
+https://github.com/michal-h21/tex4ebook[`https://github.com/michal-h21/tex4ebook`]
+
+"A tool for conversion from \LaTeX\ to ebook formats, such as EPUB, MOBI and
+EPUB 3. It is based on TeX4ht, which provides instructions for
+the actual LaTeX to HTML conversion, and on make4ht."
+
+TeX4ht
+------
+
+https://tug.org/tex4ht/[`https://tug.org/tex4ht/`]
+
+A system for converting documents written in TeX/LaTeX/ConTeXt/etc. to HTML, various XML flavors, braille, etc., optionally using MathML. 
+The features include:
+
+* support for most LaTeX packages and custom commands
+* support for input formats beyond LaTeX including PythonTeX and formats supported by Knitr and Pandoc
+* output formats including HTML 5, ODT and Docbook
+* math export to MathML, MathJax or pictures
+* publishing web pages from Overlead
+
+tex4ebook
+~~~~~~~~~
+
+https://ctan.org/pkg/tex4ebook[`https://ctan.org/pkg/tex4ebook`]
+
+A bundle of lua scripts and LaTeX packages for conversion of LaTeX files to ebook formats such as epub, mobi and epub3.\
+tex4ht is used as conversion engine. 
+
+TeXify
+------
+
+https://texify.davidar.io/[`https://texify.davidar.io/`]
+
+This page introduces TeXify, a library for performing high-quality typesetting within web browsers. It is designed to require only basic familiarity with Hyper-Text Markup Language (HTML) from the author — no knowledge about JavaScript or Cascading Style Sheets (CSS) is necessary. Although not as sophisticated as the TeX typesetting engine, the output produced is of much higher quality than that which can be obtained by unstyled HTML.
+
+TeX Live
+--------
+
+http://tug.org/texlive/[`http://tug.org/texlive/`]
+
+http://tug.org/texlive/doc/texlive-en/texlive-en.html[`http://tug.org/texlive/doc/texlive-en/texlive-en.html`]
+
+https://en.wikipedia.org/wiki/TeX_Live[`https://en.wikipedia.org/wiki/TeX_Live`]
+
+"TeX Live is intended to be a straightforward way to get up and running with the TeX document production system. It provides a comprehensive TeX system with binaries for most flavors of Unix, including GNU/Linux, macOS, and also Windows. It includes all the major TeX-related programs, macro packages, and fonts that are free software, including support for many languages around the world."
+
+texmath
+-------
+
+https://github.com/jgm/texmath[`https://github.com/jgm/texmath`]
+
+A Haskell library for converting between formats used to represent mathematics. Currently it provides functions to read and write TeX math, presentation MathML, and OMML (Office Math Markup Language, used in Microsoft Office), and to write Gnu eqn and pandoc's native format (allowing conversion, using pandoc, to a variety of different markup formats). The TeX reader and writer supports basic LaTeX and AMS extensions, and it can parse and apply LaTeX macros. The package also includes several utility modules which may be useful for anyone looking to manipulate either TeX math or MathML. For example, a copy of the MathML operator dictionary is included.
+
+TeXMe
+-----
+
+https://github.com/susam/texme[`https://github.com/susam/texme`]
+
+A lightweight JavaScript utility to create self-rendering Markdown + LaTeX documents.
+
+mathbin
+~~~~~~~
+
+https://github.com/susam/mathbin[`https://github.com/susam/mathbin`]
+
+A pastebin for mathematics. One can share snippets of mathematical text using this application. The snippets
+can be written in LaTeX, Markdown as well as HTML.
+
+TeXstudio
+---------
+
+https://www.texstudio.org/[`https://www.texstudio.org/`]
+
+An integrated writing environment for creating LaTeX documents. Our goal is to make writing LaTeX as easy and comfortable as possible. Therefore TeXstudio has numerous features like syntax-highlighting, integrated viewer, reference checking and various assistants.
+
+Tralics
+-------
+
+http://www-sop.inria.fr/marelle/tralics/[`http://www-sop.inria.fr/marelle/tralics/`]
+
+A package for converting a LaTeX document into an XML file.
+
+Transpect
+---------
+
+http://transpect.github.io/[`http://transpect.github.io/`]
+
+Transpect was designed to provide generic and stable modules for common conversion and checking tasks.
+To adress complex and diverse data, transpect offers a cascading configuration to override specific
+transformation and checking rules.
+Each component within the framework is Open Source and use standard technologies such as XSLT 2.0 and XProc.
+
+Transpect offers many modules to parse and convert a wide range of XML-based formats such as DOCX, IDML, EPUB, NLM JATS/BITS and TEI.
+Additionally, there exist tools for converting text-based formats such as CSS and LaTeX as well
+as extensions, e. g., in order to check PDF and image files.
+
+Typora
+------
+
+https://typora.io/[`https://typora.io/`]
+
+A simple and configurable document editor that provides excellent Markdown support. This application is ideal for students and professionals who need to write essays and reports. It might be difficult using Typora for multi-file projects or for website publishing.
+
+Typora stands out by offering a variety of settings without sacrificing the simplicity of a barebones interface. Newcomers to Markdown may appreciate the keyboard shortcuts for formatting options as well as the intuitive live editor that hides the Markdown formatting syntax after you type it.
+
+Many formats including docx, OpenOffice, LaTeX, MediaWiki, Epub, etc, can be exported or imported.
+
+xindy
+-----
+
+http://xindy.sourceforge.net/[`http://xindy.sourceforge.net/`]
+
+"xindy is an index processor that can be used to generate book-like indexes for arbitrary document-preparation systems. This includes systems such as TeX and LaTeX, the roff-family, SGML/XML-based systems (e.g., HTML) that process some kind of text and generate indexing information. The kernel system is not fixed to any specific system, but can be configured to work together with such systems.
+
+In comparison to other index processors xindy has several powerful features that make it an ideal framework for describing and generating complex indices, addressing especially international indexing."
+
+
+
+
+
+
+
+
+

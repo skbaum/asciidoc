@@ -1,0 +1,2030 @@
+Automating the Acquisition of River Discharge Data
+==================================================
+Steven K. Baum
+v0.5, 2013-02-18
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Synopsis
+--------
+
+The task as delineated by Matt is:
+
+[quote]
+_____
+There are two sources of daily discharge data; USACOE for the Mississippi and Atchafalaya Rivers and USGS for all the rest.
+I have not located a web service for USACOE data - a challenge for you to automate collection of these two sets.  USGS has a nice web service. 
+
+The data need to be converted to cubic meters per second, gap filled if needed, and converted to netCDF.
+My programs do this however,  the attributes may need updating to meet ISO  or ERDDAP requirements.
+
+The most elegant approach would involve appending daily updates to existing "period of record" files rather than downloading the entire period of record each time you update.
+
+My workflow involves IDL programs - and csh scripts.
+Let's plan for the scripts to run on a Mac (except for the TDS or ERDDAP server).
+
+From your iMac, visit [deleted] and download the two files
+you find there.
+The tar ball contains programs you will need, starter files (1930-May 2013)
+for the USACOE rivers, and files that you won't ever need. The pkg file
+contains the Mac version of the very latest version of IDL.
+
+Start with the file "read_me_river_programs.txt" which outlines the steps
+needed and the programs used at each step.
+
+I think your part will be to
+
+. Automate the acquisition of USACOE data - right now it's human
+interaction with a web form.
+
+. Automate some editing and appending to get the files ready for the IDL
+programs - probably with unix tools.
+
+. Write scripts that call the IDL programs and csh script.  
+(Come to me for how to run IDL programs within csh scripts - it will save you
+a lot of time looking for that info).
+
+. Figure out how to put these it the right place for TDS or ERDDAP.
+_____
+
+
+Files
+-----
+
+* +gom_discharge_archive.nc+ - original NetCDF file - 1673-40480 (38808) - 1900 to
+late 2010
+* +gom_discharge_2010_partial.nc+ - partial 2010 from 40481-40541 (61) - late 2010
+to end 2010
+* +gom_discharge_2011.nc+ - all of 2011 - 40542-40906 (365)
+* +gom_discharge_2012.nc+ - all of 2012 - 40907-41272 (366)
+* +gom_discharge_2013.nc+ - all of 2013 - 41273-41637 (365)
+* +gom_discharge_2013_short.nc+ - first 11 months of 2013 - 41273-41607
+* +gom_discharge_01_01_2014-06_15_2014.nc - Jan. 1 to Jun. 15, 2014 -
+41638-41803 (166)
+* +usace_miss_2013.txt+ - all of 2013 for Mississippi gauge
+* +usace_atch_2013.txt+ - all of 2013 for Atchafalaya gauge
+
+
+Fixes
+-----
+
+On 06/15/2014 created new updated file to correct for problem caused by
++gom_discharge_2013.nc+ having been missing a month until it was updated
+to contain all of 2013.  The file was created via:
+
++ncrcat gom_discharge_archive.nc gom_discharge_2010_partial.nc
+gom_discharge_2011.nc gom_discharge_2012.nc gom_discharge_2013.nc
+gom_discharge_01_01_2014-06_15_2014.nc gom_discharge_1900_20140615.nc+
+
+
+Previous Work
+-------------
+
+The file +read_me_river_programs.txt+ contains:
+
+-----
+Steps:
+
+1)      Go to the ACOE website
+        http://www.mvn.usace.army.mil/Missions/Engineering/StageandHydrologicData.aspx "historical discharge"
+        or directly at http://www2.mvn.usace.army.mil/eng/edhd/wcontrol/discharge.asp
+        Download 03045 Atchafalaya River at Simmesport, LA for time period of interest
+        Download 01100 Mississippi River at Tarbert Landing, MS for time period of interest
+        Trim these files to one header line - and remove trailing garbage characters
+        Edit read_coe.pro to accomodate input and output files
+        Run read_coe and append output files to existing 01100mis.Missi and 03045atc.Atcha
+
+2)      Edit get_rivers.csh to fetch updates from USGS
+        It doesn't take long to get the whole period of record. Rather than update you might just get the whole thing
+        If you get updates - cut off the header and append to the existing river records.
+
+
+3)      Edit river_list_short.txt to have the proper end dates
+
+4)      Edit read_river_list to have proper start and end dates
+5)      Run read_river_list
+        Run river_discharge_netcdf16
+
+;---------------------------------------------------------------------------------------------------------
+;                        These appears to be the important routines
+;---------------------------------------------------------------------------------------------------------
+
+river_get.csh           script to get river data from USGS
+
+read_river_list.pro     input: river_list_short.txt (is metadata: date ranges, gauge & mouth locations)
+                        input: flist.txt is river files
+
+                        output: river_list_short.wve - metadata 
+                        output: river_name.wve - flow data
+                        output: river_discharge_xdr.wve - flow data composite for all rivers and times.
+
+                        calls:  river_discharge2.pro`
+
+                      function:  fills continuous time array of discharge with data or missing data flags.
+
+read_rivers2.pro like read_river.pro but returns streamflow as an array.
+
+river_discharge_netcdf16.pro    function: output river discharge in CF1.6 standard netCDF files
+                                input:  river_discharge_xdr.wve'
+                                output: gom_river_discharge16.nc
+ 
+;---------------------------------------------------------------------------------------------------------
+; These seem to be earlier versions of the important routines and quick and dirty hacks for specifics
+;---------------------------------------------------------------------------------------------------------
+
+do_rivers.pro   input: usgs_rivers.txt  function: calls read_rivers for each river in usgs_rivers
+read_rivers.pro input: river discharge data from USGS function: read, convert, plot, print river data
+
+dumpr.pro       prints "river".wve files to the screen
+
+read_coe.pro    reads Miss. R. and Atachafalaya R. txt files converts to m^3/s
+
+river_all_txt.pro       input: river_discharge_xdr.wve
+                        output: "river".txt files
+                        function: prints all known data into txt files
+
+river_d_txt.pro         function: like river_all_txt.pro except only data after some given date are printed.
+river_discharge_netcdf.pro      function: output river discharge data in netCDF files
+-----
+
+The USACOE Site
+---------------
+
+The ACOE website is at:
+
+http://www.mvn.usace.army.mil/Missions/Engineering/StageandHydrologicData.aspx[+http://www.mvn.usace.army.mil/Missions/Engineering/StageandHydrologicData.aspx+]
+
+with the direct link to the historical discharge page:
+
+http://www2.mvn.usace.army.mil/eng/edhd/wcontrol/discharge.asp[+http://www2.mvn.usace.army.mil/eng/edhd/wcontrol/discharge.asp+]
+
+The page with the interactive form for the Atchafalaya River at Simmesport, LA
+is:
+
+http://www2.mvn.usace.army.mil/cgi-bin/watercontrol.pl?03045[+http://www2.mvn.usace.army.mil/cgi-bin/watercontrol.pl?03045+]
+
+and the one for the Mississippi River at Tarbert Landing, MS is:
+
+http://www2.mvn.usace.army.mil/cgi-bin/wcmanual.pl?01100[+http://www2.mvn.usace.army.mil/cgi-bin/wcmanual.pl?01100+]
+
+It would be nice to figure out what URL extensions for the ASP that's running
+this site are needed to extract just the discharge values for these two sites.
+A brief search for ASP wisdom about this yield nothing, and thus far a query
+about being able to automatically download these values has been unanswered.
+
+Screen Scraping
+~~~~~~~~~~~~~~~
+
+Another possibility is to screen scrape the values from the
++Daily Stage & Discharge Data+ page at:
+
+http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp[+http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp+]
+
+An example of the HTML for this page is:
+
+-----
+<HTML>
+<HEAD>
+<META NAME="designer" content="Tutashinda Salaam (tutashinda.salaam@usace.army.mil)">
+
+<title>Daily Stage &amp; Discharge Data - Water Control - New Orleans District</title>
+
+<LINK href="watercontrol.css" type=text/css rel=stylesheet>
+
+</HEAD>
+<BODY background="http://www.mvn.usace.army.mil/nodicons/usacebg.gif" topmargin="0">
+<div style="position:absolute;left:30"> <!--moves the page off of the bar on the left-->
+
+<table width="670">
+<tr>
+	<td width="170">
+		<!--<a href="http://www.mvn.usace.army.mil"><img src="http://www.mvn.usace.army.mil/pao/visitor/nod136.gif" border="0" alt="New Orleans District Logo - Link to NOD home page."
+width="136" height="121"></a>-->
+		<a href="http://www.mvn.usace.army.mil"><img src="LogoCorp.gif" border="0" alt="New Orleans District Logo - Link to NOD home page." width="113" height="90"></a>
+	</td>
+		
+	<td width="500" align="center" class="title">
+		Daily Stage &amp; Discharge Data</h2>
+	</td>
+</tr>
+</table>
+
+<table width="670">
+
+	<tr><td align="right" class="small"><strong>Data Updated July 15, 2013</strong></td></tr>
+
+<tr>
+	<td>		
+		<table border="1" width="100%">
+		<tr>
+			<td bgcolor="#bdc7ff" colspan="2">
+				<p class="normal"><strong>MISSISSIPPI RIVER</strong></p>
+			</td>
+		</tr>
+						
+		<tr>
+			<td>
+				<table width="100%" cellspacing="0">
+				<tr>
+					<th class="normal" width="30%" align="left"><strong>Station Name</strong></th>
+					<th class="normal" width="25%" align="center"><strong>Feet NAVD88 (2004.65)</strong></th>
+					<th class="normal" width="20%" align="center"><strong>Feet NGVD</strong></th>
+					<th class="normal" width="25%" align="center"><strong>24-Hour Change</strong></th>
+				</tr>
+					
+				<tr>
+					<td class="normal">*Cairo</td>
+					<td></td>
+					<td class="normal" align="center">42.3</td>
+					<td class="normal" align="center">(-0.3)</td>				
+				</tr>
+					
+				<tr>
+					<td class="normal">*Arkansas City</td>
+					<td></td>
+					<td class="normal" align="center">27.9</td>
+					<td class="normal" align="center">(0.4)</td>
+				</tr>
+				<tr>
+					<td class="normal">*Vicksburg</td>
+					<td></td>
+					<td class="normal" align="center">34.4</td>
+					<td class="normal" align="center">(0.6)</td>
+				</tr>
+				<tr>
+					<td class="normal">*Natchez</td>
+					<td></td>
+					<td class="normal" align="center">40.8</td>
+					<td class="normal" align="center">(0.6)</td>
+				</tr>
+				<tr>
+					<td class="normal">Knox Landing</td>
+					<td class="normal" align="center">44.7</td>
+					<td class="normal" align="center">44.9</td>
+					<td class="normal" align="center">(0.3)</td>
+				</tr>
+				<tr>
+					<td class="normal">Red River Landing</td>
+					<td class="normal" align="center">41.8</td>
+					<td class="normal" align="center">42.1</td>
+					<td class="normal" align="center">(0.4)</td>
+				</tr>
+				<tr>
+					<td class="normal">Discharge (cfs)</td>
+					<td></td>
+					<td class="normal" align="center">609,000</td>
+						<td class="normal" align="center">(+9,000)</td>
+				</tr>
+				<tr>
+					<td class="normal">Baton Rouge</td>
+					<td class="normal" align="center">25.4</td>
+					<td class="normal" align="center">25.8</td>
+					<td class="normal" align="center">(0.4)</td>
+				</tr>
+				<tr>
+					<td class="normal">Donaldsonville</td>
+					<td class="normal" align="center">E16.08</td>
+					<td class="normal" align="center">E 16.9</td>
+					<td class="normal" align="center">(-)</td>
+				</tr>
+				<tr>
+					<td class="normal">Reserve</td>
+					<td class="normal" align="center">12.1</td>
+					<td class="normal" align="center">12.8</td>
+					<td class="normal" align="center">(0.5)</td>
+				</tr>
+				<tr>
+					<td class="normal">New Orleans</td>
+					<td class="normal" align="center">8.3</td>
+					<td class="normal" align="center">9.0</td>
+					<td class="normal" align="center">(0.4)</td>
+				</tr>
+				<tr>
+					<td class="normal">Venice</td>
+					<td class="normal" align="center">3.2</td>
+					<td class="normal" align="center">3.7</td>
+					<td class="normal" align="center">(0.2)</td>
+				</tr>
+				</table>
+			</td>
+		</tr>
+		</table>
+	</td>
+</tr>
+
+<tr><td class="normal">E=ESTIMATED STAGE</td></tr>
+<tr><td class="normal">* FT GAGE</td></tr>
+	
+<tr>
+	<td>		
+		<table border="1" width="100%">
+		<tr>
+			<td bgcolor="#bdc7ff" colspan="2">
+				<p class="normal"><strong>ATCHAFALAYA RIVER</strong></p>
+			</td>
+		</tr>
+						
+		<tr>
+			<td>
+				<table width="100%" cellspacing="0">
+				<tr>
+					<th class="normal" width="30%" align="left"><strong>Station Name</strong></th>
+					<th class="normal" width="25%" align="center"><strong>Feet NAVD88 (2008)</strong></th>
+					<th class="normal" width="20%" align="center"><strong>Feet NGVD</strong></th>
+					<th class="normal" width="25%" align="center"><strong>24-Hour Change</strong></th>
+				</tr>
+				<tr>
+					<td class="normal">Barbre Landing</td>
+					<td class="normal" align="center">20.8</td>
+					<td class="normal" align="center">21.1</td>
+					<td class="normal" align="center">(0.6)</td>
+				</tr>
+				<tr>
+					<td class="normal">Simmesport</td>
+					<td class="normal" align="center">19.8</td>
+					<td class="normal" align="center">19.9</td>
+					<td class="normal" align="center">(0.7)</td>
+				</tr>
+				<tr>
+					<td class="normal">Discharge (cfs)</td>
+					<td></td>
+					<td class="normal" align="center">242,000</td>
+						<td class="normal" align="center">(+8,000)</td>
+				</tr>
+				<tr>
+					<td class="normal">Melville</td>
+					<td class="normal" align="center">14.5</td>
+					<td class="normal" align="center">14.5</td>
+					<td class="normal" align="center">(0.4)</td>
+				</tr>
+				<tr>
+					<td class="normal">Krotz Springs</td>
+					<td class="normal" align="center">12.7</td>
+					<td class="normal" align="center">12.8</td>
+					<td class="normal" align="center">(0.3)</td>
+				</tr>
+				<tr>
+					<td class="normal">Butte La Rose</td>
+					<td class="normal" align="center">9.7</td>
+					<td class="normal" align="center">9.7</td>
+					<td class="normal" align="center">(0)</td>
+				</tr>
+				<tr>
+					<td class="normal">Buffalo Cove</td>
+					<td class="normal" align="center">6.6</td>
+						<td class="normal" align="center">7.6</td>
+					<td class="normal" align="center">(-0.1)</td>
+				</tr>
+				<tr>
+					<td class="normal">Morgan City</td>
+					<td class="normal" align="center">2.6</td>
+					<td class="normal" align="center">3.7</td>
+					<td class="normal" align="center">(0.1)</td>
+				</tr>
+				<tr>
+					<td class="normal">Latitude Discharge (cfs)</td>
+					<td></td>
+					<td class="normal" align="center">851,000</td>
+						<td class="normal" align="center">(+17,000)</td>
+				</tr>
+				<tr>
+					<td class="normal">Percent Distribution</td>
+					<td></td>
+					<td class="normal" align="center">28.4</td>
+					<td class="normal" align="center">N/A</td>
+				</tr>
+				</table>
+			</td>
+		</tr>
+		</table>
+	</td>
+</tr>
+
+<tr><td class="normal">E=ESTIMATED STAGE</td></tr>
+	
+<tr>
+	<td>		
+		<table border="1" width="100%">
+		<tr>
+			<td bgcolor="#bdc7ff" colspan="2">
+				<p class="normal"><strong>OLD RIVER</strong></p>
+			</td>
+		</tr>
+						
+		<tr>
+			<td>
+				<table width="100%" cellspacing="0">
+				<tr>
+					<td class="normal" width="28%" align="right"></td>
+					<td class="normal" width="24%" align="center"><strong>Hydropower</strong></td>
+					<td class="normal" width="24%" align="center"><strong>Low Sill</strong></td>
+					<td class="normal" width="24%" align="center"><strong>Auxilliary</strong></td>
+				</tr>
+				<tr>
+					<td class="normal">Riverside</td>
+					<td class="normal" align="center">44.4</td>
+					<td class="normal" align="center">44.6</td>
+					<td class="normal" align="center">44.5</td>
+				</tr>
+				<tr>
+					<td class="normal">Channelside</td>
+					<td class="normal" align="center">23.6</td>
+					<td class="normal" align="center">24.8</td>
+					<td class="normal" align="center">25.0</td>
+				</tr>
+				<tr>
+					<td class="normal">Delta Head</td>
+					<td class="normal" align="center">20.8</td>
+					<td class="normal" align="center">19.8</td>
+					<td class="normal" align="center">19.5</td>
+				</tr>
+				<tr>
+					<td class="normal">Discharge (cfs)</td>
+					<td class="normal" align="center">129,000</td>
+					<td class="normal" align="center">112,000</td>
+					<td class="normal" align="center">0.0</td>
+				</tr>
+				</table>
+			</td>
+		</tr>
+		</table>
+	</td>
+</tr>
+
+<tr><td>&nbsp;</td></tr>
+
+<tr><td class="normal">The Contact for this page:<br>
+CEMVN-ED-HD
+<BR>
+New Orleans, LA
+<BR>
+<A href="mailto:MVNHydraulics@usace.army.mil"
+>MVNHydraulics@usace.army.mil</A> 
+</td></tr></table>Updated 8/26/2011</div></BODY></HTML>
+-----
+
+
+The USGS Site
+-------------
+
+The USGS site has a web service for obtaining the data. The site home page is
+at:
+
+http://waterdata.usgs.gov/nwis[+http://waterdata.usgs.gov/nwis+]
+
+The page detailing how to use the web services is:
+
+http://waterservices.usgs.gov/[+http://waterservices.usgs.gov/+]
+
+Web Services Syntax
+~~~~~~~~~~~~~~~~~~~
+
+A typical command for obtaining river discharge data is:
+
+-----
+wget -O02296750.Peace http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&begin_date=1880-01-01\&end_date=2010-10-18\&site_no=02296750\&referred_module=sw
+-----
+
+where:
+
+* +-O02296750.Peace+ is the output file into which the downloaded data will be
+placed
+
+* +cb_0600=on+ is some bloody switch
+
+* +format=rdb+ is the format, with +rdb+ being USGS RDB (tab-delimited) format
+
+* +begin_date=1880-01-01+ is the beginning date for the desired data
+
+* +end_date=2010-10-18+ is the ending date for the desired data
+
+* +site_no=02296750+ is the site number
+
+* +referred_module=sw+ is some bloody module
+
+Some experimentation has shown that the +referred_module+ part does nothing,
+and also that the +begin_date+ and +end_date+ bits can be replaced with
++period=1+, where the value +1+ indicates how many of the last N days you
+desire.  Therefore, the command:
+
+-----
+wget -O02296750.Peace_1day http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02296750
+-----
+
+will retrieve the file +02296750.Peace_1day+ containing:
+
+-----
+# ---------------------------------- WARNING
+# ----------------------------------------
+# The data you have obtained from this automated U.S. Geological Survey
+# database
+# have not received Director's approval and as such are provisional and
+# subject to
+# revision.  The data are released on the condition that neither the USGS nor
+# the
+# United States Government may be held liable for any damages resulting from
+# its use.
+# Additional info: http://waterdata.usgs.gov/nwis/help/?provisional
+#
+# File-format description:
+# http://waterdata.usgs.gov/nwis/?tab_delimited_format_info
+# Automated-retrieval info:
+# http://waterdata.usgs.gov/nwis/?automated_retrieval_info
+#
+# Contact:   gs-w_support_nwisweb@usgs.gov
+# retrieved: 2013-07-10 15:50:11 EDT       (caww02)
+#
+# Data for the following 1 site(s) are contained in this file
+#    USGS 02296750 PEACE RIVER AT ARCADIA FL
+# -----------------------------------------------------------------------------------
+#
+# Data provided for site 02296750
+#    DD parameter statistic   Description
+#    02   00060     00003     Discharge, cubic feet per second (Mean)
+#
+# Data-value qualification codes included in this output: 
+#     P  Provisional data subject to revision.  
+# 
+agency_cd       site_no datetime        02_00060_00003  02_00060_00003_cd
+5s      15s     20d     14n     10s
+USGS    02296750        2013-07-09      4540    P
+-----
+
+which is a whole lot of boiler plate to tell us that the discharge in cubic
+feet per second for site +02296750+ is +4540+.
+
+The Station List
+~~~~~~~~~~~~~~~~
+
+The stations from which we need to obtain GOM discharge data are in the following block.
+This will cycle through all the desired stations and get the latest available discharge
+value for each station in the form:
+
+-----
+USGS    02296750        2013-07-09      4540    P
+-----
+
+The stations are:
+
+-----
+wget -O02296750.Peace http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02296750
+wget -O02320500.Suwan http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02320500
+wget -O02324000.Stein http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02324000
+wget -O02324400.Fenho http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02324400
+wget -O02326000.Econf http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02326000
+wget -O02330000.Ochlo http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02330000
+wget -O02359170.Apala http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02359170
+wget -O02359000.Chipo http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02359000
+wget -O02366500.Choct http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02366500
+wget -O02368000.Yello http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02368000
+wget -O02369000.Shoal http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02369000
+wget -O02370000.Black http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02370000
+wget -O02375500.Escam http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02375500
+wget -O02376033.Escam http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02376033
+wget -O02376500.Perdi http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02376500
+wget -O02428400.Alaba http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02428400
+wget -O02469761.Tombi http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02469761
+wget -O02479310.Pasca http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02479310
+wget -O02479160.Black http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02479160
+wget -O02479300.Red_C http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02479300
+wget -O02481510.WolfR http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02481510
+wget -O02489500.Pearl http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02489500
+wget -O02492000.Bogue http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02492000
+wget -O07375500.Tangi http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=07375500
+wget -O07378500.Amite http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=07378500
+wget -O07385500.Bayou http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=07385500
+wget -O08012000.Bayou http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08012000
+wget -O08015500.Calca http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08015500
+wget -O08030500.Sabin http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08030500
+wget -O08041000.Neche http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08041000
+wget -O08041500.Villa http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08041500
+wget -O08066500.Trini http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08066500
+wget -O08068090.Jacin http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08068090
+wget -O08116650.Brazo http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08116650
+wget -O08117500.San_B http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08117500
+wget -O08162500.Color http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08162500
+wget -O08164000.Lavac http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08164000
+wget -O08176500.Guada http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08176500
+wget -O08189500.Missi http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08189500
+wget -O08188500.SanAn http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08188500
+wget -O08189700.Arans http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08189700
+wget -O08211000.Nuece http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08211000
+wget -O02298880.Myakk http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02298880
+wget -O02292010.Caloo http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02292010
+wget -O02310525.Weeki http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02310525
+wget -O02310747.Cryst http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02310747
+wget -O02313100.Rainb http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02313100
+wget -O02325000.Fenho http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02325000
+wget -O02330150.Ochlo http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02330150
+wget -O02369600.Yello http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02369600
+wget -O02479000.pasca http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=02479000
+wget -O07386980.Vermi http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=07386980
+wget -O08075000.Brays http://waterdata.usgs.gov/nwis/dv\?cb_00060=on\&format=rdb\&period=1\&site_no=08075000
+-----
+
+Original Archive File
+---------------------
+
+The original NetCDF file used to contain the river discharge time series data
+was found at:
+
+http://abcmgr.tamu.edu/gomexppp/?page_id=90[+http://abcmgr.tamu.edu/gomexppp/?page_id=90+]
+
+and had the filename +gom_river_discharge.nc+.
+
+NetCDF File Header of Original Archive File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The original version of the NetCDF file containing the river discharge data is
+available at:
+
+http://abcmgr.tamu.edu/gomexppp/?page_id=90[+http://abcmgr.tamu.edu/gomexppp/?page_id=90+]
+
+The file name is +gom_river_discharge.nc+ and the header portion is:
+
+-----
+netcdf gom_river_discharge {
+dimensions:
+        t = UNLIMITED ; // (38808 currently)
+        s = 55 ;
+        c08 = 8 ;
+        c10 = 10 ;
+        c24 = 24 ;
+variables:
+        int Julian_Day(t) ;
+                Julian_Day:units = "days since -4712-01-01 12:00:00" ;
+        float Discharge(t, s) ;
+                Discharge:units = "cubic meters per second" ;
+                Discharge:long_name = "Discharge" ;
+                Discharge:standard_name = "Discharge" ;
+                Discharge:missing_value = -999.f ;
+                Discharge:fill_value = -999.f ;
+        float End_Date(s) ;
+                End_Date:Last_record = "date" ;
+                End_Date:units = "days since -4712-01-01 12:00:00" ;
+        float Start_Date(s) ;
+                Start_Date:First_record = "date" ;
+                Start_Date:units = "days since -4712-01-01 12:00:00" ;
+        float Gage_Latitude(s) ;
+                Gage_Latitude:gage_location = "latitude" ;
+                Gage_Latitude:units = "degrees_north" ;
+        float Gage_Longitude(s) ;
+                Gage_Longitude:gage_location = "longitude" ;
+                Gage_Longitude:units = "degrees_east" ;
+        float Mouth_Latitude(s) ;
+                Mouth_Latitude:river_mouth = "latitude" ;
+                Mouth_Latitude:units = "degrees_north" ;
+        float Mouth_Longitude(s) ;
+                Mouth_Longitude:river_mouth = "longitude" ;
+                Mouth_Longitude:units = "degrees_east" ;
+        char Station_ID(s, c08) ;
+        char River_Name(s, c24) ;
+
+// global attributes:
+                :RIVERS = "U.S. Gulf of Mexico Rivers" ;
+                :CONTACT = "mkhoward@tamu.edu" ;
+...
+-----
+
+
+Changes Required for CF 1.6 Compliance
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The recommended changes - some for CF compliance and some not - are:
+
+* the variable +Julian_Day+ should be renamed +time+
+
+* the +s+ dimension should be renamed +station+
+
+* the global attribute +timeSeries+ should be added
+
+* the +Station_ID+ variable needs to be changed to:
+
+-----
+char station_id(station, id_strlen) ;
+     station_id:long_name = "station name" ;
+     station_id:cf_role = "timeseries_id" ;
+-----
+
+* the dimension +c08+ should be changed to +id_strlen+
+
+* the dimension +c24+ should be changed to +river_name_strlen+
+
+* the +River_Name+ variable should be changed to:
+
+-----
+char river_name(station, river_name_strlen) ;
+     river_name:long_name = "river name" ;
+-----
+
+* additional info about origin of data should be added to global attributes
+
+Screen Scraping
+---------------
+
+Screen scraping is the practice of downloading a page in the form of
+its HTML source code, and extracting the data you need from that
+page.  
+
+Beautiful Soup
+~~~~~~~~~~~~~~
+
+A Python package for screen-scraping that can be found at:
+
+-----
+http://www.crummy.com/software/BeautifulSoup/
+-----
+
+It can be installed with the following command:
+
+-----
+pip install BeautifulSoup4
+-----
+
+
+Python Scripts
+--------------
+
+Python scripts will be written to:
+
+* translate the original NetCDF file into a more CF-compliant NetCDF file;
+
+* download and create NetCDF files of the river discharge values needed
+to bridge the gap between the present archive file (late 2010) and the
+present;
+
+* download the discharge values and create daily NetCDF files in a format identical to the translated archive
+file so they can be concatenated to the latter using +ncrcat+.
+
+Python Script +discharge_convert.py+ to Translate Original Archive Files 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[source,python]
+-----
+#!/usr/bin/python2.7
+
+#  Filename:  convert_discharge.py
+#
+#  This converts the present river discharge NetCDF file into a more
+#  CF-1.6 compliant file.
+#
+#   Input:  gom_river_discharge.nc
+#  Output:  river_time_series.nc
+
+import numpy as np
+import netCDF4
+from netCDF4 import Dataset
+import jdcal as jd
+from netCDF4 import num2date,date2num,datetime
+
+no_stations = 55
+
+#  OPEN OLD FILE
+#
+#  The old file time array Julian_Day ranges from Aug. 1, 1904 @ 12:00:00
+#  (2416694) to Oct. 31, 2010 @ 12:00:00 (2455501)
+#  to Oct. 31, 2010 (12:00:00)
+
+print " Opening input file..."
+infile = "/home/baum/RIVER/river_programs/gom_river_discharge.nc"
+inf = netCDF4.Dataset(infile,'r')
+
+Discharge = inf.variables['Discharge'][:]
+Julian_Day = inf.variables['Julian_Day'][:]
+End_Date = inf.variables['End_Date'][:]
+Start_Date = inf.variables['Start_Date'][:]
+Gage_Latitude = inf.variables['Gage_Latitude'][:]
+Gage_Longitude = inf.variables['Gage_Longitude'][:]
+Mouth_Latitude = inf.variables['Mouth_Latitude'][:]
+Mouth_Longitude = inf.variables['Mouth_Longitude'][:]
+Station_ID = inf.variables['Station_ID'][:]
+River_Name = inf.variables['River_Name'][:]
+
+#  OPEN NEW FILE
+
+print " Opening output file..."
+tsfile = "/home/baum/RIVER/river_programs/river_time_series.nc"
+ts = netCDF4.Dataset(tsfile,'w',format="NETCDF3_CLASSIC")
+
+ts.createDimension('time',None)
+ts.createDimension('station',no_stations)
+ts.createDimension('id_strlen',8)
+ts.createDimension('river_name_strlen',24)
+
+time = ts.createVariable('time','i4',('time',))
+discharge = ts.createVariable('discharge','f4',('time','station',),fill_value="-999.")
+station_id = ts.createVariable('station_id','S1',('station','id_strlen',))
+river_name = ts.createVariable('river_name','S1',('station','river_name_strlen',))
+end_date = ts.createVariable('end_date','f4',('station',))
+start_date = ts.createVariable('start_date','f4',('station',))
+gauge_latitude = ts.createVariable('gauge_latitude','f4',('station',))
+gauge_longitude = ts.createVariable('gauge_longitude','f4',('station',))
+mouth_latitude = ts.createVariable('mouth_latitude','f4',('station',))
+mouth_longitude = ts.createVariable('mouth_longitude','f4',('station',))
+
+ts.title = "Time-series discharge data for rivers emptying in the Gulf of Mexico."
+ts.source = "USGS and U.S. Army Corps of Engineers"
+ts.source_url1 = "http://waterdata.usgs.gov/nwis"
+ts.source_url2 = "http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp"
+ts.featureType = "timeSeries"
+ts.rivers = "U.S. Gulf of Mexico Rivers"
+ts.contact = "mkhoward@tamu.edu"
+ts.conventions = "CF-1.6"
+ts.processing_information_url = "http://stommel.tamu.edu/~baum/river.html"
+
+time.standard_name = "time"
+time.long_name = "time of measurement"
+time.units = "days since 1900-01-01 00:00:00"
+
+discharge.units = "cubic meters per second"
+discharge.long_name = "discharge"
+discharge.standard_name = "discharge"
+discharge.valid_min = "0.0"
+discharge.valid_max = "43041.5"
+discharge.missing_value = -999.
+discharge.coordinates = "gauge_latitude gauge_longitude"
+
+end_date.units = "days since 1900-01-01 00:00:00"
+start_date.units = "days since 1900-01-01 00:00:00"
+gauge_latitude.units = "degrees_north"
+gauge_latitude.long_name = "latitude of gauge station"
+gauge_longitude.units = "degrees_east"
+gauge_longitude.long_name = "longitude of gauge station"
+mouth_latitude.units = "degrees_north"
+mouth_latitude.long_name = "latitute of river mouth"
+mouth_longitude.units = "degrees_east"
+mouth_longitude.long_name = "longitude of river mouth"
+station_id.long_name = "gauging station ID number"
+station_id.cf_role = "timeseries_id"
+river_name.long_name = "name of river"
+start_date.long_name = "date of first gauge station data"
+end_date.long_name = "date of most recent gauge station data"
+
+
+end_date[:] = End_Date
+start_date[:] = Start_Date
+station_id[:] = Station_ID
+river_name[:] = River_Name
+gauge_latitude[:] = Gage_Latitude
+gauge_longitude[:] = Gage_Longitude
+mouth_latitude[:] = Mouth_Latitude
+mouth_longitude[:] = Mouth_Longitude
+discharge[:] = Discharge
+
+#  CONVERT TIMES
+#
+#  Convert the Julian Day silliness to something sane
+#  that ERDDAP will like.
+#  From http://aa.usno.navy.mil/data/docs/JulianDate.php:
+#   JD 2455501.000000 is CE 2010 October 31 12:00:00.0 UT Sunday
+#
+#  import jdcal as jd
+#  Convert date to Julian days.
+#  jd.gcal2jd(2000,1,1)
+#  (2400000.5, 51544.0)
+#  Convert Julian day to date:
+#  jd.jd2gcal(2455501.0, 0.0)
+#  (2010, 10, 31, 0.5)
+
+nt = 0
+units = "days since 1900-01-01 00:00:00"
+for day in Julian_Day:
+#  Convert Julian day to calendar date.
+        dat = jd.jd2gcal(day,0.0)
+#  Create a datetime object.
+        dtime = datetime(dat[0],dat[1],dat[2],12,0,0)
+#  Find number of days since "units" and put result in output time array.
+        time[nt] = date2num(dtime,units)
+        nt = nt + 1
+
+ts.close()
+-----
+
+Python Script +discharge_year.py+ to Create Yearly NetCDF Files of Discharge Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This was used to create yearly files for 2010, 2011, 2012 and 2013 since the
+existing archive file ends in late 2010.
+The existing file - translated from +gom_river_discharge.nc+ to
++gom_discharge_archive.nc+ - ends at 40480 days since +1900-01-01 00:00:00+, which
+is in late 2010.  We must extract the part of the +gom_discharge_2010.nc+ file
+that runs from day 40481 to the end of the year.
+In +gom_discharge_2010.nc+ day 40481 is ordinal time value 304 of 364 within
+the file, so we can use the following NCO +ncks+ command to extract the
+desired portion of the file:
+
+-----
+ncks -H -d time,304,364 gom_discharge_2010.nc gom_discharge_2010_partial.nc
+-----
+
+Now we can concatenate this partial file to the archive file:
+
+-----
+ncrcat gom_discharge_archive.nc gom_discharge_2010_partial.nc gom_discharge_1900_2010.nc
+-----
+
+Now we concatenate 2011 through 2103:
+
+-----
+ncrcat gom_discharge_1900_2010.nc gom_discharge_2011.nc gom_discharge_2012.nc gom_discharge_2013.nc gom_discharge_1900_present.nc
+-----
+
+The daily files will be appended to +gom_discharge_1900_present.nc+ on a daily
+basis, e.g.
+
+-----
+ncrcat gom_discharge_1900_present.nc discharge_20130928.nc gom_discharge_1900_present.nc
+-----
+
+
+[source,python]
+-----
+#!/usr/bin/python2.7
+
+#  Program:  discharge_year.py
+#
+#  This program creates a NetCDF file from a combination of USGS and USACE river discharge
+#  values for a given year.  The USGS values are automatically downloaded from a USGS
+#  server using the station numbers in the 'stationid' array (except for the first two).
+#  The USACE river discharge values are read from files of the form usace_xxxx_yyyy.txt
+#  where xxxx is either 'miss' or 'atch' and yyyy is the year.  These files are obtained
+#  via the interactive forms at:
+#
+#   miss- http://www2.mvn.usace.army.mil/cgi-bin/wcmanual.pl?01100
+#   atch - http://www2.mvn.usace.army.mil/cgi-bin/watercontrol.pl?03045
+#
+#  A year is specified on the form, the submit button is pressed, and the resulting
+#  text file is downloaded.  The file is then hand edited to remove the extraneous
+#  lines from the top and bottom.
+#
+#  More details about the procedure can be found at:
+#
+#   http://stommel.tamu.edu/~baum/river.html
+#
+#   
+
+from bs4 import BeautifulSoup
+import urllib,re
+import numpy as np
+import netCDF4
+from netCDF4 import num2date,date2num,datetime
+import time,datetime
+from time import strftime
+from datetime import timedelta,date
+import itertools
+import sys
+
+year = "2010"
+dstart = year + "-01-01"
+dend = year + "-12-31"
+
+no_stations = 55
+cfs2cms = 0.028316847
+fillvalue = -999.
+
+miss_file = "usace_miss_" + year + ".txt"
+atch_file = "usace_atch_" + year + ".txt"
+
+try:
+	missfile = open(miss_file,"r")
+except:
+	print " Mississippi discharge file " + miss_file + " not available.  Exiting program."
+	sys.exit()
+
+try:
+	atchfile = open(atch_file,"r")
+except:
+	print " Atchafalaya discharge file " + atch_file + " not available.  Exiting program."
+	sys.exit()
+
+miss_lines = missfile.readlines()
+atch_lines = atchfile.readlines()
+len_miss = len(miss_lines)
+len_atch = len(atch_lines)
+
+miss = np.zeros(len_miss)
+atch = np.zeros(len_atch)
+
+n = 0
+for line in miss_lines:
+	stuff = line.split(";")
+	dis = float((stuff[1]).strip(' \n'))
+	miss[n] = dis*1000.*cfs2cms
+#	print " n = ",n," miss = ",miss[n]
+	n = n + 1
+
+n = 0
+for line in atch_lines:
+        stuff = line.split(";")
+        dis = float((stuff[1]).strip(' \n'))
+        atch[n] = dis*1000.*cfs2cms
+#	print " n = ",n," miss = ",atch[n]
+	n = n + 1
+
+out = "gom_discharge_" + year + ".nc"
+
+stationid = ['01100mis','03045atc','02292010','02296750','02298880','02310525','02310747','02313100',
+             '02320500','02324000','02324400','02325000','02326000','02330000','02330150','02359000',
+             '02359170','02366500','02368000','02369000','02369600','02370000','02375500','02376033',
+             '02376500','02428400','02469761','02479000','02479160','02479300','02479310','02481510',
+             '02489500','02492000','07375500','07378500','07385500','07386980','08012000','08015500',
+             '08030500','08041000','08041500','08066500','08068090','08075000','08116650','08117500',
+             '08162500','08164000','08176500','08188500','08189500','08189700','08211000']
+
+#stationid = ['01100mis','03045atc','02292010','02296750','02298880','02310525','02310747','02313100']
+
+units = "days since 1900-01-01 00:00:00"
+
+#  Establish time information.
+
+yyyy = strftime("%Y")
+mm = strftime("%m")
+dd = strftime("%d")
+
+dtime = datetime.datetime(int(yyyy),int(mm),int(dd),12,0,0)
+dm = datetime.timedelta(days=1)
+today_time = date2num(dtime,units)
+yesterday_time = date2num(dtime - dm,units)
+
+yyyymmdd = (dtime - dm).strftime("%Y") + (dtime - dm).strftime("%m") + (dtime - dm).strftime("%d")
+
+#  Open input file and read data.
+
+infile = "/home/baum/RIVER/river_programs/gom_river_discharge.nc"
+inf = netCDF4.Dataset(infile,'r')
+
+End_Date = inf.variables['End_Date'][:]
+Start_Date = inf.variables['Start_Date'][:]
+Gage_Latitude = inf.variables['Gage_Latitude'][:]
+Gage_Longitude = inf.variables['Gage_Longitude'][:]
+Mouth_Latitude = inf.variables['Mouth_Latitude'][:]
+Mouth_Longitude = inf.variables['Mouth_Longitude'][:]
+Station_ID = inf.variables['Station_ID'][:]
+River_Name = inf.variables['River_Name'][:]
+
+inf.close()
+
+#  Open output file.
+
+outfile = "/home/baum/RIVER/river_programs/" + out
+ts = netCDF4.Dataset(outfile,'w',format="NETCDF3_CLASSIC")
+
+ts.createDimension('time',None)
+ts.createDimension('station',no_stations)
+ts.createDimension('id_strlen',8)
+ts.createDimension('river_name_strlen',24)
+
+discharge = ts.createVariable('discharge','f4',('time','station',),fill_value="-999.")
+time = ts.createVariable('time','i4',('time',))
+
+time[:] = yesterday_time
+#time[:] = date2num(dtime,units)
+
+station_id = ts.createVariable('station_id','S1',('station','id_strlen',))
+river_name = ts.createVariable('river_name','S1',('station','river_name_strlen',))
+end_date = ts.createVariable('end_date','f4',('station',))
+start_date = ts.createVariable('start_date','f4',('station',))
+gauge_latitude = ts.createVariable('gauge_latitude','f4',('station',))
+gauge_longitude = ts.createVariable('gauge_longitude','f4',('station',))
+mouth_latitude = ts.createVariable('mouth_latitude','f4',('station',))
+mouth_longitude = ts.createVariable('mouth_longitude','f4',('station',))
+
+ts.title = "Time-series discharge data for rivers emptying in the Gulf of Mexico."
+ts.source = "USGS and U.S. Army Corps of Engineers"
+ts.source_url1 = "http://waterdata.usgs.gov/nwis"
+ts.source_url2 = "http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp"
+ts.featureType = "timeSeries"
+ts.rivers = "U.S. Gulf of Mexico Rivers"
+ts.contact = "mkhoward@tamu.edu"
+ts.conventions = "CF-1.6"
+ts.processing_information_url = "http://stommel.tamu.edu/~baum/river.html"
+
+time.standard_name = "time"
+time.long_name = "time of measurement"
+time.units = "days since 1900-01-01 00:00:00"
+
+discharge.units = "cubic meters per second"
+discharge.long_name = "discharge"
+discharge.standard_name = "discharge"
+discharge.valid_min = "0.0"
+discharge.valid_max = "43041.5"
+discharge.missing_value = -999.
+discharge.coordinates = "gauge_latitude gauge_longitude"
+
+end_date.units = "days since 1900-01-01 00:00:00"
+start_date.units = "days since 1900-01-01 00:00:00"
+gauge_latitude.units = "degrees_north"
+gauge_latitude.long_name = "latitude of gauge station"
+gauge_longitude.units = "degrees_east"
+gauge_longitude.long_name = "longitude of gauge station"
+mouth_latitude.units = "degrees_north"
+mouth_latitude.long_name = "latitute of river mouth"
+mouth_longitude.units = "degrees_east"
+mouth_longitude.long_name = "longitude of river mouth"
+station_id.long_name = "gauging station ID number"
+station_id.cf_role = "timeseries_id"
+river_name.long_name = "name of river"
+start_date.long_name = "date of first gauge station data"
+end_date.long_name = "date of most recent gauge station data"
+
+end_date[:] = End_Date
+start_date[:] = Start_Date
+station_id[:] = Station_ID
+river_name[:] = River_Name
+gauge_latitude[:] = Gage_Latitude
+gauge_longitude[:] = Gage_Longitude
+mouth_latitude[:] = Mouth_Latitude
+mouth_longitude[:] = Mouth_Longitude
+
+timeslice = "&begin_date=" + dstart + "&end_date=" + dend
+
+print " timeslice = ",timeslice
+
+n = 0
+for sno in stationid:
+
+	print " Processing station " + sno
+
+       	urlstring = "http://waterdata.usgs.gov/nwis/dv?cb_00060=on&format=rdb" + timeslice + "&site_no=" + sno
+
+       	usgs = urllib.urlretrieve(urlstring,"tmp.txt")
+
+#  The USGS files have a variable number of boilerplate lines at the beginning, so
+#  the number must be found each time.
+
+	nskip = 0
+	with open('tmp.txt') as f:
+		for line in itertools.islice(f,0,None):
+			if not line.startswith("USGS"):
+				nskip = nskip + 1
+			
+
+	with open('tmp.txt') as f:
+		nt = 0
+		for line in itertools.islice(f,nskip,None):
+#			print " n = ",n," nt = ",nt," line = ",line
+			try:
+				stuff = line.split("\t")
+				cfs = float(stuff[3])*cfs2cms
+				ds = stuff[2].split("-")
+				dtime = datetime.datetime(int(ds[0]),int(ds[1]),int(ds[2]))
+				today_time = date2num(dtime,units)
+#				print " discharge = ",float(stuff[3])," today = ",today_time
+
+				discharge[nt,n] = cfs
+				time[nt] = today_time
+				nt = nt + 1
+
+#  If discharge value unavailable, put in a fill value.
+			except:
+
+				print " Couldn't obtain desired discharge information for station ",stationid[n]," at time ",dtime
+				cfs = fillvalue
+				discharge[nt,n] = cfs
+				nt = nt + 1
+
+
+	n = n + 1
+
+#  Add Mississippi and Atchafalaya discharge values.
+
+for nt in range(0,len_miss):
+	discharge[nt,0] = miss[nt]
+	discharge[nt,1] = atch[nt]
+
+
+ts.close()
+-----
+
+
+Python Script +discharge_daily.py+ to Create Daily NetCDF Discharge Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[source,python]
+-----
+#!/usr/bin/python2.7
+
+#  This grabs the daily river discharge values from all the stations listed in the "stationid"
+#  array, and also two more values from the Mississippi and Atchafalaya.
+
+from bs4 import BeautifulSoup
+import urllib,re
+import numpy as np
+import netCDF4
+from netCDF4 import num2date,date2num,datetime
+import time,datetime
+from time import strftime
+from datetime import timedelta,date
+
+
+stationid = ['01100mis','03045atc','02292010','02296750','02298880','02310525','02310747','02313100',
+             '02320500','02324000','02324400','02325000','02326000','02330000','02330150','02359000',
+             '02359170','02366500','02368000','02369000','02369600','02370000','02375500','02376033',
+             '02376500','02428400','02469761','02479000','02479160','02479300','02479310','02481510',
+             '02489500','02492000','07375500','07378500','07385500','07386980','08012000','08015500',
+             '08030500','08041000','08041500','08066500','08068090','08075000','08116650','08117500',
+             '08162500','08164000','08176500','08188500','08189500','08189700','08211000']
+
+#stationid = ['01100mis','03045atc','02292010','02296750']
+
+units = "days since 1900-01-01 00:00:00"
+
+no_stations = 55
+cfs2cms = 0.028316847
+fillvalue = -999.
+
+#  Establish time information.
+
+yyyy = strftime("%Y")
+mm = strftime("%m")
+dd = strftime("%d")
+
+dtime = datetime.datetime(int(yyyy),int(mm),int(dd),12,0,0)
+dm = datetime.timedelta(days=1)
+today_time = date2num(dtime,units)
+yesterday_time = date2num(dtime - dm,units)
+
+yyyymmdd = (dtime - dm).strftime("%Y") + (dtime - dm).strftime("%m") + (dtime - dm).strftime("%d")
+
+out = "discharge_" + yyyymmdd + ".nc"
+
+#  Open input file and read data.
+
+infile = "/home/baum/RIVER/river_programs/gom_river_discharge.nc"
+inf = netCDF4.Dataset(infile,'r')
+
+End_Date = inf.variables['End_Date'][:]
+Start_Date = inf.variables['Start_Date'][:]
+Gage_Latitude = inf.variables['Gage_Latitude'][:]
+Gage_Longitude = inf.variables['Gage_Longitude'][:]
+Mouth_Latitude = inf.variables['Mouth_Latitude'][:]
+Mouth_Longitude = inf.variables['Mouth_Longitude'][:]
+Station_ID = inf.variables['Station_ID'][:]
+River_Name = inf.variables['River_Name'][:]
+
+inf.close()
+
+#  Open output file.
+
+outfile = "/home/baum/RIVER/river_programs/" + out
+ts = netCDF4.Dataset(outfile,'w',format="NETCDF3_CLASSIC")
+
+ts.createDimension('time',None)
+ts.createDimension('station',no_stations)
+ts.createDimension('id_strlen',8)
+ts.createDimension('river_name_strlen',24)
+
+discharge = ts.createVariable('discharge','f4',('time','station',),fill_value="-999.")
+time = ts.createVariable('time','i4',('time',))
+
+time[:] = yesterday_time
+#time[:] = date2num(dtime,units)
+
+station_id = ts.createVariable('station_id','S1',('station','id_strlen',))
+river_name = ts.createVariable('river_name','S1',('station','river_name_strlen',))
+end_date = ts.createVariable('end_date','f4',('station',))
+start_date = ts.createVariable('start_date','f4',('station',))
+gauge_latitude = ts.createVariable('gauge_latitude','f4',('station',))
+gauge_longitude = ts.createVariable('gauge_longitude','f4',('station',))
+mouth_latitude = ts.createVariable('mouth_latitude','f4',('station',))
+mouth_longitude = ts.createVariable('mouth_longitude','f4',('station',))
+
+ts.title = "Time-series discharge data for rivers emptying in the Gulf of Mexico."
+ts.source = "USGS and U.S. Army Corps of Engineers"
+ts.source_url1 = "http://waterdata.usgs.gov/nwis"
+ts.source_url2 = "http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp"
+ts.featureType = "timeSeries"
+ts.rivers = "U.S. Gulf of Mexico Rivers"
+ts.contact = "mkhoward@tamu.edu"
+ts.conventions = "CF-1.6"
+ts.processing_information_url = "http://stommel.tamu.edu/~baum/river.html"
+
+time.standard_name = "time"
+time.long_name = "time of measurement"
+time.units = "days since 1900-01-01 00:00:00"
+
+discharge.units = "cubic meters per second"
+discharge.long_name = "discharge"
+discharge.standard_name = "discharge"
+discharge.valid_min = "0.0"
+discharge.valid_max = "43041.5"
+discharge.missing_value = -999.
+discharge.coordinates = "gauge_latitude gauge_longitude"
+
+end_date.units = "days since 1900-01-01 00:00:00"
+start_date.units = "days since 1900-01-01 00:00:00"
+gauge_latitude.units = "degrees_north"
+gauge_latitude.long_name = "latitude of gauge station"
+gauge_longitude.units = "degrees_east"
+gauge_longitude.long_name = "longitude of gauge station"
+mouth_latitude.units = "degrees_north"
+mouth_latitude.long_name = "latitute of river mouth"
+mouth_longitude.units = "degrees_east"
+mouth_longitude.long_name = "longitude of river mouth"
+station_id.long_name = "gauging station ID number"
+station_id.cf_role = "timeseries_id"
+river_name.long_name = "name of river"
+start_date.long_name = "date of first gauge station data"
+end_date.long_name = "date of most recent gauge station data"
+
+end_date[:] = End_Date
+start_date[:] = Start_Date
+station_id[:] = Station_ID
+river_name[:] = River_Name
+gauge_latitude[:] = Gage_Latitude
+gauge_longitude[:] = Gage_Longitude
+mouth_latitude[:] = Mouth_Latitude
+mouth_longitude[:] = Mouth_Longitude
+
+
+n = 0
+for sno in stationid:
+
+	try:
+
+        	urlstring = "http://waterdata.usgs.gov/nwis/dv?cb_00060=on&format=rdb&period=1&site_no=" + sno
+
+        	usgs = urllib.urlopen(urlstring)
+        	ht = BeautifulSoup(usgs)
+
+#  Find text within <p> containing USGS - i.e. all of it - and put into object 'first'.
+        	first = ht.find("p", text=re.compile("USGS"))
+
+#  Convert the whole thing into a string.
+        	ug = str(first.text)
+
+#  Split string at 'USGS'.
+        	uga = ug.split("USGS")
+
+# uga[3] = '\t02292010\t2013-09-24\t4090\tP\n'
+
+#  Further split the string portion containing the discharge value, date, etc.
+        	stuff = uga[3].split("\t")
+
+# stuff[3] = '4090'
+
+#  Convert string to float and convert cfs to cms.
+		cfs = float(stuff[3])*cfs2cms
+
+		discharge[0,n] = cfs
+
+#  If discharge value unavailable, put in a fill value.
+	except:
+
+		print " Inserting fill value for station ",sno
+
+		cfs = fillvalue
+
+		discharge[0,n] = cfs
+
+
+	print " n = ",n," cfs = ",cfs
+#	discharge[0,n] = cfs
+	n = n + 1
+
+#  Grab the discharge values for the Mississippi and Atchafalaya that
+#  aren't available at the USGS site.
+
+#  Grab the URL of interest.
+html = urllib.urlopen("http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp").read()
+
+#  Pull the URL of interest into the soup object.
+soup = BeautifulSoup(html)
+
+#  Find the first <td> tag containing "Discharge (cfs)"
+first = soup.find("td", text=re.compile("Discharge \(cfs\)"))
+#  <td class="normal">Discharge (cfs)</td>
+
+#  Find the first <td> tag after that with an 'align' attribute.
+first = first.find_next("td",align="center")
+#  <td align="center" class="normal">286,000</td>
+
+#  Extract the Mississippi discharge value.
+miss_discharge = str(first.string)
+#  '286,000'
+
+#  Find the next Discharge.
+first = first.find_next("td", text=re.compile("Discharge \(cfs\)"))
+#  <td class="normal">Latitude Discharge (cfs)</td>
+
+#  Find the next discharge value.
+first = first.find_next("td",align="center")
+#  <td align="center" class="normal">410,000</td>
+
+#  Extract the Atchafalaya discharge value.
+atch_discharge = str(first.string)
+#  '410,000'
+
+print " miss = ",miss_discharge," atch = ",atch_discharge
+
+mm = miss_discharge.split(',')
+aa = atch_discharge.split(',')
+
+miss = int(mm[0] + mm[1])
+atch = int(aa[0] + aa[1])
+
+
+discharge[0,0] = miss*cfs2cms
+discharge[0,1] = atch*cfs2cms
+
+ts.close()
+-----
+
+Making the NetCDF Discharge Archive File Available via ERDDAP
+-------------------------------------------------------------
+
+Running +GenerateDatasetsXml+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A skeleton XML file was created for ERDDAP using
++GenerateDatasetsXml+ and the following entries:
+
+-----
+Which EDDType (default="")
+? EDDTableFromNcCFFiles         
+Parent directory (default="")
+? /data/rivers
+File name regex (e.g., ".*\.nc") (default="")
+? .*\.nc
+Full file name of one file
+(default="")
+? /data/rivers/gom_discharge_1900_present.nc
+ReloadEveryNMinutes (e.g., 10080) (default="")
+? 
+PreExtractRegex (default="")
+? 
+PostExtractRegex (default="")
+? 
+ExtractRegex (default="")
+? 
+Column name for extract (default="")
+? 
+Sort files by sourceName (default="")
+? 
+infoUrl (default="")
+? 
+institution (default="")
+? 
+summary (default="")
+? 
+title (default="")
+?
+working....... 
+-----
+
+Prototype XML File
+~~~~~~~~~~~~~~~~~~
+
+The initial XML file created was:
+
+[source,xml]
+-----
+<dataset type="EDDTableFromNcCFFiles" datasetID="rivers_c356_96e2_45a3" active="true">
+    <reloadEveryNMinutes>10080</reloadEveryNMinutes>
+    <fileDir>/data/rivers/</fileDir>
+    <recursive>true</recursive>
+    <fileNameRegex>.*\.nc</fileNameRegex>
+    <metadataFrom>last</metadataFrom>
+    <preExtractRegex></preExtractRegex>
+    <postExtractRegex></postExtractRegex>
+    <extractRegex></extractRegex>
+    <columnNameForExtract></columnNameForExtract>
+    <sortFilesBySourceNames></sortFilesBySourceNames>
+    <fileTableInMemory>false</fileTableInMemory>
+    <!-- sourceAttributes>
+        <att name="cdm_data_type">TimeSeries</att>
+        <att name="cdm_timeseries_variables">station_id, river_name, end_date, start_date, gauge_latitude, gauge_longitude, mouth_latitude, mouth_longitude, alt</att>
+        <att name="contact">mkhoward@tamu.edu</att>
+        <att name="conventions">CF-1.6</att>
+        <att name="featureType">timeSeries</att>
+        <att name="processing_information_url">http://stommel.tamu.edu/~baum/river.html</att>
+        <att name="rivers">U.S. Gulf of Mexico Rivers</att>
+        <att name="source">USGS and U.S. Army Corps of Engineers</att>
+        <att name="source_url1">http://waterdata.usgs.gov/nwis</att>
+        <att name="source_url2">http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp</att>
+        <att name="subsetVariables">station_id, river_name, end_date, start_date, gauge_latitude, gauge_longitude, mouth_latitude, mouth_longitude, alt</att>
+        <att name="title">Time-series discharge data for rivers emptying in the Gulf of Mexico.</att>
+    </sourceAttributes -->
+    <addAttributes>
+        <att name="Conventions">CF-1.6, COARDS, Unidata Dataset Discovery v1.0</att>
+        <att name="conventions">null</att>
+        <att name="creator_email">mkhoward@tamu.edu</att>
+        <att name="creator_name">TAMU</att>
+        <att name="history">USGS and U.S. Army Corps of Engineers</att>
+        <att name="infoUrl">???</att>
+        <att name="institution">TAMU</att>
+        <att name="keywords">above, altitude, atmosphere,
+Atmosphere &gt; Altitude &gt; Station Height,
+data, date, discharge, distance, emptying, first, gauge, gauging, gulf, gulf of mexico, height, latitute, measurement, mexico., most, mouth, name, number, recent, river, rivers, series, station, statistics, surface, tamu, time, time-series, vertical</att>
+        <att name="keywords_vocabulary">GCMD Science Keywords</att>
+        <att name="license">[standard]</att>
+        <att name="Metadata_Conventions">CF-1.6, COARDS, Unidata Dataset Discovery v1.0</att>
+        <att name="sourceUrl">(local files)</att>
+        <att name="standard_name_vocabulary">CF-12</att>
+        <att name="summary">Time-series discharge data for rivers emptying in the Gulf of Mexico.</att>
+    </addAttributes>
+    <dataVariable>
+        <sourceName>time</sourceName>
+        <destinationName>time</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="HDF5_chunksize" type="int">1</att>
+            <att name="long_name">time of measurement</att>
+            <att name="standard_name">time</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>discharge</sourceName>
+        <destinationName>discharge</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="float">-999.0</att>
+            <att name="coordinates">gauge_latitude gauge_longitude alt</att>
+            <att name="HDF5_chunksize" type="intList">55 1</att>
+            <att name="long_name">discharge</att>
+            <att name="missing_value" type="float">-999.0</att>
+            <att name="standard_name">discharge</att>
+            <att name="units">cubic meters per second</att>
+            <att name="valid_max">43041.5</att>
+            <att name="valid_min">0.0</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">50000.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Time</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>station_id</sourceName>
+        <destinationName>station_id</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="cf_role">timeseries_id</att>
+            <att name="long_name">gauging station ID number</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">100.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Statistics</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>river_name</sourceName>
+        <destinationName>river_name</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">name of river</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Unknown</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>end_date</sourceName>
+        <destinationName>end_date</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">date of most recent gauge station data</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+            <att name="standard_name">time</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>start_date</sourceName>
+        <destinationName>start_date</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">date of first gauge station data</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+            <att name="standard_name">time</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>gauge_latitude</sourceName>
+        <destinationName>latitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">latitude of gauge station</att>
+            <att name="units">degrees_north</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">90.0</att>
+            <att name="colorBarMinimum" type="double">-90.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">latitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>gauge_longitude</sourceName>
+        <destinationName>longitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">longitude of gauge station</att>
+            <att name="units">degrees_east</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">180.0</att>
+            <att name="colorBarMinimum" type="double">-180.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">longitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>mouth_latitude</sourceName>
+        <destinationName>mouth_latitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">latitute of river mouth</att>
+            <att name="units">degrees_north</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">90.0</att>
+            <att name="colorBarMinimum" type="double">-90.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">latitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>mouth_longitude</sourceName>
+        <destinationName>mouth_longitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">longitude of river mouth</att>
+            <att name="units">degrees_east</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">180.0</att>
+            <att name="colorBarMinimum" type="double">-180.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">longitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>alt</sourceName>
+        <destinationName>altitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="axis">Z</att>
+            <att name="long_name">vertical distance above the surface</att>
+            <att name="positive">up</att>
+            <att name="standard_name">height</att>
+            <att name="units">m</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">altitude</att>
+        </addAttributes>
+    </dataVariable>
+</dataset>
+-----
+
+Working XML Code
+~~~~~~~~~~~~~~~~
+
+The working - if not final - version of this skeleton file is:
+
+[source,xml]
+-----
+<dataset type="EDDTableFromNcCFFiles" datasetID="rivers_c356_96e2_45a3" active="true">
+    <reloadEveryNMinutes>10080</reloadEveryNMinutes>
+    <fileDir>/data/rivers/</fileDir>
+    <recursive>true</recursive>
+    <fileNameRegex>.*\.nc</fileNameRegex>
+    <metadataFrom>last</metadataFrom>
+    <preExtractRegex></preExtractRegex>
+    <postExtractRegex></postExtractRegex>
+    <extractRegex></extractRegex>
+    <columnNameForExtract></columnNameForExtract>
+    <sortFilesBySourceNames></sortFilesBySourceNames>
+    <fileTableInMemory>false</fileTableInMemory>
+    <!-- sourceAttributes>
+        <att name="cdm_data_type">TimeSeries</att>
+        <att name="cdm_timeseries_variables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+        <att name="contact">mkhoward@tamu.edu</att>
+        <att name="conventions">CF-1.6</att>
+        <att name="featureType">timeSeries</att>
+        <att name="processing_information_url">http://stommel.tamu.edu/~baum/river.html</att>
+        <att name="rivers">U.S. Gulf of Mexico Rivers</att>
+        <att name="source">USGS and U.S. Army Corps of Engineers</att>
+        <att name="source_url1">http://waterdata.usgs.gov/nwis</att>
+        <att name="source_url2">http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp</att>
+        <att name="subsetVariables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+        <att name="title">Time-series discharge data for rivers emptying in the Gulf of Mexico.</att>
+    </sourceAttributes -->
+    <addAttributes>
+        <att name="Conventions">CF-1.6, COARDS, Unidata Dataset Discovery v1.0</att>
+        <att name="conventions">null</att>
+        <att name="creator_email">mkhoward@tamu.edu</att>
+        <att name="creator_name">TAMU</att>
+        <att name="history">USGS and U.S. Army Corps of Engineers</att>
+        <att name="infoUrl">???</att>
+        <att name="institution">TAMU</att>
+        <att name="keywords">above, altitude, atmosphere,
+Atmosphere &gt; Altitude &gt; Station Height,
+data, date, discharge, distance, emptying, first, gauge, gauging, gulf, gulf of mexico, height, latitute, measurement, mexico., most, mouth, name, number, recent, river, rivers, series, station, statistics, surface, tamu, time, time-series, vertical</att>
+        <att name="keywords_vocabulary">GCMD Science Keywords</att>
+        <att name="license">[standard]</att>
+        <att name="Metadata_Conventions">CF-1.6, COARDS, Unidata Dataset Discovery v1.0</att>
+        <att name="sourceUrl">(local files)</att>
+        <att name="standard_name_vocabulary">CF-12</att>
+        <att name="summary">Time-series discharge data for rivers emptying in the Gulf of Mexico.</att>
+        <att name="cdm_data_type">TimeSeries</att>
+        <att name="cdm_timeseries_variables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+        <att name="contact">mkhoward@tamu.edu</att>
+        <att name="conventions">CF-1.6</att>
+        <att name="featureType">timeSeries</att>
+        <att name="processing_information_url">http://stommel.tamu.edu/~baum/river.html</att>
+        <att name="rivers">U.S. Gulf of Mexico Rivers</att>
+        <att name="source">USGS and U.S. Army Corps of Engineers</att>
+        <att name="source_url1">http://waterdata.usgs.gov/nwis</att>
+        <att name="source_url2">http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp</att>
+        <att name="subsetVariables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+        <att name="title">Time-series discharge data for rivers emptying in the Gulf of Mexico.</att>
+    </addAttributes>
+    <dataVariable>
+        <sourceName>time</sourceName>
+        <destinationName>time</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="HDF5_chunksize" type="int">1</att>
+            <att name="long_name">time of measurement</att>
+            <att name="standard_name">time</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+            <att name="HDF5_chunksize" type="int">1</att>
+            <att name="long_name">time of measurement</att>
+            <att name="standard_name">time</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>discharge</sourceName>
+        <destinationName>discharge</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="float">-999.0</att>
+            <att name="coordinates">gauge_latitude gauge_longitude alt</att>
+            <att name="HDF5_chunksize" type="intList">55 1</att>
+            <att name="long_name">discharge</att>
+            <att name="missing_value" type="float">-999.0</att>
+            <att name="standard_name">discharge</att>
+            <att name="units">cubic meters per second</att>
+            <att name="valid_max">43041.5</att>
+            <att name="valid_min">0.0</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">50000.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Time</att>
+            <att name="_FillValue" type="float">-999.0</att>
+            <att name="coordinates">gauge_latitude gauge_longitude alt</att>
+            <att name="HDF5_chunksize" type="intList">55 1</att>
+            <att name="long_name">discharge</att>
+            <att name="missing_value" type="float">-999.0</att>
+            <att name="standard_name">discharge</att>
+            <att name="units">cubic meters per second</att>
+            <att name="valid_max">43041.5</att>
+            <att name="valid_min">0.0</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>station_id</sourceName>
+        <destinationName>station_id</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="cf_role">timeseries_id</att>
+            <att name="long_name">gauging station ID number</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">100.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Statistics</att>
+            <att name="cf_role">timeseries_id</att>
+            <att name="long_name">gauging station ID number</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>river_name</sourceName>
+        <destinationName>river_name</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">name of river</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Unknown</att>
+            <att name="long_name">name of river</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>end_date</sourceName>
+        <destinationName>end_date</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">date of most recent gauge station data</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+            <att name="standard_name">time</att>
+            <att name="long_name">date of most recent gauge station data</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>start_date</sourceName>
+        <destinationName>start_date</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">date of first gauge station data</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+            <att name="standard_name">time</att>
+            <att name="long_name">date of first gauge station data</att>
+            <att name="units">days since 1900-01-01T00:00:00Z</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>gauge_latitude</sourceName>
+        <destinationName>latitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">latitude of gauge station</att>
+            <att name="units">degrees_north</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">90.0</att>
+            <att name="colorBarMinimum" type="double">-90.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">latitude</att>
+            <att name="long_name">latitude of gauge station</att>
+            <att name="units">degrees_north</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>gauge_longitude</sourceName>
+        <destinationName>longitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">longitude of gauge station</att>
+            <att name="units">degrees_east</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">180.0</att>
+            <att name="colorBarMinimum" type="double">-180.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">longitude</att>
+            <att name="long_name">longitude of gauge station</att>
+            <att name="units">degrees_east</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>mouth_latitude</sourceName>
+        <destinationName>mouth_latitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">latitute of river mouth</att>
+            <att name="units">degrees_north</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">90.0</att>
+            <att name="colorBarMinimum" type="double">-90.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">latitude</att>
+            <att name="long_name">latitute of river mouth</att>
+            <att name="units">degrees_north</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>mouth_longitude</sourceName>
+        <destinationName>mouth_longitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">longitude of river mouth</att>
+            <att name="units">degrees_east</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">180.0</att>
+            <att name="colorBarMinimum" type="double">-180.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">longitude</att>
+            <att name="long_name">longitude of river mouth</att>
+            <att name="units">degrees_east</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>alt</sourceName>
+        <destinationName>altitude</destinationName>
+        <dataType>float</dataType>
+        <!-- sourceAttributes>
+            <att name="axis">Z</att>
+            <att name="long_name">vertical distance above the surface</att>
+            <att name="positive">up</att>
+            <att name="standard_name">height</att>
+            <att name="units">m</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Location</att>
+            <att name="standard_name">altitude</att>
+            <att name="axis">Z</att>
+            <att name="long_name">vertical distance above the surface</att>
+            <att name="positive">up</att>
+            <att name="standard_name">height</att>
+            <att name="units">m</att>
+        </addAttributes>
+    </dataVariable>
+</dataset>
+-----
+
+Differences Between Prototype and Working XML Codes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The differences are:
+
+-----
+15c15
+<         <att name="cdm_timeseries_variables">station_id, river_name, end_date, start_date, gauge_latitude, gauge_longitude, mouth_latitude, mouth_longitude, alt</att>
+---
+>         <att name="cdm_timeseries_variables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+24c24
+<         <att name="subsetVariables">station_id, river_name, end_date, start_date, gauge_latitude, gauge_longitude, mouth_latitude, mouth_longitude, alt</att>
+---
+>         <att name="subsetVariables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+43a44,55
+>         <att name="cdm_data_type">TimeSeries</att>
+>         <att name="cdm_timeseries_variables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+>         <att name="contact">mkhoward@tamu.edu</att>
+>         <att name="conventions">CF-1.6</att>
+>         <att name="featureType">timeSeries</att>
+>         <att name="processing_information_url">http://stommel.tamu.edu/~baum/river.html</att>
+>         <att name="rivers">U.S. Gulf of Mexico Rivers</att>
+>         <att name="source">USGS and U.S. Army Corps of Engineers</att>
+>         <att name="source_url1">http://waterdata.usgs.gov/nwis</att>
+>         <att name="source_url2">http://www2.mvn.usace.army.mil/eng/edhd/dailystagedisplay.asp</att>
+>         <att name="subsetVariables">station_id, river_name, end_date, start_date, latitude, longitude, mouth_latitude, mouth_longitude, altitude</att>
+>         <att name="title">Time-series discharge data for rivers emptying in the Gulf of Mexico.</att>
+56a69,72
+>             <att name="HDF5_chunksize" type="int">1</att>
+>             <att name="long_name">time of measurement</att>
+>             <att name="standard_name">time</att>
+>             <att name="units">days since 1900-01-01T00:00:00Z</att>
+77a94,102
+>             <att name="_FillValue" type="float">-999.0</att>
+>             <att name="coordinates">gauge_latitude gauge_longitude alt</att>
+>             <att name="HDF5_chunksize" type="intList">55 1</att>
+>             <att name="long_name">discharge</att>
+>             <att name="missing_value" type="float">-999.0</att>
+>             <att name="standard_name">discharge</att>
+>             <att name="units">cubic meters per second</att>
+>             <att name="valid_max">43041.5</att>
+>             <att name="valid_min">0.0</att>
+91a117,118
+>             <att name="cf_role">timeseries_id</att>
+>             <att name="long_name">gauging station ID number</att>
+102a130
+>             <att name="long_name">name of river</att>
+115a144,145
+>             <att name="long_name">date of most recent gauge station data</att>
+>             <att name="units">days since 1900-01-01T00:00:00Z</att>
+128a159,160
+>             <att name="long_name">date of first gauge station data</att>
+>             <att name="units">days since 1900-01-01T00:00:00Z</att>
+143a176,177
+>             <att name="long_name">latitude of gauge station</att>
+>             <att name="units">degrees_north</att>
+158a193,194
+>             <att name="long_name">longitude of gauge station</att>
+>             <att name="units">degrees_east</att>
+173a210,211
+>             <att name="long_name">latitute of river mouth</att>
+>             <att name="units">degrees_north</att>
+188a227,228
+>             <att name="long_name">longitude of river mouth</att>
+>             <att name="units">degrees_east</att>
+204a245,249
+>             <att name="axis">Z</att>
+>             <att name="long_name">vertical distance above the surface</att>
+>             <att name="positive">up</att>
+>             <att name="standard_name">height</att>
+>             <att name="units">m</att>
+-----
+
+

@@ -1,0 +1,472 @@
+NetCDF Subset for Curvilinear Coordinates
+=========================================
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+How to set up THREDDS to use the NetCDF subset service with
+curvilinear coordinates.
+
+Links
+-----
+
+Epoch Converter -
+http://www.epochconverter.com/[+http://www.epochconverter.com/+]
+
+Examples
+--------
+
+THREDDS Catalog -
+http://geoport.whoi.edu/thredds/catalog.html[+http://geoport.whoi.edu/thredds/catalog.html+]
+
+BBLEH Model Results Catalog -
+http://geoport.whoi.edu/thredds/bbleh_catalog.html[+http://geoport.whoi.edu/thredds/bbleh_catalog.html+]
+
+Spring 2012 -
+http://geoport.whoi.edu/thredds/bbleh_catalog.html?dataset=bbleh/spring2012[+http://geoport.whoi.edu/thredds/bbleh_catalog.html?dataset=bbleh/spring2012+]
+
+NetCDF Subset -
+http://geoport.whoi.edu/thredds/ncss/grid/bbleh/spring2012/pointDataset.html[+http://geoport.whoi.edu/thredds/ncss/grid/bbleh/spring2012/pointDataset.html+]
+
+This example used the XML file at:
+
+https://github.com/rsignell-usgs/xml/blob/master/THREDDS/geoport/bbleh_catalog.xml[+https://github.com/rsignell-usgs/xml/blob/master/THREDDS/geoport/bbleh_catalog.xml+]
+
+[source,xml]
+-----
+<dataset name="BBLEH Spring 2012" ID="bbleh/spring2012" urlPath="bbleh/spring2012">
+  <serviceName>gridServices</serviceName>
+  <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+    <aggregation dimName="ocean_time" type="joinExisting">
+      <scan location="/usgs/data0/bbleh/spring2012" suffix=".nc"/>
+    </aggregation>
+  </netcdf>
+</dataset>
+-----
+
+The global attributes of the NetCDF file as obtained from:
+
+http://geoport.whoi.edu/thredds/dodsC/bbleh/spring2012.html[+http://geoport.whoi.edu/thredds/dodsC/bbleh/spring2012.html+]
+
+are:
+
+-----
+file: his_bbleh_0069.nc
+format: netCDF-3 classic file
+Conventions: CF-1.0
+type: ROMS/TOMS history file
+title: BBLEH ADCIRC,Real rivers,Plume,Lowpass Espresso bdry,NAM,new bathy
+rst_file: bbleh_rst.nc
+his_base: his_bbleh
+grd_file: ../grid/bbleh_grid_027m.nc
+ini_file: ./part1/bbleh_rst.nc
+frc_file_01: ../forcing/bbleh_tide_026.nc
+frc_file_02: ../forcing/bbleh_rivers_026.nc
+frc_file_03: ../forcing/bbleh_frc_bulk_022.nc
+bry_file: ../forcing/bbleh_boundary_027.nc
+script_file: ../external/ocean_bbleh_027m_rst.in
+svn_url: https://www.myroms.org/svn/omlab/branches/jcwarner
+svn_rev: 578M
+code_dir: /home/zdefne/models/COAWST_bbleh
+header_dir: /peach/data1/zdefne/projects/bbleh/run027
+header_file: bbleh_026.h
+os: Linux
+cpu: x86_64
+compiler_system: pgi
+compiler_command: /share/apps/openmpi/bin/mpif90
+compiler_flags:  -fastsse -Mipa=fast -tp k8-64 -Mfree
+tiling: 004x012
+history: ROMS/TOMS, Version 3.4, Sunday - November 11, 2012 -  8:00:46 PM
+ana_file: ROMS/Functionals/ana_btflux.h, ROMS/Functionals/ana_cloud.h,
+ROMS/Functionals/ana_nudgcoef.h, ROMS/Functionals/ana_rain.h,
+ROMS/Functionals/ana_stflux.h
+CPP_options: BBLEH, ADD_FSOBC, ADD_M2OBC, ATM_PRESS, ANA_BSFLUX, ANA_BTFLUX,
+ANA_CLOUD, ANA_RAIN, ANA_SSFLUX, ASSUMED_SHAPE, BULK_FLUXES, CURVGRID,
+DJ_GRADPS, DOUBLE_PRECISION, EAST_FSCHAPMAN, EAST_M2FLATHER, EAST_M3RADIATION,
+EAST_TNUDGING, EAST_TRADIATION, GLS_MIXING, KANTHA_CLAYSON, LONGWAVE, MASKING,
+MPI, NONLINEAR, !NONLIN_EOS, NORTH_FSCHAPMAN, NORTH_M2FLATHER,
+NORTH_M3RADIATION, NORTH_TNUDGING, NORTH_TRADIATION, N2S2_HORAVG, OUT_DOUBLE,
+POWER_LAW, PROFILE, K_GSCHEME, RADIATION_2D, RAMP_TIDES, !RST_SINGLE,
+SALINITY, SOLAR_SOURCE, SOLVE3D, SOUTH_FSCHAPMAN, SOUTH_M2FLATHER,
+SOUTH_M3RADIATION, SOUTH_TNUDGING, SOUTH_TRADIATION, SPLINES, SSH_TIDES,
+THREE_GHOST, TS_MPDATA, TS_PSOURCE, UV_ADV, UV_U3HADVECTION, UV_C4VADVECTION,
+UV_QDRAG, UV_PSOURCE, UV_TIDES, VAR_RHO_2D, WEST_FSRADIATION,
+WEST_M2RADIATION, WEST_M3RADIATION, WEST_TNUDGING, WEST_TRADIATION, WET_DRY
+N: 7
+-----
+
+
+NetCDF Subset Service
+---------------------
+
+NetCDF Subset Service Reference (TDS 4.5) -
+http://www.unidata.ucar.edu/software/thredds/current/tds/reference/NetcdfSubsetServiceReference.html#DatasetDescription[+http://www.unidata.ucar.edu/software/thredds/current/tds/reference/NetcdfSubsetServiceReference.html#DatasetDescription+]
+
+
+The TXLA H 2012-2014 Files
+--------------------------
+
+File Location and Characteristics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The files reside at +barataria.tamu.edu:/raid/dj/tmp+ in the
+subdirectories +txla_h_2012+, +txla_h_2013+ and +txla_h_2014+.
+
+They are:
+
+-----
+txla_h_2012
+ocean_his_0022.nc   
+ocean_his_0023.nc
+ocean_his_0024.nc
+ocean_his_0025.nc
+ocean_his_0026.nc
+ocean_his_0027.nc
+ocean_his_0028.nc
+ocean_his_0029.nc
+ocean_his_0030.nc
+ocean_his_0031.nc
+ocean_his_0032.nc
+ocean_his_0033.nc
+ocean_his_0034.nc
+ocean_his_0035.nc
+ocean_his_0036.nc
+ocean_his_0037.nc
+ocean_his_0038.nc
+ocean_his_0039.nc
+ocean_his_0040.nc
+ocean_his_0041.nc
+ocean_his_0042.nc
+ocean_his_0043.nc
+ocean_his_0044.nc
+
+txla_h_2013
+ocean_his_0001.nc
+ocean_his_0002.nc
+ocean_his_0003.nc
+ocean_his_0004.nc
+ocean_his_0005.nc
+ocean_his_0006.nc
+ocean_his_0007.nc
+ocean_his_0008.nc
+ocean_his_0009.nc
+ocean_his_0010.nc
+ocean_his_0011.nc
+ocean_his_0012.nc
+ocean_his_0013.nc
+ocean_his_0014.nc
+
+txla_h_2014
+ocean_his_01.nc
+ocean_his_02.nc
+ocean_his_03.nc
+ocean_his_04.nc
+ocean_his_05.nc
+ocean_his_06.nc
+ocean_his_07.nc
+ocean_his_08.nc
+-----
+
+They are all symbolically linked as shown below, with the symbolic
+filenames of the form
++YYMMDDHH+
+which indicates the date at the start of each file.
+The date at the end of the last file of each year is also
+shown below.
+
+Overlapping and Redundant Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that the times for the last date of
+the last file from 2013 and the first date of the first
+file from 2014 are the same, so we have an overlap.
+The second to last file for 2013 also overlaps both those
+files for +2014-01-01-00+, giving us a the same date three
+times.
+There are overlaps elsewhere as can be seen in the
+last couple of columns which indicate the starting and
+ending dates of each file.
+The overlaps are shown in the chart below.
+
+-----
+11121704.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0022.nc   1324094400  1325520000
+12010220.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0023.nc   1325534400  1326960000
+12011912.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0024.nc   1326974400  1328400000
+12020504.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0025.nc   1328414400  1329840000
+12022120.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0026.nc   1329854400  1331280000
+12030912.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0027.nc   1331294400  1332720000
+12032604.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0028.nc   1332734400  1334160000
+12041120.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0029.nc
+12042812.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0030.nc
+12051504.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0031.nc
+12053120.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0032.nc
+12061712.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0033.nc
+12070404.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0034.nc
+12072020.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0035.nc
+12080612.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0036.nc
+12082304.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0037.nc
+12090820.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0038.nc
+12092512.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0039.nc
+12101204.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0040.nc
+12102820.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0041.nc
+12111412.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0042.nc  1352894400  1354320000
+12120104.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0043.nc  1354334400  1355760000
+12121720.nc -> /raid/dj/tmp/txla_h_2012/ocean_his_0044.nc  2012-12-17-20  2013-01-01-00  1355774400  1356998400 
+13010104.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0001.nc  2013-01-01-04  
+13013104.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0002.nc
+13030204.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0003.nc
+13040104.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0004.nc
+13050104.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0005.nc
+13052216.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0006.nc
+13062116.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0007.nc
+13072116.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0008.nc
+13081316.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0009.nc
+13091216.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0010.nc  2013-09-12-16  2013-10-12-16
+13101216.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0011.nc  2013-10-12-16  2013-11-11-16
+13111116.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0012.nc  2013-11-11-16  2013-12-11-16   1384185600  1386777600
+13121116.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0013.nc  2013-12-11-16  2014-01-01-08   1386777600  1388563200
+13123116.nc -> /raid/dj/tmp/txla_h_2013/ocean_his_0014.nc  2013-12-31-16  2014-01-01-00   1388505600  1388534400
+14010100.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_01.nc    2014-01-01-00  2014-01-31-00   1388534400  1391126400
+14013100.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_02.nc    2014-01-31-00  2014-03-02-00
+14030200.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_03.nc    2014-03-02-00
+14040100.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_04.nc
+14050100.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_05.nc
+14053100.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_06.nc
+14063000.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_07.nc
+14073000.nc -> /raid/dj/tmp/txla_h_2014/ocean_his_08.nc    1406678400  1409270400
+-----
+
+Error Messages
+~~~~~~~~~~~~~~
+
+----
+2014-11-17T19:07:52.506 -0600 [ 239913220][  829799] ERROR - thredds.catalog.InvDatasetFcFmrc - Error making catalog for TXLA/ROMS/2012_2014
+java.lang.ArithmeticException: The calculation caused an overflow: 1324094400000 + 9223372036854775807
+----
+
+
+The Apathy of OpenDAP About Overlaps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It turns out that the OpenDAP server doesn't care if the files overlap.
+It simply concatenates the files and the dates therein.  If we set up an
+aggregation of all three years of the original, unmodified files using the following XML:
+
+[source, xml]
+-----
+  <dataset name="TXLA ROMS 2012-2014 Aggregation" ID="TXLA_ROMS_2012_2014" urlPath="TXLA/ROMS/2012_2014">
+      <serviceName>fullServices</serviceName>
+      <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+        <attribute name="featureType" value="grid"/>
+        <aggregation dimName="ocean_time" type="joinExisting">
+          <scan location="/raid/dj/tmp/txla_h_2012/MOD/" suffix=".nc"/>
+        </aggregation>
+      </netcdf>
+  </dataset>
+-----
+
+and extract all the +ocean_time+ values on the OPeNDAP dataset access form at:
+
+http://barataria.tamu.edu:6060/thredds/dodsC/TXLA/ROMS/2012_2014.html[+http://barataria.tamu.edu:6060/thredds/dodsC/TXLA/ROMS/2012_2014.html+]
+
+then we wil get the following consecutive values for +ocean_time+ at one place in the array:
+
+-----
+1.3885344E9, 1.3885488E9, 1.3885632E9, 1.3885056E9, 1.38852E9, 1.3885344E9, 1.3885344E9
+-----
+
+where we see the value +1.3885344E9+ repeated three times.
+
+The Dislike of Feature Collections of Overlaps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If we instead attempt to serve the original files via:
+
+[source,xml]
+-----
+  <featureCollection name="TXLA ROMS 2012-2014 Feature Collection" featureType="FMRC" harvest="true" path="TXLA/ROMS/2012_2014">
+    <serviceName>fullServices</serviceName>
+    <metadata inherited="true">
+      <documentation type="summary">ROMS TGLO/TABS GOM Simulation for 2012-2014
+      </documentation>
+    </metadata>
+
+    <collection spec="/raid/dj/tmp/txla_h_2012/MOD/#yyMMddHH#.*nc$"
+        olderThan="5 min"/>
+  </featureCollection>
+-----
+
+we get a:
+
+-----
+UnsupportedOperationException exception handled : Feature Type not supported
+-----
+
+error for the NetCDF subset server, and a shortened OPeNDAP dataset acccess
+form page that contains only the global attributes.
+
+The Problem
+~~~~~~~~~~~
+
+Upon further investigation we find that while the dimension +tracer+ is
++6+ in the 2012 files, it is +2+ in the 2013 and 2014 files, which is probably
+what's making the servers not function properly.  
+
+New Solution
+^^^^^^^^^^^^
+
+The simplest and most elegant way to remove the variables that use the
++tracer+ dimension is to use NcML.  An appropriate XML entry would be:
+
+[source,xml]
+-----
+  <featureCollection name="TXLA ROMS 2012-2014 Feature Collection" featureType="FMRC" harvest="true" path="TXLA/ROMS/2012_2014">
+    <serviceName>fullServices</serviceName>
+    <metadata inherited="true">
+      <documentation type="summary">ROMS TGLO/TABS GOM Simulation for 2012-2014
+      </documentation>
+    </metadata>
+
+    <collection spec="/raid/dj/tmp/txla_h_2012/MOD/#yyMMddHH#.*nc$"
+        olderThan="5 min"/>
+    <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+        <remove name="nl_tnu2" type="variable" />
+        <remove name="Akt_bak" type="variable" />
+        <remove name="Tnudg" type="variable" />
+        <remove name="Tobc_in" type="variable" />
+        <remove name="Tobc_out" type="variable" />
+        <remove name="LtracerSrc" type="variable" />
+    </netcdf>
+
+  </featureCollection>
+-----
+
+
+Old Solution
+^^^^^^^^^^^^
+
+The quickest solution to this problem is to delete the +tracer+ dimensions and
+all variables that include it from all files.
+This can be done using +ncks+.  To find the variables using the
++tracer+ dimension we enter:
+
+-----
+ncdump ocean_his_0022.nc | grep tracer
+-----
+
+which yields:
+
+-----
+tracer = 6 ;
+	double nl_tnu2(tracer) ;
+		nl_tnu2:long_name = "nonlinear model Laplacian mixing coefficient for tracers" ;
+	double Akt_bak(tracer) ;
+		Akt_bak:long_name = "background vertical mixing coefficient for tracers" ;
+	double Tnudg(tracer) ;
+	double Tobc_in(boundary, tracer) ;
+		Tobc_in:long_name = "tracers inflow, nudging inverse time scale" ;
+	double Tobc_out(boundary, tracer) ;
+		Tobc_out:long_name = "tracers outflow, nudging inverse time scale" ;
+	int LtracerSrc(tracer) ;
+		LtracerSrc:long_name = "tracer point sources and sink activation switch" ;
+		LtracerSrc:flag_values = 0, 1 ;
+		LtracerSrc:flag_meanings = ".FALSE. .TRUE." ;
+ LtracerSrc = 1, 1, 1, 1, 1, 1 ;
+-----
+
+So a +ncks+ command to get rid of these variables would be:
+
+-----
+ncks -x -v nl_tnu2,Akt_bak,Tnudg,Tobc_in,Tobc_out,LtracerSrc ocean_his_0022.nc ocean_his_mod_0022.nc
+-----
+
+
+THREDDS XML Code Used
+~~~~~~~~~~~~~~~~~~~~~
+
+[source,xml]
+-----
+
+-----
+
+The NAM Files
+-------------
+
+Some problems encountered while upgraded to THREDDS 4.5.
+
+The THREDDS page:
+
+http://barataria.tamu.edu:6060/thredds/catalog/grib/NCEP/NAM/CONUS_12km/2012/catalog.html[+http://barataria.tamu.edu:6060/thredds/catalog/grib/NCEP/NAM/CONUS_12km/2012/catalog.html+]
+
+yields the error message:
+
+-----
+Status 500 - Internal Server Error
+-----
+
+and the corresponding log file at:
+
+-----
+/opt/tomcat7/content/thredds/logs/fc.2012-NAM-CONUS_12km-conduit.log
+-----
+
+gives us the more detailed error message:
+
+-----
+2014-11-20T18:26:15.114 -0600 WARN  - GribCdmIndex.openCdmIndex failed on /raid/howie/2012_NAM12/YEAR/2012-NAM-CONUS_12km-conduit.ncx2
+java.io.FileNotFoundException: /raid/howie/2012_NAM12/YEAR/2012-NAM-CONUS_12km-conduit.ncx2 (No such file or directory)
+-----
+
+If we look for that file in that location we find a file named:
+
+-----
+2012-NAM-CONUS_12km-conduit-YEAR.ncx2
+-----
+
+but not one named:
+
+-----
+2012-NAM-CONUS_12km-conduit.ncx2
+-----
+
+so we'll just make a copy of the former and give it the latter name and try again.
+
+Now we get the catalog page without an error message, but as we enter the
++Best 2012-NAM-CONUS 12km-conduit Time Series+ page at: 
+
+http://barataria.tamu.edu:6060/thredds/catalog/grib/NCEP/NAM/CONUS_12km/2012/catalog.html?dataset=grib/NCEP/NAM/CONUS_12km/2012/Best[+http://barataria.tamu.edu:6060/thredds/catalog/grib/NCEP/NAM/CONUS_12km/2012/catalog.html?dataset=grib/NCEP/NAM/CONUS_12km/2012/Best+]
+
+and attempt to access the NetCDF subset page at:
+
+http://barataria.tamu.edu:6060/thredds/ncss/gridgrib/NCEP/NAM/CONUS_12km/2012/Best/dataset.html[+http://barataria.tamu.edu:6060/thredds/ncss/gridgrib/NCEP/NAM/CONUS_12km/2012/Best/dataset.html+]
+
+we get the error:'
+
+-----
+UnsupportedOperationException exception handled : Feature Type not supported
+-----
+
+
+This obtains the log message:
+
+-----
+2014-11-20T18:40:02.436 -0600 INFO  - GribCollectionBuilderFromIndex raf /raid/howie/2012_NAM12/YEAR/2012-NAM-CONUS_12km-conduit.ncx2: has different name= '2012-NAM-CONUS_12km-conduit' than stored in ncx= '2012-NAM-CONUS_12km-conduit-YEAR'
+-----
+
+
+
+
+
+
+
+
+

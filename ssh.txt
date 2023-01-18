@@ -1,0 +1,1310 @@
+Secure Shell, SSL, Etc.
+=======================
+Steven K. Baum
+v0.1, 2016-08-07
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Prefatory Note of Obligatory Warning
+------------------------------------
+
+Below you will find what I've done to update the OpenSSH, OpenSSL and Apache HTTP Server
+packages on CentOS 7 to more recent versions.  The folks at Red Hat - the upstream distribution
+on which CentOS is built - do backport security fixes from more recent versions of OpenSSH and
+OpenSSL to their official binary RPM versions of these packages, and thus those packages aren't
+as creaky and insecure as their admittedly advanced ages might make them seem.  But they almost
+certainly aren't as safe as their newer versions even with the backporting.  This inevitably
+leads to the question of how safe is safe enough, which can only be answered within the context
+of your specific situation.  In my case, I've got network lords above me running standardized
+security scanning packages that spit out reports itemizing in excruciating detail what security flaws
+exist in my set-up and what must be done to fix them.  I've received reports listing literally
+hundreds of problems, the cure for which is almost always updating OpenSSL or OpenSSH (or, indeed, even
+the Linux kernel) to a newer version.  Also, the scanning software is apparently either unaware of
+the backporting efforts or disregards them.
+
+With this information in mind, I came to the brilliant conclusion that upgrading the
+OpenSSL and OpenSSH packages to newer versions would be a corking good idea.
+The genius idea and the realization thereof are two different things, though.
+It's not trivially easy to upgrade packages in official distributions if the software
+package version you want is more recent than the one you get via whatever official
+upgrading procedure exists, which is +yum update openssl+ in the case of CentOS 7.
+You have two choices if the official channels are insufficient.  The first choice is to compile a
+new set of binary RPM files using the source code and the +*.spec+ file used to
+create the official distributions RPMs, which will place the various pieces of
+the package in the same bewildering variety of places as the official RPMs.
+The second choice is to compile the source code without the +.spec+ file and
+put it entirely in a non-standard location such as +/opt/openssl+.  Both methods
+can be useful as both methods have different situational pluses and minuses.  Both
+will be used in the sections below.
+
+As encouragement, all I can say is that the first machine onto which I installed
+the most recent version of OpenSSH via the method detailed below had the cleanest
+security report of any I've ever received.  However, I'm not liable for however you
+may use or misuse this page.  If you find a better way entirely or a tweak that
+can make these procedures more elegant, please do be forthcoming so your
+contribution can be included and your person showered with encomiums (or not, as
+you so desire).
+
+The license for this page is a free beer license.  If it's helpful to you, you
+owe me a beer.  If it's not helpful to you, you owe me a beer.  If you stumbled upon
+it while searching for Apache Indian porn, you owe me a beer.  If you're helpful to
+me, I owe you a beer. You get
+the picture.
+
+
+Edifying Links
+--------------
+
+*Red Hat Security Backporting Practices* - https://access.redhat.com/security/updates/backporting[+https://access.redhat.com/security/updates/backporting+]
+
+*How to Create OpenSSH RPM Package* - http://sharadchhetri.com/2015/01/18/how-to-create-openssh-rpm-package-and-its-upgrade/[+http://sharadchhetri.com/2015/01/18/how-to-create-openssh-rpm-package-and-its-upgrade/+]
+
+*Beyond Linux from Scratch OpenSSH* - http://www.linuxfromscratch.org/blfs/view/svn/postlfs/openssh.html[+http://www.linuxfromscratch.org/blfs/view/svn/postlfs/openssh.html+]
+
+*OpenSSH/Client Configuration Files* - https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files[+https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files+]
+
+*Secure Secure Shell* - https://stribika.github.io/2015/01/04/secure-secure-shell.html[+https://stribika.github.io/2015/01/04/secure-secure-shell.html+]
+
+*OpenSSH moduli* - https://entropux.net/article/openssh-moduli/[+https://entropux.net/article/openssh-moduli/+]
+
+*SSH and SCP: Howto, tips & tricks* - https://linuxacademy.com/blog/linux/ssh-and-scp-howto-tips-tricks/[+https://linuxacademy.com/blog/linux/ssh-and-scp-howto-tips-tricks/+]
+
+*Setting up hostbased authentication for passphraseless SSH communication* - https://arc.liv.ac.uk/SGE/howto/hostbased-ssh.html[+https://arc.liv.ac.uk/SGE/howto/hostbased-ssh.html+]
+
+*PKCS #11: Cryptographic Token Interface Standard* - https://www.emc.com/emc-plus/rsa-labs/standards-initiatives/pkcs-11-cryptographic-token-interface-standard.htm[+https://www.emc.com/emc-plus/rsa-labs/standards-initiatives/pkcs-11-cryptographic-token-interface-standard.htm+]
+
+*How do you manage your SSH host keys?* - https://debian-administration.org/article/503/How_do_you_manage_your_SSH_host_keys[+https://debian-administration.org/article/503/How_do_you_manage_your_SSH_host_keys+]
+
+*Linux PAM configuration that allows or deny login via the sshd server* - https://www.cyberciti.biz/tips/linux-pam-configuration-that-allows-or-deny-login-via-the-sshd-server.html[+https://www.cyberciti.biz/tips/linux-pam-configuration-that-allows-or-deny-login-via-the-sshd-server.html+]
+
+*OpenSSH/Cookbook/File Transfer with SFTP* - https://en.wikibooks.org/wiki/OpenSSH/Cookbook/File_Transfer_with_SFTP[+https://en.wikibooks.org/wiki/OpenSSH/Cookbook/File_Transfer_with_SFTP+]
+
+*Using ssh-agent with ssh* - http://mah.everybody.org/docs/ssh[+http://mah.everybody.org/docs/ssh+]
+
+*OpenSSH/Cookbook/Public Key Authentication* - https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Public_Key_Authentication[+https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Public_Key_Authentication+]
+
+*An Illustrated Guide to SSH Agent Forwarding* - http://www.unixwiz.net/techtips/ssh-agent-forwarding.html[+http://www.unixwiz.net/techtips/ssh-agent-forwarding.html+]
+
+*The code monkey's guide to cryptographic hashes* - http://valerieaurora.org/monkey.html[+http://valerieaurora.org/monkey.html+]
+
+*Lifetimes of cryptographic hash functions* - http://valerieaurora.org/hash.html[+http://valerieaurora.org/hash.html+]
+
+*LibreSSL on Linux* - http://penzin.net/libressl.html[+http://penzin.net/libressl.html+]
+
+*Compiling nginx with LibreSSL for HTTP/2 support* - https://matthiasadler.info/blog/nginx-http2-static-libressl-on-centos-7/[+https://matthiasadler.info/blog/nginx-http2-static-libressl-on-centos-7/+]
+
+*Remember to mitigate brute-force SSH attacks* - https://matthiasadler.info/blog/mitigate-ssh-brute-force-attacks/[+https://matthiasadler.info/blog/mitigate-ssh-brute-force-attacks/+]
+
+*SSL/TLS configuration for Apache* - https://www.insecure.ws/linux/apache_ssl.html[+https://www.insecure.ws/linux/apache_ssl.html+]
+
+
+Build the Latest OpenSSH on Centos 7
+------------------------------------
+
+The version of OpenSSH that ships with the latest (as of 3/17) CentOS 7.3.1611 is openssh-6.6.1p1-31, while
+the latest version of OpenSSH available at its home site is openssh-7.4p1.
+Various security scanning programs and - more to the point - those who use them, do not
+like this gap.
+
+Therefore, we will compile the latest version of OpenSSH on CentOS 7.
+While the source code can be downloaded and compiled in the usual way, RedHat/CentOS
+have specific directories into which they put the various bits and pieces that can
+only be duplicated with the source code by painstakingly figuring out all the command-line
+arguments to configure that are needed to put everything in its proper place.
+
+A better way to do this is with an RPM SPEC file, which is a file containing instructions
+on how to create a binary RPM from a source code file.
+
+Set Up the RPM Building Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+First we must set up an RPM building environment.
+We'll starting by installing the necessary RPMs via yum.
+
+-----
+yum install rpm-build
+yum install redhat-rpm-config
+-----
+
+You'll also need the +make+ and +gcc+ programs, although if you're far enough along to
+have to be compiling OpenSSH then you've probably already got them.
+
+Now create directories for RPM building in your home directory (or elsewhere), as
+well as an +.rpmmacros+ file.
+
+-----
+mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
+-----
+
+Obtain the OpenSSH Source Distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The OpenSSH home page is at:
+
+https://www.openssh.com/[+https://www.openssh.com/+]
+
+with the portable release page at:
+
+https://www.openssh.com/portable.html[+https://www.openssh.com/portable.html+]
+
+with a list of download mirrors at the bottom.  A USA mirror is at:
+
+http://mirror.esc7.net/pub/OpenBSD/OpenSSH/portable/[+http://mirror.esc7.net/pub/OpenBSD/OpenSSH/portable/+]
+
+where we'll find the most recent releae at the bottom of the page, and then
+get it with +wget+ after moving into the +rpmbuild+ directory.  Be sure to check the
+download page to see if the number of the latest version is the same as below.
+If it's been update, then make the appropriate changes in the +wget+ command.
+
+-----
+cd ~/rpmbuild
+wget http://mirror.esc7.net/pub/OpenBSD/OpenSSH/portable/openssh-7.4p1.tar.gz
+-----
+
+Creation of RPM Binary Files
+~~~~~~~~~~~-----------------
+
+Now uncompress and unpack the file, and copy the +openssh.spec+
+file therein into the SPECS subdirectory.
+
+-----
+tar xzvf openssh-7.4p1.tar.gz
+cp openssh-7.4p1/contrib/redhat/openssh.spec SPECS
+-----
+
+Now we'll make a few edits to +openssh.spec+ as suggested at:
+
+http://sharadchhetri.com/2015/01/18/how-to-create-openssh-rpm-package-and-its-upgrade/[+http://sharadchhetri.com/2015/01/18/how-to-create-openssh-rpm-package-and-its-upgrade/+]
+
+-----
+cd SPECS
+sed -i -e "s/%define no_gnome_askpass 0/%define no_gnome_askpass 1/g" openssh.spec
+sed -i -e "s/%define no_x11_askpass 0/%define no_x11_askpass 1/g" openssh.spec
+sed -i -e "s/BuildPreReq/BuildRequires/g" openssh.spec
+-----
+
+Now copy the compressed source file into the SOURCES directory.
+
+-----
+cd ..
+cp openssh-7.4p1.tar.gz SOURCES
+-----
+
+and then return to the SPECS directory to build the binary RPM files.
+
+-----
+cd ../SPECS
+rpmbuild -bb openssh.spec
+-----
+
+When this has finished with hopefully no errors go to the RPMS directory and take a look.
+
+-----
+cd ../RPMS
+ls openssh* | more
+
+openssh-7.4p1-1.x86_64.rpm
+openssh-clients-7.4p1-1.x86_64.rpm
+openssh-server-7.4p1-1.x86_64.rpm
+-----
+
+Contents of RPM Binary Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you've gotten to the point where you're compiling your own versions of OpenSSH, then
+you really need to know a bit about the various pieces of the package and what they
+do.  This section supplies the basics.
+
+Base Package
+^^^^^^^^^^^^
+
+The contents of these files, which can be found without actually
+installing them via:
+
+-----
+rpm -qpl openssh-7.4p1-1.x86_64.rpm
+-----
+
+is shown below, with explanations of the key pieces.
+We start with the base portion of the package.
+
+
+'''
+
+*/etc/ssh/moduli*
++++++++++++++++++
+
+This contains prime numbers and generators for use by +sshd+ in the
+Diffie-Hellman Group Exchange key exchange method.
+It is a static file provided by the OpenSSH project, although
+it can be recreated.
+It contains several different entries, and +sshd+ picks one
+randomly for each session.
+It also contains entries of different lengths in the range of
+1024 to 8192 bits.  Connecting SSH clients specify the
+minimum and maximum bit lengths they will accept, and also the
+bit length they prefer.
+If this file does not exist, a 2048 bit number
+hardcoded into the OpenSSH source code is used and you'll
+see the error message:  +WARNING: /etc/ssh/moduli does not exist, using fixed modulus+.
+
+The +moduli+ file can be recreated via a two-step process.
+First, candidate primes are generated with:
+
+-----
+ssh-keygen -G /etc/ssh/moduli.all -b 4096
+-----
+
+which generates over 10,000 candidate primes.  Next, these
+candidates are tested and the safe ones - typically somewhere
+around 30 or so - are kept.  This is done with:
+
+-----
+ssh-keygen -T /etc/ssh/moduli.safe -f /etc/ssh/moduli.all
+-----
+
+This process takes hours for 4096 bit primes as opposed to
+minutes for 1024 bit primes, which explains why the static
+file containing even 8192 bit entries is pre-generated and
+provided with the package.
+
+Some suggest a security measure where all entries smaller
+than 2048 bits are removed from the +moduli+ file, although
+the most recent one - dated 2016/08/11 - only contains
+entries that are 2048 bits or larger.
+
+'''
+
+*/usr/bin/scp*
+++++++++++++++
+
+The secure copy or +scp+ binary is allow you to copy files over +ssh+ connections.
+You can transfer files between and local and a remote host, or between two
+remote hosts.  The syntax of a local to remote transfer is:
+
+-----
+scp thisfile yossarian@catch22.com:/home/yossarian/thatfile
+-----
+
+The syntax for a remote to local transfer is:
+
+-----
+scp yossarian@catch22.com:/home/yossarian/thatfile thisfile
+-----
+
+Entire directories can be recursed and transferred using the +-r+ argument:
+
+-----
+scp -r yossarian@catch22.com:/home/yossarian/thatfolder thisfolder
+-----
+
+'''
+
+*/usr/bin/ssh-keygen*
++++++++++++++++++++++
+
+The +ssh-keygen+ binary is used to generate, manage and convert authentication keys.
+You run this program as a new user as follows:
+
+-----
+ssh-keygen [-b 2048]
+
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/test/.ssh/id_rsa): 
+Created directory '/home/test/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/test/.ssh/id_rsa.
+Your public key has been saved in /home/test/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:vuOGhSiywvnBAp46P1/OWga8FNxuQ8yOvrRZ9EaULkQ minderbinder@catch22.com
+The key's randomart image is:
++---[RSA 2048]----+
+|      E          |
+|   . =   .       |
+|    o * o        |
+|   . B o         |
+|.   =.B.S        |
+|+ +o.=.*.        |
+|.*.++ =o+        |
+|=oo..@..o.       |
+|ooo+*.ooo.       |
++----[SHA256]-----+
+-----
+
+The +-b+ argument specifies the number of bits in the key to be created, with
+the default being 2048.
+There are other arguments for more advanced usage.
+This command creates the directory +/home/minderbinder/.ssh+
+containinig:
+
+-----
+-rw-------. 1 test test 1679 Feb 24 15:22 id_rsa
+-rw-r--r--. 1 test test  400 Feb 24 15:22 id_rsa.pub
+-----
+
+The +id.rsa+ file is the protocol version 2 authentication identity of the user.
+In this case it is RSA authentication, although it could also be DSA, ECDSA or
+ED25519 with different command-line arguments.
+This file is read when an +ssh+ client program attempts to log in to this machine.
+This file is created as readable only by the user, and should remain that way.
+
+The +id.rsa_pub+ file is the protocol version 2 RSA public key for authentication.
+The contents of this file are added to the +~/.ssh/authorized_keys+ file on all
+other machines where the user wishes to log in without using a password via
+public key authentication.  This file is created readable by anybody since there
+is no reason to keep its contents secret.
+
+'''
+
+*/usr/libexec/openssh/ssh-keysign*
+++++++++++++++++++++++++++++++++++
+
+This is a helper program to access the local host keys and generate the digital signature
+required for host-based authentication.  This is disabled by default but can be
+enabled in the configuration file +/etc/ssh/ssh_config+ via:
+
+-----
+Host * 
+        HostbasedAuthentication yes
+        EnableSSHKeysign yes
+-----
+
+An explanation of why one might want to enable this can be found at:
+
+https://arc.liv.ac.uk/SGE/howto/hostbased-ssh.html[+https://arc.liv.ac.uk/SGE/howto/hostbased-ssh.html+]
+
+'''
+
+*/usr/libexec/openssh/ssh-pkcs11-helper*
+++++++++++++++++++++++++++++++++++++++++
+
+This is used by +ssh-agent+ to access keys provided by a PKCS #11 token.a
+The PKCS #11 standard defines a platform-independent API to cryptographic tokens.
+Most commercial certificate authority software uses PKCS #11 to access the CA signing key or to enroll user certificates.
+
+'''
+
+*/usr/share/doc*
+++++++++++++++++
+
+The official documentation included in the distribution.
+
+-----
+/usr/share/doc/openssh-7.4p1
+/usr/share/doc/openssh-7.4p1/CREDITS
+/usr/share/doc/openssh-7.4p1/ChangeLog
+/usr/share/doc/openssh-7.4p1/INSTALL
+/usr/share/doc/openssh-7.4p1/LICENCE
+/usr/share/doc/openssh-7.4p1/OVERVIEW
+/usr/share/doc/openssh-7.4p1/PROTOCOL
+/usr/share/doc/openssh-7.4p1/PROTOCOL.agent
+/usr/share/doc/openssh-7.4p1/PROTOCOL.certkeys
+/usr/share/doc/openssh-7.4p1/PROTOCOL.chacha20poly1305
+/usr/share/doc/openssh-7.4p1/PROTOCOL.key
+/usr/share/doc/openssh-7.4p1/PROTOCOL.krl
+/usr/share/doc/openssh-7.4p1/PROTOCOL.mux
+/usr/share/doc/openssh-7.4p1/README
+/usr/share/doc/openssh-7.4p1/README.dns
+/usr/share/doc/openssh-7.4p1/README.platform
+/usr/share/doc/openssh-7.4p1/README.privsep
+/usr/share/doc/openssh-7.4p1/README.tun
+/usr/share/doc/openssh-7.4p1/TODO
+/usr/share/man/man1/scp.1.gz
+/usr/share/man/man1/ssh-keygen.1.gz
+/usr/share/man/man8/ssh-keysign.8.gz
+/usr/share/man/man8/ssh-pkcs11-helper.8.gz
+-----
+
+'''
+
+Server Package
+^^^^^^^^^^^^^^
+
+Now we look at the server part of the package,
+discovering the contents therein via:
+
+-----
+rpm -qpl openssh-server-7.4p1-1.x86_64.rpm
+-----
+
+*/etc/pam.d/sshd*
++++++++++++++++++
+
+'''
+
+*/etc/rc.d/init.d/sshd*
++++++++++++++++++++++++
+
+The initialization file for the OpenSSH server daemon.
+
+'''
+
+*/etc/ssh/sshd_config*
+++++++++++++++++++++++
+
+The configuration file for the OpenSSH server daemon.
+Here is the file upon installation on CentOS 7.
+
+-----
+#       $OpenBSD: sshd_config,v 1.100 2016/08/15 12:32:04 naddy Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/bin:/usr/bin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_dsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+#PermitRootLogin prohibit-password
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+#PubkeyAuthentication yes
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile      .ssh/authorized_keys
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+#PasswordAuthentication yes
+#PermitEmptyPasswords no
+
+# Change to no to disable s/key passwords
+#ChallengeResponseAuthentication yes
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+#X11Forwarding no
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+#PrintMotd yes
+#PrintLastLog yes
+#TCPKeepAlive yes
+#UseLogin no
+#UsePrivilegeSeparation sandbox
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# override default of no subsystems
+Subsystem       sftp    /usr/libexec/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#       X11Forwarding no
+#       AllowTcpForwarding no
+#       PermitTTY no
+#       ForceCommand cvs server
+-----
+
+Nearly all the options are commented out to start.  You can
+get information about the options from the man page by entering
++man sshd_config+, as well as find help at such places as:
+
+*How to Tune Your SSH Daemon Configuration* - https://www.digitalocean.com/community/tutorials/how-to-tune-your-ssh-daemon-configuration-on-a-linux-vps[+https://www.digitalocean.com/community/tutorials/how-to-tune-your-ssh-daemon-configuration-on-a-linux-vps+]
+
+
+
+
+
+'''
+
+*/usr/libexec/openssh/sftp-server*
+++++++++++++++++++++++++++++++++++
+
+SFTP is the SSH (or Secure) File Transfer Protocol.  It was designed
+as an extension to SSH to provide secure file access, transfer and
+management.  While the SCP protocol only allows file transfers,
+SFTP allows for a range of operations on remote files including
+resuming interrupted transfers, directory listings, and remote file removal.
+The +sftp-server+ program implements the SFTP protocol with OpenSSH.
+
+'''
+
+*/usr/sbin/sshd*
+++++++++++++++++
+
+This is the daemon program for the the OpenSSH server.
+It is typically started on boot via the initialization file, listens
+for connections from clients, and forks a new daemon for each
+incoming connection.  These daemons handle
+key exchange, encryption, authentication, command
+execution and data exchange.
+
+'''
+
+*/usr/share/man*
+++++++++++++++++
+
+Manual pages for the various bits of the server package.
+
+-----
+/usr/share/man/man5/moduli.5.gz
+/usr/share/man/man5/sshd_config.5.gz
+/usr/share/man/man8/sftp-server.8.gz
+/usr/share/man/man8/sshd.8.gz
+-----
+
+'''
+
+*/var/empty/sshd*
++++++++++++++++++
+
+An empty directory wherein some processes
+can chroot to, i.e. got to chroot jail, which is a way to
+isolate a process and its children from the rest of the system,
+but should only be used for processes that don't run as root.
+This is a way to keep processes that do not need file
+access from having any files to access, so their privileges
+cannot be abused.
+
+'''
+
+Client Package
+^^^^^^^^^^^^^^
+
+Finally, we unpack the client part of the package via: 
+
+-----
+rpm -qpl openssh-clients-7.4p1-1.x86_64.rpm
+-----
+
+to find therein:
+
+'''
+
+*/etc/ssh/ssh_config*
++++++++++++++++++++++
+
+The configuration file for the +ssh+ client program.
+This file sets the default configuration for all users of OpenSSH clients and it must be readable by all users on the system.
+User-specific +ssh+ client files can be created to override the settings
+in the global +ssh_config+ file.
+Upon installing CentOS 7, this file looks like this:
+
+-----
+#       $OpenBSD: ssh_config,v 1.30 2016/02/20 23:06:23 sobrado Exp $
+
+# This is the ssh client system-wide configuration file.  See
+# ssh_config(5) for more information.  This file provides defaults for
+# users, and the values can be changed in per-user configuration files
+# or on the command line.
+
+# Configuration data is parsed as follows:
+#  1. command line options
+#  2. user-specific file
+#  3. system-wide file
+# Any configuration value is only changed the first time it is set.
+# Thus, host-specific definitions should be at the beginning of the
+# configuration file, and defaults at the end.
+
+# Site-wide defaults for some commonly used options.  For a comprehensive
+# list of available options, their meanings and defaults, please see the
+# ssh_config(5) man page.
+
+# Host *
+#   ForwardAgent no
+#   ForwardX11 no
+#   RhostsRSAAuthentication no
+#   RSAAuthentication yes
+#   PasswordAuthentication yes
+#   HostbasedAuthentication no
+#   GSSAPIAuthentication no
+#   GSSAPIDelegateCredentials no
+#   BatchMode no
+#   CheckHostIP yes
+#   AddressFamily any
+#   ConnectTimeout 0
+#   StrictHostKeyChecking ask
+#   IdentityFile ~/.ssh/identity
+#   IdentityFile ~/.ssh/id_rsa
+#   IdentityFile ~/.ssh/id_dsa
+#   IdentityFile ~/.ssh/id_ecdsa
+#   IdentityFile ~/.ssh/id_ed25519
+#   Port 22
+#   Protocol 2
+#   Cipher 3des
+#   Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-cbc,3des-cbc
+#   MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160
+#   EscapeChar ~
+#   Tunnel no
+#   TunnelDevice any:any
+#   PermitLocalCommand no
+#   VisualHostKey no
+#   ProxyCommand ssh -q -W %h:%p gateway.example.com
+#   RekeyLimit 1G 1h
+-----
+
+
+
+'''
+
+*/usr/bin/sftp*
++++++++++++++++
+
+A command-line interface client program to transfer files using the SSH File Transfer Protocol (SFTP) as implemented by the sftp-server command by the OpenSSH project, which runs inside the encrypted Secure Shell connection.
+It provides an interactive interface similar to that of traditional FTP clients, although it is not the same thing
+as running an FTP client over an SSH connection.
+
+'''
+
+*/usr/bin/ssh*
+++++++++++++++
+
+The +ssh+ client is a program for logging into a remote machine and executing commands on that machine.
+It is intended to provide secure encrypted communications between two untrusted hosts over an insecure
+network.  X11 connections, arbitrary TCP ports and UNIX-domain sockets can also be forwarded over the secure channel.
+
+'''
+
+*/usr/bin/ssh-add*
+++++++++++++++++++
+
+The +ssh_add+ program adds RSA or DSA identities to the authentication agent, +ssh-agent+.
+When run without arguments, it adds the files +~/.ssh/id_rsa+, +~/.ssh/id_dsa+ and +~/.ssh/identity+.
+Alternative file names can be given on the command line. If any file requires a passphrase,
++ssh-add+ asks for the passphrase from the user. The passphrase is read from the user's tty.
+It retries the last passphrase if multiple identity files are given. 
+
+'''
+
+*/usr/bin/ssh-agent*
+++++++++++++++++++++
+
+The +ssh-agent+ program holds private keys used for public key authentication (RSA, DSA). The idea is that ssh-agent is started in the beginning of an X-session or a login session, and all other windows or programs are started as clients to the +ssh-agent+ program. Through use of environment variables the agent can be located and automatically used for authentication when logging in to other machines using +ssh+.
+
+The +ssh-agent+ program is started automatically upon logging in 
+on CentOS and most Linux distributions.  You can check for this via:
+
+-----
+ps aux | grep ssh-agent
+yossarian      5978  0.0  0.0  21404   336 ?        Ss   Feb22   0:00 ssh-agent
+yossarian     20623  0.0  0.0  21400   328 ?        Ss   14:19   0:00 /usr/bin/ssh-agent /bin/sh -c exec -l /bin/bash -c "env GNOME_SHELL_SESSION_MODE=classic gnome-session --session gnome-classic"
+-----
+
+'''
+
+*/usr/bin/ssh-keyscan*
+++++++++++++++++++++++
+
+A utility for gathering the public +ssh+ host keys of a number
+of hosts.  It is intended to aid in building and verifying +ssh_known_hosts+ files.
+It uses non-blocking socket I/O to contact as many hosts as possible in parallel, so it is very efficient. The keys from a domain of 1,000 hosts can be collected in tens of seconds, even when some of those hosts are down or do not run ssh. For scanning, one does not need login access to the machines that are being scanned, nor does the scanning process involve any encryption.
+
+And example of the use of +ssh-keygen+ would be to store the RSA key fingerprints - i.e. hashes of the
+full RSA key - of any number of machines in a LAN in a system-wide list.  Just as those keys are
+stored in a +~/.ssh/knownhosts+ file for individual users, +ssh-keyscan+ will create a system-wide
++/etc/ssh/ssh_known_hosts+ file for all the LAN fingerprints. For example, with three LAN machines
++larry.tamu.edu+, +curly.tamu.edu+ and +moe.tamu.edu+ a system-wide file would be created via:
+
+-----
+ssh-keyscan -t rsa,dsa larry.tamu.edu     >> /etc/ssh/ssh_known_hosts
+ssh-keyscan -t rsa,dsa larry              >> /etc/ssh/ssh_known_hosts
+ssh-keyscan -t rsa,dsa curly.tamu.edu     >> /etc/ssh/ssh_known_hosts
+ssh-keyscan -t rsa,dsa curly              >> /etc/ssh/ssh_known_hosts
+ssh-keyscan -t rsa,dsa moe.tamu.edu       >> /etc/ssh/ssh_known_hosts
+ssh-keyscan -t rsa,dsa moe                >> /etc/ssh/ssh_known_hosts
+-----
+
+Both the short and long forms are needed since the machine names must match exactly
+what a user types to connect.
+
+'''
+
+*/usr/share/man*
+++++++++++++++++
+
+-----
+/usr/share/man/man1/sftp.1.gz
+/usr/share/man/man1/ssh-add.1.gz
+/usr/share/man/man1/ssh-agent.1.gz
+/usr/share/man/man1/ssh-keyscan.1.gz
+/usr/share/man/man1/ssh.1.gz
+/usr/share/man/man5/ssh_config.5.gz
+-----
+
+
+
+Backing Up Essential Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We must do some things before we go ahead and install the binary RPMs.
+We need to make back-ups of a directory and of a file, and both must be
+done as superuser or via sudo.
+
+*DO NOT SKIP THESE STEPS!!*
+
+-----
+su
+tar -cvzf /etc/etc_ssh.tar.gz /etc/ssh
+cp -p /etc/pam.d/sshd /etc/pamd-sshd
+-----
+
+Removing the Old Binary RPMs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If we try to immediately install the binary RPMs we created, we will
+get error messages saying that our version of OpenSSH conflicts with the
+OpenSSH version already installed on CentOS 7.
+We must first remove all the conflicting binary RPM files - and their dependencies - that stand in
+our way.
+
+Basically, you start at the top of the list below, and whenever you
+get a message that something can't be deleted because something else
+depends on it, go ahead and delete that.  Keep going until all the
++openssh-*+ packages are gone.
+
+*NOTE*: The number of RPM files you will need to remove to complete
+this process will depend on what you have already installed on your
+CentOS 7 installation.  Those who aren't obsessive/compulsive
+completists who have to have all the precious packages available installed
+on a new machine will probably have less to deal with than you see below.
+
+-----
+su
+rpm -e openssh                                                                                                           
+rpm -e openssh-ldap                                                                                              
+rpm -e openssh-keycat                                                                                            
+rpm -e openssh-askpass                                                                                            
+rpm -e openssh-server                                                                                             
+rpm -e openssh-server-sysvinit                                                                                    
+rpm -e openssh-server                                                                                             
+rpm -e openssh-clients                                                                                            
+rpm -e openssh                                                                                                    
+rpm -e openssh-clients                                                                                            
+rpm -e systemtap-client python-meh git virt-viewer fence-agents-ilo-ssh                                           
+rpm -e perl-Git gettext-devel                                                                                     
+rpm -e perl-Git gettext-devel git                                                                                 
+rpm -e perl-Git gettext-devel git intltool                                                                        
+rpm -e systemtap-client python-meh git virt-viewer fence-agents-ilo-ssh                                           
+rpm -e openssh-clients
+rpm -e systemtap-client
+rpm -e systemtap
+rpm -e systemtap-client
+rpm -e openssh-clients
+rpm -e python-meh
+rpm -e anaconda-core
+rpm -e anaconda-tui anaconda-gui
+exit
+-----
+
+Installing the New Binary RPMs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now install the binary RPMs we created.
+
+-----
+cd ~rpmbuild/RPMS/x86_64
+su
+rpm -ivh openssh*.rpm
+-----
+
+Reinstalling the Dependent Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now we go back and reinstall the OpenSSH-dependent
+files that we deleted.  As in the removal process,
+the number of files you will need to reinstall will
+depend on what's installed on your system.
+
+You can see what you've deleted with the command:
+
+-----
+history | grep rpm
+-----
+
+Here's what I needed to reinstall.
+
+-----
+yum install systemtap
+yum install anaconda-core
+yum install python-meh
+yum install systemtap-client
+yum install virt-viewer fence-agents-ilo-ssh
+yum install perl-Git
+yum install anaconda-core anaconda-gui anaconda-tui
+-----
+
+Restoring the Saved Files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now we restore the files we backed up to their original locations.
+
+-----
+cp -p /etc/pam.d/sshd /root/sshd.afterupgrade
+mv /etc/pamd-sshd /etc/pam.d/sshd
+-----
+
+Edit the +/etc/ssh/sshd_config+ file.
+
+-----
+vi /etc/ssh/sshd_config
+-----
+
+and replace:
+
+-----
+UsePAM no
+-----
+
+with
+
+-----
+UsePAM yes
+-----
+
+Now remove the keys from the previous OpenSSH version.
+
+-----
+rm /etc/ssh/ssh*key
+-----
+
+and then restart the service to regenerate the keys.
+
+-----
+systemctl restart sshd
+-----
+
+Now try to SSH to this machine from another to see if the server
+is working.
+
+
+Upgrading the OpenSSL Version on CentOS 7
+-----------------------------------------
+
+The version of OpenSSL on CentOS 7 is openssl-1.0.1e.
+If you check the OpenSSL site at:
+
+https://www.openssl.org/source/[+https://www.openssl.org/source/+]
+
+you read that:
+
+=====
+The latest stable version is the 1.1.0 series of releases. Also available is the 1.0.2 series. This is also our Long Term Support (LTS) version (support will be provided until 31st December 2019). The 0.9.8, 1.0.0 and 1.0.1 versions are now out of support and should not be used.
+=====
+
+This is not necessarily a very bad thing, though, since RedHat/CentOS backports security fixes from more recent
+OpenSSL versions to the official distribution version.  For example, while the official openssl-1.0.1e package
+is ostensibly from Feb. 2013, the changelog for OpenSSL, that is,
+
+-----
+rpm -q --changelog openssl
+
+* Thu Sep 22 2016 Tomáš Mráz <tmraz@redhat.com> 1.0.1e-60
+- fix CVE-2016-2177 - possible integer overflow
+- fix CVE-2016-2178 - non-constant time DSA operations
+- fix CVE-2016-2179 - further DoS issues in DTLS
+- fix CVE-2016-2180 - OOB read in TS_OBJ_print_bio()
+- fix CVE-2016-2181 - DTLS1 replay protection and unprocessed records issue
+- fix CVE-2016-2182 - possible buffer overflow in BN_bn2dec()
+- fix CVE-2016-6302 - insufficient TLS session ticket HMAC length check
+- fix CVE-2016-6304 - unbound memory growth with OCSP status request
+- fix CVE-2016-6306 - certificate message OOB reads
+- mitigate CVE-2016-2183 - degrade all 64bit block ciphers and RC4 to
+  112 bit effective strength
+...
+-----
+
+shows security fixes from as recent as Sep. 2016.  Red Hat explains its backporting security policy here:
+
+https://access.redhat.com/security/updates/backporting[+https://access.redhat.com/security/updates/backporting+]
+
+Nonetheless, it's probably a good idea to have more recent versions of OpenSSL on your system, so
+we'll do so here in a manner than will not bollix up anything already installed.
+We start by downloading the latest 1.1.0 and 1.0.2 versions from:
+
+https://www.openssl.org/source/[+https://www.openssl.org/source/+]
+
+Here we obtain the latest (as of 3/17) versions using +wget+, although you should
+check the site to see if newer versions have become available and make suitable
+changes to these commands as needed.
+
+-----
+wget https://www.openssl.org/source/openssl-1.1.0e.tar.gz
+wget https://www.openssl.org/source/openssl-1.0.2k.tar.gz
+-----
+
+Start with the latest 1.0.2 or Long Term Support (LTS) series distribution.
+The +Configure+ arguments differ from the format typically used for
+configuring such things, with the available arguments available for you
+perusal via:
+
+-----
+./Configure
+
+Usage: Configure [no-<cipher> ...] [enable-<cipher> ...] [experimental-<cipher> ...] [-Dxxx] [-lxxx] [-Lxxx] [-fxxx] [-Kxxx] [no-hw-xxx|no-hw] [[no-]threads] [[no-]shared] [[no-]zlib|zlib-dynamic] [no-asm] [no-dso] [no-krb5] [sctp] [386] [--prefix=DIR] [--openssldir=OPENSSLDIR] [--with-xxx[=vvv]] [--test-sanity] os/compiler[:flags]
+
+pick os/compiler from:
+BC-32 BS2000-OSD BSD-generic32 BSD-generic64 BSD-ia64 BSD-sparc64 BSD-sparcv8 
+BSD-x86 BSD-x86-elf BSD-x86_64 Cygwin Cygwin-x86_64 DJGPP MPE/iX-gcc OS2-EMX 
+...
+ebug-solaris-sparcv8-gcc debug-solaris-sparcv9-cc debug-solaris-sparcv9-gcc 
+debug-steve-opt debug-steve32 debug-steve64 debug-vos-gcc 
+
+NOTE: If in doubt, on Unix-ish systems use './config'.
+-----
+
+The +linux-x86_64+ argument is a good choice if you're using hardware
+less than five years old, or unless you know specifically what else it
+should be.  The +shared+ argument is needed since shared libraries aren't created
+by default in the 1.0.2 series.  The +--prefix+ argument is entirely
+up to you.  I've chosen this form so I can keep several OpenSSL versions
+in the same generic +/opt/openssl+ directory.
+
+-----
+tar xzvf openssl-1.0.2k.tar.gz
+cd openssl-1.0.2k.tar.gz
+./Configure linux-x86_64 shared --prefix=/opt/openssl/1.0.2k
+make
+su
+make install
+exit
+-----
+
+Move on to
+the 1.1.0 series, presently the latest stable version.
+The +Configure+ arguments are basically the same as for the
+1.0.2 series, although the +shared+ argument is no longer
+needed to create shared libraries.
+
+-----
+tar xzvf openssl-1.1.0e.tar.gz
+cd openssl-1.1.0e
+./Configure linux-x86_64 --prefix=/opt/openssl/1.1.0e
+make
+su
+make install
+exit
+-----
+
+Now we have both versions sitting in +/opt/openssl+ to be
+used whenever we need them.
+
+
+Apache HTTP Server and OpenSSL 1.1.0
+------------------------------------
+
+The Apache HTTP site is at:
+
+https://httpd.apache.org/[+https://httpd.apache.org/+]
+
+The latest official releases of the Apache HTTP Server have not yet
+caught up to the latest stable version of OpenSSL, the 1.1.0 series.
+As of this writing (3/17), the most recent official releases are
+2.4.25 for the stable branch and 2.2.32 for the legacy branch, and
+both will throw errors if you attempt to compile them with OpenSSL 1.1.0.
+
+As of 3/17, however, the latest github pull of the distribution will
+compile with OpenSSL 1.1.0.
+The github site is at:
+
+https://github.com/apache/httpd[+https://github.com/apache/httpd+]
+
+and the latest version can be obtained via:
+
++git clone https://github.com/apache/httpd.git+
+
+Once we've pulled that down, we'll enter the directory
+and configure it.  Our configuration command is mostly cobbled from the
+arguments contained within the +httpd.spec+ file in the distribution.
+These are:
+
+-----
+%configure \
+        --enable-layout=RPM \
+        --libdir=%{_libdir} \
+        --sysconfdir=%{_sysconfdir}/httpd/conf \
+        --includedir=%{_includedir}/httpd \
+        --libexecdir=%{_libdir}/httpd/modules \
+        --datadir=%{contentdir} \
+        --with-installbuilddir=%{_libdir}/httpd/build \
+        --enable-mpms-shared=all \
+        --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
+        --enable-suexec --with-suexec \
+        --with-suexec-caller=%{suexec_caller} \
+        --with-suexec-docroot=%{contentdir} \
+        --with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
+        --with-suexec-bin=%{_sbindir}/suexec \
+        --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+        --enable-pie \
+        --with-pcre \
+        --enable-mods-shared=all \
+        --enable-ssl --with-ssl --enable-socache-dc --enable-bucketeer \
+        --enable-case-filter --enable-case-filter-in \
+        --enable-policy --enable-crypto \
+        --disable-imagemap
+-----
+
+These are the arguments used to compile the official binary RPMs used
+in all the major Linux distributions, so it's generally a good idea to
+stick with them for the sake of some compatibility and equivalent
+functionality.  Since I desire this to be installed in a non-standard
+location (+/opt+), though, all the +--*dir+ arguments will be discarded in favor of
++/opt/httpd-2.5+.  There's nothing sacred about this, as it could also
+be specified - and perhaps should be - as +/opt/httpd-github-2-23-17+.
+We will also ignore the +apr+-related arguments in
+favor of +--with-included-apr+ to make things simpler. All the other
+arguments are more-or-less the same.  We specifically include the
+location of the OpenSSL 1.1.0 series installation via:
+
+-----
+--with-ssl=/opt/openssl/1.1.0e
+-----
+
+with the location being that specified in the OpenSSL compilation instructions
+in the previous section.
+
+So now we configure, make and install.
+
+-----
+cd httpd
+./configure --prefix=/opt/httpd-2.5 --enable-mpms-shared=all --enable-suexec --with-suexec --with-suexec-caller=apache --with-suexec-docroot=/var/www --with-suexec-logfile=/opt/httpd-2.4.25/log/httpd/suexec.log --with-suexec-bin=/usr/sbin/suexec --with-suexec-uidmin=500 --with-suexec-gidmin=100 --enable-pie --with-pcre --enable-mods-shared=all --enable-ssl --with-ssl=/opt/openssl/1.1.0e --enable-socache-dc --enable-bucketeer --enable-case-filter --enable-case-filter-in --disable-imagemap --with-included-apr
+make
+su
+make install
+exit
+-----
+
+Now we have the bleeding-edge, state-of-the-art Apache HTTP Server compiled
+with the latest stable version of OpenSSL 1.1.0 sitting happily in
++/opt/httpd-2.5+ and ready for action.
+
+
+
+
+SSH Tunneling
+-------------
+
+This technique is useful if you are on a machine on which access to, say, +yahoo.com:80+
+is blocked - hypothetically on +rocks.tamu.edu+ in the example below - but have
+SSH access between +rocks.tamu.edu+ and another machine - in this example
++copano.tamu.edu+ - on which access to +yahoo.com+ is not blocked.
+This will create an encrypted link for +yahoo.com+ traffic between +copano.tamu.edu+
+and +rocks.tamu.edu+, although the link between +yahoo.com+ and +copano.tamu.edu+ will
+be unencrypted.
+
+https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/[+https://chamibuddhika.wordpress.com/2012/03/21/ssh-tunnelling-explained/+]
+
+Run the following command on rocks.tamu.edu:
+
+-----
+ssh -L 9001:yahoo.com:80 baum@copano.tamu.edu
+-----
+
+This allows you to SSH tunnel to yahoo.com:80 via entering
+the following address in a web browser on rocks.tamu.edu:
+
+-----
+localhost:9001
+-----
+
+Note that this will only worked with +localhost+ and not with either
+the machine name or IP number.
+
+
+SSH-Related Software
+--------------------
+
+Awesome SSH
+~~~~~~~~~~~
+
+https://github.com/moul/awesome-ssh[+https://github.com/moul/awesome-ssh+]
+
+=====
+A curated list of SSH apps, libraries and resources.
+=====
+
+clusterssh
+~~~~~~~~~~
+
+https://github.com/duncs/clusterssh[+https://github.com/duncs/clusterssh+]
+
+=====
+ClusterSSH is a tool for making the same change on multiple servers at 
+the same time.  The 'cssh' command opens an administration console and 
+an xterm to all specified hosts.  Any text typed into the administration 
+console is replicated to all windows.  All windows may also be typed into
+directly.
+=====
+
+dsh
+~~~
+
+https://www.netfort.gr.jp/%7Edancer/software/dsh.html.en[+https://www.netfort.gr.jp/%7Edancer/software/dsh.html.en+]
+
+=====
+An implementation of a wrapper for executing multiple remote shell (rsh/remsh/ssh) commands.
+=====
+
+mosh
+~~~~
+
+https://mosh.org/[+https://mosh.org/+]
+
+=====
+Remote terminal application that allows roaming, supports intermittent connectivity, and provides intelligent local echo and line editing of user keystrokes.  Mosh is a replacement for SSH. It's more robust and responsive, especially over Wi-Fi, cellular, and long-distance links.
+
+With Mosh, you can put your laptop to sleep and wake it up later, keeping your connection intact. If your Internet connection drops, Mosh will warn you — but the connection resumes when network service comes back.
+
+Mosh doesn't listen on network ports or authenticate users. The mosh client logs in to the server via SSH, and users present the same credentials (e.g., password, public key) as before. Then Mosh runs the mosh-server remotely and connects to it over UDP.
+=====
+
+ngrok
+~~~~~
+
+https://github.com/inconshreveable/ngrok[+https://github.com/inconshreveable/ngrok+]
+
+=====
+A reverse proxy that creates a secure tunnel from a public endpoint to a locally running web service. ngrok captures and analyzes all traffic over the tunnel for later inspection and replay.
+
+Own your data. Host personal cloud services on your own private network. Run webmail, file syncing, and more securely on your hardware with full end-to-end encryption. 
+=====
+
+=====
+
+sshfs
+~~~~~
+
+https://github.com/libfuse/sshfs[+https://github.com/libfuse/sshfs+]
+
+=====
+A network filesystem client to connect to SSH servers.
+=====
+
+sshttp
+~~~~~~
+
+https://github.com/stealth/sshttp[+https://github.com/stealth/sshttp+]
+
+=====
+Run a webserver and a sshd on the same port w/o changes.  In case your FW policy forbids SSH access to the DMZ or internal network from outside, but you still want to use ssh on machines which only have one open port, e.g. HTTP.
+=====
+
+sshtunnel
+~~~~~~~~~
+
+https://github.com/pahaz/sshtunnel[+https://github.com/pahaz/sshtunnel+]
+
+=====
+SSH tunnels to remote server.  One of the typical scenarios where sshtunnel is helpful is
+when a user may need to connect a port of a remote server (i.e. 8080) where only SSH port (usually port 22) is reachable.
+=====
+
+sshuttle
+~~~~~~~~
+
+https://github.com/apenwarr/sshuttle[+https://github.com/apenwarr/sshuttle+]
+
+=====
+Transparent proxy server that works as a poor man's VPN. Forwards over ssh. Doesn't require admin. Works with Linux and MacOS. Supports DNS tunneling.
+=====
+
+sshync
+~~~~~~
+
+https://github.com/mateogianolio/sshync[+https://github.com/mateogianolio/sshync+]
+
+=====
+Auto-sync files or directories over SSH.
+=====
+
+tmux-cssh
+~~~~~~~~~
+
+https://github.com/dennishafemann/tmux-cssh[+https://github.com/dennishafemann/tmux-cssh+]
+
+====
+A terminal multiplexer, like e.g. screen, which gives you a possibility to use multiple virtual terminal session within one real terminal session. tmux-cssh (tmux-cluster-ssh) sets a comfortable and easy to use functionality, clustering and synchronizing virtual tmux-sessions, on top of tmux. No need for a x-server or x-forwarding. tmux-cssh works just with tmux and in an low-level terminal-environment, like most server do.
+====
+
+tund
+~~~~
+
+https://github.com/aphyr/tund[+https://github.com/aphyr/tund+]
+
+=====
+Tund (tunneling daemon) establishes a reverse SSH tunnel from some publically
+accessible computer to your own. In the event of theft or loss, you can log in
+to your machine as soon as it connects to the internet.
+It's also useful for machines behind a NAT you'd like to have a tunnel to.
+=====
+
+
+

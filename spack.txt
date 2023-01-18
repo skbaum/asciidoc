@@ -1,0 +1,34 @@
+Spack Notes
+===========
+Steven K. Baum
+0.1, July 26, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+== Converting Spack Configurations Into EasyBuild Configurations
+
+There are many software package covered by Spack that are not yet covered by EasyBuild.
+Herein are speculations about cobbling together a cheap and easy method for converting
+Spack package specs into EasyBuild package specs.
+
+You can obtain a summary of what would be installed for a given package, e.g. `kokkos`, via:
+
+-----
+spack spec kokkos
+
+kokkos@3.4.00%gcc@11.1.1~aggressive_vectorization~compiler_warnings~cuda~cuda_lambda~cuda_ldg_intrinsic~cuda_relocatable_device_code~cuda_uvm~debug~debug_bounds_check~debug_dualview_modify_check~deprecated_code~examples~explicit_instantiation~hpx~hpx_async_dispatch~hwloc~ipo~memkind~numactl~openmp~pic+profiling~profiling_load_print~pthread~qthread~rocm+serial+shared~sycl~tests~tuning~wrapper amdgpu_target=none build_type=RelWithDebInfo cuda_arch=none std=14 arch=linux-fedora34-nehalem
+    ^cmake@3.20.5%gcc@11.1.1~doc+ncurses+openssl+ownlibs~qt build_type=Release arch=linux-fedora34-nehalem
+        ^ncurses@6.2%gcc@11.1.1~symlinks+termlib abi=none arch=linux-fedora34-nehalem
+            ^pkgconf@1.7.4%gcc@11.1.1 arch=linux-fedora34-nehalem
+        ^openssl@1.1.1k%gcc@11.1.1~docs+systemcerts arch=linux-fedora34-nehalem
+            ^perl@5.34.0%gcc@11.1.1+cpanm+shared+threads arch=linux-fedora34-nehalem
+                ^berkeley-db@18.1.40%gcc@11.1.1+cxx~docs+stl patches=b231fcc4d5cff05e5c3a4814f6a5af0e9a966428dc2176540d2c05aff41de522 arch=linux-fedora34-nehalem
+                ^gdbm@1.19%gcc@11.1.1 arch=linux-fedora34-nehalem
+                    ^readline@8.1%gcc@11.1.1 arch=linux-fedora34-nehalem
+            ^zlib@1.2.11%gcc@11.1.1+optimize+pic+shared arch=linux-fedora34-nehalem
+-----
+

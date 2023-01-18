@@ -1,0 +1,519 @@
+OneAPI Notes
+============
+Steven K. Baum
+0.1, July 26, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+== Meta
+
+*Early Experiences Migrating CUDA codes to oneAPI* - https://arxiv.org/abs/2105.13489[`https://arxiv.org/abs/2105.13489`]
+
+*Exploiting co-execution with oneAPI* - https://arxiv.org/abs/2106.01726[`https://arxiv.org/abs/2106.01726`]
+
+== Overview
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html`]
+
+There are a set of OneAPI Toolkits.
+
+* Base Toolkit
+* HPC Toolkit
+* AI Analytics Toolkit
+* IoT Toolkit
+* Rendering Toolkit
+* OpenVINO Toolkit
+
+== HPC Toolkit
+
+This is the only toolkit that contains the Fortran compilers.
+When you install it you are informed that it is missing the Base Toolkit for which it
+is officially an add-on.  The Base Toolkit is around 30GB, while this HPC Toolkit weighs
+in at 1.3GB.  And this will install just fine without the presence of the Base Toolkit.
+It may very well be that this toolkit isn't fully functional without the additional 
+30GB worth of software clogging your system disk, but I've not yet discovered any problems.
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/hpc-toolkit.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/hpc-toolkit.html`]
+
+This Toolkit contains:
+
+* oneAPI DPC++/C++ Compiler
+* C++ Compiler Classic
+* Cluster Checker
+* Fortan Compiler (Beta)
+* Fortran Compiler Classic
+* Inspector
+* MPI Library
+* Trace Analyzer and Collector
+
+Once installed, the upper level directory at `/opt/intel/oneapi` looks like:
+
+-----
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 clck
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 compiler
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 inspector
+drwxr-xr-x. 6 root root 4096 Jul 28 16:39 installer
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 itac
+drwxr-xr-x. 2 root root 4096 Jul 28 16:40 logs
+-rw-r--r--. 1 root root 6013 Aug 20  2020 readme-get-started-linux-hpc-kit.html
+-----
+
+=== oneAPI DPC+\+/C++ Compiler
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html`]
+
+=====
+Use this standards-based C++ compiler with support for OpenMP* to take advantage of more cores and built-in technologies in platforms based on Intel® Xeon® and Intel® Core™ processors with Intel® Processor Graphics.
+The capabilities include:
+
+* Compile ISO C++, Khronos SYCL*, and DPC++ source code.
+* Reuse code across hardware targets, including CPUs, GPUs, and FPGAs.
+* Avoid proprietary lock-in with a cross-industry, open, standards-based unified programming model.
+* Generate optimized binary host code and accelerator code.
+* Leverage optimized Intel oneAPI performance and threading libraries.
+* Integrate seamlessly with popular third-party compilers, development environments, and operating systems.
+* Use the latest standards including C++ 20, SYCL, and OpenMP* 5.0 for GPU offload.†
+* Stay compatible with existing CPU-focused workflows with Intel® C++ Compiler Classic.
+=====
+
+==== Binary Directory
+
+The 64-bit binary directory - which also contains the Fortran compilers - is at:
+
+-----
+/opt/intel/oneapi/compiler/2021.3.0/linux/bin/intel64
+-----
+
+and contains:
+
+-----
+-rwxr-xr-x. 1 root root 66453600 Jun  9 05:44 fortcom
+-rwxr-xr-x. 1 root root  2671472 Jun  9 05:44 fpp
+-rwxr-xr-x. 1 root root  4445136 Jun  9 05:44 icc
+-rw-r--r--. 1 root root        0 Jun  9 05:44 icc.cfg
+-rwxr-xr-x. 1 root root  4445136 Jun  9 05:44 icpc
+-rw-r--r--. 1 root root        0 Jun  9 05:44 icpc.cfg
+-rwxr-xr-x. 1 root root  4237680 Jun  9 05:44 ifort
+-rw-r--r--. 1 root root        0 Jun  9 05:44 ifort.cfg
+-rwxr-xr-x. 1 root root 67122744 Jun  9 05:44 mcpcom
+-----
+
+
+=== C++ Compiler Classic
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html`]
+
+=====
+Use this standards-based C++ compiler with support for OpenMP* to take advantage of more cores and built-in technologies in platforms based on Intel® Xeon® Scalable processors and Intel® Core™ processors.
+=====
+
+=== Cluster Checker
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/cluster-checker.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/cluster-checker.html#gs.7lqtxd`]
+
+=====
+Enhance system reliability and performance, and verify that cluster components work together seamlessly for improved uptime, productivity, and lower total cost of ownership. 
+Features include:
+
+* Run the tool to ensure your system is intact and configured to run a parallel application.
+* Pinpoint trouble spots and get detailed diagnostic information to improve cluster functionality and performance.
+* Resolve issues in minutes, reducing the need for specialized support skills.
+=====
+
+==== Base Directory
+
+The installed Cluster Checker directory at:
+
+-----
+/opt/intel/oneapi/clck/2021.3.0
+-----
+
+looks like:
+
+-----
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 analyzer
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 bin
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 collect
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 datastore
+drwxr-xr-x.  2 root root  4096 Jul 28 16:40 env
+drwxr-xr-x.  7 root root  4096 Jul 28 16:40 etc
+drwxr-xr-x. 11 root root  4096 Jul 28 16:40 include
+drwxr-xr-x.  7 root root 12288 Jul 28 16:40 kb
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 lib
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 lib_common
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 libexec
+drwxr-xr-x.  2 root root  4096 Jul 28 16:40 licensing
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 man
+drwxr-xr-x.  2 root root  4096 Jul 28 16:40 modulefiles
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 postprocessor
+drwxr-xr-x.  3 root root  4096 Jul 28 16:40 provider
+drwxr-xr-x.  2 root root  4096 Jul 28 16:40 third-party
+-----
+
+==== Binary Directory
+
+The binary directory at:
+
+-----
+/opt/intel/oneapi/clck/2021.3.0/bin/intel64
+-----
+
+contains:
+
+-----
+-rwxr-xr-x. 1 root root 3267472 Jun 16 04:48 clck
+-rwxr-xr-x. 1 root root     671 Jun 15 23:47 clck-analyze
+-rwxr-xr-x. 1 root root     670 Jun 15 23:47 clck-collect
+-rwxr-xr-x. 1 root root  172016 Jun 16 04:48 clckdb
+-----
+
+=== Fortan Compiler (Beta)
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/fortran-compiler.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/fortran-compiler.html`]
+
+=====
+Use this standards-based Fortran Compiler with OpenMP* support for CPU and GPU offload.
+The capabilities include:
+
+* Improves development productivity by targeting CPUs and GPUs† through single-source code while permitting custom tuning
+* Supports broad Fortran language standards
+* Incorporates industry standards support for OpenMP* 4.5 and initial OpenMP 5.0 for GPU Offload†
+* Leverages well-proven LLVM compiler technology† and Intel’s history of compiler leadership
+* Takes advantage of multicore, Single Instruction Multiple Data (SIMD) vectorization, and multiprocessor systems with OpenMP, automatic parallelism, and coarrays
+* Optimizes code with an automatic processor dispatch feature
+=====
+
+==== Binary Directory
+
+The 64-bit binary directory - which also contains the C compilers - is at:
+
+-----
+/opt/intel/oneapi/compiler/2021.3.0/linux/bin/intel64
+-----
+
+and contains:
+
+-----
+-rwxr-xr-x. 1 root root 66453600 Jun  9 05:44 fortcom
+-rwxr-xr-x. 1 root root  2671472 Jun  9 05:44 fpp
+-rwxr-xr-x. 1 root root  4445136 Jun  9 05:44 icc
+-rw-r--r--. 1 root root        0 Jun  9 05:44 icc.cfg
+-rwxr-xr-x. 1 root root  4445136 Jun  9 05:44 icpc
+-rw-r--r--. 1 root root        0 Jun  9 05:44 icpc.cfg
+-rwxr-xr-x. 1 root root  4237680 Jun  9 05:44 ifort
+-rw-r--r--. 1 root root        0 Jun  9 05:44 ifort.cfg
+-rwxr-xr-x. 1 root root 67122744 Jun  9 05:44 mcpcom
+-----
+
+==== ifx
+
+===== Developer Guide and Reference
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top.html`]
+
+=====
+The Intel Fortran Compiler (`ifx`)
+is a new compiler based on the Intel Fortran Compiler Classic (`ifort`)
+front-end and runtime libraries, using LLVM back-end technology. At this time, `ifx`
+supports features of the Fortran 95 language, OpenMP* 5.0 Version TR4
+and some OpenMP Version 5.1 directives and offloading features. `ifx`
+is binary (.o/.obj)
+and module (.mod
+) file compatible; binaries and libraries generated with `ifort`
+can be linked with binaries and libraries built with `ifx`,
+and .mod
+files generated with one compiler can be used by the other. Both compilers use the `ifort`
+runtime libraries. `ifx`
+is released as a Beta version for users interested in trying GPU offloading, which `ifort`
+does not support. Other Fortran users should continue to use `ifort`.
+
+The `-fp-model fast`
+and `-fp-model fast=2`
+options behave differently with `ifx`
+and `ifort`.
+With `ifort`,
+floating point compares happen as specified by the IEEE floating point standard,
+in that the code sequence generated for them assumes a compare can involve a NaN. `ifx`
+does not generate the check for NaN operands. If using `-fp-model fast`
+or `-fp-model fast=2`
+with `ifx`
+and NaN compares are desired to match `ifort`'s
+behavior, the `-assume nan_compare` option should be added to the command line.
+=====
+
+===== Release Notes
+
+https://software.intel.com/content/www/us/en/develop/articles/intel-oneapi-fortran-compiler-release-notes.html[`https://software.intel.com/content/www/us/en/develop/articles/intel-oneapi-fortran-compiler-release-notes.html`]
+
+===== Compiler Options List
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/compiler-reference/compiler-options/alphabetical-list-of-compiler-options.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/compiler-reference/compiler-options/alphabetical-list-of-compiler-options.html`]
+
+===== New Compiler Options
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/compiler-reference/compiler-options/new-options.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/compiler-reference/compiler-options/new-options.html`]
+
+===== Language Reference
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/language-reference.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/language-reference.html`]
+
+===== OpenMP Support
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/optimization-and-programming-guide/openmp-support.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/optimization-and-programming-guide/openmp-support.html`]
+
+=====
+The Intel® Fortran Compiler Classic and Intel® Fortran Compiler (Beta)
+fully supports the OpenMP* Application Programming Interface 5.0 Version TR4, and some of the features of OpenMP Version 5.1.
+
+To compile with the OpenMP API, add the directives in the form of the Fortran program comments
+to your code. The compiler processes the code and internally produces a multithreaded version which is then compiled into an executable with the parallelism implemented by threads that execute parallel regions or constructs. 
+
+The OpenMP specification does not define interoperability of multiple implementations, so the OpenMP implementation supported by other compilers and OpenMP support in the Intel Fortran Compiler Classic and Intel Fortran Compiler (Beta)
+might not be interoperable.
+=====
+
+* *Getting Started with OpenMP Offload Features to GPU* - https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html[`https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html`]
+
+=====
+The OpenMP* Offload to GPU feature of the Intel® oneAPI DPC/C++ Compiler and the Intel® Fortran Compiler (Beta) compiles OpenMP source files for a wide range of accelerators. Only the `icx`
+and `ifx`
+compilers support the OpenMP Offload feature. 
+
+The `icx`
+and `ifx`
+compilers support all OpenMP 4.5 features on CPU except User-Defined Reduction (UDR) support. GPU and Offloading support a subset of OpenMP 4.5 and OpenMP 5.0 declared variant features.
+
+For GPU support, the multi-level parallelism is enabled via multiple OpenMP teams, threads, and SIMD lanes to fully utilize the hardware sources at all levels.
+
+Intel supports two new options
+that support OpenMP and offloading execution on CPU and GPU. The `-fiopenmp`
+option enables a middle-end that supports the transformation of OpenMP in LLVM* (but not in a Clang* front-end). The `-fopenmp-targets=spir64`
+option enables the compiler to generate a x86 + SPIR64
+fat binary for the GPU device binary generation. 
+
+Given that OpenMP offloading is built on top of an OpenCL™ Runtime stack for GPU, the restrictions that apply to any OpenCL kernel functions also apply to OpenMP offloading region code.
+
+In some cases, there will be multiple variants of a given math function with differing accuracy/performance tradeoffs. The compiler provides a way to choose an appropriate variant based on your compiler options. The OpenMP Offload to GPU Feature of the Intel® oneAPI DPC++/C++ Compiler and the Intel® Fortran Compiler (Beta) supports all fp-models. The fp-model that is supported by Intel® C++ Compiler is migrated as well.
+=====
+
+===== CUDA Support
+
+https://developer.nvidia.com/cuda-fortran[`https://developer.nvidia.com/cuda-fortran`]
+
+=====
+CUDA Fortran includes language extension to simplify data management, the `!$cuf` kernel directive for automatically generating device code loops, and interface modules to all the NVIDIA CUDA-X math libraries.
+
+CUDA Fortran is a low-level explicit programming model with substantial runtime library components that gives expert Fortran programmers direct control over all aspects of GPU programming. CUDA Fortran enables programmers to access and control all the newest GPU features including CUDA Managed Data, Cooperative Groups and Tensor Cores. CUDA Fortran includes several productivity enhancements such as Loop Kernel Directives, module interfaces to the NVIDIA GPU math libraries and OpenACC interoperability features.
+
+CUDA Fortran includes module-defined interfaces to all the CUDA-X math libraries including cuBLAS, cuFFT, cuRAND, cuSOLVER, cuSPARSE, and cuTENSOR, as well as the NCCL and NVSHMEM communications libraries. The NVFORTRAN compiler can seamlessly accelerate many standard Fortran array intrinsics and language constructs including sum, maxval, minval, matmul, reshape, spread, and transpose on device and managed arrays by mapping Fortran statements to the functions available in the NVIDIA cuTENSOR library, a first-of-its-kind, GPU-accelerated, tensor linear algebra library providing tensor contraction, reduction, and element-wise operations.
+=====
+
+* *NVIDIA CUDA Fortran Programming Guide* - https://docs.nvidia.com/hpc-sdk/compilers/cuda-fortran-prog-guide/index.html[`https://docs.nvidia.com/hpc-sdk/compilers/cuda-fortran-prog-guide/index.html`]
+
+* *NVIDIA Fortran CUDA Interfaces* - https://docs.nvidia.com/hpc-sdk/compilers/fortran-cuda-interfaces/index.html[`https://docs.nvidia.com/hpc-sdk/compilers/fortran-cuda-interfaces/index.html`]
+
+* *Programming GPUS with NVIDIA CUDA Fortran* - https://www.youtube.com/watch?v=COjvWNpxnxc[`https://www.youtube.com/watch?v=COjvWNpxnxc`]
+
+===== Intel Fortran Extensions
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/optimization-and-programming-guide/fortran-language-extensions.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/optimization-and-programming-guide/fortran-language-extensions.html`]
+
+===== List of Run-Time Error Messages
+
+https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/compiler-reference/error-handling/handling-run-time-errors/list-of-run-time-error-messages.html[`https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top/compiler-reference/error-handling/handling-run-time-errors/list-of-run-time-error-messages.html`]
+
+===== Code Samples
+
+https://software.intel.com/content/www/us/en/develop/tools/documentation-library.html?query=&currentPage=1&externalFilter=emtcontenttype:softwareordriver/sourcecode/codesample;[`https://software.intel.com/content/www/us/en/develop/tools/documentation-library.html?query=&currentPage=1&externalFilter=emtcontenttype:softwareordriver/sourcecode/codesample;`]
+
+=== Fortran Compiler Classic
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/fortran-compiler.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/fortran-compiler.html`]
+
+=====
+Provides continuity with existing CPU-focused workflows.
+=====
+
+=== Inspector
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/inspector.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/inspector.html`]
+
+=====
+Memory errors and nondeterministic threading errors are difficult to find without the right tool. Intel® Inspector is designed to find these errors. It is a dynamic memory and threading error debugger for C, C++, and Fortran applications that run on Windows* and Linux* operating systems. 
+=====
+
+==== Base Directory
+
+The base directory at:
+
+-----
+/opt/intel/oneapi/inspector/2021.3.0
+-----
+
+contains:
+
+-----
+drwxr-xr-x.  3 root root 4096 Jul 28 16:39 API
+drwxr-xr-x.  2 root root 4096 Jul 28 16:40 bin32
+drwxr-xr-x.  2 root root 4096 Jul 28 16:40 bin64
+drwxr-xr-x. 10 root root 4096 Jul 28 16:40 config
+drwxr-xr-x.  3 root root 4096 Jul 28 16:39 documentation
+drwxr-xr-x.  2 root root 4096 Jul 28 16:40 env
+drwxr-xr-x.  6 root root 4096 Jul 28 16:40 include
+lrwxrwxrwx.  1 root root   14 Jun 21 13:39 inspxe-vars.csh -> ./env/vars.csh
+lrwxrwxrwx.  1 root root   13 Jun 21 13:39 inspxe-vars.sh -> ./env/vars.sh
+drwxr-xr-x.  4 root root 4096 Jul 28 16:40 lib32
+drwxr-xr-x.  5 root root 4096 Jul 28 16:40 lib64
+drwxr-xr-x.  2 root root 4096 Jul 28 16:40 licensing
+drwxr-xr-x.  3 root root 4096 Jul 28 16:40 man
+drwxr-xr-x.  3 root root 4096 Jul 28 16:40 message
+drwxr-xr-x.  2 root root 4096 Jul 28 16:40 modulefiles
+drwxr-xr-x.  3 root root 4096 Jul 28 16:40 resource
+drwxr-xr-x.  3 root root 4096 Jul 28 16:40 samples
+drwxr-xr-x.  5 root root 4096 Jul 28 16:40 sdk
+-rw-r--r--.  1 root root   81 Jun  2 03:47 support.txt
+drwxr-xr-x.  2 root root 4096 Jul 28 16:40 sys_check
+-----
+
+==== Binary Directory
+
+The 64-bit binary directory at:
+
+-----
+/opt/intel/oneapi/inspector/2021.3.0/bin64
+-----
+
+contains:
+
+-----
+-rwxr-xr-x. 1 root root  405648 Jun  2 03:45 crashreport
+-rwxr-xr-x. 1 root root  434728 Jun  2 03:49 inspxe-cl
+-rwxr-xr-x. 1 root root  484728 Jun  2 03:47 inspxe-feedback
+-rwxr-xr-x. 1 root root 1611672 Jun  2 03:45 inspxe-gui
+-rwxr-xr-x. 1 root root   57464 Jun  2 03:47 inspxe-runmc
+-rwxr-xr-x. 1 root root   68024 Jun  2 03:47 inspxe-runtc
+-rwxr-xr-x. 1 root root   14712 Jun  2 03:47 pin
+-rwxr-xr-x. 1 root root 6182976 May 24 09:50 pinbin
+-rwxr-xr-x. 1 root root  273280 Jun  2 03:48 pmeminsp
+-rwxr-xr-x. 1 root root 4716368 Jun  2 03:48 replay
+-rwxr-xr-x. 1 root root  106576 Jun  2 03:47 stackcollector
+-----
+
+with the 32-bit binary directory containing basically the same programs.
+
+=== MPI Library
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/mpi-library.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/mpi-library.html`]
+
+=====
+Intel® MPI Library is a multifabric message-passing library that implements the open-source MPICH specification. Use the library to create, maintain, and test advanced, complex applications that perform better on high-performance computing (HPC) clusters based on Intel® processors.
+=====
+
+=== Trace Analyzer and Collector
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/trace-analyzer.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/trace-analyzer.html`]
+
+=====
+The Intel® Trace Analyzer and Collector profiles and analyzes MPI applications to help focus your optimization efforts.
+The capabilities include:
+
+* Find temporal dependencies and bottlenecks in your code.
+* Check the correctness of your application.
+* Locate potential programming errors, buffer overlaps, and deadlocks.
+* Visualize and understand parallel application behavior.
+* Evaluate profiling statistics and load balancing.
+* Analyze performance of subroutines or code blocks.
+* Learn about communication patterns, parameters, and performance data.
+* Identify communication hot spots.
+* Decrease time to solution and increase application efficiency.
+=====
+
+==== Base Directory
+
+The base directory at:
+
+-----
+/opt/intel/oneapi/itac/2021.3.0
+-----
+
+contains:
+
+-----
+drwxr-xr-x. 4 root root 4096 Jul 28 16:40 bin
+drwxr-xr-x. 2 root root 4096 Jul 28 16:40 env
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 examples
+drwxr-xr-x. 2 root root 4096 Jul 28 16:40 include
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 lib
+drwxr-xr-x. 2 root root 4096 Jul 28 16:40 licensing
+drwxr-xr-x. 5 root root 4096 Jul 28 16:40 man
+drwxr-xr-x. 2 root root 4096 Jul 28 16:40 modulefiles
+drwxr-xr-x. 3 root root 4096 Jul 28 16:40 slib
+-----
+
+==== Binary Directory
+
+The binary directory at:
+
+-----
+/opt/intel/oneapi/itac/2021.3.0/bin
+-----
+
+contains:
+
+-----
+-r-xr-xr-x. 1 root root    2943 Jun  8 21:31 convert-stats.pl
+-r-xr-xr-x. 1 root root   11262 Jun  8 21:31 expandvtlog.pl
+-r-xr-xr-x. 1 root root    3124 Jun  8 21:31 itcconfig
+-r-xr-xr-x. 1 root root 2018808 Jun  8 21:31 otf2-to-stf
+drwxr-xr-x. 2 root root    4096 Jul 28 16:40 platforms
+drwxr-xr-x. 2 root root    4096 Jul 28 16:40 rtlib
+-r-xr-xr-x. 1 root root 2500584 Jun  8 21:31 stftool
+-r-xr-xr-x. 1 root root    2767 Jun  8 21:31 traceanalyzer
+-r-xr-xr-x. 1 root root 8329104 Jun  8 21:31 traceanalyzer.bin
+-r-xr-xr-x. 1 root root    2341 Jun  8 21:31 traceidealizer
+-r-xr-xr-x. 1 root root 2296920 Jun  8 21:31 traceidealizer.bin
+-r-xr-xr-x. 1 root root 2417016 Jun  8 21:31 VTserver
+-r-xr-xr-x. 1 root root    3268 Jun  8 21:31 xstftool
+-----
+
+== Base Toolkit
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/base-toolkit.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/base-toolkit.html`]
+
+The Base Toolkit consists of the following components, with a silent 'Intel' in front of each.
+
+* oneAPI Collective Communications Library
+* oneAPI Data Analytics Library
+* oneAPI Deep Neural Networks Library
+* oneAPI DPC++/C++ Compiler
+* oneAPI DPC++ Library
+* oneAPI Math Kernel Library
+* oneAPI Threading Building Blocks
+* oneAPI Video Processing Library
+* Advisor
+* Distribution for GDB*
+* Distribution for Python*
+* DPC++ Compatibility Tool
+* FPGA Add-on for oneAPI Base Toolkit
+* Integrated Performance Primitives
+* VTune™ Profiler
+
+
+=== oneAPI Collective Communications Library
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/oneccl.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/oneccl.html`]
+
+=== oneAPI Data Analytics Library
+
+=== oneAPI Deep Neural Networks Library
+
+=== oneAPI DPC++/C++ Compiler
+
+https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html[`https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html`]
+
+
+
+

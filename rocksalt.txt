@@ -1,0 +1,105 @@
+ROCKS Alternatives
+==================
+Steven K. Baum
+v0.1, 2017-02-20
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+OpenHPC
+-------
+
+=====
+Welcome to the OpenHPC site. OpenHPC is a collaborative, community effort that initiated from a desire to aggregate a number of common ingredients required to deploy and manage High Performance Computing (HPC) Linux clusters including provisioning tools, resource management, I/O clients, development tools, and a variety of scientific libraries. Packages provided by OpenHPC have been pre-built with HPC integration in mind with a goal to provide re-usable building blocks for the HPC community. Over time, the community also plans to identify and develop abstraction interfaces between key components to further enhance modularity and interchangeability. The community includes representation from a variety of sources including software vendors, equipment manufacturers, research institutions, supercomputing sites, and others.
+=====
+
+http://www.openhpc.community/[+http://www.openhpc.community/+]
+
+Download an RPM for CentoOS 7.
+
+-----
+wget https://github.com/openhpc/ohpc/releases/download/v1.2.1.GA/ohpc-release-centos7.2-1.2-1.x86_64.rpm
+-----
+
+Install it.
+
+-----
+su
+rpm -ivh ohpc-release-centos7.2-1.2-1.x86_64.rpm
+-----
+
+Find out what's in it.
+
+-----
+rpm -ql ohpc-release
+
+/etc/ohpc-release
+/etc/pki
+/etc/pki/rpm-gpg
+/etc/pki/rpm-gpg/RPM-GPG-KEY-OpenHPC-1
+/etc/yum.repos.d
+/etc/yum.repos.d/OpenHPC.repo
+-----
+
+Install the recipes.
+
+=====
+The intent of these guides is to present a simple cluster installation procedure using components from the OpenHPC software stack. The documentation is intended to be reasonably generic, but uses the underlying motivation of a small, stateless cluster installation to define a step-by-step process. Several optional customizations are included and the intent is that these collective instructions can be modified as needed for local site use cases.  Please consult the install guide for more detail and discussion regarding a companion template install script.
+=====
+
+-----
+yum install docs-ohpc
+-----
+
+Inspect the contents.
+
+-----
+rpm -ql docs-ohpc
+
+/opt/ohpc
+/opt/ohpc/pub
+/opt/ohpc/pub/doc
+/opt/ohpc/pub/doc/ChangeLog
+/opt/ohpc/pub/doc/Release_Notes.txt
+/opt/ohpc/pub/doc/contrib
+/opt/ohpc/pub/doc/recipes
+/opt/ohpc/pub/doc/recipes/centos7.2
+/opt/ohpc/pub/doc/recipes/centos7.2/aarch64
+/opt/ohpc/pub/doc/recipes/centos7.2/aarch64/warewulf
+/opt/ohpc/pub/doc/recipes/centos7.2/aarch64/warewulf/slurm
+/opt/ohpc/pub/doc/recipes/centos7.2/aarch64/warewulf/slurm/Install_guide.pdf
+/opt/ohpc/pub/doc/recipes/centos7.2/aarch64/warewulf/slurm/recipe.sh
+/opt/ohpc/pub/doc/recipes/centos7.2/input.local
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf/pbspro
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf/pbspro/Install_guide.pdf
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf/pbspro/recipe.sh
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf/slurm
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf/slurm/Install_guide.pdf
+/opt/ohpc/pub/doc/recipes/centos7.2/x86_64/warewulf/slurm/recipe.sh
+/opt/ohpc/pub/doc/recipes/sles12sp1
+/opt/ohpc/pub/doc/recipes/sles12sp1/aarch64
+/opt/ohpc/pub/doc/recipes/sles12sp1/aarch64/warewulf
+/opt/ohpc/pub/doc/recipes/sles12sp1/aarch64/warewulf/slurm
+/opt/ohpc/pub/doc/recipes/sles12sp1/aarch64/warewulf/slurm/Install_guide.pdf
+/opt/ohpc/pub/doc/recipes/sles12sp1/aarch64/warewulf/slurm/recipe.sh
+/opt/ohpc/pub/doc/recipes/sles12sp1/input.local
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf/pbspro
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf/pbspro/Install_guide.pdf
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf/pbspro/recipe.sh
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf/slurm
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf/slurm/Install_guide.pdf
+/opt/ohpc/pub/doc/recipes/sles12sp1/x86_64/warewulf/slurm/recipe.sh
+-----
+
+
+
+
+

@@ -1,0 +1,35 @@
+Interesting Plants
+==================
+Steven K. Baum
+v0.1, 2016-12-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+Alibertia patinoi (borojó)
+--------------------------
+
+*Trade Winds Fruit* - http://www.tradewindsfruit.com/alibertia-patinoi-borojo-seeds[+http://www.tradewindsfruit.com/alibertia-patinoi-borojo-seeds+]
+=====
+A Colombian native fruit that can grow to the size of a large orange. The nutritious pulp is used locally in the production of juices, candies, wine, and various flavorings. It has some traditional alleged aphrodisiac qualities as well. Little known outside of its native range, its recently come under more scrutiny for its high vitamin content. Unknown hardiness. Small tree to 10-15ft. a.k.a. Borojo Patinoi.
+=====
+
+*Wikipedia* - https://en.wikipedia.org/wiki/Alibertia_patinoi[+https://en.wikipedia.org/wiki/Alibertia_patinoi+]
+=====
+Alibertia patinoi, commonly known as borojó, is a small (2-5m), dioecious tropical rainforest tree. It is one of the few of the Rubiaceae family that has edible fruit. It grows in the northwest area of Colombia in the Chocó Department and in the Esmeraldas Province of Ecuador, in areas of high humidity and temperature. Borojó is an Emberá word meaning: boro = head, jo = fruit - head-shaped fruit, or round, globulous fruit.[1][2] The species has also been reported from Panamá and Costa Rica.[3]
+
+Alibertia patinoi has grey-brown bark and sometimes has two or three smaller trunks as well as one main one. It needs high humidity (over 85%) and temperature (an average of at least 25 °C) to thrive, though it can tolerate brief frosts as well as floods.[4]
+
+The fruit is large (about 12 cm length), with a round shape and brown color and average weight of 740-1000 grams. The pulp represents 88% of the total weight. Each fruit has 90 to 640 seeds. Borojo has high levels of protein, ascorbic acid, calcium and iron and very high levels of phosphorus. [1] Borojo is used in the preparation of jam, wine, desserts and traditional medicines with supposed aphrodisiac effects. It is also used by the local communities against hypertension, bronchial diseases and malnutrition. Borojo extract is widely sold on the internet as a health food.
+
+A study commissioned at Rutgers University by Nutropical, a private company, found that borojo fruit powder had a high and significant content of polyphenols as measured by the Folin-Ciocalteu polyphenol test. Most notably, the researchers believe the key polyphenol found in borojo may be novel. Work continues to identify the compound and/or elucidate its chemical structure. An analysis conducted by the same company found borojo has an ORAC value of over 54 μmolTE/g (5400 µmolTE/100g). The form of the fruit tested, however, is not mentioned (fresh, freeze-dried, spray-dried, etc.).
+=====
+
+
+
+

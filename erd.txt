@@ -1,0 +1,2736 @@
+= A Brief Guide to Using ERDDAP for Serving CF-Compliant netCDF Files: A Limited Use Case
+Steven K. Baum
+v2.718, 2020-08-28
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+[preface]
+
+
+== Overview
+
+The basic steps for setting up ERDDAP and preparing and serving
+CF-compliant netCDF files from it are described herein.
+The netCDF files were needed to serve historical physical oceanographic
+datasets for the GRIIDC project.
+The separate official online documents for setting up ERDDAP and for working with datasets
+are complete and invaluable, but somewhat daunting for anyone who wants to spin up from the beginning.
+This document is meant to provide a brief introduction to ERDDAP and the
+official documentation for a limited use case, and covers only a small fraction of
+what is contained within the latter.
+It can be consulted for getting a sense of the general procedures needed to install
+and use ERDDAP, but the official documentation for both setting up an ERDDAP server:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html`]
+
+and for preparing datasets to be served by ERDDAP:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html[`https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html`]
+
+should be consulted for the final word on everything you find in the document.
+There are links to the sections in the official documentation that correspond to
+the sections herein, and you should read them sooner rather than later.
+There are also many, many sections in the official documentation that aren't covered here.
+This brief introduction doesn't cover even 10% of the available details of how to set up
+ERDDAP and use it to serve datasets.
+It covers how to install and set up ERDDAP for a first time in a reasonably secure way,
+and how to prepare CF-compliant netCDF files to serve in it.
+
+The CF-compliant netCDF files covered here are just one example of one of the two general
+types of data that ERDDAP can process and serve: gridded and tabular.
+Gridded data is data that exists on regular grids such as numerical model output or satellite
+data.  Tabular data is data that isn't on grids and can be stored in tables.
+Oceanographic examples of this include buoy, station and trajectory data that exist as points
+that can vary in space and time, but do not exist as entire spatial fields that vary in time.
+The types of gridded datasets ERDDAP can handle are described at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDGrid[`https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDGrid`]
+
+and the types of tabular datasets at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDTable[`https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDTable`]
+
+Reading through these sections will give you an idea of what kinds of data and files
+ERDDAP can serve, and how to prepare them.  
+
+The subset of the table category that is covered here is the *EDDTableFromNcCFFiles* category
+that aggregates data from netCDF files that follow the conventions of the CF Discrete Sampling
+Geometries as described at:
+
+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/cf-conventions.html#discrete-sampling-geometries[`http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/cf-conventions.html#discrete-sampling-geometries`]
+
+The details about the category are found in the official documentation at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDTableFromNcCFFiles[`https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDTableFromNcCFFiles`]
+
+The specific and limited use of ERDDAP described here consists of three major steps:
+
+* Obtaining, installing and setting up Java, Tomcat and ERDDAP.
+* Preparing the files - in this case netCDF files containing historical Gulf of Mexico datasets - such that
+they can be properly processed and displayed by ERDDAP.
+* Creating an XML configuration fragment for each netCDF file containing all the meta-data needed by
+ERDDAP to properly serve it.
+
+*Note:* This document document explains how to do these things on a Linux operating system, in this case the
+CentOS distribution.  ERDDAP can be installed on OSX and Windows machines, but that is not covered here.
+This document also assumes reasonable familiarity with the use of the command line on Linux
+systems.  While ERDDAP itself is a tremendously capable and useful GUI, all the things you will need
+to do to prepare datasets for it will be from the command line.
+
+== Initial Installation
+
+The procedure for obtaining and installing ERDDAP is present is great detail at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html`]
+
+It's a good idea to at least skim through the first part of this document about how to install the chain of
+Java, Tomcat and ERDDAP needed to achieve proper ERDDAP functionality.
+Familiarization with the steps of the entire procedure can prevent annoying stumbles and backtracking.
+Herein we'll focus on those things specific to the present GRIIDC ERDDAP server set-up.
+
+It is popular and profitable to install such things using Docker these days.
+In this matter we'll just quote the official document:
+
+[quote]
+If you already use Docker, you might prefer the Docker version.
+If you don't already use Docker, we generally don't recommend this.
+If you chose to install ERDDAP via Docker, we don't offer any support for the installation process.
+We haven't worked with Docker yet. If you work with this, please send us your comments.
+
+=== Java
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#java[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#java`]
+
+The GRIIDC ERDDAP server is presently on a machine that runs the Linux CentOS operating system, which is a
+freely available downstream variant of the RedHat Enterprise distribution.
+CentOS contains its own Java and Tomcat packages, but the GRIIDC ERDDAP server is presently
+run on Java and Tomcat packages that are external to the official CentOS distribution.
+This is due to CentOS being historically a bit slow in updating the Java and Tomcat packages in
+their official distribution, as well as more recently because the official document recommends a very specific
+Java distribution on which to run Tomcat and ERDDAP.
+
+The Java, Tomcat and ERDDAP packages were all installed in `/opt` in this project because they are all external to CentOS,
+and because it's a useful thing to keep them all in one centralized
+location.  The official CentOS Java and Tomcat packages are
+scattered all over the filesystem, and it is more trouble than it is worth to attempt to shoehorn non-standard
+packages into the various niches into which the standard packages are presently stashed.  There is a procedure for
+taking source code packages and configuring and compiling them into standard CentOS binary packages, although one
+might call it attempting to lower the river rather than raising the bridge.  Steadily increasing security
+demands will probably force future installations to use the standard Java and Tomcat packages in the CentOS
+distribution, but that is beyond the scope of this document.
+
+The Java distribution officially recommended can be found at:
+
+https://adoptopenjdk.net/[`https://adoptopenjdk.net/`]
+
+This is not the official distribution available from java.com nor the CentOS distribution package.
+The AdoptOpenJDK project was started because of "the general lack of an open and reproducible build & test system for OpenJDK source across multiple platforms."
+The general goals are to provide a reliable source of OpenJDK binaries for all platforms for the long run,
+and to provide an open, common, audited, build infrastructure.
+If the creator of ERDDAP recommends it - "it is the main, community-supported, free (as in beer and speech) version of Java 8 that offers Long Term Support (free upgrades until at least September 2023)" - then we'll use it.
+An additional bonus to using AdoptOpenJDK is that is contains the DejaVu fonts that are
+recommended to replace the standard Java fonts, so you can skip the step of downloading them
+and installing them in another Java distribution.
+
+There are Java versions - 9, 10 and 11 - beyond the recommended version 8, but ERDDAP has not yet been
+tested with them.  Check the official installation document for further developments in this area.
+
+Installing the recommended Java is as easy as downloading it into `/opt`, unpacking it.  Bob recommends
+installing it in `/usr/local`, but that is the standard place into which most open source packages are installed 
+by default and can get crowded.  Using `/opt` allows you to limit the neighborhood to just the essentials of Java,
+Tomcat and ERDDAP.
+
+=== Tomcat
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#tomcat[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#tomcat`]
+
+==== Overview
+
+While the Java installation is easy, Tomcat is more complicated, requiring additional steps beyond
+downloading and unpacking.
+Tomcat is a Java Application Server (JAS), a piece of software - sometimes called middleware - that exists
+between the network services of the operating system and Java applications like ERDDAP.
+There are other freely available and commercial JAS packages, but ERDDAP is only supported under Tomcat.
+The recommended Tomcat distribution is the latest version of Tomcat 8, and can be found at:
+
+https://tomcat.apache.org/download-80.cgi[`https://tomcat.apache.org/download-80.cgi`]
+
+*Note:*  If you are already running a Tomcat server it is recommended that you install a second
+one that will run only ERDDAP.
+
+The general procedure for installing and configuring Tomcat is:
+
+* install Tomcat in the recommended location
+* create a `tomcat` user for security
+* make changes to configuration files
+* make whatever changes are recommended or required for security
+* set the environment variables appropriately for an ERDDAP server
+* convince yourself that the Tomcat server is working correctly
+
+Each of these steps are explained below.  The official documentation on how to set up your
+own ERDDAP goes into much greater detail about all of these steps.
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html[+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html+]
+
+==== Installation
+
+Download it and unpack it into `/opt`.
+This will create a directory such as `apache-tomcat-8.5.57` (the latest release as of 2020-08-18).
+It is useful to change the directory name to something like `tomcat8`, and also to create a file
+in `/opt` called `000-tomcat-8.5.57` as a reminder.
+Your Tomcat distribution is now installed in `/opt/tomcat8`.
+The procedure for doing this as root after you downloaded the Tomcat distribution into `/opt` is:
+
+-----
+tar xzvf apache-tomcat-8.5.57.tar.gz
+mv apache-tomcat-8.5.57 tomcat8
+-----
+
+*Note:*  In the remainder of this document, all commands run within
+the Tomcat directory will be shown with their full path including
+the base directory `/opt/tomcat8`.  If you install Tomcat elsewhere, you
+will of course need to change this to the new path.  You might want to
+grab a copy of the source code for this document (as detailed at the end
+of this document), do a global search and replace on the Tomcat path
+location, and recompile a custom version for your own use.
+
+It is useful to keep the original tarred and compressed file in the directory to
+remind you which version you're running.  If you wish to remove it, then you might want to
+create a reminder file, e.g.
+
+-----
+vi 000-tomcat-8.5.57
+-----
+
+==== Creating a `tomcat` User
+
+It is strongly recommended to set up Tomcat (and ERDDAP) to belong to a `tomcat` user
+that has no password and limited permissions.
+This means that only the super user can switch to user `tomcat` and that nobody can
+log in to your server as `tomcat`.
+The general procedure for doing this is as root or via `sudo` is:
+
+-----
+useradd tomcat -s /bin/bash -p '*'
+chown -R tomcat /opt/tomcat8
+chgrp -R tomcat /opt/tomcat8
+chmod -R ug+rwx /opt/tomcat8
+chmod -R o-rwx /opt/tomcat8
+-----
+
+After this has been set up, you can become user `tomcat` via:
+
+`sudo su - tomcat`
+
+==== Configuration File Changes
+
+At this point, the official documentation recommends making changes to three configuration files.
+First, the file:
+
+`/opt/tomcat8/conf/server.xml`
+
+needs to be edited (as user `tomcat`).  The value of `connectionTimeout` should be changed to `300000` and
+the parameter `relaxedQueryChars` needs to be added as shown.  Some additional parameters as suggested at:
+
+https://www.upguard.com/blog/15-ways-to-secure-apache-tomcat-8[+https://www.upguard.com/blog/15-ways-to-secure-apache-tomcat-8+]
+
+have also been added in the example below.  Just change that entire section to what you see below.
+
+-----
+    <Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="300000"
+               relaxedQueryChars="[]|"
+               redirectPort="8443" 
+               allowTrace="False" 
+               xpoweredby="False"
+               deployXML="False"/>
+-----
+
+This also needs to be done for the section:
+
+-----
+    <Connector port="8443" ...
+	...
+    </Connector>
+-----
+
+if that section is uncommented and used to provide `https` connections.
+
+Next, edit the file:
+
+`/opt/tomcat8/conf/context.xml`
+
+(also as user `tomcat`) and add the `Resources` tag as shown below.
+
+-----
+<Context>
+     <WatchedResource>WEB-INF/web.xml</WatchedResource>
+     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+     <Resources cachingAllowed="true" cacheMaxSize="80000" />
+</Context>
+-----
+
+Finally, edit the file:
+
+`/etc/httpd/conf/httpd.conf`
+
+and add the following lines near the end of the file right before the
+`Supplemental configuration` line.  This must be done as root or via `sudo`.
+
+-----
+TimeOut 3600
+ProxyTimeout 3600
+-----
+
+==== General Security Considerations
+
+The official documentation has many suggestions about securing your Tomcat server, as
+well as links to other resources.
+The THREDDS documentation at:
+
+https://www.unidata.ucar.edu/software/tds/current/tutorial/AdditionalSecurityConfiguration.html[+https://www.unidata.ucar.edu/software/tds/current/tutorial/AdditionalSecurityConfiguration.html+]
+
+also contains many useful Tomcat security suggestions and links.
+If you search for "tomcat security" you can find many, many more suggestions.
+It would be a good idea to consult your local security people about this, or
+just wait for them to contact you.
+
+A very important recommendation is to run Tomcat under the user `tomcat` rather than as `root`.
+There are instructions as to how to create this separate user with limited permissions
+and with no password, thus enabling only the superuser or those with `sudo` privileges to
+become user `tomcat` and make changes to the installation.
+There are also recommendations on changing file permissions to increase security.
+Follow them all.
+
+==== Specific Security Measures
+
+We'll now go over a few simple things that can be done to increase security.
+First, we'll disable some HTTP methods that won't be needed.
+Edit the file:
+
+`/opt/tomcat8/conf/web.xml`
+
+and add the following block of code.  It can be added anywhere before the
+`</web-app>` tag at the end of the file.
+
+-----
+<security-constraint>
+<web-resource-collection>
+<web-resource-name>restricted methods</web-resource-name>
+<url-pattern>/*</url-pattern>
+<http-method>TRACE</http-method>
+<http-method>PUT</http-method>
+<http-method>OPTIONS</http-method>
+<http-method>DELETE</http-method>
+</web-resource-collection>
+<auth-constraint />
+</security-constraint>
+-----
+
+There are also ways to implement fine-grained security measures at the file
+and directory level.  These are available at both the Java and OS level.  The Java level
+procedures can be found at:
+
+http://tomcat.apache.org/tomcat-8.0-doc/security-manager-howto.html[+http://tomcat.apache.org/tomcat-8.0-doc/security-manager-howto.html+]
+
+and the OS level procedures at:
+
+https://wiki.centos.org/HowTos/SELinux[+https://wiki.centos.org/HowTos/SELinux+]
+
+These are way, way beyond the scope of this document and most confusing to apply. If you really do want to give them a try
+you might want to contact a security professional.
+
+
+
+==== Environment Variables
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#WindowsMemory[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#WindowsMemory`]
+
+Variables specifying the environment in which Tomcat will run need to be created in a file called:
+
+`/opt/tomcat8/bin/setenv.sh`
+
+An example of this for this specific set-up is:
+
+-----
+export JAVA_HOME=/opt/jre
+export JAVA_OPTS='-server -Djava.awt.headless=true -Xmx8000M -Xms8000M'
+export TOMCAT_HOME=/opt/tomcat8
+export CATALINA_HOME=/opt/tomcat8
+-----
+
+Follow the instructions about how to set the `-Xmx` and `-Xms` memory
+settings.  It will depend on both your available RAM and the size and number
+of files you're attempting to serve with ERDDAP.
+The example contains the recommended minimum setting for a 64-bit machine,
+although it is further recommended to set these to 1/2 of your available RAM
+memory.
+These recommendations tell you that you should have at least 16GB of RAM to
+run an ERDDAP server, although experience has shown that 32GB is a better choice for a minimum.
+
+==== Testing Tomcat
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#testTomcat[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#testTomcat`]
+
+After all the configuring and securing, try to start Tomcat with:
+
+`/opt/tomcat8/bin/startup.sh`
+
+*Note:*  If you're not going to attempt to install ERDDAP on a Windows machine, go ahead
+and delete all the `*.bat` files in `/opt/tomcat8/bin`.
+
+After you start it, use your browser to go to:
+
+`https://yourmachine.org:8080`
+
+If you don't get the Tomcat welcome page, then go through the debugging section in
+the official documentation.
+A very important log file for this is:
+
+`/opt/tomcat8/logs/catalina.out`
+
+which will typically supply details about the problem if it is a Tomcat rather than
+an external network problem.
+
+A good thing to do right after you've successfully tested Tomcat is to go into
+the directory:
+
+`/opt/tomcat8/webapps`
+
+and delete everything therein, unless you're planning to manage the server remotely
+rather than from the command line.  Remote management can be and usually is a big security hole,
+so you're better off just removing everything from that directory.
+You might consider keeping the `ROOT` directory which supplies the initial Tomcat
+splash page, and there are suggestions on web as to how to edit the contents of `ROOT`
+to remove the splash page and provide minimal information rather than the error message
+you'll get in your browser if you remove it.
+
+=== ERDDAP
+
+==== Overview
+
+ERDDAP is a Java web application that runs in the web application server Tomcat.
+The general installation and configuration procedure is:
+
+* install the ERDDAP configuration files
+* make appropriate changes to the configuration file `setup.xml` that sets the general server environment
+* modify the `datasets.xml` file to specify your datasets
+* create a parent directory in which all the internal ERDDAP files are kept
+* install the ERDDAP war archive file `erddap.war` in Tomcat
+* restart Tomcat to see if ERDDAP is working and, if not, debug as necessary
+
+==== Install Configuration Files
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#erddapContent[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#erddapContent`]
+
+Download the configuration files from:
+
+https://github.com/BobSimons/erddap/releases/download/v2.02/erddapContent.zip[`https://github.com/BobSimons/erddap/releases/download/v2.02/erddapContent.zip`]
+
+This address will change whenever a new version becomes available, so check the official documentation to be sure.
+
+The installation procedure - performed as user `tomcat` - is:
+
+-----
+cd /opt/tomcat8
+wget https://github.com/BobSimons/erddap/releases/download/v2.02/erddapContent.zip
+unzip erddapContent.zip
+-----
+
+which will create the directory:
+
+`/opt/tomcat8/content/erddap`
+
+in which the configuration files for both the server and the datasets it will serve reside.
+
+==== Modifying `setup.xml`
+
+Edit the file `/opt/tomcat8/content/erddap/setup.xml` and make all the suggested changes therein.
+The changes that are *mandatory* are:
+
+-----
+<bigParentDirectory>
+<emailEverythingTo>
+<baseUrl>
+<baseHttpsUrl>
+<email.*>
+<admin.*>
+-----
+
+Additonally, `<fontFamily>` will have to be changed if you're not using the DejaVu fonts
+that come with the AdoptOpenJDK distribution.
+There are many non-mandatory configuration options, which you may need to come back to
+as you gain experience in running your server.
+
+*Note:*  It is easy enough to make changes to `setup.xml` that are not considered well-formed
+by the very finicky XML parser.  You can either use an XML validator to check the file
+or check the contents of a log file that will soon enough become your intimate friend:
+
+`/opt/erddap/logs/log.txt`
+
+for information as to the nature of your XML problem.
+Be warned, though, that error messages about XML problems provide information
+no more specific than the line number of the end of the `<dataset>` block in which
+the XML problem resides.  A validator is probably your best option.
+This file will also be the go-to
+place to track down the inevitable problems your dataset configuration files will have,
+and the error messages for dataset rather than XML syntax problems are generally much
+more useful.
+
+==== Modifying `datasets.xml`
+
+This file does not need to be modified to test if your ERDDAP server is working.
+The distribution comes with a default `datasets.xml` file that is fully debugged
+and contains examples of how to set up various types of datasets.  
+Just leave it as is to test your initial server set up.
+
+See the remaining 90% of this document for how to move on to configuring `datasets.xml`
+for your datasets.
+
+==== Create a Parent Directory
+
+The `<bigParentDirectory>` is a very important directory to create.
+It will contain all the internal netCDF and Java database files ERDDAP creates from
+the netCDF and other files you configure in `datasets.xml` for inclusion.
+ERDDAP creates several new internal files for each file it ingests, including those
+with summary information data for each dataset in a format more quickly and readily available
+than the original file.
+On the GRIIDC ERDDAP server, this directory is specified as `/opt/erddap`.
+*DO NOT* in any circumstances put this directory inside the `/opt/tomcat8` directory hierarchy.
+You might even want to put it on a separate data disk.
+
+It is also very important to make user `tomcat` the owner of the `/opt/erddap` hierarchy and
+change the permissions as indicated.  The basic procedure to create and appropriately modify
+this directory - assuming that it will be create as `/opt/erddap` - is:
+
+-----
+mkdir /opt/erddap
+chown -R tomcat /opt/erddap
+chgrp -R tomcat /opt/erddap
+chmod -R ug+rwx /opt/erddap
+chmod -R o-rwx /opt/erddap
+-----
+
+==== Installing the ERDDAP Server
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#erddap.war[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#erddap.war`]
+
+The ERDDAP server can now be downloaded from:
+
+https://github.com/BobSimons/erddap/releases/download/v2.02/erddap.war[`https://github.com/BobSimons/erddap/releases/download/v2.02/erddap.war`]
+
+the location of which, as with the configuration files, will change with the version number.
+
+*Note*:  The full ERDDAP distribution is half a gigabyte in size, so it might take a while to download.
+
+The procedure for doing this as user `tomcat` is:
+
+-----
+cd /opt/tomcat8
+wget https://github.com/BobSimons/erddap/releases/download/v2.02/erddap.war
+mv erddap.war webapps
+-----
+
+==== Shortening the URL
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#ProxyPass[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#ProxyPass`]
+
+At this point you can edit the Apache/HTTPD configuration file to use ProxyPass so users won't have 
+to specify the port number `:8080` in the URL for the server.  The official documentation provides the
+details for this, and don't forget to restart the Apache server if you do this.
+
+The procedure is to edit - as root or via `sudo` - the file:
+
+`/etc/httpd/conf/httpd/conf`
+
+and modify an existing `VirtualHost` tag - or create one - and add:
+
+-----
+<VirtualHost *:80>
+   ServerName YourDomain.org
+   ProxyRequests Off
+   ProxyPreserveHost On
+   ProxyPass /erddap http://localhost:8080/erddap
+   ProxyPassReverse /erddap http://localhost:8080/erddap
+</VirtualHost>
+-----
+
+Then restart your Apache HTTP server via:
+
+`/usr/sbin/apachectl -k graceful`
+
+There are infinite possibilities and subtleties when it comes to modifying the `httpd.conf` file.
+If you have a problem with getting this to work, search through the extensive web documentation
+available for doing just this.  An Apache HTTP configuration tutorial is beyond the scope of this document.
+
+==== Starting the ERDDAP Server
+
+This is officially covered at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#startTomcat[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#startTomcat`]
+
+Now we start the ERDDAP server.  If the Tomcat server is still running from your initial
+test shut it down via:
+
+`/opt/tomcat8/bin/shutdown.sh`
+
+and then start it up again via:
+
+`/opt/tomcat8/bin/startup.sh`
+
+*Note:*  You can check the up or down status of your Tomcat server via the command:
+
+`ps -ef | grep tomcat`
+
+After you've started or restarted Tomcat, check the status of ERDDAP by browsing to:
+
+`https://yourmachine.org:8080/erddap/status.html`
+
+You can also check to see if your ProxyPass set-up is working by trying this URL
+without the port number `:8080`.
+
+If ERDDAP does not successfully start it could be a problem with the Apache server, the
+Tomcat server, or ERDDAP itself.  Check the appropriate logs for error messages.  If your
+Tomcat server started without any problems, you can probably skip checking Apache and just
+look in either:
+
+-----
+/opt/tomcat8/logs/catalina.out
+/opt/erddap/logs/log.txt
+-----
+
+The official documentation has much more information about this at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#isErddapRunning[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#isErddapRunning`]
+
+==== Upgrading ERDDAP
+
+The official instructions are at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#update[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#update`]
+
+and you should read them before this.
+
+You will eventually need to upgrade ERDDAP to a new version, and
+also to upgrade Tomcat significantly more often since that package
+seems to have updates every month or so.
+If there is a new ERDDAP release, check to see if there's also
+a more recent Tomcat version - there will be - and upgrade them
+both at the same time.
+
+The official documentation has a section on how to do this, but
+there are some additional things you really should consider.
+
+Before you upgrade both, though, there are a couple of directories
+you really, really need to back up before you do anything.
+The first directory to back up is:
+
+`/opt/tomcat8/webapps/erddap/WEB-INF`
+
+which contains the `GenerateDatasetsXml.sh` script you use to create
+XML configuration chunks for the `datasets.xml` file.  In the present
+GRIIDC set-up, that is the directory in which the Python scripts used to
+automatically create XML for the configuration file from all files
+in a dataset reside.  You can skip this if you set up those scripts
+somewhere other than under `/opt/tomcat8`, although that will require
+making some modifications to `GenerateDatasetsXml.sh` so it can find
+the libraries it requires.  It is presently written such that it looks
+for them relative to the `WEB-INF` directory.
+
+The second directory you'll need to back up is the directory holding
+all your XML configuration files:
+
+`/opt/tomcat8/content/erddap`
+
+You do not strictly need to back this up if you are only dropping a new version
+of ERDDAP into the `webapps` directory, but it is a good idea to do so anyway
+(and often).  You do not want to lose those configuration files after all you've
+done to create them.
+
+It is recommended that you do not simply swap out `erddap.war` files since
+it is quite possible that the new ERDDAP version will throw an error on
+file configurations the previous version successfully processed.
+You should set up a temporary second Tomcat server as outlined in
+the next section about setting up a development server.
+That way your present production server can keep humming along while
+you do any debugging you might have to do with the new server.
+After you are satisfied that the new server is working as it should,
+then simply shut down the old one and start up the new one.
+The old one can then be deleted.
+
+To summarize:  Do *NOT* remove your present Tomcat/ERDDAP combination until
+you have backed up what you need to and you are confident that the new
+combination is working.
+
+==== The Need for an Additional Development Server
+
+If you have only a single production ERDDAP server running and
+wish to put some new datasets on it you will almost certainly
+have to go through the debugging cycle.  This requires time to start
+ERDDAP, peruse the log file to see what's not yet quite right, fix it,
+restart ERDDAP, and repeat as necessary.
+It can also take minutes to even hours for an ERDDAP to start even
+with already debugged datasets.
+An ERDDAP with dozens of Florida visual census data files - some of which are
+over a gigabyte in size - takes well over an hour to start and completely
+process all the files.
+
+The bullet point to take away from this part of the presentation is that
+you're going to incur significant down time on your production server if
+you also use it for development, and that just restarting it for any
+purpose can cause significant down time.
+A solution is to set up a second server for development purposes.
+
+This is done by setting up a second Tomcat server - for example in `/opt/tomcat-dev`
+rather than `/opt/tomcat` - in the same way you set up the first, production server.
+The only significant difference is that you'll have to edit the file:
+
+`/opt/tomcat-dev/conf/server.conf`
+
+to change the port on which it is served from `8080` to another available port.
+You can use the same Java distribution but you'll have to have a second Tomcat
+installation.
+
+This is also covered in the official documentation:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#secondErddap[+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#secondErddap+]
+
+==== Customizing the Appearance of ERDDAP
+
+This is covered in the official documentation at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#customize[`https://coastwatch.pfeg.noaa.gov/erddap/download/setup.html#customize`]
+
+The aesthetic appearance of the default ERDDAP distribution is based on
+the needs of NOAA ERD.  If you're not NOAA ERD you'll probably want to modify the aesthetics.
+This is done by copying either or both of the tags shown below into the
+`datasets.xml` file, wherein they will override the default versions.
+Change whatever is needed to personalize the banners for your organization.
+Look at the ERDDAP home page and decide what you want to change, find where it's
+located in the files below, and edit them to reflect your desired changes.
+
+The image `/images/noaab.png` specified in the `startBodyHtml5` tag is located
+at:
+
+`/opt/tomcat8/webapps/erddap/images/noaab.png`
+
+which tells you the `messages.xml` file and its contents are processed
+from the directory:
+
+`/opt/tomcat8/webapps/erddap`
+
+and thus where you'll need to put a replacement image.
+
+The settings at the top of the home page are established in the file:
+
+`/opt/tomcat8/webapps/erddap/WEB-INF/classes/gov/noaa/pfel/erddap/util/messages.xml`
+
+in the `<startBodyHtml5>` tag.  The default state of this tag is:
+
+-----
+<startBodyHtml5><![CDATA[
+<body>
+<table class="compact nowrap" style="width:100%; background-color:#128CB5;">
+  <tr> 
+    <td style="text-align:center; width:80px;"><a rel="bookmark"
+      href="https://www.noaa.gov/"><img 
+      title="National Oceanic and Atmospheric Administration" 
+      src="&erddapUrl;/images/noaab.png" alt="NOAA"
+      style="vertical-align:middle;"></a></td> 
+    <td style="text-align:left; font-size:x-large; color:#FFFFFF; ">
+      <strong>ERDDAP</strong>
+      <br><small><small><small>Easier access to scientific data</small></small></small>
+      </td> 
+    <td style="text-align:right; font-size:small;"> 
+      &loginInfo; &nbsp; &nbsp;
+      <br>Brought to you by 
+      <a title="National Oceanic and Atmospheric Administration" rel="bookmark"
+      href="https://www.noaa.gov">NOAA</a>  
+      <a title="National Marine Fisheries Service" rel="bookmark"
+      href="https://www.fisheries.noaa.gov">NMFS</a>  
+      <a title="Southwest Fisheries Science Center" rel="bookmark"
+      href="https://swfsc.noaa.gov">SWFSC</a> 
+      <a title="Environmental Research Division" rel="bookmark"
+      href="https://swfsc.noaa.gov/textblock.aspx?Division=ERD&amp;id=1315&amp;ParentMenuId=200">ERD</a>  
+      &nbsp; &nbsp;
+      </td> 
+  </tr> 
+</table>
+]]></startBodyHtml5>
+-----
+
+The settings for the left side of the page are set in the `<theShortDescriptionHtml>` tag,
+the default state of which is:
+
+-----
+<theShortDescriptionHtml><![CDATA[
+<h1>ERDDAP</h1>
+ERDDAP is a data server that gives you a simple, consistent way to download 
+subsets of scientific datasets in common file formats and make graphs and maps. 
+This particular ERDDAP installation has oceanographic data
+(for example, data from satellites and buoys).
+
+[standardShortDescriptionHtml]
+
+]]></theShortDescriptionHtml>
+-----
+
+wherein the `standardShortDescriptionHtml` contents can also be found in the `messages.xml` file.
+
+== How to Get Datasets into ERDDAP
+
+=== Overview
+
+The initial installation and configuration of ERDDAP is the easy part.
+Configuring datasets such that they can be correctly ingested by ERDDAP
+is both harder and more tedious, but is straightforward enough given some practice.
+
+With many geoscience data servers such as THREDDS and OpenDAP the configuration
+process is to simply specify the directory path or the URL of the dataset and the
+server does the rest.  With ERDDAP you have to write a large chunk of XML that
+describes the dataset.
+
+The basic process by which this is done is:
+
+* set up a standardized data directory structure
+* prepare a dataset - in the case of GRIIDC netCDF files - for ingestion into ERDDAP
+* run an ERDDAP script that reads the dataset and creates 99% of the XML boilerplate required
+* place that chunk of XML into the `datasets.xml` file
+* restart ERDDAP
+* if the chunk works and ERDDAP has processed and is displaying your dataset, rejoice
+* if your dataset doesn't appear in the ERDDAP listing, search the `/opt/erddap/logs/log.txt` 
+file for your dataset and hopefully find a message that tells you what you need to fix
+* go back to the restart ERDDAP step, and cycle through as needed
+
+The ERDDAP error messages are very useful and typically
+tell you exactly what's missing or otherwise wrong.  There are also occasional less than helpful
+Java error messages like `EOFException`, but that's usually not the case.
+As was mentioned earlier, you will be spending a lot of time perusing
+the `/opt/erddap/logs/log.txt` file, so you might want to create a short macro that
+will take your editor directly there.
+
+The two really big tasks are creating the datasets in the correct netCDF format and
+creating the XML configuration file from these datasets.
+We will approach these separately.
+
+=== The Directory Structure
+
+==== The Data Directory
+
+ERDDAP must be able to read the files in all the datasets from somewhere in
+order to process them via the information in the configuration files.
+If you're running ERDDAP on more than one machine you soon discover that it is a good
+idea to establish a standard location for the data across all machines.
+The GRIIDC set-up sets this location as:
+
+`/data`
+
+This can be either an actual subdirectory at your root level, or
+a symbolic link to somewhere else on a data disk.
+
+Below this level are subdirectories for each different geometry.  This
+looks like:
+
+-----
+/data/profile
+      trajectory
+      ts
+      trajprof
+      tsprof
+-----
+
+There are subdirectories in each of these for separate projects.
+
+-----
+/data/profile/griidc
+              latex
+              negom
+              deepwater
+              ws
+-----
+
+And, finally, there are - if there many different datasets within a project
+such as with GRIIDC - subdirectories whose names reflect the UDI of each datasets.
+
+-----
+/data/profile/griidc/R1.x132.134.0001
+                     R1.x132.134.0002
+                        ...
+                     Y1.x030.000.0007
+-----
+
+The choice of the UDI as the finest-grained subdirectory name was obvious.
+The motivation for this particular overall structure was ultimately decided
+by there existing multiple geometry types - e.g. profile and trajectory files -
+in the same UDI dataset.  Each of the geometry types requires processing in
+different ways by different scripts, and it is less confusing to keep them
+separate in their archive as well as in the processing stage.
+
+You inform ERDDAP of the location of all the ERDDAP-ready netCDF-format
+datasets via the scripts that use `GenerateDatasetsXml.sh` to create the XML
+configuration chunks.
+Each dataset is contained in a separate subdirectory under `/data`
+that must be specified when running the scripts that automatically
+create the XML for an entire dataset.
+
+==== The Working Directory
+
+The various preparation steps described below will leave a lot of detritus
+in the directories containing your completed and ERDDAP-ready netCDF files.
+For example, it is a good idea to create an `ARCHIVE` subdirectory in which
+to store any files you receive so you can copy the originals back into your
+main working directory should you happen to munge them beyond repair.
+It is thus good to have a separate working directory structure where the
+sausages can be made and the finished product exported to the data archive
+directory structure.
+
+Also, during the preparation of many of the old datasets, different one-off
+shell and Python scripts were required to even get them to the point where the
+general attribute fixing scripts could be used.
+
+=== Creating the netCDF Datasets
+
+==== Overview
+
+There are many different types of dataset formats that ERDDAP can ingest and display if they
+are properly prepared.  For the purposes of this document, we are only going to concern ourselves
+with netCDF files that conform to the metadata and feature type conventions described in the
+latest CF conventions document at:
+
+https://cfconventions.org/latest.html[`https://cfconventions.org/latest.html`]
+
+and the NOAA NCEI netCDF templates - a recommended superset of the CF standards - at:
+
+https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/[`https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/`]
+
+and the ACDD metadata conventions at:
+
+https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3[`https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3`]
+
+There are additional metadata conventions required by IOOS and described at:
+
+https://ioos.noaa.gov/data/contribute-data/metadata-data-formats/[`https://ioos.noaa.gov/data/contribute-data/metadata-data-formats/`]
+
+but these three sets of conventions are the bulk of that with which you must be concerned.
+
+It is important to realize the difference between the types of conventions as well as the necessity of
+conforming to both in order for a dataset to be successfully served by ERDDAP.
+The metadata convetions concern descriptions of the data rather than the data itself, for instance
+the standard names and units of the variables as well as the provence and processing of the dataset.
+The feature type conventions deal with the specifics of how the data is structured within the files
+in the dataset.  Each will now be explained more fully.
+
+===== Metadata Conventions
+
+The metadata in a dataset is everything that is not the data itself.
+It provides information about the type of data as well as the provenance and processing of the data.
+
+GRIIDC files need to conform to the IOOS metadata requirements for data providers. These requirements
+are specified in the IOOS Metadata Profile, which is at version 1.2 as of this writing.
+This contains dataset attribution guidelines and examples to help the US IOOS community publish datasets
+in netCDF and other related data formats in an interoperable manner.
+The Profile defines recommended and required global and variable attributes for IOOS data
+providers to include when publishing their datasets and accompanying services.
+
+https://ioos.github.io/ioos-metadata/[`https://ioos.github.io/ioos-metadata/`]
+
+The Metadata Profile is based on the following standards, each of which is a superset of
+the previous one.
+
+* *netCDF Climate and Forecast Conventions (CF)*
+** https://cfconventions.org/[`https://cfconventions.org/`]
+* *Attribute Convention for Data Discovery (ACDD)*
+** https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3[`https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3`]
+* *NOAA NCEI NetCDF Templates* 
+** https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/[`https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/`]
+
+As is it the highest level superset, the NCEI Standard Attributes and Guide Table at:
+
+https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/#guidancetable[`https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/#guidancetable`]
+
+contains all the metadata items with you need to be concerned, at
+least for the GRIIDC physical oceanography data.  It contains both the CF and ACDD
+metadata requirements as well as some additional NCEI metadata requirements.
+
+IOOS additionally requires adherence to the following metadata standards:
+
+* *ISO 19115-2* for ancillary dataset and collection level metadata for Catalog indexing
+** https://www.iso.org/standard/39229.html[`https://www.iso.org/standard/39229.html`]
+* *Darwin Core* for biological data
+** https://dwc.tdwg.org/[`https://dwc.tdwg.org/`]
+
+The Metadata Profile standards deal with what is called discovery and use metadata that help find a file and
+use the data therein.  The ISO 19115-2 standard deals with the details of the provenance and processing of the data.
+The Darwin Core - still under early development for oceanographic data - is for biological datasets.
+
+The ERDDAP program itself also has some additional metadata requirements that are needed to ensure
+that datasets can be served with the full subsetting and graphical capabilities available.
+These will be described in the course of this document.
+
+While it won't help you to create your netCDF file with the various metadata requirements,
+there is a
+useful tool to check the compliance of your file
+after you have created it. It is the IOOS Compliance Checker available at:
+
+https://github.com/ioos/compliance-checker[`https://github.com/ioos/compliance-checker`]
+
+It is a Python script that checks for completeness and community standard compliance of
+local or remote netCDF files against CF and ACDD file standards.  It checks for any
+combination of or all of ACDD, CF, SOS, IOOS, Glider DAC and NCEI standards.
+When you run it from the command line it tells you what your file is missing or has specified incorrectly.
+
+===== Feature Type Conventions
+
+Types of oceanographic data are classified into feature types by the CF standards.
+These types are not based on the kind of observing system, instrument type, or variable collected,
+but rather on the fundamental relationships among the spatiotemporal coordinates.
+Two of these types - `grid` and `swath` - are for types of data that exist on horizontal grids.
+Six others are separately grouped as `discrete sampling geometries` or `point observation types`.
+These are `point`, `timeSeries`, `trajectory`, `profile`, `timeSeriesProfile` and `trajectoryProfile`.
+The GRIIDC data all fits into one of these categories, each of which will be briefly explained.
+
+* `point` - This is for one more more observations that have no temporal or spatial relationship.
+Somebody moving a boat along an essentially random course and measuring the water temperature intermittently
+would produce one of these.
+
+* `timeSeries` - A set of observations at the same location over time.  An instrument measuring the water temperature
+at a point over time would make one of these.
+
+* `trajectory` - A set of data points along a horizontal path in space.  A glider will produce one of these.
+
+* `profile` - A set of observations along a vertical path in space.  These are produced by CTD and XBT instruments.
+
+* `timeSeriesProfile` - A series of profiles at the same location over time.  An ADCP taking a series of measurements at
+a fixed point over time would produce one of these.
+
+* `trajectoryProfile` - A series of profiles along a trajectory.  An ADCP being towed along a horizontal trajectory would
+produce one of these.
+
+The different relationships among the spatioatemporal coordinates require different data structures
+within the netCDF files for each geometry type.
+ERDDAP has a specific processor called `EDDTableFromNcCFFiles` that processes netCDF files
+that conform to the data structure requirements of these geometry types.  If the data structures
+are incorrectly implemented ERDDAP will either not process and serve them at all, or will serve
+them with only a portion of its capabilities.
+Also, in addition to the data structure requirements, ERDDAP has a few additional metadata requirements beyond
+the IOOS set that are required to achieve full functionality for subsetting and graphing the data.
+
+The NCEI NetCDF Templates at:
+
+https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/[`https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/`]
+
+provide templates for each geometry as well as example netCDF files demonstrating a correct
+way for using the templates.
+The NCEI templates implement a superset of the CF sampling geometry requirements, and as such the latter
+probably won't need to be consulted.
+
+==== Software and Methods for netCDF File Creation
+
+There are no general tools for creating structurally compliant ERDDAP-ready netCDF files
+from non-netCDF files because the formats of
+the latter are seemingly infinite, and the metadata - if it even exists - is generally
+separate from the file holding the data.
+The procedure is typically different for each and every dataset, and involves
+studying the original data file to see what it contains and what data structures
+are used, and then writing a program to read it and output a netCDF file with
+the same content.  The data structures can be and often are different given the
+requirements of netCDF standards for geoscience data.
+
+The earliest incarnation of the netCDF format was instantiated as C and Fortran libraries.
+Given the ubiquity of Fortran for programming in the geosciences until the early 2000s,
+the most common method for creating a netCDF program was to write a Fortran program into
+which calls to the various methods in the netCDF library were embedded.
+Given the limitations of early versions of Fortran, this was a tedious and error-prone
+procedure.
+
+===== Python and NumPy
+
+In the mid-2000s the Python programming language began to be used in the geoscience
+community as a scripting or glue language to facilitate the handling of input and output
+files for Fortran programs.  Python was much more flexible and capable than Fortran, e.g.
+system calls were readily available and string processing was indescribably easier than
+with Fortran.
+Around 2006, a change was made to the Python language internal structure to enable it to
+more readily perform matrix computations, a move that led to the development of what came to 
+be known as Numpy, a very powerful Python package for performing operations on N-dimensional
+arrays.  Today Python, Numpy, and the SciPy package of scientific programming tools built on top of
+them, are ubiquitous in the geoscience, and fast spreading into all sciences, as is
+attested by the presentations and tutorials given at the annual SciPy Conference.
+Hundreds if not thousands of packages have been built on top of the NumPy/SciPy stack,
+including one that provides a wrapper around the netCDF C library and thus enables netCDF
+files to be created from within Python programs.
+
+Further information about the Python/NumPy stack can be found at:
+
+* Python - https://www.python.org/[`https://www.python.org/`]
+* Numpy - https://numpy.org/[`https://numpy.org/`]
+* netCDF4-python - https://unidata.github.io/netcdf4-python/netCDF4/index.html[`https://unidata.github.io/netcdf4-python/netCDF4/index.html`]
+
+Both Python 2 and 3 are available in all major Linux distributions.  Most programs presently
+being developed use Python 3, although there are still some legacy programs that require Python 2.
+There will be no problems using Python 3 with the software listed here.
+Numpy is also available in most distributions, although an alternative used by many is to
+install the Anaconda Individual Edition Python distribution available at:
+
+https://www.anaconda.com/products/individual[`https://www.anaconda.com/products/individual`]
+
+This allows you to use the `conda` package manager along with Conda Forge
+
+https://conda-forge.org/[`https://conda-forge.org/`]
+
+to install just about any available Python package, especially those that employ the
+array manipulation and scientific programming capabilities of NumPy/SciPy.
+
+===== netCDF Operators (NCO)
+
+A very useful package for making changes in metadata - that is, in the global and varible attributes of the
+netCDF files - is the netCDF Operators (NCO).
+
+https://github.com/nco/nco[`https://github.com/nco/nco`]
+
+The NCO comprise a dozen standalone, command-line programs that take netCDF files as input and then
+operate (e.g. derive new data, compute statistics, print, hyperslab, manipulate metadata) and output the results 
+to a new file.  Specific capabilities of these programs that have proved invaluable during the GRIIDC
+project include:
+
+* *ncrename* - This enables changing the names of dimensions, variables and attributes.
+* *ncatted* - This enables attributes to be added, deleted and overwritten.
+* *ncks* - This enables the delection of arbitrary variables from a file.
+
+Recipes for doing these and many other things that have been developed to solve various specific
+problems during the project are available at:
+
+http://pong.tamu.edu/\~baum/netcdf_recipes.html[`http://pong.tamu.edu/~baum/netcdf_recipes.html`]
+
+===== NcML
+
+The netCDF Markup Language (NcML) is a possibility for making virtual structural
+changes to your netCDF files.  You can do things like add a dimension with a single
+value to a netCDF file that otherwise requires a significant amount of programming
+with Python and netcdf4-python.
+
+NcML files allow you to specify on-the-fly changes to netCDF source files.
+The combination of the netCDF file and the NcML file creates a virtual file that
+contains the netCDF file with whatever changes are specified in the NcML file.
+Instead of specifying the netCDF file (`test.nc`) as the source file in your XML
+configuration file, you specify the NcML file (`test.ncml`).
+
+A trade-off that should be considered with using NcML is that the virtual modifications
+it can make to a netCDF can be easier than actually changing the file itself, but
+you're also going to add to the number of files you have to create and manage since
+each netCDF file modified will require a separate and additional NcML file.
+
+Further information can be found at:
+
+https://www.unidata.ucar.edu/software/netcdf-java/v4.6/ncml/[`https://www.unidata.ucar.edu/software/netcdf-java/v4.6/ncml/`]
+
+https://www.unidata.ucar.edu/software/netcdf-java/v4.6/ncml/Cookbook.html[`https://www.unidata.ucar.edu/software/netcdf-java/v4.6/ncml/Cookbook.html`]
+
+==== Strategic Overview
+
+There are two methods that have been found to be useful as starting points to transform
+datasets into ERDDAP-ready netCDF files.
+
+* The use of scripts that create the entirety of the required metadata and file geometry
+structure.  You need to copy and edit the scripts to fill in the values for all of the
+attributes, the vast majority of which have been set to `Unknown`.
+You also need to write some Python/Numpy code to read the data from the format in
+which you already have it into Numpy arrays that can be written to the netCDF output file.
+
+* The use of scripts that attempt to fix already existing netCDF files that have most
+or some of the metadata in them, and that already have the correct structure for their
+data geometry.  There are also a couple of scripts that might be able to fix small problems
+with the file structure.
+
+There is no sharp line of demarcation between these methods.  Sometimes it's a judgment call
+or a coin flip as to which is the best way to proceed.
+
+
+
+==== Metadata Preparation
+
+===== The Extreme Importance of Time and Space Variables
+
+If those who wish to use your data don't know where it is located in
+time and space they will be as lost as you'd be if you didn't know what 
+time it was or where you were.
+The official ERDDAP documentation goes into great detail about
+how to specify spatiotemporal metadata in the `dataset.xml` file to get maximum use of its
+capabilities.
+The good news is that if you specify all this properly in the metadata of
+your netCDF file, the `GenerateDatasetsXml.sh` script will translate it to
+XML code that's exactly what ERDDAP needs.
+
+All the global attributes that exist in your netCDF file are placed into
+a `sourceAttributes` section in the XML chunk created.
+All the additional metadata created internally by ERDDAP is
+placed into an `addAttributes` section, which can also be edited by
+ERDDAP administrators to supply additional attributes or redefine
+attributes in the `sourceAttributes` section.
+These two sections are combined to create the attributes list
+ERDDAP displays for a dataset.
+
+In the matter of time and space (and all other) variables, the variable
+name ERDDAP reads from the netCDF file is called the `sourceName`, and
+the name it uses to identify the variable in its interface is called
+the `destinationName`.  If the ERDDAP admin does not manually edit the
+configuration file to change it, the `destinationName` is automatically
+made the `sourceName`.
+
+The official documentation tells us that the longitude, latitude, altitude (or depth)
+and time (LLAT) variables "are made known to ERDDAP if the destination names are
+*longitude*, *latitude*, *altitude* (or *depth*) and *time*.
+Thus, if you specify them as such in the attribute section of your netCDF file
+you will have no problems with the LLAT variables.
+Doing this correctly will also enable ERDDAP to:
+
+* create appropriate default graphs for your dataset
+* automatically add more metadata to LLAT variables
+* automatically add more global metadata related to LLAT variables
+
+This will also make it easy for clients that use the standards to find
+and extract data from ERDDAP.  That's a lot of return for the small investment
+of correctly specifying just four variables.
+
+Further important considerations about these variables include:
+
+* `longitude` and `latitude` should only be used if the accompanying
+`units` attributes are, respectively, `degrees_east` and `degrees_north`
+
+* `depth` is the vertical variable to use to specify distance below sea
+level, with variable attribute `positive` specified as `down`
+
+* the `unit` attribute for vertical variables must be `m`, `meter` or
+`meters`
+
+* `time` should only be used for variables that contain all the date and time information (although
+if you have a netCDF file that has separate date and time variables you should combine them
+before attempting to run it through ERDDAP)
+
+All these considerations will be satisfied if you correctly create your
+netCDF file according to the instructions below.
+
+
+The inordinately complex issue of time and how ERDDAP deals with is further
+explained at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/convert/time.html#erddap[`https://coastwatch.pfeg.noaa.gov/erddap/convert/time.html#erddap`]
+
+===== Variable Attribute Overview
+
+As with everything else, your best strategy for getting the variable attributes
+right in the ERDDAP XML chunks is to get them right in your netCDF files.
+This section offers some general considerations about how one might go
+about this.
+
+====== The Automatically Generated Variable Attributes
+
+The ERDDAP XML configuration file encapsulates metadata about
+variables in `dataVariable` containers.
+A typical such container from a random GRIIDC profile dataset file that was
+automatically created by `GenerateDatasetsXml.sh` is:
+
+-----
+    <dataVariable>
+        <sourceName>time</sourceName>
+        <destinationName>time</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_ChunkSizes" type="intList">39 1</att>
+            <att name="axis">T</att>
+            <att name="calendar">gregorian</att>
+            <att name="comment">unknown</att>
+            <att name="coverage_content_type">physicalMeasurement</att>
+            <att name="FillValue" type="double">-9.99E-29</att>
+            <att name="ioos_category">time</att>
+            <att name="long_name">time</att>
+            <att name="standard_name">time</att>
+            <att name="units">seconds since 1970-01-01 00:00:00</att>
+            <att name="valid_max" type="double">1.49459772E9</att>
+            <att name="valid_min" type="double">1.4936883E9</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="_ChunkSizes">null</att>
+            <att name="_FillValue" type="double">-9.99E-29</att>
+            <att name="colorBarMaximum" type="double">1.4948E9</att>
+            <att name="colorBarMinimum" type="double">1.4936E9</att>
+            <att name="comment">null</att>
+            <att name="FillValue">null</att>
+            <att name="ioos_category">Time</att>
+            <att name="units">seconds since 1970-01-01T00:00:00Z</att>
+        </addAttributes>
+    </dataVariable>
+-----
+
+The `sourceAttributes` section is created from the netCDF file, and the
+`addAttributes` section is internally generated by the generation script.
+Note that the latter will supersede the former, and that ERDDAP not only creates
+new attributes not present in the netCDF file, but also creates attributes
+to supersede those in the netCDF file.  This author is in the dark as to how
+and why some attributes are overwritten, and trusts that ERDDAP knows what it's doing.
+If you find yourself in disagreement with the internal choice of attributes,
+simply edit the XML chunk after it has been generated.
+
+====== The `ioos_category` Attribute
+
+The values for the `ioos_category` variable attribute originate from the NOAA IOOS at:
+
+https://ioos.noaa.gov/[`https://ioos.noaa.gov/`]
+
+and were born in a document written in 2010:
+
+http://www.iooc.us/wp-content/uploads/2010/11/US-IOOS-Blueprint-for-Full-Capability-Version-1.0.pdf[`http://www.iooc.us/wp-content/uploads/2010/11/US-IOOS-Blueprint-for-Full-Capability-Version-1.0.pdf`]
+
+It is a list in flux, and the ERDDAP documentation section about it at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#ioos_category[`https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#ioos_category`]
+
+seems to be the most up-to-date source for it.
+
+This attribute was mandatory with an earlier version of ERDDAP before 2.02, but
+after a version update was rumored to have caused every one of several hundred
+datasets in an ERDDAP production installation to throw an error and not be processed
+by the newer version, the capability was provided to make it optional in
+succeeding versions.
+If the `<variablesMustHaveIoosCategory>` parameter in `setup.xml` is set to
+`False`, the `ioos_category` is considerd optional by ERDDAP.
+The default is set to `True`.
+Nonetheless, all those who prepare these datasets should assume that it
+will soon enough be mandatory and include it.
+
+The list of currently valid values of `ioos_category` in ERDDAP is larger than
+that found in the original source.  The official documentation has added additional values
+as the need has arisen.
+
+As of ERDDAP 2.02, the valid values of `ioos_category` are:
+
+-----
+Bathymetry, Biology, Bottom Character, CO2, Colored Dissolved Organic Matter, Contaminants, Currents, Dissolved Nutrients, Dissolved O2, Ecology, Fish Abundance, Fish Species, Heat Flux, Hydrology, Ice Distribution, Identifier, Location, Meteorology, Ocean Color, Optical Properties, Other, Pathogens, Phytoplankton Species, Pressure, Productivity, Quality, Salinity, Sea Level, Statistics, Stream Flow, Surface Waves, Taxonomy, Temperature, Time, Total Suspended Matter, Unknown, Wind, Zooplankton Species, and Zooplankton Abundance.
+-----
+
+A good reason to leave the parameter set to `True` is that 
+`GenerateDatasetsXml.sh` always creates/suggests an `ioos_category` attribute
+for each variable in each new dataset. 
+Just be a mensch and get this variable attribute right, eh?
+
+===== Useful Scripts for Attribute Addition and Repair
+
+A couple of Python scripts are available for supplying missing metadata and/or checking
+metadata that is already in a netCDF file.
+These were originally developed as ad hoc one-offs for each dataset until it became obvious
+that something more substantial than constantly reinventing the wheel would be more useful.
+As such, separate scripts for handling global and variable attributes
+were written.  That is, they were written and debugged until they worked on a first
+dataset, and then tried on a second dataset.  If they didn't work on that, they were
+again debugged or their capabilities extended to handle unanticipated problems that hadn't
+been encountered the first time around.
+This process continued until they became generally useful for most datasets.
+
+One of the scripts - `gatt.py` - adds and/or repairs global attributes, while the
+other - `vatt.py` - does the same with variable attributes.
+They do not work miracles, though.  If no value is readily available for
+a missing global or variable attribute that missing, then that value will be
+set to `Unknown`.  There are several attributes that can be and are created from
+the information in the data arrays or other attributes, but the vast majority have
+to be externally specified.
+
+====== The `gatt.py` Script
+
+The source code of `gatt.py` is reproduced here.  It can downloaded from:
+
+http://pong.tamu.edu/\~baum/erddap/gattts.py[`http://pong.tamu.edu/~baum/erddap/gattts.py`]
+
+The required and recommended global attributes are all defined as `Unknown` near
+the top of the script and defined otherwise further on if possible.
+If not possible, then the modified file will have more global attributes than before
+and be closer to passing the compliance checker tests, but just about all the values
+for the new attributes will be `Unknown`.
+
+To alleviate this problem, you need to make a new copy of this script into each
+subdirectory containing all the files for a single dataset.
+You then edit the file and replace all the unknown attribute values with known ones
+you have painstakingly pulled like teeth from the PI who created the dataset.
+And be sure to save the modified version of the file in that subdirectory so you
+can use it again with much less modification to add - and never, never subtract - more
+attributes.
+
+A much more elegant and compact version of this script could be created by
+creating a Python dictionary containing all the attributes and their values,
+and then simply cycling through a single version of the NCO `ncatted` instances
+comprising the latter part of the script that either overwrite an existing
+attribute value or create a new attribute and value.  Or you could extract
+all the attribute-value pairs into an external text file specific to each
+dataset and read it with a single script that works over all datasets.
+Have at it!
+
+[source,python]
+-----
+include::erddap/gattts.py[]
+-----
+
+====== The `vatt.py` Script
+
+The source code of `vatt.py` is reproduced here.  It can downloaded from:
+
+http://pong.tamu.edu/\~baum/erddap/vattts.py[`http://pong.tamu.edu/~baum/erddap/vattts.py`]
+
+[source,python]
+-----
+include::erddap/vattts.py[]
+-----
+
+==== File Structure Preparation
+
+Fixing structural problems in netCDF files is trickier than fixing 
+attribute problems.  It's much easier to wrap a Python script around
+NCO programs that can overwrite or create global and local attributes than
+to, say, create a new leading profile dimension in a file that doesn't have one.
+
+The NCEI template for profile datasets at:
+
+https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/profileOrthogonal.cdl[+https://www.nodc.noaa.gov/data/formats/netcdf/v2.0/profileOrthogonal.cdl+]
+
+specifies that profile datasets have two dimensions.  The leading dimension is `profile`, which specifies
+the number of profiles in the file, and the second is `z`, which specifies the number of depths in the file.
+Each of the netCDF files in the GRIIDC profile datasets contains only a single profile, but the standard
+nonetheless tells us that the dimension must be specified.
+
+Many of the historical datasets have only a single dimension for the depth,
+with the times, lats and lons specified as global attributes.  They need to be processed
+such that they have both dimensions, with the times, lats and lons extracted from the
+attributes and placed into variable arrays.
+This is not possible using any command-line tool (e.g. NCO, CDO, etc) known to this author,
+so a program must be created to do this.
+The following program does just that.
+It reads the file, checks the dimension structure, and then creates a new netCDF file
+with the correct dimension structure with a leading `profile` dimension.  It passes through
+those files that already have both dimensions.
+
+[source,python]
+-----
+include::erddap/extradim.py[]
+-----
+
+Adding such an extra dimension can also be done using NcML as described at:
+
+https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#NcML[`https://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#NcML`]
+
+where the basic format is:
+
+-----
+<netcdf xmlns='https://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2'>
+  <variable name='time' type='int' shape='time' />
+  <aggregation dimName='time' type='joinNew'>
+    <variableAgg name='pic'/>
+    <netcdf location='no_time_variable.nc' coordValue='1041379200'/>
+  </aggregation>
+</netcdf>
+-----
+
+This trades off a more elegant solution for having to create an additional NcML file
+for every one of your netCDF files.
+
+=== Creating the ERDDAP Dataset Configuration File
+
+==== Using `GenerateDatasetsXml.sh`
+
+The ERDDAP distribution contains the script `GenerateDatasetsXml.sh` that can be used to
+create the required XML configuration chunks for each dataset file.  It is located at:
+
+`/opt/tomcat8/webapps/erddap/WEB-INF/GenerateDatasetsXml.sh`
+
+You run it from the command line and supply the location and name of the dataset file to
+be processed, and it creates most of the boilerplate XML required by ERDDAP to correctly
+process and make available the file.
+It is not guaranteed to produce all of the required XML code - and almost never does - but it
+does produce probably 99% so you only have to do a little more work via hand editing to
+finish a correct XML code chunk.
+
+The most common use case for ERDDAP is to present the data that has been and is being
+collected by an instrument
+or set of instruments.  In such a case one XML chunk can be created for each instrument, tweaked
+until it works correctly, and then used for as long as that instrument is producing data.
+The GRIIDC historical datasets do not fit that use case.
+Each dataset is different, and there are differences within many of the datasets.
+As such, custom XML chunks had to be created for hundreds of vastly different datasets in all
+six sampling geometries, with each containing its own set of variables and metadata.
+
+At the beginning of the GRIIDC project, the XML chunks were constructed with quite a bit
+of hand editing.  One XML chunk for a dataset was created using 
+`GenerateDatasetsXml.sh` and a template file was created from it wherein all the
+parts of the file that changed from file to file were replaced with placeholder variables.
+A program was then written to cycle through all the netCDF files in the dataset, extract
+all the information that changed between files, and replace the placeholder variables with
+that information.
+
+Each new ERDDAP release created new pieces of information that differed between files when they
+were processed with `GenerateDatasetsXml.sh`.  Also, an expanding number of required metadata
+also produced more differences between files.  Creating a template file with only half a dozen
+placeholder variables is more feasible than creating one with dozens.  The ultimate answer was
+to run each file in each dataset through `GenerateDatasetsXml.sh` to create a correct XML chunk
+for each dataset that required no further editing, but this also had feasibility problems with
+datasets containing over a thousand files.  Fortunately, at this point a new version of
+ERDDAP was released wherein `GenerateDatasetsXml.sh` could be used in script files, which would
+allow the automation of the entire process and minimize the errors that can creep in with tedious
+hand editing.
+
+==== Automating the Process
+
+A script was created for each of the sampling geometries to individually process each
+of the files in every dataset.
+The functionality of these scripts includes:
+
+* create a list of all the files in the dataset to be processed
+* create all the command-line arguments required by `GenerateDatasetsXml.sh` for the given sampling geometry
+* create a string containing all of the arguments to be run by the script
+* check the geospatial information for sanity and fix if not sane
+* create a title from the information within the file
+* check for the proper required `cf_role` attribute(s) for this geometry
+* create the required geometry-specific extra attribute(s) - `cdm_profile_variables`, `cdm_timeseries_variables`,
+`cdm_trajectory_variables` - for this geometry
+* check the name of the vertical variable and add the appropriate extra attribute when needed
+* check that multiple geometry-specific extra attributes don't share variables
+* run the command-line string to create the initial XML chunk
+* delete unnecessary boilerplate from the beginning and end of the XML chunk
+* delete any attribute lines that are to be replaced
+* add all attribute lines that are to be replacements
+* change the datasetID to more human grokkable form
+* after cycling through all the files in the dataset, concatenate them all and copy that to the
+ERDDAP configuration directory
+
+Each of these scripts evolved rather than being created complete.  You tweak a script
+until it works on your first dataset, and then run it on the next dataset.  If it doesn't work,
+tweak it again.  Repeat as needed.  Each of the scripts has worked on a number of datasets, but
+there's no guarantee they won't crash on the very next dataset.  A number of common problems and issues are
+dealt with, but there's always one more.
+
+*BIG NOTE*:  Just because a dataset can be processed by `GenerateDatasetsXml.sh` and these scripts
+without error doesn't mean ERDDAP will find it worthy.  You may end up going through a debugging loop
+with ERDDAP as well.
+
+===== The `griidc_prof.py` Script
+
+===== The `griidc_traj.py` Script
+
+===== The `griidc_trajprof.py` Script
+
+==== Assembling the ERDDAP Configuration File
+
+Now that XML configuration chunks have been created for the netCDF files in the
+datasets, we must assemble all of them into the `datasets.xml` configuration file.
+If you have just a few datasets to deal with, this is done easily enough by cutting,
+pasting and including files with a text editor.
+If you have hundreds of datasets, a text editor will not suffice.
+
+In the GRIIDC ERDDAP, the XML configuration chunks are contained in subdirectories in
+main configuration directory `/opt/tomcat8/content/erddap`.  This
+looks like:
+
+----
+/opt/tomcat8/content/erddap/profile
+                            trajectory
+                            trajprof
+                            timeseries
+                            tsprof
+----
+
+Within each subdirectory, the XML chunks are stored in files that contain the
+concatenated XML chunks for all files within each directory.  This looks like:
+
+----
+/opt/tomcat8/content/erddap/profile/R1.x132.134.0001_ALL.XML
+                                    R1.x132.134.0002_ALL.XML
+                                             ...
+----
+
+These are all assembled using the shell script `datasets_assemble.sh`, which
+looks like:
+
+----
+# ----- ERDDAP BP START
+
+cat BP/datasets_boilerplate_begin.xml > datasets_prov.xml
+
+#************************** GRIIDC *********************************
+
+# ----- GRIIDC TRAJECTORY-PROFILE DATASETS
+
+cat trajprof/griidc_trajprof_begin.xml >> datasets_prov.xml
+
+cat trajprof/*.XML >> datasets_prov.xml
+
+cat trajprof/griidc_trajprof_end.xml >> datasets_prov.xml
+
+# ----- GRIIDC TRAJECTORY DATASETS
+
+cat trajectory/griidc_trajectory_begin.xml >> datasets_prov.xml
+
+cat trajectory/*.XML >> datasets_prov.xml
+
+cat trajectory/griidc_trajectory_end.xml >> datasets_prov.xml
+
+# ----- GRIIDC profile datasets
+
+cat profile/griidc_profile_begin.xml >> datasets_prov.xml
+
+cat profile/*.XML >> datasets_prov.xml
+
+cat profile/griidc_profile_end.xml >> datasets_prov.xml
+
+# ----- GRIIDC TIMESERIES DATASETS
+
+cat ts/griidc_ts_begin.xml >> datasets_prov.xml
+
+cat ts/*.XML >> datasets_prov.xml
+
+cat ts/griidc_ts_end.xml >> datasets_prov.xml
+
+# ----- GRIIDC TIMESERIES-PROFILE DATASETS
+
+cat tsprof/griidc_tsprof_begin.xml >> datasets_prov.xml
+
+cat tsprof/*.XML >> datasets_prov.xml
+
+cat tsprof/griidc_tsprof_end.xml >> datasets_prov.xml
+
+# ---- END OF DATASETS ----
+
+cat BP/datasets_boilerplate_end.xml >> datasets_prov.xml
+----
+
+Note that this script creates a provisional configuration file
+called `datasets_prov.xml`.  You don't want to be overwriting your
+present working `datasets.xml` file.  Each time you create a new
+`datasets_prov.xml` file, it is good procedure to:
+
+* copy the old `datasets.xml` file to `datasets-YYYY-MM-DD.xml`
+* then copy then `datasets_prov.xml` file to `datasets.xml`
+
+This allows you to backtrack to a working file if the new one doesn't work.
+
+[appendix]
+== Basic Use of `netcdf4-python`
+
+`netcdf4-python` is a Python interface to the netCDF C library.
+This module can read and write files in both the new netCDF 4 and the old netCDF 3 format.
+Most new features of netCDF 4 are implemented, such as multiple unlimited dimensions, groups and zlib data compression.
+Compound, variable length and enumerated data types are supported.
+
+The official documentation for the Python netCDF module can be found at:
+
+https://unidata.github.io/netcdf4-python/netCDF4/index.html[`https://unidata.github.io/netcdf4-python/netCDF4/index.html`]
+
+and the Github repository is at:
+
+https://github.com/Unidata/netcdf4-python[`https://github.com/Unidata/netcdf4-python`]
+
+=== Installation
+
+A very basic prerequisite to installing this is to first install the netCDF C library.
+This can be installed on CentOS and other distributions via `yum` or `dnf`.
+The official documentation details how to install it the old fashioned way by compiling it,
+but it's much easier to do all of this using the `conda` command in an Anaconda distribution,
+and using Conda Forge to find all the required packages.
+
+We will now cover the basics of how to create a complete netCDF file.  Once you understand
+these basics you can easily apply them to creating more complex netCDF files.
+
+=== Opening a File
+
+A Python script employing `netcdf4-python` to open a dataset is:
+
+----
+#!/usr/bin/python
+
+#  Import the netcdf4-python module.
+from netCDF4 import Dataset
+
+#  Open the file for writing in netCDF4 format.
+ncfile = Dataset("filename.nc", "w", format="netCDF4")
+
+#  Close the file
+ncfile.close()
+----
+
+This will create a binary file `filename.nc`.  The file can be viewed in text format using
+the `ncdump` utility, e.g.
+
+`ncdump filename.nc > filename.txt`
+
+where `filename.txt` will be:
+
+----
+netcdf filename {
+}
+----
+
+The `"w"` is mode for opening the file, which can be:
+
+* `r` for reading
+* `w` for writing
+* `a` for appending
+* `r+` for reading and writing
+
+The `format` specifies the type of netCDF desired.  You will probably only be concerned with three of them:
+
+* `NETCDF4` - the default format that uses the version 4 disk format (HDF) and uses the features of the version 4 API
+* `NETCDF3_CLASSIC` - the original netCDF binary format limited to file sizes less than 2 Gb
+* `NETCDF4_CLASSIC` - uses the version 4 disk format but omits only of the features of version 4 not found in version 3
+
+Now we must supply the fundamental structures of a netCDF file using dimensions, variables and attributes.
+
+=== Creating Dimensions
+
+netCDF defines the sizes of all variables in terms of dimensions, so before any variables can be created the
+dimensions they use must be created first.
+A dimension is created using the `createDimension` method.
+
+----
+#!/usr/bin/python
+
+from netCDF4 import Dataset
+
+ncfile = Dataset("filename.nc", "w", format="netCDF4")
+
+#  Create an unlimited dimension.
+ncfile.createDimension("time", None)
+#  Create fixed dimensions.
+ncfile.createDimension("depth", 10)
+
+ncfile.close()
+----
+
+Executing this script will obtain the netCDF file:
+
+----
+netcdf filename {
+dimensions:
+        time = UNLIMITED ; // (0 currently)
+        depth = 10 ;
+}
+----
+
+The `None` argument to `createDimension` creates an unlimited dimension to which you
+can append more data.
+An example is a file containing numerical model output of a model that runs daily, with
+each day's output being appended to the netCDF file.
+An integer creates a fixed dimension, in the case the number
+of depths, latitudes and longitudes in the data array.
+
+=== Creating Variables
+
+A netCDF variable is an object within which that data is stored.
+To create a netCDF variable, use the `createVariable` method.
+This method has two mandatory arguments, the variable name
+(a Python string), and the variable datatype. The variable's dimensions are given by a
+tuple containing the dimension names (as defined previously with `createDimension`).
+
+-----
+#!/usr/bin/python
+
+from netCDF4 import Dataset
+
+ncfile = Dataset("filename.nc", "w", format="NETCDF4")
+
+ncfile.createDimension("time", None)
+ncfile.createDimension("depth", 10)
+
+#  A 1-D variable array containing all the time step values.
+times = ncfile.createVariable("time","f8",("time",))
+#  A 1-D variable array containing all the depth values.
+depths = ncfile.createVariable("depth","f4",("depth",))
+#  A scalar variable containing containing just a single scalar value.
+station = ncfile.createVariable("station","i2",)
+
+ncfile.close()
+-----
+
+This will create the following netCDF file.
+
+-----
+netcdf filename {
+dimensions:
+        time = UNLIMITED ; // (0 currently)
+        depth = 10 ;
+variables:
+        double time(time) ;
+        float depth(depth) ;
+        short station ;
+data:
+
+ depth = _, _, _, _, _, _, _, _, _, _ ;
+
+ station = _ ;
+-----
+
+The values of the variables are undefined since they haven't yet been written to the file.
+
+The available datatype specifiers include:
+
+* `"f4"` - 32-bit floating point
+* `"f8"` - 64-bit floating point
+* `"i2"` - 16-bit signed integer
+* `"i4"` - 32-bit signed integer
+* `"i8"` - 64-bit signed integer
+* `str` - character string (note that quotes aren't needed for this)
+
+=== Creating Global and Variable Attributes
+
+There are two types of attributes in a netCDF file, global and variable.
+Global attributes provide information about a group, or the entire dataset, as a whole.
+Variable attributes provide information about one of the variables in a group.
+
+A Python script that creates both global and variable attributes is:
+
+-----
+#!/usr/bin/python
+
+from netCDF4 import Dataset
+
+ncfile = Dataset("filename.nc", "w", format="NETCDF4")
+
+ncfile.createDimension("time", None)
+ncfile.createDimension("depth", 10)
+
+times = ncfile.createVariable("time","f8",("time",))
+depths = ncfile.createVariable("depth","f4",("depth",))
+station = ncfile.createVariable("station","i2",)
+
+#  Write global attributes to the file.
+ncfile.description = "Python script showing how attributes are written."
+ncfile.history = "Made a long time ago in a galaxy far away."
+
+#  Write variable attributes to the file.
+times.standard_name = "time"
+times.units = "hours since 1970-01-01 00:00:00"
+depths.standard_name = "depth"
+depths.units = "m"
+station.standard_name = "Station number 0001"
+
+ncfile.close()
+-----
+
+which will yield the netCDF file:
+
+-----
+netcdf filename {
+dimensions:
+        time = UNLIMITED ; // (0 currently)
+        depth = 10 ;
+variables:
+        double time(time) ;
+                time:standard_name = "time" ;
+                time:units = "hours since 1970-01-01 00:00:00" ;
+        float depth(depth) ;
+                depth:standard_name = "depth" ;
+                depth:units = "m" ;
+        short station ;
+                station:standard_name = "Station number 0001" ;
+
+// global attributes:
+                :description = "Python script showing how attributes are written." ;
+                :history = "Made a long time ago in a galaxy far away." ;
+data:
+
+ depth = _, _, _, _, _, _, _, _, _, _ ;
+
+ station = _ ;
+}
+-----
+
+=== Writing to a File
+
+Since netCDF variables behave much like python multidimensional array objects supplied by the
+Numpy module, you can simply write data to the netCDF file by assigning data to a slice of
+a variable you have created.
+
+-----
+#!/usr/bin/python
+
+#  Import the Numpy module.
+import numpy as np
+from netCDF4 import Dataset
+
+ncfile = Dataset("filename.nc", "w", format="NETCDF4")
+
+ncfile.createDimension("time", None)
+ncfile.createDimension("depth", 10)
+
+times = ncfile.createVariable("time","f8",("time",))
+depths = ncfile.createVariable("depth","f4",("depth",))
+station = ncfile.createVariable("station","i2",)
+
+ncfile.description = "Python script showing how attributes are written."
+ncfile.history = "Made a long time ago in a galaxy far away."
+
+times.standard_name = "time"
+times.units = "hours since 1970-01-01 00:00:00"
+depths.standard_name = "depth"
+depths.units = "m"
+station.standard_name = "Station number 0001"
+
+#  Create synthetic depth and time arrays.
+deps = np.arange(0,10,1)
+timesteps = np.arange(600,1000,23)
+
+#  Write the synthetic arrays to the netCDF file as slices.
+depths[:] = deps
+times[:] = timesteps
+
+ncfile.close()
+-----
+
+This will create the netCDF file:
+
+-----
+netcdf filename {
+dimensions:
+        time = UNLIMITED ; // (18 currently)
+        depth = 10 ;
+variables:
+        double time(time) ;
+                time:standard_name = "time" ;
+                time:units = "hours since 1970-01-01 00:00:00" ;
+        float depth(depth) ;
+                depth:standard_name = "depth" ;
+                depth:units = "m" ;
+        short station ;
+                station:standard_name = "Station number 0001" ;
+
+// global attributes:
+                :description = "Python script showing how attributes are written." ;
+                :history = "Made a long time ago in a galaxy far away." ;
+data:
+
+ time = 600, 623, 646, 669, 692, 715, 738, 761, 784, 807, 830, 853, 876, 899, 
+    922, 945, 968, 991 ;
+
+ depth = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ;
+
+ station = _ ;
+}
+-----
+
+In this example the `time` and `depth` arrays were synthetically created.  You
+will be working with real data for which you will write additional Python code to
+extract it from its original source and format and store it in a Numpy array.
+
+=== Reading from a File
+
+A script to read from the netCDF file created in the previous section is:
+
+-----
+#!/usr/bin/python
+
+#  Import the Numpy module.
+import numpy as np
+from netCDF4 import Dataset
+
+ncfile = Dataset("filename.nc", "r", format="NETCDF4")
+
+times = ncfile.variables["time"][:]
+depths = ncfile.variables["depth"][:]
+
+print(" times = " + times)
+print(" depths = " + depths)
+
+ncfile.close()
+-----
+
+=== Time Coordinates
+
+Time coordinate values pose a special challenge to netCDF users. Most metadata standards
+specify that time should be measure relative to a fixed date using a certain calendar, with units specified
+using a string like `hours since YY-MM-DD hh:mm:ss` as the `units` attribute to the `time` variable.
+
+Most historical datasets do not do this.  They typically have an array
+of variables looking something like `Jan. 12, 1994 2:35 PM` or any of a thousand variations thereof.
+The `netcdf4-python` package has a couple of functions called `num2date` and `date2num` that work
+with the Python module `datetime` to greatly help converting historical dates to the
+CF required format.
+
+==== The `datetime` Module
+
+The Python `datetime` module supplies classes for manipulating dates and time.
+It works with dates as date objects.
+You can create a datetime object with the following program:
+
+-----
+#!/usr/bin/python
+
+from datetime import datetime
+x = datetime(2020, 5, 17, 10, 27, 56)
+print(x)
+-----
+
+Running this yields:
+
+-----
+2020-05-17 10:27:56
+-----
+
+But given that you're probably stuck with something like `Jan. 12, 1994 2:35 PM`, this
+isn't going to help you create a datetime object.
+A `datetime` function called `strptime`, however, allows you to create a datetime object from
+just about any variation of how the date and time are represented.
+You specify how the string you have is written using the format codes in the package, and
+it is read into a datetime object.  The following script:
+
+-----
+#!/usr/bin/python
+
+from datetime import datetime
+
+arbitrary_datetime = 'Jan. 12, 1994 2:35 PM'
+format = '%b. %d, %Y %I:%M %p'
+dstr = datetime.strptime(arbitrary_datetime, format)
+print(dstr)
+-----
+
+will turn your unusable string into the datetime string:
+
+-----
+1994-01-12 14:35:00
+-----
+
+The following list of format codes should enable you to wrestle just about
+anything not written in Sanskrit into a datetime object.
+
+|===
+
+|*Directive*	|*Description*|	*Example*	
+|%a |	Weekday, short version	| Wed
+|%A|	Weekday, full version|	Wednesday
+|%w|	Weekday as a number 0-6, 0 is Sunday|	3
+|%d|	Day of month 01-31|	31
+|%b|	Month name, short version|	Dec
+|%B|	Month name, full version|	December
+|%m|	Month as a number 01-12|	12
+|%y|	Year, short version, without century|	18
+|%Y|	Year, full version|	2018
+|%H|	Hour 00-23|	17
+|%I|	Hour 00-12|	05
+|%p|	AM/PM|	PM
+|%M|	Minute 00-59|	41
+|%S|	Second 00-59|	08
+|%f|	Microsecond 000000-999999|	548513
+|%z|	UTC offset|	+0100	
+|%Z|	Timezone|	CST	
+|%j|	Day number of year 001-366|	365
+|%U|	Week number of year, Sunday as the first day of week, 00-53|	52
+|%W|	Week number of year, Monday as the first day of week, 00-53|	52
+|%c|	Local version of date and time|	Mon Dec 31 17:41:00 2018
+|%x|	Local version of date	|12/31/18
+|%X|	Local version of time|17:41:00
+|%%|	A % character|	%
+
+|===
+
+==== `num2date` and `date2num`
+
+Once you have wrestled your date and time string into a datetime object, you
+can convert it into an actual number of seconds or hours or days since the
+starting time you have set as the `units` attribute of `time` using
+the `date2num` function as follows.
+
+-----
+#!/usr/bin/python
+
+#  Import datetime module
+from datetime import datetime
+#  Import num2date and date2num from netcdf4-python
+from netCDF4 import num2date,date2num
+
+#  Set 'units' attribute of 'time' variable
+units = "hours since 1970-01-01 00:00:00"
+
+#  Convert the arbitrary date and time string into a datetime string.
+arbitrary_datetime = 'Jan. 12, 1994 2:35 PM'
+format = '%b. %d, %Y %I:%M %p'
+dstr = datetime.strptime(arbitrary_datetime, format)
+
+#  Convert the datetime string 'dstr' into the number of hours since 1970-01-01 00:00:00
+ncnum = date2num(dstr, units, calendar='standard')
+print(ncnum)
+#  Convert the number of hours since 1970-01-01 00:00:00 back into the date and time format
+ncdate = num2date(ncnum, units, calendar='standard')
+print(ncdate)
+-----
+
+This will first calculate the number of hours since the base time from
+your datetime object, and then convert it from that back into the original
+date.
+
+-----
+210662.583333
+1994-01-12 14:35:00
+-----
+
+The `calendar` argument is optional, and defaults to `standard`.
+The available values are `standard`, `gregorian`, `proleptic_gregorian`, `no_leap`,
+`365_day`, `360_day`, `julian`, `all_leap` and `366_day`, but if you're lucky you'll
+never have to bother with anything other than the default.
+
+[appendix]
+== Python Scripts to Replicate NCEI Example netCDF Files
+
+The NOAA NCEI netCDF templates provide not only CDL templates for creating compliant
+netCDF files, but also what they call Gold Standard examples which are netCDF files that
+were built using their templates.  They are quite good, although many changes
+in various requirements have occurred since these examples were created in 2016.
+Here we provide Python scripts that mostly replicate those original Gold Standard
+examples, but add and sometimes subtract requirements that have changed.
+
+The suggested scenario for using these scripts as opposed to the `vatt.py` and `gatt.py` scripts discussed
+earlier in this document would be if your original data source consisted of the data in some non-netCDF
+format and the metadata in some separate format that's hopefully not a clay tablet.
+In that case you could add some Python/Numpy code to one of these example scripts
+to read in the data and transform it into the appropriate array format.
+You would then edit the script to supply all the required global and variable
+attributes - using `Unknown` where nothing can be found to satisfy ERDDAP - and then
+run the script to create a hopefully ERDDAP-ready netCDF file.
+
+A very good idea is to keep a copy of the script you edited and modified for a specific dataset with
+that dataset.  Thus, if you find yourself having to modify the metadata - that is, when you find
+yourself inevitably having to modify the metadata - you can simply reuse a script that's already
+mostly done and requires just a few modifications.  And if the data arrays haven't changed, you
+can simply read it in from the netCDF files you previously created and write it right back out to
+the new netCDF files you are creating.
+
+=== Profile Feature Type
+
+As of Aug. 2020, this script creates a file that passes the following compliance checker
+suites:  acdd:1.3, cf:1.7, ioos:1.1 and ncei-profile-orthogonal:2.0.
+There are a few issues with ioos:1.1, although they are due to the script following
+the 1.2 version of the IOOS Profile and the checker following the 1.1 version.
+
+This script optionally reads the Gold Standard Example profile netCDF file found at:
+
+https://data.nodc.noaa.gov/thredds/fileServer/example/v2.0/NCEI_profile_template_v2.0_2016-09-22_181835.151325.nc[`https://data.nodc.noaa.gov/thredds/fileServer/example/v2.0/NCEI_profile_template_v2.0_2016-09-22_181835.151325.nc`]
+
+to obtain the synthetic data contained therein.
+If that file is available, it will create the array data from internal numpy arrays.
+Those Gold Standard Examples are four years out of date at this writing, but still contain
+much of what is required and recommended.
+
+The script can be downloaded from:
+
+http://pong.tamu.edu/\~baum/erddap/ncei_profile.py[`http://pong.tamu.edu/~baum/erddap/ncei_profile.py`]
+
+and the netCDF file it creates from:
+
+http://pong.tamu.edu/\~baum/erddap/NCEI_profile.nc[`http://pong.tamu.edu/~baum/erddap/NCEI_profile.nc`]
+
+[source,python]
+-----
+include::erddap/ncei_profile.py[]
+-----
+
+=== Trajectory Feature Type
+
+The script can be downloaded from:
+
+http://pong.tamu.edu/\~baum/erddap/ncei_traj.py[`http://pong.tamu.edu/~baum/erddap/ncei_traj.py`]
+
+and the netCDF file it creates from:
+
+http://pong.tamu.edu/\~baum/erddap/NCEI_traj.nc[`http://pong.tamu.edu/~baum/erddap/NCEI_traj.nc`]
+
+[source,python]
+-----
+include::erddap/ncei_traj.py[]
+-----
+
+=== Time Series Feature Type
+
+The script can be downloaded from:
+
+http://pong.tamu.edu/\~baum/erddap/ncei_ts.py[`http://pong.tamu.edu/~baum/erddap/ncei_ts.py`]
+
+and the netCDF file it creates from:
+
+http://pong.tamu.edu/\~baum/erddap/NCEI_ts.nc[`http://pong.tamu.edu/~baum/erddap/NCEI_ts.nc`]
+
+[source,python]
+-----
+include::erddap/ncei_ts.py[]
+-----
+
+=== Trajectory of Profiles Feature Type
+
+The script can be downloaded from:
+
+http://pong.tamu.edu/\~baum/erddap/ncei_trajprof.py[`http://pong.tamu.edu/~baum/erddap/ncei_trajprof.py`]
+
+and the netCDF file it creates from:
+
+http://pong.tamu.edu/\~baum/erddap/NCEI_trajprof.nc[`http://pong.tamu.edu/~baum/erddap/NCEI_trajprof.nc`]
+
+-----
+include::erddap/ncei_trajprof.py[]
+-----
+
+[appendix]
+== ERDDAP Input Data Formats
+
+ERDDAP can ingest datasets from:
+
+* comma-, tab-, semicolon- or space-separated tabular ASCII files;
+* some NOAA NOS web services;
+* groups of local audio files;
+* Automatic Weather Station (AWS) XML files;
+* Cassandra tables;
+* tabular ASCII files with fixed-width data columns;
+* DAP sequence servers;
+* database (MySQL, PostgreSQL, etc.) tables;
+* other ERDDAP servers;
+* Hyrax OpenDAP servers;
+* netCDF 3 or 4 files;
+* netCDF 3 or 4 files formatted using any of the CF discrete sampling geometries;
+* NCCSV ASCII csv files;
+* NOS XML servers;
+* OBIS servers;
+* SOS servers; and
+* THREDDS servers.
+
+Once ingested, the data can be extracted from ERDDAP in over 30 different ways, including as NetCDF files.
+
+[appendix]
+== NetCDF and Discrete Sampling Geometries
+
+For the purposes of GRIIDC, the most import dataset file format is netCDF files formatted
+using the CF *Discrete Sampling Geometries* (DSG).  Examples of DSGs are time series, vertical profiles and
+trajectories.  A DSG dataset is characterized by a dimensionality lower than that of the region being
+sampled.  They can be thought of as limited paths through 4-D spacetime, e.g. a time series dataset is one
+fixed in all three spatial variables and variable in time.
+
+The CF conventions are commonly used for specifying dataset metadata designed to promote the processing
+and sharing of netCDF files.  For instance, the `standard_name` variable attribute enables a person or machine
+processing a netCDF file to know which variable contains, say, the sea water salinity via the use of the defined
+standard name `sea_water_salinity`.  If the appropriate `standard_name` and units are used in the file, then someone
+looking for the sea water salinity can easily find and use it without having to spend altogether too much time
+attempting to ascertain if a variable called `sws` or `sal` or `saltyschtoff` is really what they're looking for.
+
+The DSGs do the same for how the spatio-temporal structure of the dataset is represented within
+the netCDF file.  For instance, if a netCDF file containing a time series dataset contains a global
+attribute `featureType` with the value `timeSeries`, and variable `station_name` with an attribute
+`cf_role` with value `timeseries_id`, and the spatial, temporal and data variables have the appropriate
+structures, anybody or any program that can identify the various DSGs can process it easily and
+immediately without having to waste time attempting just to identify what kind of dataset is contained
+within a file.  ERDDAP is a program that recognizes datasets in netCDF files that
+follow the recommended conventions, and takes advantage of this for further subsetting or graphing tasks.
+
+Each type of DSG is defined by the relationships among its spatiotemporal coordinates, with each type known as a
+*featureType*.
+The CF conventions describe standard methods for storing and describing each featureType within
+a netCDF file.  These conventions are designed to enable maximum efficiency and clarity for storing
+specific featureTypes within netCDF files.
+Each featureType will now be briefly described.
+
+=== point
+
+The *point* featureType is a single data point with no implied coordinate relationship to other
+points.  The form of a data variable containing values for a point featureType is `data(i)`, and
+the mandatory space-time coordinates for a collection of these features is `x(i)`, `y(i)` and `t(i)`. 
+Both the data and coordinates must share the same dimension.  An example of the header of a netCDF file
+containing point data follows.  It shows the data structure and minimum information required for the
+file to be readily identified as containing a point featureType.
+
+----
+dimensions:
+      obs = 1234 ;
+
+   variables:
+      double time(obs) ;
+          time:standard_name = “time”;
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float lon(obs) ;
+          lon:standard_name = "longitude";
+          lon:long_name = "longitude of the observation";
+          lon:units = "degrees_east";
+      float lat(obs) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "latitude of the observation" ;
+          lat:units = "degrees_north" ;
+      float alt(obs) ;
+          alt:long_name = "vertical distance above the surface" ;
+          alt:standard_name = "height" ;
+          alt:units = "m";
+          alt:positive = "up";
+          alt:axis = "Z";
+
+      float humidity(obs) ;
+          humidity:standard_name = "specific_humidity" ;
+          humidity:coordinates = "time lat lon alt" ;
+      float temp(obs) ;
+          temp:standard_name = "air_temperature" ;
+          temp:units = "Celsius" ;
+          temp:coordinates = "time lat lon alt" ;
+
+   attributes:
+      :featureType = "point";
+----
+
+=== timeSeries
+
+The *timeSeries* featureType is a series of data points at the same spatial location with
+monotonically increasing times.  The form of a data variable is `data(i,o)`, and the mandatory space-time
+coordinates are `x(i)`, `y(i)` and `t(i,o)`.
+Data are taken over periods of time at a single or set of discrete point spatial locations
+called stations.  The instance or station dimension specifies the number of time series
+in the collection.
+An example of the header of a netCDF file
+containing timeSeries data a single spatial location or station follows.  It shows the data structure
+and minimum information required for the
+file to be readily identified as containing a timeSeries featureType. There are extensions to this
+for the case of datasets containing multiple time series.
+
+-----
+dimensions:
+      time = 100233 ;
+      name_strlen = 23 ;
+
+   variables:
+      float lon ;
+          lon:standard_name = "longitude";
+          lon:long_name = "station longitude";
+          lon:units = "degrees_east";
+      float lat ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+      float alt ;
+          alt:long_name = "vertical distance above the surface" ;
+          alt:standard_name = "height" ;
+          alt:units = "m";
+          alt:positive = "up";
+          alt:axis = "Z";
+      char station_name(name_strlen) ;
+          station_name:long_name = "station name" ;
+          station_name:cf_role = "timeseries_id";
+
+      double time(time) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+      float humidity(time) ;
+          humidity:standard_name = “specific_humidity” ;
+          humidity:coordinates = "time lat lon alt station_name" ;
+          humidity:_FillValue = -999.9f;
+      float temp(time) ;
+          temp:standard_name = “air_temperature” ;
+          temp:units = "Celsius" ;
+          temp:coordinates = "time lat lon alt station_name" ;
+          temp:_FillValue = -999.9f;
+
+   attributes:
+          :featureType = "timeSeries";
+-----
+
+=== trajectory
+
+A *trajectory* featureType is a series of data points along a path through space with
+monotonically increasing times.  The form of a data variable is `data(i,o)`, and the
+mandatory space-time coordinates are `x(i,o)`, `y(i,o)` and `t(i,o)`.
+A flight path or a cruise track are examples of trajectories.
+The instance or trajectory dimension specifies the number of trajectories in a collection.
+The instance or trajectory variables have this dimension.
+An example of a netCDF header for a trajectory featureType follows.  This is for a single
+trajectory.  Other CF examples are available for multiple trajectory collections.
+
+-----
+dimensions:
+      time = 42;
+
+   variables:
+      char trajectory(name_strlen) ;
+          trajectory:cf_role = "trajectory_id";
+
+      double time(time) ;
+          time:standard_name = "time";
+          time:long_name = "time" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float lon(time) ;
+          lon:standard_name = "longitude";
+          lon:long_name = "longitude" ;
+          lon:units = "degrees_east" ;
+      float lat(time) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "latitude" ;
+          lat:units = "degrees_north" ;
+      float z(time) ;
+          z:standard_name = “altitude”;
+          z:long_name = "height above mean sea level" ;
+          z:units = "km" ;
+          z:positive = "up" ;
+           z:axis = "Z" ;
+
+      float O3(time) ;
+          O3:standard_name = “mass_fraction_of_ozone_in_air”;
+          O3:long_name = "ozone concentration" ;
+          O3:units = "1e-9" ;
+          O3:coordinates = "time lon lat z" ;
+
+      float NO3(time) ;
+          NO3:standard_name = “mass_fraction_of_nitrate_radical_in_air”;
+          NO3:long_name = "NO3 concentration" ;
+          NO3:units = "1e-9" ;
+          NO3:coordinates = "time lon lat z" ;
+
+   attributes:
+      :featureType = "trajectory";
+-----
+
+=== profile
+
+A *profile* featureType is an ordered set of data points along a vertical line at a fixed horizontal
+position and time.
+The form of a data variable is `data(i,o)` and the mandatory space-time
+coordinates are `x(i)`, `y(i)`, `z(i,o)` and `t(i)`.
+An example of a profile is an ocean sounding or an XBT measurement.
+The instance or profile dimension specifies the number of profiles in the collection.
+The instance or profile variables contain information about the profiles.
+An example of a netCDF file header for a single profile collection follows.  It shows the 
+data structure and minimum information required for the
+file to be readily identified as containing a profile featureType. There
+are more complex examples for multiple profile collections.
+
+-----
+dimensions:
+      z = 42 ;
+
+   variables:
+      int profile ;
+          profile:cf_role = "profile_id";
+
+      double time;
+          time:standard_name = "time";
+          time:long_name = "time" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float lon;
+          lon:standard_name = "longitude";
+          lon:long_name = "longitude" ;
+          lon:units = "degrees_east" ;
+      float lat;
+          lat:standard_name = "latitude";
+          lat:long_name = "latitude" ;
+          lat:units = "degrees_north" ;
+
+      float z(z) ;
+          z:standard_name = “altitude”;
+          z:long_name = "height above mean sea level" ;
+          z:units = "km" ;
+          z:positive = "up" ;
+          z:axis = "Z" ;  
+
+      float pressure(z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat z" ;
+
+      float temperature(z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat z" ;
+
+      float humidity(z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat z" ;
+
+   attributes:
+      :featureType = "profile";
+-----
+
+=== timeSeriesProfile
+
+A *timeSeriesProfile* featureType is a series of profile features at the same horizontal
+position with monotonically increasing times.
+The form of a data variable is `data(i,p,o)` and the mandatory
+space-time coordinates are `x(i)`, `y(i)`, `z(i,p,o)` and `t(i,p)`.
+This featureType occurs when profiles are taken repeatedly at a station. The
+instance or station dimension specifies the number of profiles.
+The instance or station variables contain information describing the stations.
+An example of a netCDF header for a timeSeriesProfile dataset with a single station follows.
+It shows the
+data structure and minimum information required for the
+file to be readily identified as containing a timeSeriesProfile featureType.
+Examples of headers for datasets with multiple stations are available in the CF standard document.
+
+-----
+dimensions:
+      profile = 30 ;
+      z = 42 ;
+
+   variables:
+      float lon ;
+          lon:standard_name = "longitude";
+          lon:long_name = "station longitude";
+          lon:units = "degrees_east";
+      float lat ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+      char station_name(name_strlen) ;
+          station_name:cf_role = "timeseries_id" ;
+          station_name:long_name = "station name" ;
+      int station_info;
+          station_info:long_name = "some kind of station info" ;
+
+      float alt(profile , z) ;
+          alt:standard_name = “altitude”;
+          alt:long_name = "height above mean sea level" ;
+          alt:units = "km" ;
+          alt:axis = "Z" ;  
+          alt:positive = "up" ;
+
+      double time(profile ) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+
+      float pressure(profile , z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat alt station_name" ;
+
+      float temperature(profile , z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat alt station_name" ;
+
+      float humidity(profile , z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat alt station_name" ;
+
+   attributes:
+    :featureType = "timeSeriesProfile";
+-----
+
+=== trajectoryProfile
+
+A *trajectoryProfile* featureType is a series of profile features located at points
+ordered along a trajectory.
+A data variable has the form `data(i,p,o)` and the
+mandatory space-time coordinates are `x(i,p)`, `y(i,p)`, `z(i,p,o)` and `t(i,p)`.
+The data collected from a horizontally moving ADCP would create
+a trajectoryProfile dataset.
+The instance or trajectory dimension species the number of trajectories.
+The instance or trajectory variables contain information describing the trajectories.
+Each trajectory has a number of profiles as its elements, and each profile has
+a number of data from various levels as its elements.
+A netCDF header for a trajectoryProfile dataset containing just a single trajectory
+follows.  
+It shows the
+data structure and minimum information required for the
+file to be readily identified as containing a trajectoryProfile featureType.
+More complex examples involving multiple trajectories can be found in the
+CF standard document.
+
+-----
+dimensions:
+      profile = 33;
+      z = 42 ;
+
+   variables:
+      int trajectory;
+          trajectory:cf_role = "trajectory_id" ;
+
+      float lon(profile) ;
+          lon:standard_name = "longitude";
+          lon:units = "degrees_east";
+      float lat(profile) ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+
+      float alt(profile, z) ;
+          alt:standard_name = “altitude”;
+          alt:long_name = "height above mean sea level" ;
+          alt:units = "km" ;
+          alt:positive = "up" ;
+           alt:axis = "Z" ;  
+
+      double time(profile ) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+          time:missing_value = -999.9;
+
+      float pressure(profile, z) ;
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat alt" ;
+
+      float temperature(profile, z) ;
+          temperature:standard_name = "surface_temperature" ;
+          temperature:long_name = "skin temperature" ;
+          temperature:units = "Celsius" ;
+          temperature:coordinates = "time lon lat alt" ;
+
+      float humidity(profile, z) ;
+          humidity:standard_name = "relative_humidity" ;
+          humidity:long_name = "relative humidity" ;
+          humidity:units = "%" ;
+          humidity:coordinates = "time lon lat alt" ;
+
+   attributes:
+    :featureType = "trajectoryProfile";
+-----
+
+[appendix]
+== FeatureType
+
+https://www.unidata.ucar.edu/software/netcdf-java/v4.3/v4.0/javadocAll/ucar/nc2/constants/FeatureType.html[`https://www.unidata.ucar.edu/software/netcdf-java/v4.3/v4.0/javadocAll/ucar/nc2/constants/FeatureType.html`]
+
+* any
+* any_point
+* grid
+* image
+* point
+* profile
+* radial
+* section
+* station
+* station_profile
+* station_radial
+* swath
+* trajectory
+
+[appendix]
+== ACDD Requirements
+
+From https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3[`https://wiki.esipfed.org/Attribute_Convention_for_Data_Discovery_1-3`].
+
+=== Global Attributes
+
+==== Highly Recommended
+
+|===
+
+| Attribute |	Description
+| *title*     |	A short phrase or sentence describing the dataset. In many discovery systems, the title will be displayed in the results list from a search, and therefore should be human readable and reasonable to display in a list of such names. This attribute is also recommended by the NetCDF Users Guide and the CF conventions.
+| *summary*   |	A paragraph describing the dataset, analogous to an abstract for a paper.
+| *keywords*  |	A comma-separated list of key words and/or phrases. Keywords may be common words or phrases, terms from a controlled vocabulary (GCMD is often used), or URIs for terms from a controlled vocabulary (see also "keywords_vocabulary" attribute).
+| *Conventions* |	A comma-separated list of the conventions that are followed by the dataset. For files that follow this version of ACDD, include the string 'ACDD-1.3'. (This attribute is described in the NetCDF Users Guide.)
+
+|===
+
+==== Recommended
+
+|===
+
+| Attribute|	Description
+| *id*|	An identifier for the data set, provided by and unique within its naming authority. The combination of the "naming authority" and the "id" should be globally unique, but the id can be globally unique by itself also. IDs can be URLs, URNs, DOIs, meaningful text strings, a local key, or any other unique string of characters. The id should not include white space characters.
+| *naming_authority*	|The organization that provides the initial id (see above) for the dataset. The naming authority should be uniquely specified by this attribute. We recommend using reverse-DNS naming for the naming authority; URIs are also acceptable. Example: `edu.ucar.unidata`.
+| *history* |	Provides an audit trail for modifications to the original data. This attribute is also in the NetCDF Users Guide: "This is a character array with a line for each invocation of a program that has modified the dataset. Well-behaved generic netCDF applications should append a line containing: date, time of day, user name, program name and command arguments." To include a more complete description you can append a reference to an ISO Lineage entity; see NOAA EDM ISO Lineage guidance.
+| *source*	|The method of production of the original data. If it was model-generated, source should name the model and its version. If it is observational, source should characterize it. This attribute is defined in the CF Conventions. Examples: 'temperature from CTD #1234'; 'world model v.0.1'.
+| *processing_level*	|A textual description of the processing (or quality control) level of the data.
+comment	Miscellaneous information about the data, not captured elsewhere. This attribute is defined in the CF Conventions.
+| *acknowledgement* |	A place to acknowledge various types of support for the project that produced this data.
+license	Provide the URL to a standard or specific license, enter "Freely Distributed" or "None", or describe any restrictions to data access and distribution in free text.
+| *standard_name_vocabulary*  |	The name and version of the controlled vocabulary from which variable standard names are taken. (Values for any standard_name attribute must come from the CF Standard Names vocabulary for the data file or product to comply with CF.) Example: 'CF Standard Name Table v27'.
+| *date_created*	| The date on which this version of the data was created. (Modification of values implies a new version, hence this would be assigned the date of the most recent values modification.) Metadata changes are not considered when assigning the date_created. The ISO 8601:2004 extended date format is recommended, as described in the Attribute Content Guidance section.
+| *creator_name*	| The name of the person (or other creator type specified by the creator_type attribute) principally responsible for creating this data.
+| *creator_email* |	The email address of the person (or other creator type specified by the creator_type attribute) principally responsible for creating this data.
+| *creator_url* |	The URL of the person (or other creator type specified by the creator_type attribute) principally responsible for creating this data.
+| *institution*	| The name of the institution principally responsible for originating this data. This attribute is recommended by the CF convention.
+| *project* |	The name of the project(s) principally responsible for originating this data. Multiple projects can be separated by commas, as described under Attribute Content Guidelines. Examples: 'PATMOS-X', 'Extended Continental Shelf Project'.
+| *publisher_name* |	The name of the person (or other entity specified by the publisher_type attribute) responsible for publishing the data file or product to users, with its current metadata and format.
+| *publisher_email* |	The email address of the person (or other entity specified by the publisher_type attribute) responsible for publishing the data file or product to users, with its current metadata and format.
+| *publisher_url* |	The URL of the person (or other entity specified by the publisher_type attribute) responsible for publishing the data file or product to users, with its current metadata and format.
+| *geospatial_bounds* |	Describes the data's 2D or 3D geospatial extent in OGC's Well-Known Text (WKT) Geometry format (reference the OGC Simple Feature Access (SFA) specification). The meaning and order of values for each point's coordinates depends on the coordinate reference system (CRS). The ACDD default is 2D geometry in the EPSG:4326 coordinate reference system. The default may be overridden with geospatial_bounds_crs and geospatial_bounds_vertical_crs (see those attributes). EPSG:4326 coordinate values are latitude (decimal degrees_north) and longitude (decimal degrees_east), in that order. Longitude values in the default case are limited to the [-180, 180) range. Example: 'POLYGON ((-111.29 40.26, -111.29 41.26, -110.29 41.26, -110.29 40.26, -111.29 40.26))'.
+| *geospatial_bounds_crs* |	The coordinate reference system (CRS) of the point coordinates in the geospatial_bounds attribute. This CRS may be 2-dimensional or 3-dimensional, but together with geospatial_bounds_vertical_crs, if that attribute is supplied, must match the dimensionality, order, and meaning of point coordinate values in the geospatial_bounds attribute. If geospatial_bounds_vertical_crs is also present then this attribute must only specify a 2D CRS. EPSG CRSs are strongly recommended. If this attribute is not specified, the CRS is assumed to be EPSG:4326. Examples: 'EPSG:4979' (the 3D WGS84 CRS), 'EPSG:4047'.
+| *geospatial_bounds_vertical_crs* |	The vertical coordinate reference system (CRS) for the Z axis of the point coordinates in the geospatial_bounds attribute. This attribute cannot be used if the CRS in geospatial_bounds_crs is 3-dimensional; to use this attribute, geospatial_bounds_crs must exist and specify a 2D CRS. EPSG CRSs are strongly recommended. There is no default for this attribute when not specified. Examples: 'EPSG:5829' (instantaneous height above sea level), "EPSG:5831" (instantaneous depth below sea level), or 'EPSG:5703' (NAVD88 height).
+| *geospatial_lat_min* |	Describes a simple lower latitude limit; may be part of a 2- or 3-dimensional bounding region. Geospatial_lat_min specifies the southernmost latitude covered by the dataset.
+| *geospatial_lat_max*	|Describes a simple upper latitude limit; may be part of a 2- or 3-dimensional bounding region. Geospatial_lat_max specifies the northernmost latitude covered by the dataset.
+| *geospatial_lon_min*	| Describes a simple longitude limit; may be part of a 2- or 3-dimensional bounding region. geospatial_lon_min specifies the westernmost longitude covered by the dataset. See also geospatial_lon_max.
+| *geospatial_lon_max* |	Describes a simple longitude limit; may be part of a 2- or 3-dimensional bounding region. geospatial_lon_max specifies the easternmost longitude covered by the dataset. Cases where geospatial_lon_min is greater than geospatial_lon_max indicate the bounding box extends from geospatial_lon_max, through the longitude range discontinuity meridian (either the antimeridian for -180:180 values, or Prime Meridian for 0:360 values), to geospatial_lon_min; for example, geospatial_lon_min=170 and geospatial_lon_max=-175 incorporates 15 degrees of longitude (ranges 170 to 180 and -180 to -175).
+| *geospatial_vertical_min* |	Describes the numerically smaller vertical limit; may be part of a 2- or 3-dimensional bounding region. See geospatial_vertical_positive and geospatial_vertical_units.
+| *geospatial_vertical_max* |	Describes the numerically larger vertical limit; may be part of a 2- or 3-dimensional bounding region. See geospatial_vertical_positive and geospatial_vertical_units.
+| *geospatial_vertical_positive* |	One of 'up' or 'down'. If up, vertical values are interpreted as 'altitude', with negative values corresponding to below the reference datum (e.g., under water). If down, vertical values are interpreted as 'depth', positive values correspond to below the reference datum. Note that if geospatial_vertical_positive is down ('depth' orientation), the geospatial_vertical_min attribute specifies the data's vertical location furthest from the earth's center, and the geospatial_vertical_max attribute specifies the location closest to the earth's center.
+| *time_coverage_start* |	Describes the time of the first data point in the data set. Use the ISO 8601:2004 date format, preferably the extended format as recommended in the Attribute Content Guidance section.
+| *time_coverage_end* |	Describes the time of the last data point in the data set. Use ISO 8601:2004 date format, preferably the extended format as recommended in the Attribute Content Guidance section.
+| *time_coverage_duration* |	Describes the duration of the data set. Use ISO 8601:2004 duration format, preferably the extended format as recommended in the Attribute Content Guidance section.
+| *time_coverage_resolution* |	Describes the targeted time period between each value in the data set. Use ISO 8601:2004 duration format, preferably the extended format as recommended in the Attribute Content Guidance section.
+
+|===
+
+[appendix]
+== How to Create This Document
+
+This document was authored using the Asciidoctor text processor and publishing toolchain available at:
+
+https://asciidoctor.org/[+https://asciidoctor.org/+]
+
+It is written in the Ruby computer language that is available on all useful Linux distributions.
+Asciidoctor is installed as a Ruby module in the same way that Numpy is installed as a Python module.
+
+AsciiDoc is the lightweight markup language - similar to Markdown and all its variants - 
+processed by AsciiDoctor.  Your document is created using a text editor.
+You write using a combination of plain-text syntax and markup that's easy to read, write and
+edit in raw form.  It is not a WYSIWYG word processor that instantly shows you what you've written in
+processed form until it crashes.  You edit your document, and then use command-line tools to convert it
+to HTML, PDF or other formats.  And there are templates for authoring notes, articles, documentation, books,
+ebooks, web pages, slide decks, blogs posts, man pages, etc.  This documentation uses the book format.
+
+The source file for this document is called `erd.txt`.  It is available at:
+
+http://pong.tamu.edu/\~baum/erd.txt[`http://pong.tamu.edu/~baum/erd.txt`]
+
+It can be converted into HTML via the command:
+
+`asciidoctor -a toclevels=4 erd.txt`
+
+and the result is the web document at:
+
+http://pong.tamu.edu/\~baum/erd.html[`http://pong.tamu.edu/~baum/erd.html`]
+
+It can also be converted into PDF via the installation of an Asciidoctor Ruby extension and the command:
+
+`asciidoctor-pdf -a toclevels=4 erd.txt`
+
+with the result available at:
+
+http://pong.tamu.edu/\~baum/erd.pdf[`http://pong.tamu.edu/~baum/erd.pdf`]
+
+This PDF document has internal hyperlinks just like the HTML document.
+Please peruse it with your favorite PDF viewer rather than printing it out.
+
+Suggestions for improvement will be entertained at `baum at tamu dot edu`.
+
+The source code for this document is released to the public domain.
+
+
+
+

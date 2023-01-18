@@ -1,0 +1,128 @@
+Cartopy
+=======
+Steven K. Baum
+v0.1, 2021-01-19
+:doctype: book
+:toc:
+:icons:
+:source-highlighter: coderay
+:numbered!:
+
+[preface]
+
+Cartopy is a Python package designed for geospatial data processing in order to produce maps and other geospatial data analyses.
+
+*Cartopy Tutorial* - https://github.com/nawendt/cartopy-tutorial/blob/master/cartopy-tutorial.ipynb[`https://github.com/nawendt/cartopy-tutorial/blob/master/cartopy-tutorial.ipynb`]
+
+Plot global Mercator image with coastlines and national borders.
+
+https://towardsdatascience.com/plotting-geospatial-data-with-cartopy-4b5ad0da0761
+
+[source,python]
+-----
+import cartopy.crs as crs
+import cartopy.feature as cfeature
+import matplotlib.pyplot as plt
+
+figure = plt.figure(figsize=(8,6))
+ax = figure.add_subplot(1,1,1, projection=crs.Mercator())
+# adds a stock image as a background
+ax.stock_img()
+# adds national borders
+ax.add_feature(cfeature.BORDERS)
+# add coastlines
+ax.add_feature(cfeature.COASTLINE)
+plt.show()
+-----
+
+Plot regional GOM Mercator image with coastlines and state borders.
+
+[source,python]
+-----
+import cartopy.crs as crs
+import cartopy.feature as cfeature
+import matplotlib.pyplot as plt
+
+figure = plt.figure(figsize=(8,6))
+ax = figure.add_subplot(1,1,1, projection=crs.Mercator())
+ax.set_extent([-98,-80.5,18,30.7])
+ax.add_feature(cfeature.COASTLINE)
+ax.add_feature(cfeature.STATES)# Zoom in on the US by setting longitude/latitude parameters
+plt.show()
+-----
+
+Plot Wind Vectors in GOM Area
+-----------------------------
+
+[source,python]
+-----
+import cartopy.crs as crs
+import cartopy.feature as cfeature
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import griddata
+from mpl_toolkits.basemap import Basemap
+
+filename = "test.txt"
+data = np.loadtxt(filename,skiprows=2,usecols=[0,1,4,5])
+lon = data[:,0]
+lat = data[:,1]
+u = data[:,2]
+v = data[:,3]
+
+proj = crs.PlateCarree()
+#proj = crs.Robinson()
+
+latmin = 18.0
+#latmin = 19.0
+latmax = 31.0
+#latmax = 28.0
+lonmin = -98.0
+#lonmin = -96.0
+lonmax = -80.5
+#lonmax = -82.5
+
+xpts = 25
+ypts = 25
+
+# Create a regular grid and interpolate the u and v values to it.
+xi = np.linspace(lonmin,lonmax,xpts)
+yi = np.linspace(latmin,latmax,ypts)
+
+ui = griddata((lon, lat), u, (xi[None,:], yi[:,None]), method='cubic')
+vi = griddata((lon, lat), v, (xi[None,:], yi[:,None]), method='cubic')
+
+xm, ym = np.meshgrid(xi, yi)
+print(" xm.shape = ",xm.shape)
+
+#cs = ax.contour(xi,yi,ui,15,linewidths=0.5,colors='k', projection=crs.Mercator())
+
+figure = plt.figure(figsize=(8,6))
+ax = plt.axes(projection=proj)
+ax.set_global()
+#ax = figure.add_subplot(1,1,1, projection=crs.Mercator())
+ax.set_extent([lonmin,lonmax,latmin,latmax])
+#ax.set_extent([-110,-68,5,42])
+
+
+ax.add_feature(cfeature.COASTLINE)
+ax.add_feature(cfeature.STATES)# Zoom in on the US by setting longitude/latitude parameters
+
+#  Interpolated contouring.
+#plt.contour(xm, ym, ui, transform=proj)
+#  Raw vectors.
+#plt.quiver(lon, lat, u, v, transform=proj)
+#  Interpolated vectors.
+Q = plt.quiver(xm, ym, ui, vi, transform=proj)
+qk = plt.quiverkey(Q, 0.83, 0.9, 8, r'$8  m/s$', labelpos='E',
+                   coordinates='figure')
+
+plt.title("Surface Wind Vectors")
+ax.gridlines(color="black", linestyle="dotted")
+
+#  Save plot in JPEG format.
+plt.savefig('testplot.jpg')
+
+plt.show()
+-----
+

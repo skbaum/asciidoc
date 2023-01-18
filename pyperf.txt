@@ -1,0 +1,814 @@
+
+= Python Performance Enhancement
+:doctype: book
+:toc:
+:icons:
+
+Methods and software packages to enhance the performance of standard Python.
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Meta
+
+=== Courses
+
+* *High-Performance Computing with Python* - https://github.com/eth-cscs/PythonHPC[`https://github.com/eth-cscs/PythonHPC`]
+* *High Performance Computing for Weather and Climate* - https://github.com/ofuhrer/HPC4WC[`https://github.com/ofuhrer/HPC4WC`]
+* *Getting Started with Containers on HPC* - https://github.com/supercontainers/isc-tutorial[`https://github.com/supercontainers/isc-tutorial`]
+* *Practical Introduction to High Performance Computing* - https://github.com/cambiotraining/hpc-intro[`https://github.com/cambiotraining/hpc-intro`]
+* *Elements of High Performance Computing* - https://github.com/csc-training/elements-of-hpc[`https://github.com/csc-training/elements-of-hpc`]
+* *HPC Carpentry Lessons* - https://github.com/gu-eresearch/hpcCarpentryLessons[`https://github.com/gu-eresearch/hpcCarpentryLessons`]
+* *Argonne Training Program on Extreme-Scale Computing*
+** *ATPESC 2020* - https://extremecomputingtraining.anl.gov/agenda-2020/[`https://extremecomputingtraining.anl.gov/agenda-2020/`]
+** *ATPESC 2019 Docs* - https://extremecomputingtraining.anl.gov/archive/atpesc-2019/agenda-2019/[`https://extremecomputingtraining.anl.gov/archive/atpesc-2019/agenda-2019/`]
+** *ATPESC 2019 Videos* - https://www.youtube.com/channel/UCfwgjtIQB3puojz_N9ly_Ag/playlists?view=50&sort=dd&shelf_id=5[`https://www.youtube.com/channel/UCfwgjtIQB3puojz_N9ly_Ag/playlists?view=50&sort=dd&shelf_id=5`]
+
+=== Sites
+
+* *GPU Hackathons* - https://www.gpuhackathons.org/[`https://www.gpuhackathons.org/`]
+* *hgpu.org* - https://hgpu.org/[`https://hgpu.org/`]
+* *HPCWire* - https://www.hpcwire.com/[`https://www.hpcwire.com/`]
+* *Inside HPC* - https://insidehpc.com/[`https://insidehpc.com/`]
+* *The Next Platform* - https://www.nextplatform.com/[`https://www.nextplatform.com/`]
+
+=== Docs
+
+* *HPC and MPI*
+
+** *Survey of Methodologies, Approaches, and Challenges in Parallel Programming Using HPC Systems - https://www.hindawi.com/journals/sp/2020/4176794/[`https://www.hindawi.com/journals/sp/2020/4176794/`]
+
+** *HPC is dying, and MPI is killing it* - https://www.dursi.ca/post/hpc-is-dying-and-mpi-is-killing-it.html[`https://www.dursi.ca/post/hpc-is-dying-and-mpi-is-killing-it.html`]
+
+** *Objections, continued* - https://www.dursi.ca/post/objections-continued.html[`https://www.dursi.ca/post/objections-continued.html`]
+
+** *In praise of MPI collectives and MPI-IO* - https://www.dursi.ca/post/in-praise-of-mpi-collectives-and-mpi-io.html[`https://www.dursi.ca/post/in-praise-of-mpi-collectives-and-mpi-io.html`]
+
+=== Python Docs
+
+* *GPU-Accelerated Computing with Python* - https://developer.nvidia.com/how-to-cuda-python[`https://developer.nvidia.com/how-to-cuda-python`]
+
+* *Complete Introduction to GPU Programming With CUDA and Python* - https://www.cherryservers.com/blog/introduction-to-gpu-programming-with-cuda-and-python[`https://www.cherryservers.com/blog/introduction-to-gpu-programming-with-cuda-and-python`]
+
+* *GPU development with Python 101 Tutorial* - https://github.com/jacobtomlinson/gpu-python-tutorial[`https://github.com/jacobtomlinson/gpu-python-tutorial`]
+
+* *GPU environments (Jupyter Notebooks with Python with GPU)* - https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=environments-gpu[`https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=environments-gpu`]
+
+== Software
+
+https://wiki.python.org/moin/ParallelProcessing[`https://wiki.python.org/moin/ParallelProcessing`]
+
+=== aesara
+
+https://github.com/aesara-devs/aesara[`https://github.com/aesara-devs/aesara`]
+
+https://aesara.readthedocs.io/en/latest/
+
+=====
+Aesara is the successor Python library to Theano that allows one to define, optimize, and efficiently evaluate mathematical expressions involving multi-dimensional arrays.
+The features include:
+
+* A hackable, pure-Python codebase
+* Tight integration with NumPy 
+* Efficient symbolic differentiation
+* Speed and stability optimizations
+* Extensible graph framework suitable for rapid development of custom operators and symbolic optimizations
+* Implements an extensible graph transpilation framework that currently provides compilation via C, JAX, and Numba
+* Based on one of the most widely-used Python tensor libraries: Theano
+=====
+
+
+=== Bohrium
+
+https://bohrium.readthedocs.io/[`https://bohrium.readthedocs.io/`]
+
+https://github.com/bh107/bohrium[`https://github.com/bh107/bohrium`]
+
+=====
+Bohrium provides automatic acceleration of array operations in Python/NumPy, C, and C++ targeting multi-core CPUs and GP-GPUs. Forget handcrafting CUDA/OpenCL to utilize your GPU and forget threading, mutexes and locks to utilize your multi-core CPU, just use Bohrium.
+The features include:
+
+* Lazy Evaluation, Bohrium will lazy evaluate all Python/NumPy operations until it encounters a “Python Read” such a printing an array or having a if-statement testing the value of an array.
+* Views Bohrium supports NumPy views fully thus operating on array slices does not involve data copying.
+* Loop Fusion, Bohrium uses a fusion algorithm that fuses (or merges) array operations into the same computation kernel that are then JIT-compiled and executed. However, Bohrium can only fuse operations that have some common sized dimension and no horizontal data conflicts.
+* Lazy CPU/GPU Communication, Bohrium only moves data between the host and the GPU when the data is accessed directly by Python or a Python C-extension.
+* `python -m bohrium`, automatically makes import numpy use Bohrium.
+* Jupyter Support, you can use the magic command %%bohrium to automatically use Bohrium as NumPy.
+* Zero-copy interoperability with Numpy, Cython, PyOpenCL and PyCUDA
+
+To have Bohrium replacing NumPy automatically, you can use the `-m bohrium` argument when running Python.
+In order to choose which Bohrium backend to use, you can define the `BH_STACK` environment variable. Currently, three backends exist: `openmp`, `opencl`, and `cuda`.
+=====
+
+=== Compyle
+
+https://github.com/pypr/compyle[`https://github.com/pypr/compyle`]
+
+https://compyle.readthedocs.io/en/latest/[`https://compyle.readthedocs.io/en/latest/`]
+
+=====
+Compyle allows users to execute a restricted subset of Python (almost similar to C) on a variety of HPC platforms. Currently we support multi-core CPU execution using Cython, and for GPU devices we use OpenCL or CUDA.
+
+Users start with code implemented in a very restricted Python syntax, this code is then automatically transpiled, compiled and executed to run on either one CPU core, or multiple CPU cores (via OpenMP) or on a GPU. Compyle offers source-to-source transpilation, making it a very convenient tool for writing HPC libraries.
+
+Some simple yet powerful parallel utilities are provided which can allow you to solve a remarkably large number of interesting HPC problems. Compyle also features JIT transpilation making it easy to use.
+
+Compyle is itself largely pure Python but depends on numpy and requires either Cython or PyOpenCL or PyCUDA along with the respective backends of a C/C++ compiler, OpenCL and CUDA. If you are only going to execute code on a CPU then all you need is Cython.
+=====
+
+=== cuda-python
+
+https://github.com/NVIDIA/cuda-python[`https://github.com/NVIDIA/cuda-python`]
+
+=====
+The NVIDIA CUDA-Python bindings.
+=====
+
+=== CuPy
+
+https://github.com/cupy/cupy/[`https://github.com/cupy/cupy/`]
+
+https://cupy.dev/[`https://cupy.dev/`]
+
+https://docs.cupy.dev/en/stable/user_guide/basic.html[`https://docs.cupy.dev/en/stable/user_guide/basic.html`]
+
+=====
+CuPy is an open-source array library for GPU-accelerated computing with Python. CuPy utilizes CUDA Toolkit libraries including cuBLAS, cuRAND, cuSOLVER, cuSPARSE, cuFFT, cuDNN and NCCL to make full use of the GPU architecture.  Most operations perform well on a GPU using CuPy out of the box. CuPy speeds up some operations more than 100X. 
+
+CuPy acts as a drop-in replacement to run existing NumPy/SciPy code on NVIDIA CUDA or AMD ROCm platforms.
+CuPy's interface is highly compatible with NumPy and SciPy. All you need to do is just replace numpy and scipy with cupy and cupyx.scipy in your Python code.
+=====
+
+=== Cython
+
+https://cython.org/[`https://cython.org/`]
+
+https://cython.readthedocs.io/en/latest/[`https://cython.readthedocs.io/en/latest/`]
+
+=====
+Cython is a programming language that makes writing C extensions for the Python language as easy as Python itself. It aims to become a superset of the [Python] language which gives it high-level, object-oriented, functional, and dynamic programming. Its main feature on top of these is support for optional static type declarations as part of the language. The source code gets translated into optimized C/C++ code and compiled as Python extension modules. This allows for both very fast program execution and tight integration with external C libraries, while keeping up the high programmer productivity for which the Python language is well known.
+
+The primary Python execution environment is commonly referred to as CPython, as it is written in C. Other major implementations use Java (https://www.jython.org/[Jython]), C# (https://ironpython.net/[IronPython]) and Python itself (https://www.pypy.org/[PyPy]). Written in C, CPython has been conducive to wrapping many external libraries that interface through the C language. It has, however, remained non trivial to write the necessary glue code in C, especially for programmers who are more fluent in a high-level language like Python than in a close-to-the-metal language like C.
+
+Originally based on the well-known Pyrex [Pyrex], the Cython project has approached this problem by means of a source code compiler that translates Python code to equivalent C code. This code is executed within the CPython runtime environment, but at the speed of compiled C and with the ability to call directly into C libraries. At the same time, it keeps the original interface of the Python source code, which makes it directly usable from Python code. These two-fold characteristics enable Cython’s two major use cases: extending the CPython interpreter with fast binary modules, and interfacing Python code with external C libraries.
+
+While Cython can compile (most) regular Python code, the generated C code usually gains major (and sometime impressive) speed improvements from optional static type declarations for both Python and C types. These allow Cython to assign C semantics to parts of the code, and to translate them into very efficient C code. Type declarations can therefore be used for two purposes: for moving code sections from dynamic Python semantics into static-and-fast C semantics, but also for directly manipulating types defined in external libraries. Cython thus merges the two worlds into a very broadly applicable programming language.
+=====
+
+=== DaCe
+
+https://github.com/spcl/dace[`https://github.com/spcl/dace`]
+
+*Productivity, Portability, Performance: Data-Centric Python* - https://arxiv.org/abs/2107.00555[`https://arxiv.org/abs/2107.00555`]
+
+=====
+DaCe is a parallel programming framework that takes code in Python/NumPy and other programming languages, and maps it to high-performance CPU, GPU, and FPGA programs, which can be optimized to achieve state-of-the-art. Internally, DaCe uses the Stateful DataFlow multiGraph (SDFG) data-centric intermediate representation: A transformable, interactive representation of code based on data movement. Since the input code and the SDFG are separate, it is posible to optimize a program without changing its source, so that it stays readable. On the other hand, transformations are customizable and user-extensible, so they can be written once and reused in many applications. With data-centric parallel programming, we enable direct knowledge transfer of performance optimization, regardless of the application or the target processor.
+
+DaCe generates high-performance programs for
+
+* multi-core CPUs (tested on Intel and IBM POWER9),
+* NVIDIA GPUs,
+AMD GPUs (with HIP),
+* Xilinx FPGAs and
+Intel FPGAs.
+
+DaCe can be written inline in Python and transformed in the command-line/Jupyter Notebooks or SDFGs can be interactively modified using the Data-centric Interactive Optimization Development Environment Visual Studio Code extension.
+=====
+
+=== Dask
+
+https://www.dask.org/[`https://www.dask.org/`]
+
+https://docs.dask.org/en/stable/[`https://docs.dask.org/en/stable/`]
+
+https://en.wikipedia.org/wiki/Dask_(software)[`https://en.wikipedia.org/wiki/Dask_(software)`]
+
+=====
+Dask is a flexible open-source Python library for parallel computing. Dask [1] scales Python code from multi-core local machines to large distributed clusters in the cloud. Dask provides a familiar user interface by mirroring the APIs of other libraries in the PyData ecosystem including: Pandas, Scikit-learn and NumPy. It also exposes low-level APIs that help programmers run custom algorithms in parallel. 
+
+Dask is composed of two parts:
+
+* Dynamic task scheduling optimized for computation. This is similar to Airflow, Luigi, Celery, or Make, but optimized for interactive computational workloads.
+* “Big Data” collections like parallel arrays, dataframes, and lists that extend common interfaces like NumPy, Pandas, or Python iterators to larger-than-memory or distributed environments. These parallel collections run on top of dynamic task schedulers.
+
+Dask emphasizes the following virtues:
+
+* Familiar: Provides parallelized NumPy array and Pandas DataFrame objects
+* Flexible: Provides a task scheduling interface for more custom workloads and integration with other projects.
+* Native: Enables distributed computing in pure Python with access to the PyData stack.
+* Fast: Operates with low overhead, low latency, and minimal serialization necessary for fast numerical algorithms
+* Scales up: Runs resiliently on clusters with 1000s of cores
+* Scales down: Trivial to set up and run on a laptop in a single process
+* Responsive: Designed with interactive computing in mind, it provides rapid feedback and diagnostics to aid humans
+=====
+
+=== Entangle
+
+https://github.com/radiantone/entangle/wiki[`https://github.com/radiantone/entangle/wiki`]
+
+=====
+Entangle intends to be a lightweight, multi-functional parallel workflow framework. It's a great starting point to add functionality specific to your needs on top yet comes with a set of usable decorators out-of-the-box! Unlike other heavyweight frameworks, entangle is designed to be extended. Workflows often involve a variety of task types and infrastructure destinations and mixing and matching them to accomplish complex or specific workflows is the point of entangle.
+
+Entangle tries to find a niche that isn't already occupied by an established framework like Dask or Parsl. So let's look at some of the key differences.
+
+Dask is a great parallel compute framework for python! It is designed to run on established infrastructure where you are able to set up dask servers on them. Dask uses a client/server approach to distributed computation which requires open ports, firewall rules, etc.
+
+Entangle takes a different approach. It does not require an pre-running services (clients or servers) on remote machines and thus no open ports, firewall rules. It only uses port 22 ssh via mutually trusted certificates. Entangle promotes the notion of declarative infrastructure, and thus you are able to design your workflows against dynamic infrastructure destinations. Dask does not do this.
+
+Dask uses invocation idioms like dask.compute() to evaluate delayed objects. Entangle dispenses with most idiomatic usage like this and each workflow or task behaves just as a normal python function would behave, as a callable. This is important because you can pass entangle tasks or workflows through 3rd party libraries that operate on python callables. Extra wrappers and coding would be required for your dask delayeds.
+
+Entangle computations can crawl CPUs across machines and be modified along the way. Dask prevents modifying delayeds (Delayed Best Practices) after creation or embedding new delayed invocations within a function that is being invoked by dask scheduler already. Entangle has no curent limitation like this.
+=====
+
+=== GraalPython
+
+https://www.graalvm.org/python/quickstart/[`https://www.graalvm.org/python/quickstart/`]
+
+https://www.graalvm.org/reference-manual/python/[`https://www.graalvm.org/reference-manual/python/`]
+
+=====
+GraalVM is not just a Java Virtual Machine to run Java. It is also a high-performance multilingual runtime and provides support for a number of languages beyond Java, allowing different languages and libraries to interoperate with no performance penalty.
+
+Python is one of the supported languages and GraalVM provides the Python 3 runtime environment. The key to GraalVM’s polyglot support is language compliance, and a primary goal of the GraalVM Python runtime is to support SciPy and its constituent libraries, to work with other data science and machine learning libraries from the rich Python ecosystem.
+
+The Python runtime is yet experimental in GraalVM, but it already offers performance 5-6 times faster than CPython 3.8 (after warm-up) or 6-7x faster than Jython. Apart the performance benefits, GraalVM’s Python runtime enables the support for native extensions that Jython never supported, the possibility to create native platform binaries using the Native Image, a managed execution mode to run, for example, NumPy extensions in a safe manner, and many more.
+=====
+
+==== Installation and Use
+
+https://www.graalvm.org/python/[`https://www.graalvm.org/python/`]
+
+https://www.graalvm.org/python/quickstart/[`https://www.graalvm.org/python/quickstart/`]
+
+https://www.graalvm.org/docs/getting-started/linux/[`https://www.graalvm.org/docs/getting-started/linux/`]
+
+https://github.com/graalvm/graalvm-ce-builds/releases[`https://github.com/graalvm/graalvm-ce-builds/releases`]
+
+Get file, e.g.: `graalvm-ce-java8-linux-amd64-21.0.0.2.tar.gz`
+
+Unravel and move to '/opt':
+
+-----
+tar xzvf graalvm-ce-java8-linux-amd64-21.0.0.2.tar.gz
+mv graalvm-ce-java8-21.0.0.2 /opt
+-----
+
+Edit `.bashrc` and add:
+
+-----
+export PATH=/opt/graalvm-ce-java8-21.0.0.2/bin:$PATH
+export JAVA_HOME=/opt/graalvm-ce-java8-21.0.0.2
+[source .bashrc]
+-----
+
+The Python package is separately installed.  This should also install `llmv-toolchain`, but if
+not do so separately.
+
+-----
+gu install python
+[gu install llvm-toolchain]
+-----
+
+Create and activate a virtual environment:
+
+-----
+graalpython -m venv graalpy
+source graalpy/bin/activate
+-----
+
+=== Grizzly
+
+https://www.weld.rs/grizzly/[`https://www.weld.rs/grizzly/`]
+
+=====
+A subset of the Pandas data analytics library integrated with Weld. Grizzly uses lazy evaluation to accelerate Pandas workloads by optimizing across individual operators.
+
+Grizzly currently supports Weld-optimized versions of several commonly used operators, including:
+
+* Filtering for DataFrames and Series
+* Elementwise operators such as logical and/or, summation, etc.
+* Pivot table creation
+* groupBy
+* Sorting
+=====
+
+=== JAX
+
+https://github.com/google/jax[`https://github.com/google/jax`]
+
+https://www.tensorflow.org/xla[`https://www.tensorflow.org/xla`]
+
+=====
+JAX is Autograd and XLA, brought together for high-performance machine learning research.
+
+With its updated version of Autograd, JAX can automatically differentiate native Python and NumPy functions. It can differentiate through loops, branches, recursion, and closures, and it can take derivatives of derivatives of derivatives. It supports reverse-mode differentiation (a.k.a. backpropagation) via grad as well as forward-mode differentiation, and the two can be composed arbitrarily to any order.
+
+What’s new is that JAX uses XLA to compile and run your NumPy programs on GPUs and TPUs. Compilation happens under the hood by default, with library calls getting just-in-time compiled and executed. But JAX also lets you just-in-time compile your own Python functions into XLA-optimized kernels using a one-function API, jit. Compilation and automatic differentiation can be composed arbitrarily, so you can express sophisticated algorithms and get maximal performance without leaving Python. You can even program multiple GPUs or TPU cores at once using pmap, and differentiate through the whole thing.
+
+Dig a little deeper, and you'll see that JAX is really an extensible system for composable function transformations. Both grad and jit are instances of such transformations. Others are vmap for automatic vectorization and pmap for single-program multiple-data (SPMD) parallel programming of multiple accelerators, with more to come.
+=====
+
+=== Mars
+
+https://github.com/mars-project/mars[`https://github.com/mars-project/mars`]
+
+"Mars is a tensor-based unified framework for large-scale data computation which scales Numpy, Pandas and Scikit-learn."
+
+=== multiprocessing
+
+https://docs.python.org/3/library/multiprocessing.html[`https://docs.python.org/3/library/multiprocessing.html`]
+
+https://medium.com/swlh/5-step-guide-to-parallel-processing-in-python-ac0ecdfcea09[`https://medium.com/swlh/5-step-guide-to-parallel-processing-in-python-ac0ecdfcea09`]
+
+=====
+A package that supports spawning processes using an API similar to the threading module. The multiprocessing package offers both local and remote concurrency, effectively side-stepping the Global Interpreter Lock by using subprocesses instead of threads. Due to this, the multiprocessing module allows the programmer to fully leverage multiple processors on a given machine. It runs on both Unix and Windows.
+
+The multiprocessing module also introduces APIs which do not have analogs in the threading module. A prime example of this is the Pool object which offers a convenient means of parallelizing the execution of a function across multiple input values, distributing the input data across processes (data parallelism). The following example demonstrates the common practice of defining such functions in a module so that child processes can successfully import that module.
+=====
+
+=== mypyc
+
+https://github.com/mypyc/mypyc[`https://github.com/mypyc/mypyc`]
+
+https://mypyc.readthedocs.io/en/latest/index.html[`https://mypyc.readthedocs.io/en/latest/index.html`]
+
+http://www.mypy-lang.org/[`http://www.mypy-lang.org/`]
+
+https://blog.meadsteve.dev/programming/2022/09/27/making-python-fast-for-free/[`https://blog.meadsteve.dev/programming/2022/09/27/making-python-fast-for-free/`]
+
+=====
+Mypyc compiles Python modules to C extensions. It uses standard Python type hints to generate fast code. Mypyc uses mypy to perform type checking and type inference.
+
+Mypyc can compile anything from one module to an entire codebase. The mypy project has been using mypyc to compile mypy since 2019, giving it a 4x performance boost over regular Python.
+
+The features include:
+
+* Support most features in the stdlib typing module
+* Compile clean, regular-looking Python code with type annotations
+* Expressive type system, including generics, optional types, union types and tuple types
+* Powerful type inference -- no need to annotate most variables
+* All code is valid Python, and all Python editors and IDEs work just fine
+* Access to all stdlib and third-party libraries in compiled code
+* Strict runtime enforcement of type annotations for runtime type safety
+* Ahead-of-time compilation for fast program startup
+* Compiled code runs as normal Python code (compilation is optional)
+* Both static type checking (via mypy) and runtime type checking
+=====
+
+=== Nuitka
+
+https://nuitka.net/index.html[`https://nuitka.net/index.html`]
+
+=====
+Nuitka is the optimizing Python compiler written in Python that creates executables that run without an need for a separate installer. Data files can both be included or put alongside.
+
+Right now Nuitka is a good replacement for the Python interpreter. It compiles every language construct in all relevant CPython versions, and even the irrelevant ones like 2.6 and 3.3. It translates Python into a C program that then is linked against libpython to execute exactly like CPython. It is extremely compatible.
+
+Nuitka is already slightly faster than CPython, but there is work to be done to include as many C optimizations as possible. We currently get a 335% speedup in pystone, which is a good start.
+=====
+
+=== Numba
+
+https://numba.pydata.org/[`https://numba.pydata.org/`]
+
+https://github.com/numba/numba[`https://github.com/numba/numba`]
+
+https://en.wikipedia.org/wiki/Numba[`https://en.wikipedia.org/wiki/Numba`]
+
+*5 Minute Guide to Numba* - https://numba.pydata.org/numba-doc/latest/user/5minguide.html[`https://numba.pydata.org/numba-doc/latest/user/5minguide.html`]
+
+*Python Speed-Up with Numba Compilation* - https://www.youtube.com/watch?v=bZ5G-RZoE6Q[`https://www.youtube.com/watch?v=bZ5G-RZoE6Q`]
+
+=====
+Numba translates Python functions to optimized machine code at runtime using the industry-standard LLVM compiler library. Numba-compiled numerical algorithms in Python can approach the speeds of C or FORTRAN.
+
+You don't need to replace the Python interpreter, run a separate compilation step, or even have a C/C++ compiler installed. Just apply one of the Numba decorators to your Python function, and Numba does the rest.
+
+Numba is designed to be used with NumPy arrays and functions. Numba generates specialized code for different array data types and layouts to optimize performance. Special decorators can create universal functions that broadcast over NumPy arrays just like NumPy functions do.
+
+Numba also works great with Jupyter notebooks for interactive computing, and with distributed execution frameworks, like Dask and Spark.
+=====
+
+=== Parallel Python
+
+https://www.parallelpython.com/[`https://www.parallelpython.com/`]
+
+=====
+Parallel Python is a python module which provides mechanism for parallel execution of python code on SMP (systems with multiple processors or cores) and clusters (computers connected via network).   The features include:
+
+* Parallel execution of python code on SMP and clusters
+* Easy to understand and implement job-based parallelization technique (easy to convert serial application in parallel)
+* Automatic detection of the optimal configuration (by default the number of worker processes is set to the number of effective processors)
+* Dynamic processors allocation (number of worker processes can be changed at runtime)
+* Low overhead for subsequent jobs with the same function (transparent caching is implemented to decrease the overhead)
+* Dynamic load balancing (jobs are distributed between processors at runtime)
+* Fault-tolerance (if one of the nodes fails tasks are rescheduled on others)
+* Auto-discovery of computational resources
+* Dynamic allocation of computational resources (consequence of auto-discovery and fault-tolerance)
+* SHA based authentication for network connections
+=====
+
+=== Parsl
+
+https://parsl-project.org/[`https://parsl-project.org/`]
+
+https://parsl.readthedocs.io/en/stable/[`https://parsl.readthedocs.io/en/stable/`]
+
+https://github.com/Parsl[`https://github.com/Parsl`]
+
+*Parsl: Pervasive parallel programming in Python* - https://arxiv.org/abs/1905.02158[`https://arxiv.org/abs/1905.02158`]
+
+*Scalable parallel programming in Python* - https://dl.acm.org/doi/10.1145/3332186.3332231[`https://dl.acm.org/doi/10.1145/3332186.3332231`]
+
+=====
+Parsl is a flexible and scalable parallel programming library for Python. Parsl augments Python with simple constructs for encoding parallelism. Developers annotate Python functions to specify opportunities for concurrent execution. These annotated functions, called apps, may represent pure Python functions or calls to external applications. Parsl further allows invocations of these apps, called tasks, to be connected by shared input/output data (e.g., Python objects or files) via which Parsl constructs a dynamic dependency graph of tasks to manage concurrent task execution where possible.
+
+Parsl includes an extensible and scalable runtime that allows it to efficiently execute Parsl programs on one or many processors. Parsl programs are portable, enabling them to be easily moved between different execution resources: from laptops to supercomputers. When executing a Parsl program, developers must define (or import) a Python configuration object that outlines where and how to execute tasks. Parsl supports various target resources including clouds (e.g., Amazon Web Services and Google Cloud), clusters (e.g., using Slurm, Torque/PBS, HTCondor, Cobalt), and container orchestration systems (e.g., Kubernetes). Parsl scripts can scale from several cores on a single computer through to hundreds of thousands of cores across many thousands of nodes on a supercomputer.
+=====
+
+=== pPython
+
+https://arxiv.org/abs/2208.14908[`https://arxiv.org/abs/2208.14908`]
+
+=====
+pPython seeks to provide a parallel capability that provides good speed-up without sacrificing the ease of programming in Python by implementing partitioned global array semantics (PGAS) on top of a simple file-based messaging library (PythonMPI) in pure Python. The core data structure in pPython is a distributed numerical array whose distribution onto multiple processors is specified with a map construct. Communication operations between distributed arrays are abstracted away from the user and pPython transparently supports redistribution between any block-cyclic-overlapped distributions in up to four dimensions. pPython follows a SPMD (single program multiple data) model of computation. pPython runs on any combination of heterogeneous systems that support Python, including Windows, Linux, and MacOS operating systems. In addition to running transparently on single-node (e.g., a laptop), pPython provides a scheduler interface, so that pPython can be executed in a massively parallel computing environment. The initial implementation uses the Slurm scheduler.
+=====
+
+=== Pyccel
+
+https://github.com/pyccel/pyccel[`https://github.com/pyccel/pyccel`]
+
+https://github.com/pyccel/pyccel/blob/master/tutorial/quickstart.md[`https://github.com/pyccel/pyccel/blob/master/tutorial/quickstart.md`]
+
+=====
+The aim of Pyccel is to provide a simple way to generate automatically, parallel low level code. The main uses would be:
+
+* Convert a Python code (or project) into a Fortran or C code.
+* Accelerate Python functions by converting them to Fortran or C functions.
+
+Pyccel can be viewed as:
+
+* Python-to-Fortran/C converter
+* a compiler for a Domain Specific Language with Python syntax
+
+Pyccel comes with a selection of extensions allowing you to convert calls to some specific Python packages to Fortran/C.  These
+include Numpy, Scipy and (eventually) mpi4py and h5py.
+
+Pyccel's acceleration capabilities lead to much faster code.
+=====
+
+=== PyCOMPSs
+
+https://compss-doc.readthedocs.io/en/stable/Sections/08_PyCOMPSs_CLI.html[`https://compss-doc.readthedocs.io/en/stable/Sections/08_PyCOMPSs_CLI.html`]
+
+https://compss-doc.readthedocs.io/en/stable/Sections/09_PyCOMPSs_Notebooks.html[`https://compss-doc.readthedocs.io/en/stable/Sections/09_PyCOMPSs_Notebooks.html`]
+
+https://compss-doc.readthedocs.io/en/stable/[`https://compss-doc.readthedocs.io/en/stable/`]
+
+=====
+PyCOMPSs is the Python binding of COMPSs, a programming model and runtime which aims to ease the development of parallel applications for distributed infrastructures, such as Clusters and Clouds. The Programming model offers a sequential interface but at execution time the runtime system is able to exploit the inherent parallelism of applications at task level. The framework is complemented by a set of tools for facilitating the development, execution monitoring and post-mortem performance analysis.
+
+The PyCOMPSs CLI (pycompss-cli) provides a standalone tool to use PyCOMPSs interactively within docker environments, local machines and remote clusters. This tool has been implemented on top of the PyCOMPSs programming model.
+
+A PyCOMPSs application is composed of tasks, which are methods annotated with decorators following the PyCOMPSs syntax. At execution time, the runtime builds a task graph that takes into account the data dependencies between tasks, and from this graph schedules and executes the tasks in the distributed infrastructure, taking also care of the required data transfers between nodes.
+=====
+
+==== dislib
+
+https://dislib.bsc.es/en/stable/index.html[`https://dislib.bsc.es/en/stable/index.html`]
+
+*ds-array: A Distributed Data Structure for Large Scale Machine Learning* - https://arxiv.org/abs/2104.10106[`https://arxiv.org/abs/2104.10106`]
+
+=====
+The Distributed Computing Library (dislib) provides distributed algorithms ready to use as a library. So far, dislib is highly focused on machine learning algorithms, and is greatly inspired by scikit-learn. However, other types of numerical algorithms might be added in the future. The main objective of dislib is to facilitate the execution of big data analytics algorithms in distributed platforms, such as clusters, clouds, and supercomputers.
+
+Dislib has been implemented on top of PyCOMPSs programming model.
+=====
+
+=== PyCUDA
+
+https://documen.tician.de/pycuda/[`https://documen.tician.de/pycuda/`]
+
+=====
+PyCUDA gives you easy, Pythonic access to Nvidia’s CUDA parallel computation API.
+The features include:
+
+* Object cleanup tied to lifetime of objects. This idiom, often called RAII in C++, makes it much easier to write correct, leak- and crash-free code. PyCUDA knows about dependencies, too, so (for example) it won’t detach from a context before all memory allocated in it is also freed.
+* Convenience. Abstractions like pycuda.compiler.SourceModule and pycuda.gpuarray.GPUArray make CUDA programming even more convenient than with Nvidia’s C-based runtime.
+* Completeness. PyCUDA puts the full power of CUDA’s driver API at your disposal, if you wish.
+* Automatic Error Checking. All CUDA errors are automatically translated into Python exceptions.
+* Speed. PyCUDA’s base layer is written in C++, so all the niceties above are virtually free.
+=====
+
+==== Reikna
+
+https://github.com/fjarri/reikna[`https://github.com/fjarri/reikna`]
+
+http://reikna.publicfields.net/en/latest/[`http://reikna.publicfields.net/en/latest/`]
+
+=====
+Reikna is a library containing various GPU algorithms built on top of PyCUDA and PyOpenCL. The main design goals are:
+
+* separation of computation cores (matrix multiplication, random numbers generation etc) from simple transformations on their input and output values (scaling, typecast etc);
+* separation of the preparation and execution stage, maximizing the performance of the execution stage at the expense of the preparation stage (in other words, aiming at large simulations)
+* partial abstraction from CUDA/OpenCL
+=====
+
+=== PyOpenCL
+
+https://mathema.tician.de/software/pyopencl/[`https://mathema.tician.de/software/pyopencl/`]
+
+=====
+PyOpenCL gives you easy, Pythonic access to the OpenCL parallel computation API.
+The features include:
+
+* Object cleanup tied to lifetime of objects. This idiom, often called RAII in C++, makes it much easier to write correct, leak- and crash-free code.
+* Completeness. PyOpenCL puts the full power of OpenCL’s API at your disposal, if you wish. Every obscure get_info() query and all CL calls are accessible.
+* Automatic Error Checking. All errors are automatically translated into Python exceptions.
+* Speed. PyOpenCL’s base layer is written in C++, so all the niceties above are virtually free.
+* Liberal license. PyOpenCL is open-source under the MIT license and free for commercial, academic, and private use.
+=====
+
+==== PyCLBLAS
+
+https://github.com/jroose/pyclblas[`https://github.com/jroose/pyclblas`]
+
+https://pyclblas.readthedocs.io/en/latest/index.html[`https://pyclblas.readthedocs.io/en/latest/index.html`]
+
+https://github.com/clMathLibraries/clBLAS[`https://github.com/clMathLibraries/clBLAS
+
+=====
+PyCLBLAS is a wrapper for the clBLAS library. This module can be used to call BLAS routines on OpenCL enabled devices from Python.
+
+The clBLAS library is the BLAS portion of clMATH, which implements the complete set of level 1, 2 & 3 routines.
+In addition to GPU devices, the library also supports running on CPU devices to facilitate debugging and multicore programming.
+=====
+
+==== PyCLBlast
+
+https://github.com/CNugteren/CLBlast/tree/master/src/pyclblast[`https://github.com/CNugteren/CLBlast/tree/master/src/pyclblast`]
+
+https://github.com/CNugteren/CLBlast[`https://github.com/CNugteren/CLBlast`]
+
+https://cnugteren.github.io/clblast/clblast.html[`https://cnugteren.github.io/clblast/clblast.html`]
+
+=====
+This Python package provides a straightforward wrapper for CLBast based on PyOpenCL. CLBlast is a modern, lightweight, performant and tunable OpenCL BLAS library written in C++11. It is designed to leverage the full performance potential of a wide variety of OpenCL devices from different vendors, including desktop and laptop GPUs, embedded GPUs, and other accelerators.
+=====
+
+=== PyKokkos
+
+https://github.com/kokkos/pykokkos[`https://github.com/kokkos/pykokkos`]
+
+https://github.com/kokkos/kokkos/[`https://github.com/kokkos/kokkos/`]
+
+https://kokkos.github.io/kokkos-core-wiki/[`https://kokkos.github.io/kokkos-core-wiki/`]
+
+=====
+PyKokkos is a framework for writing performance portable kernels in Python. At a high-level, PyKokkos translates type-annotated Python code into C++ Kokkos and automatically generating bindings for the translated C++ code. PyKokkos also makes use of Python bindings for constructing Kokkos Views.
+
+Kokkos Core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose it provides abstractions for both parallel execution of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use CUDA, HIP, SYCL, HPX, OpenMP and C++ threads as backend programming models with several other backends in development.
+=====
+
+=== PySpark
+
+https://spark.apache.org/docs/latest/api/python/[`https://spark.apache.org/docs/latest/api/python/`]
+
+https://spark.apache.org/
+
+=====
+Apache Spark is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters.
+
+PySpark is an interface for Apache Spark in Python. It not only allows you to write Spark applications using Python APIs, but also provides the PySpark shell for interactively analyzing your data in a distributed environment. PySpark supports most of Spark’s features such as Spark SQL, DataFrame, Streaming, MLlib (Machine Learning) and Spark Core.
+
+Spark SQL is a Spark module for structured data processing. It provides a programming abstraction called DataFrame and can also act as distributed SQL query engine.
+
+The pandas API on Spark allows you to scale your pandas workload out.  This enables you to be immediately productive with Spark, with no learning curve, if you are already familiar with pandas, have  a single codebase that works both with pandas (tests, smaller datasets) and with Spark (distributed datasets), and switch to pandas API and PySpark API contexts easily without any overhead.
+=====
+
+=== Pyston
+
+https://github.com/pyston/pyston[`https://github.com/pyston/pyston`]
+
+https://www.pyston.org/[`https://www.pyston.org/`]
+
+https://blog.pyston.org/[`https://blog.pyston.org/`]
+
+https://pybenchmarks.org/u64q/pyston.php[`https://pybenchmarks.org/u64q/pyston.php`]
+
+=====
+Pyston is a fork of CPython 3.8.12 with additional optimizations for performance. It is targeted at large real-world applications such as web serving, delivering up to a 30% speedup with no development work required.
+=====
+
+=== Pythran
+
+https://github.com/serge-sans-paille/pythran[`https://github.com/serge-sans-paille/pythran`]
+
+https://pythran.readthedocs.io/en/latest/[`https://pythran.readthedocs.io/en/latest/`]
+
+https://serge-sans-paille.github.io/pythran-stories/pythran-tutorial.html[`https://serge-sans-paille.github.io/pythran-stories/pythran-tutorial.html`]
+
+=====
+Pythran is an ahead of time compiler for a subset of the Python language, with a focus on scientific computing. It takes a Python module annotated with a few interface description and turns it into a native Python module with the same interface, but (hopefully) faster.
+
+It is meant to efficiently compile scientific programs, and takes advantage of multi-cores and SIMD instruction units."
+=====
+
+=== RAPIDS
+
+==== cuDF
+
+https://github.com/rapidsai/cudf[`https://github.com/rapidsai/cudf`]
+
+https://docs.rapids.ai/api/cudf/stable/
+
+=====
+Built based on the Apache Arrow columnar memory format, cuDF is a GPU DataFrame library for loading, joining, aggregating, filtering, and otherwise manipulating data.
+
+cuDF provides a pandas-like API that will be familiar to data engineers & data scientists, so they can use it to easily accelerate their workflows without going into the details of CUDA programming.
+=====
+
+==== cuGRAPH
+
+https://github.com/rapidsai/cugraph[`https://github.com/rapidsai/cugraph`]
+
+=====
+The RAPIDS cuGraph library is a collection of GPU accelerated graph algorithms that process data found in GPU DataFrames. The vision of cuGraph is to make graph analysis ubiquitous to the point that users just think in terms of analysis and not technologies or frameworks. To realize that vision, cuGraph operates, at the Python layer, on GPU DataFrames, thereby allowing for seamless passing of data between ETL tasks in cuDF and machine learning tasks in cuML. Data scientists familiar with Python will quickly pick up how cuGraph integrates with the Pandas-like API of cuDF. Likewise, users familiar with NetworkX will quickly recognize the NetworkX-like API provided in cuGraph, with the goal to allow existing code to be ported with minimal effort into RAPIDS.
+=====
+
+==== cuML
+
+https://github.com/rapidsai/cuml[`https://github.com/rapidsai/cuml`]
+
+https://docs.rapids.ai/api/cuml/stable/[`https://docs.rapids.ai/api/cuml/stable/`]
+
+=====
+cuML is a suite of libraries that implement machine learning algorithms and mathematical primitives functions that share compatible APIs with other RAPIDS projects.
+
+cuML enables data scientists, researchers, and software engineers to run traditional tabular ML tasks on GPUs without going into the details of CUDA programming. In most cases, cuML's Python API matches the API from scikit-learn.
+
+For large datasets, these GPU-based implementations can complete 10-50x faster than their CPU equivalents.
+=====
+
+==== cuSignal
+
+https://github.com/rapidsai/cusignal[`https://github.com/rapidsai/cusignal`]
+
+https://docs.rapids.ai/api/cusignal/stable/[`https://docs.rapids.ai/api/cusignal/stable/`]
+
+=====
+cuSignal is a GPU-accelerated signal processing library that is both based on and extends the SciPy Signal API. Notably, cuSignal:
+
+* Delivers orders-of-magnitude speedups over CPU with a familiar API
+* Supports a zero-copy connection to popular Deep Learning frameworks like PyTorch, Tensorflow, and Jax
+* Runs on any CUDA-capable GPU of Maxwell architecture or newer, including the Jetson Nano
+* Optimizes streaming, real-time applications via zero-copy memory buffer between CPU and GPU
+* Is fully built within the GPU Python Ecosystem, where both core functionality and optimized kernels are dependent on the CuPy and Numba projects
+=====
+
+==== cuSpatial
+
+https://github.com/rapidsai/cuspatial[`https://github.com/rapidsai/cuspatial`]
+
+=====
+cuSpatial supports the following operations on spatial and trajectory data:
+
+* Spatial window query
+* Point-in-polygon test
+* Haversine distance
+* Hausdorff distance
+* Deriving trajectories from point location data
+* Computing distance/speed of trajectories
+* Computing spatial bounding boxes of trajectories
+* Quadtree-based indexing for large-scale point data
+* Quadtree-based point-in-polygon spatial join
+* Quadtree-based point-to-polyline nearest neighbor distance
+=====
+
+==== cuxfilter
+
+https://github.com/rapidsai/cuxfilter[`https://github.com/rapidsai/cuxfilter`]
+
+=====
+cuxfilter ( ku-cross-filter ) is a RAPIDS framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the original, it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via cuDF.
+=====
+
+==== RMM
+
+https://github.com/rapidsai/rmm[`https://github.com/rapidsai/rmm`]
+
+https://docs.rapids.ai/api/rmm/stable/[`https://docs.rapids.ai/api/rmm/stable/`]
+
+=====
+Achieving optimal performance in GPU-centric workflows frequently requires customizing how host and device memory are allocated. For example, using "pinned" host memory for asynchronous host <-> device memory transfers, or using a device memory pool sub-allocator to reduce the cost of dynamic device memory allocation.
+
+The goal of the RAPIDS Memory Manager (RMM) is to provide:
+
+* A common interface that allows customizing device and host memory allocation
+* A collection of implementations of the interface
+* A collection of data structures that use the interface for memory allocation
+=====
+
+=== Ray
+
+https://github.com/ray-project/ray[`https://github.com/ray-project/ray`]
+
+https://docs.ray.io/en/latest/[`https://docs.ray.io/en/latest/`]
+
+=====
+Ray is a unified framework for scaling AI and Python applications. Ray consists of a core distributed runtime and a toolkit of libraries (Ray AIR) for simplifying ML compute.
+
+Ray AI Runtime (AIR) is a scalable and unified toolkit for ML applications. AIR enables simple scaling of individual workloads, end-to-end workflows, and popular ecosystem frameworks, all in just Python.  AIR builds on Ray’s best-in-class libraries for Preprocessing, Training, Tuning, Scoring, Serving, and Reinforcement Learning to bring together an ecosystem of integrations.
+=====
+
+=== scikit-cuda
+
+https://scikit-cuda.readthedocs.io/en/latest/[`https://scikit-cuda.readthedocs.io/en/latest/`]
+
+https://developer.nvidia.com/cuda-toolkit[`https://developer.nvidia.com/cuda-toolkit`]
+
+=====
+This provides Python interfaces to many of the functions in the CUDA device/runtime, CUBLAS, CUFFT, and CUSOLVER libraries distributed as part of NVIDIA’s CUDA Programming Toolkit, as well as interfaces to select functions in the CULA Dense Toolkit. Both low-level wrapper functions similar to their C counterparts and high-level functions comparable to those in NumPy and Scipy are provided.
+=====
+
+==== cuBLAS
+
+https://developer.nvidia.com/cublas[`https://developer.nvidia.com/cublas`]
+
+=====
+The cuBLAS Library provides a GPU-accelerated implementation of the basic linear algebra subroutines (BLAS). cuBLAS accelerates AI and HPC applications with drop-in industry standard BLAS APIs highly optimized for NVIDIA GPUs. The cuBLAS library contains extensions for batched operations, execution across multiple GPUs, and mixed and low precision execution. Using cuBLAS, applications automatically benefit from regular performance improvements and new GPU architectures. The cuBLAS library is included in both the NVIDIA HPC SDK and the CUDA Toolkit.
+=====
+
+==== cuFFT
+
+https://docs.nvidia.com/cuda/cufft/index.html[`https://docs.nvidia.com/cuda/cufft/index.html`]
+
+=====
+cuFFT consists of two separate libraries: cuFFT and cuFFTW. The cuFFT library is designed to provide high performance on NVIDIA GPUs. The cuFFTW library is provided as a porting tool to enable users of FFTW to start using NVIDIA GPUs with a minimum amount of effort. 
+=====
+
+==== CULA
+
+http://www.culatools.com/cula_dense_programmers_guide/[`http://www.culatools.com/cula_dense_programmers_guide/`]
+
+=====
+CULA is a next-generation linear algebra package that uses the GPU as a co-processor to achieve speedups over existing linear algebra packages. CULA provides the same functionality you receive with your existing package, only at a greater speed.
+
+CULA provides easy access to the NVIDIA computing resources available in your computer system. The library is a self-contained package that enhances linear algebra programs with little to no knowledge of the GPU computing model.
+
+There are free and commercial versions of this.
+=====
+
+==== cuSOLVER
+
+https://docs.nvidia.com/cuda/cusolver/index.html[`https://docs.nvidia.com/cuda/cusolver/index.html`]
+
+=====
+A GPU accelerated library for decompositions and linear system solutions for both dense and sparse matrices. 
+The cuSolver library is a high-level package based on the cuBLAS and cuSPARSE libraries. It consists of two modules corresponding to two sets of API:
+
+* The cuSolver API on a single GPU
+* The cuSolverMG API on a single node multiGPU
+
+Each of these can be used independently or in concert with other toolkit libraries.
+
+The intent of cuSolver is to provide useful LAPACK-like features, such as common matrix factorization and triangular solve routines for dense matrices, a sparse least-squares solver and an eigenvalue solver. In addition cuSolver provides a new refactorization library useful for solving sequences of matrices with a shared sparsity pattern. 
+=====
+
+=== Transonic
+
+https://transonic.readthedocs.io/en/latest/[`https://transonic.readthedocs.io/en/latest/`]
+
+https://transonic.readthedocs.io/en/latest/backends/pythran.html
+
+https://foss.heptapod.net/fluiddyn/transonic[`https://foss.heptapod.net/fluiddyn/transonic`]
+
+https://fluiddyn.netlify.app/transonic-vision.html[`https://fluiddyn.netlify.app/transonic-vision.html`]
+
+=====
+Transonic is a pure Python package (requiring Python >= 3.6) to easily accelerate modern Python-Numpy code with different accelerators (currently Cython, Pythran and Numba, but potentially later Cupy, PyTorch, JAX, Weld, Pyccel, Uarray, etc…).
+
+The accelerators are not hard dependencies of Transonic: Python codes using Transonic run fine without any accelerators installed (of course without speedup).
+
+For some FluidDyn packages (FluidFFT, FluidSim, FluidImage), high performance is mandatory so we worked seriously on this aspect. We first used Cython and progressively switched to using only Pythran (in particular for its ability to strongly accelerate vectorized Python-Numpy code). Because Pythran (similar to Cython) optimized code on the module level and does not support Python classes (unlike Cython and Numba), our code had a "twisted" structure by the use of Pythran, with extra Pythran modules and functions that we wouldn't have with pure-Numpy code.
+
+This motivated us to add a light runtime layer above Pythran to make it much more easy to use in packages, with a Python API similar to Numba's API.  Several months of development followed (which are described here) and ultimately resulted in Transonic.  
+=====
+
+=== WeldNumpy
+
+https://www.weld.rs/weldnumpy/[`https://www.weld.rs/weldnumpy/`]
+
+https://www.weld.rs/[`https://www.weld.rs/`]
+
+=====
+WeldNumpy is a Weld-enabled library that provides a subclass of NumPy’s ndarray module, called weldarray, which supports automatic parallelization, lazy evaluation, and various other optimizations for data science workloads. This is achieved by implementing various NumPy operators in Weld’s IR. Thus, as you operate on a weldarray, it will internally build a graph of the operations, and pass them to weld’s runtime system to optimize and execute in parallel whenever required.
+
+In examples, you can see improvements of upto 5x on a single thread on some NumPy workloads, essentially without changing any code from the original NumPy implementations. Naturally, much bigger performance gains can be got by using the parallelism provided by Weld. In general, Weld works well with programs that operate on large NumPy arrays with compute operations that are supported by Weld.
+
+Weld is a compiler and runtime for improving the performance of data-intensive applications. It enables powerful compiler optimizations and automatic parallelization across functions by expressing the core computations in libraries using a small common intermediate representation and a lazy runtime API.
+=====
+
+
+

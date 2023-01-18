@@ -1,0 +1,536 @@
+PostgreSQL Notes
+================
+Steven K. Baum
+0.1, Jan. 5, 2022
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+== PostgreSQL Commands
+
+=== Databases
+
+==== Log In to a Database
+
+-----
+psql -d amiedb -U amieuser -h localhost
+-----
+
+
+
+==== List Databases
+
+-----
+\l
+-----
+
+==== Connect to a Database
+
+-----
+\c database_name
+-----
+
+==== List Tables in Database
+
+-----
+\dt
+-----
+
+==== List Schemas of Current Database
+
+-----
+\dn
+-----
+
+==== List Available Functions of Current Database
+
+-----
+\df
+-----
+
+==== List Available Views of Current Database
+
+-----
+\dv
+-----
+
+==== List Users and Roles
+
+-----
+\du
+-----
+
+=== Tables
+
+==== Create a Table
+
+Generic format.
+
+-----
+CREATE TABLE [IF NOT EXISTS] table_name (
+   column1 datatype(length) column_contraint,
+   column2 datatype(length) column_contraint,
+   column3 datatype(length) column_contraint,
+   table_constraints
+);
+-----
+
+==== Describe a Table
+
+-----
+\d table_name
+-----
+
+==== Insert Data Into a Table
+
+-----
+INSERT INTO table_name(column1,column2) VALUES('data1','data2')
+-----
+
+==== Update Data in a Table
+
+-----
+UPDATE approval SET approval_status = approved WHERE trans_rec_id = '111135727';
+-----
+
+==== Select All Data from a Table
+
+-----
+SELECT * from table_name;
+-----
+
+==== Select Specific Data From a Table Using Pattern Match
+
+The `pi.lp46691` can be exact or a regular expression, e.g. `pi.lp%`.
+
+-----
+SELECT first_name,last_name FROM local_info WHERE person_id LIKE 'pi.lp46691';
+-----
+
+==== Delete All Entries from a Table
+
+-----
+DELETE FROM table_name;
+-----
+
+==== Rename a Table
+
+-----
+ALTER TABLE table_name RENAME TO new_table_name;
+-----
+
+==== Delete A Table
+
+-----
+DROP TABLE tablename
+-----
+
+==== Add a Column to a Table
+
+-----
+ALTER TABLE approval ADD COLUMN ts timestamp;
+-----
+
+==== Order/Sort by a Specific Column
+
+-----
+select * from data_tbl where person_id = 'u.gs47101' order by tag;
+-----
+
+==== Change Name of Column in Table
+
+-----
+ALTER TABLE table_name RENAME COLUMN column_name TO new_column_name;
+-----
+
+==== Alter Datatype of a Column in a Table
+
+-----
+ALTER TABLE table_name ALTER COLUMN column TYPE varchar(35);
+-----
+
+==== Add Unique Constraint to a Table
+
+-----
+ALTER TABLE approval ADD CONSTRAINT project_unique UNIQUE (trans_rec_id,type_id,grant_number);
+-----
+
+==== Dump All the Entries in a Table 
+
+Dump all the entries in a table column.
+
+-----
+select * from state_des;
+  state_id   
+-------------
+ in-progress
+ completed
+ failed
+ on-hold
+ rejected
+-----
+
+==== Search for a Specific Value in a Column
+
+Search for a `state_id` value of `completed` in table `state_des`.
+
+-----
+select state_id from state_des where state_id = 'completed';
+ state_id 
+----------
+ completed
+-----
+
+==== Search a Column Using a Wild Card
+
+Search for entries starting with `compl` using:
+
+-----
+select state_id from state_des where state_id like 'compl%';
+-----
+
+==== Extract the Distinct Values from a Column
+
+-----
+select distinct project_id from local_info;
+-----
+
+==== Append One Table to Another Table (With Identical Table Formats)
+
+-----
+insert into data_tbl select * from data_test;
+-----
+
+==== Append One Table in a Database to Another Table in Another Database
+
+-----
+pg_dump -a -t transaction_tbl amiedb -U amieuser -h localhost | psql amiedevdb -U amiedevuser -h localhost
+pg_dump -a -t packet_tbl amiedb -U amieuser -h localhost | psql amiedevdb -U amiedevuser -h localhost
+-----
+
+==== Clone a Table
+
+-----
+CREATE TABLE data_tbl_backup AS TABLE data_tbl;
+-----
+
+==== Copy a Table Structure Without Data
+
+-----
+CREATE TABLE data_tbl_backup AS TABLE data_tbl WITH NO DATA;
+-----
+
+==== Using Foreign Keys
+
+Create the table that holds the foreign key `var_key`.
+
+-----
+CREATE TABLE state_des (var_key varchar(20) PRIMARY KEY);
+-----
+
+Create the table that references the foreign key `var_key`.
+
+-----
+CREATE TABLE transaction_tbl (var varchar(16), var_key varchar(20) REFERENCES state_des);
+-----
+
+Add a foreign key to an already existing table.
+
+-----
+ALTER TABLE table_test ADD FOREIGN KEY (packet_rec_id) REFERENCES packet_tbl(packet_rec_id);
+-----
+
+==== Do Not Insert a Row in Table If a Conflict Occurs
+
+https://linuxhint.com/insert-row-functions-postgresql-shell/[`https://linuxhint.com/insert-row-functions-postgresql-shell/`]
+
+Create a table with the columns `id` and `name` and insert two rows.
+
+-----
+CREATE TABLE tbl2 (ID INT PRIMARY KEY, Name CHARACTER VARYING);
+INSERT INTO tbl2 VALUES (1,'uzma'), (2,'abdul');
+SELECT * FROM tbl2;
+ id | name  
+----+-------
+  1 | uzma
+  2 | abdul
+-----
+
+Attempt to insert a row where the column value of `id` conflicts with
+one that already exists.
+
+-----
+INSERT INTO tbl2 VALUES (2,'abdul') ON CONFLICT (id) DO NOTHING;
+SELECT * FROM tbl2;
+ id | name  
+----+-------
+  1 | uzma
+  2 | abdul
+-----
+
+The row is not added because of the conflict.
+
+==== Update a Row If a Conflict Occurs
+
+https://linuxhint.com/insert-row-functions-postgresql-shell/[`https://linuxhint.com/insert-row-functions-postgresql-shell/`]
+
+Create a table with two rows and then insert a third row with no conflict.
+
+-----
+CREATE TABLE tbl4 (ID INT PRIMARY KEY, Name CHARACTER VARYING);
+INSERT INTO tbl4 VALUES (1,'uzma'), (2,'abdul');
+ id | name  
+----+-------
+  1 | uzma
+  2 | abdul
+INSERT INTO tbl4 VALUES (3,'rida') ON CONFLICT (id) DO UPDATE SET name= Excluded.name;
+SELECT * FROM tbl4;
+ id | name  
+----+-------
+  1 | uzma
+  2 | abdul
+  3 | rida
+-----
+
+Attempt to insert a row whose `id` value conflicts with one already in the table.
+
+-----
+INSERT INTO tbl4 VALUES (3,'mahi') ON CONFLICT (id) DO UPDATE SET name= Excluded.name;
+select * from tbl4;
+ id | name  
+----+-------
+  1 | uzma
+  2 | abdul
+  3 | mahi
+-----
+
+The `name` corresponding to the `id` value of 3 has been
+changed from 'rida' to 'mahi'.
+
+=== General Commands
+
+==== Quit
+
+-----
+\q
+-----
+
+==== Get Help About Commands
+
+-----
+\?
+-----
+
+==== Execute SQL Commands from a File
+
+-----
+\q filename.sql
+-----
+
+==== Command History
+
+-----
+\s
+-----
+
+==== Save Command History to a File
+
+-----
+\s command_history_filename
+-----
+
+==== Execute Previous Command
+
+-----
+\g
+-----
+
+==== Find Version of PostgreSQL Server
+
+-----
+SELECT version();
+-----
+
+== psycopg2 Commands
+
+=== Resources
+
+https://zetcode.com/python/psycopg2/[`https://zetcode.com/python/psycopg2/`]
+
+
+
+=== Basic Database Connection and Interaction
+
+-----
+#  Import the appropriate module.
+
+import psycopg2
+
+#  Connect to database 'template1' with user 'dbuser' at 'localhost' with password 'dbpass'.
+#  If successful, return connection object 'conn'.
+
+try:
+    conn = psycopg2.connect("dbname='template1' user='dbuser' host='localhost' password='dbpass'")
+except:
+    print "I am unable to connect to the database"
+
+#  Define a cursor with which to work.
+
+cur = conn.cursor()
+
+#  Execute a db command.
+
+cur.execute(""" [PostgrESQL command here] """)
+
+#  Place the results of the command in the list/variable 'rows'.
+
+rows = cur.fetchall()
+
+#  Commit method to make changes persistent into the database.
+conn.commit()
+
+#  Close the cursor object.
+cursor.close()
+
+#  Close the connection object.
+conn.close()
+-----
+
+=== Use of the With Statement
+
+Psycopg2 connections and cursors can be used with the `with` statement, e.g.
+
+-----
+with psycopg2.connect(DSN) as conn:
+	with conn.cursor() as curs:
+		curs.execute(SQL)
+-----
+
+The key concepts here are:
+
+* When a connection exits the `with` block, the transaction is automatically
+committed if an exception has not been raised.
+* When a cursor exits the `with` block it is closed to release any resource associated
+with it.
+* Exiting the `with` block closes the transaction but *not* the connection. A try-catch
+block should be used if you wish to ensure that a connection is closed.
+
+=== Passing Parameters to SQL Queries
+
+Psycopg automatically converts Python variables to SQL values using their types, with
+most standard Python types already dapted to their correct SQL representation.
+Passing parameters is done via `%s` placeholders in the SQL statement, and passing a
+sequence of values as the second argument of the function.
+For example, the Python function call:
+
+-----
+cur.execute("""  INSERT INTO some_table (an_int, a_date, a_string) VALUES (%s, %s, %s); """,
+   (10, datetime.date(2005, 11, 18), "O'Reilly"))
+-----
+
+is converted into the SQL command:
+
+-----
+INSERT INTO some_table (an_int, a_date, a_string) VALUES (10, '2005-11-18', 'O''Reilly');
+-----
+
+Rules to remember:
+
+* the placeholder must *always* be `%s`,
+* the placeholder must not be quote,
+* the second argument must always be a sequence, and
+* pass variables in a SQL command *only* by using the second argument of the `execute()`
+method.
+
+An example of passing variables properly via separately defining each of the
+two `execute()` arguments as variables is:
+
+-----
+SQL = "INSERT INTO authors (name) VALUES (%s);"
+data = ("O'Reilly", )
+cur.execute(SQL, data)
+-----
+
+Note how the single data value `O'Reilly` is transformed into a sequence via
+the trailing comma.
+
+=== Automatic Adaptation of Python Values to SQL Types
+
+==== Numbers
+
+Python numeric objects `int`, `long`, `float` and `Decimal` are converted into
+a PostgreSQL numerical representation, e.g.
+
+-----
+numbers = cur.mogrify("SELECT %s, %s, %s, %s;", (10, 10L, 10.0, Decimal("10.00"))
+print(numbers)
+'SELECT 10, 10, 10.0, 10.00;'
+-----
+
+==== Lists
+
+Python lists are converted into PostgreSQL ARRAYs.
+
+-----
+list = cur.mogrify("SELECT %s;", ([10, 20, 30], ))
+print(list)
+'SELECT ARRAY[10,20,30];'
+-----
+
+==== Dates and Times
+
+The Python built-ins `datetime`, `date`, `time` and `timedelta` are converted,
+respectively, into the PostgreSQL `timestamp[tz]`, `date`, `time[tz]` and
+`interval` data types.
+An example is:
+
+-----
+#  set a data and time.
+
+dt = datetime.datetime.now()
+dt
+datetime.datetime(2010, 2, 8, 1, 40, 27, 425337)
+
+#  Let psycopg2 convert this into SQL types via `mogrify`, which enables you to
+#  see the exact SQL variable values that will be used in the `SELECT` call.
+
+sel = cur.mogrify("SELECT %s, %s, %s;", (dt, dt.date(), dt.time())) 
+print(sel)
+"SELECT '2010-02-08T01:40:27.425337', '2010-02-08', '01:40:27.425337';"
+
+#  An interval example.
+
+diff = cur.mogrify("SELECT %s;", (dt - datetime.datetime(2010,1,1),))
+print(diff)
+"SELECT '38 days 6027.425337 seconds';"
+-----
+
+
+=== A Class to Connect to a DB, Create a Cursor, Execute a Query, and Close the Connection
+
+https://stackoverflow.com/questions/37488175/simplify-database-psycopg2-usage-by-creating-a-module[`https://stackoverflow.com/questions/37488175/simplify-database-psycopg2-usage-by-creating-a-module`'
+
+-----
+import psycopg2
+
+class MyDatabase():
+    def __init__(self, db="mydb", user="postgres"):
+	self.conn = psycopg2.connect(host=host, database=db, user=user, password=pw)
+#        self.conn = psycopg2.connect(database=db, user=user)
+        self.cur = self.conn.cursor()
+
+    def query(self, query):
+        self.cur.execute(query)
+
+    def close(self):
+        self.cur.close()
+        self.conn.close()
+
+db = MyDatabase()
+db.query("SELECT * FROM table;")
+db.close()
+-----
+

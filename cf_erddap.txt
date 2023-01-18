@@ -1,0 +1,476 @@
+ERDDAP for CF Discrete Sampling Geometry Files
+==============================================
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+About using ERDDAP to serve CF discrete sampling geometry files, more about
+which can be found here:
+
+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#discrete-sampling-geometries[+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#discrete-sampling-geometries+]
+
+Links
+~~~~~
+
+ERDDAP Docs -
+http://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDTableFromNcCFFiles[+http://coastwatch.pfeg.noaa.gov/erddap/download/setupDatasetsXml.html#EDDTableFromNcCFFiles+]
+
+
+ERDDAP Documentation
+--------------------
+
+EDDTableFromNcCFFiles aggregates data aggregates data from .nc (or .ncml)
+files which use one of the file formats specified by the CF Discrete Sampling
+Geometries (external link) conventions. See this class' superclass,
+EDDTableFromFiles, for information on how to use this class and how this class
+works.
+
+The CF DSG conventions defines dozens of file formats and includes numerous
+minor variations. These class deals with all of the variations we are aware
+of, but we may have missed one (or more). So if this class can't read data
+from your CF DSG files, please email bob.simons at noaa.gov and include a
+sample file. 
+
+Skeleton XML
+~~~~~~~~~~~~
+
+[source,xml]
+-----
+<dataset type="EDDTableFrom...Files" datasetID="..." active="..." >
+  <nDimensions>...</nDimensions>  <!-- This was used prior to ERDDAP version 1.30, 
+    but is now ignored. -->
+  <accessibleTo>...</accessibleTo> <!-- 0 or 1 -->
+  <reloadEveryNMinutes>...</reloadEveryNMinutes> <!-- 0 or 1 -->
+  <defaultDataQuery>...</defaultDataQuery> <!-- 0 or 1 -->
+  <defaultGraphQuery>...</defaultGraphQuery> <!-- 0 or 1 -->
+  <fgdcFile>...</fgdcFile> <!-- 0 or 1 -->
+  <iso19115File>...</iso19115File> <!-- 0 or 1 -->
+  <onChange>...</onChange> <!-- 0 or more -->
+  <specialMode>mode</specialMode>  <-- This rarely-used, OPTIONAL tag can be used 
+    with EDDTableFromThreddsFiles to specify that special, hard-coded rules 
+    should be used to determine which files should be downloaded from the server.
+    Currently, the only valid mode is SAMOS which is used with datasets from
+    http://coaps.fsu.edu/thredds/catalog/samos to download only the files with 
+    the last version number. -->
+  <sourceUrl>...</sourceUrl>  <-- For subclasses like EDDTableFromHyraxFiles and 
+    EDDTableFromThreddsFiles, this is where you specify the base URL for the files 
+    on the remote server.  For subclasses that get data from local files, ERDDAP 
+    doesn't use this information to get the data, but does display the information 
+    to users. So I usually use "(local files)". -->
+  <fileDir>...</fileDir> <-- The directory (absolute) with the data files. -->
+  <recursive>true|false</recursive> <-- Indicates if subdirectories
+    of fileDir have data files, too. -->
+  <fileNameRegex>...</fileNameRegex> <-- A regular expression (external link) 
+    (tutorial (external link)) describing valid data files names, e.g., ".*\.nc" for 
+    all .nc files. -->
+  <metadataFrom>...</metadataFrom> <-- The file to get metadata
+    from ("first" or "last" (the default) based on file's 
+    lastModifiedTime). -->
+  <charset>...</charset> (For EDDTableFromAsciiFiles only) This OPTIONAL tag
+    specifies the character set (case sensitive!) of the source files, e.g.,
+    ISO-8859-1 (the default) and UTF-8.  --> 
+  <columnNamesRow>...</columnNamesRow> <-- (For EDDTableFromAsciiFiles only) 
+    This specifies the number of the row with the column names in the files. 
+    (The first row is "1". Default = 1.)  If you specify 0, ERDDAP will not 
+    look for column names and will assign names: Column#1, Column#2, ... -->
+  <firstDataRow>...</firstDataRow> <-- (For 
+    EDDTableFromAsciiFiles only) This specifies the number of the first
+    row with data in the files. (The first row is "1". default = 2.) -->
+  <-- For the next four tags, see File Name Extracts. -->
+  <preExtractRegex>...</preExtractRegex>
+  <postExtractRegex>...</postExtractRegex>
+  <extractRegex>...</extractRegex>
+  <columnNameForExtract>...</columnNameForExtract> 
+  <sortedColumnSourceName>...</sortedColumnSourceName> 
+    <-- The sourceName of the numeric column that the data files are 
+    usually already sorted by within each file, e.g., "time".
+    Use null or "" if no variable is suitable.
+    It is ok if not all files are sorted by this column.
+    If present, this can greatly speed up some data requests. 
+    For EDDTableFromHyraxFiles, EDDTableFromNcFiles and 
+    EDDTableFromThreddsFiles, this must be the leftmost axis 
+    variable. -->
+  <sortFilesBySourceNames>...</sortFilesBySourceNames>
+    <-- This is a space-separated list of sourceNames 
+    which specifies how the internal list of files should be sorted
+    (in ascending order), for example "id time". 
+    It is the minimum value of the specified columns in each file
+    that is used for sorting.
+    When a data request is filled, data is obtained from the files
+    in this order. Thus it determines the overall order of the data
+    in the response.  If you specify more than one column name, the
+    second name is used if there is a tie for the first column; the
+    third is used if there is a tie for the first and second columns; ...
+    This is OPTIONAL (the default is fileDir+fileName order). -->
+  <isLocal>false<isLocal> <!-- (may be true or false, 
+    the default). This is only used by EDDTableFromNcCFFiles. It 
+    indicates if the files are local (actual files) or remote 
+    (accessed via the web). The two types are treated slightly 
+    differently.
+  <sourceNeedsExpandedFP_EQ>true(default)|false</sourceNeedsExpandedFP_EQ>
+  <fileTableInMemory>...</fileTableInMemory> <!-- 0 or 1 (true or false (the default)) -->
+  <addAttributes>...</addAttributes> <!-- 0 or 1 -->
+  <dataVariable>...</dataVariable> <!-- 1 or more -->
+    <-- For EDDTableFromHyraxFiles, EDDTableFromNcFiles, and 
+    EDDTableFromThreddsFiles, the axis variables (e.g., time) needn't
+    be first or in any specific order. -->
+</dataset>
+-----
+
+ERDDAP Profile Example
+----------------------
+
+Location of Example
+~~~~~~~~~~~~~~~~~~~
+
+This working example can be found at:
+
+http://gcoos1.tamu.edu:8080/erddap/info/index.html[+http://gcoos1.tamu.edu:8080/erddap/info/index.html+]
+
+The sub-pages:
+
+*Subset* -
+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.subset[+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.subset+]
+
+*Data Access Form* -
+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.html[+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.html+]
+
+*Graphs* -
+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.graph[+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.graph+]
+
+NetCDF Header
+~~~~~~~~~~~~~
+
+The header of the NetCDF file containing the data for this example is:
+
+-----
+netcdf profile_handcorrected {
+dimensions:
+	z = 7001 ;
+	profile = 46 ;
+	idchar = 12 ;
+variables:
+	char profile(profile, idchar) ;
+		profile:cf_role = "profile_id" ;
+	double min_depth(profile) ;
+		min_depth:units = "m" ;
+		min_depth:long_name = "minimum_cast_depth" ;
+	double max_depth(profile) ;
+		max_depth:units = "m" ;
+		max_depth:long_name = "maximum_cast_depth" ;
+	double time(profile) ;
+		time:units = "Minutes since 1-Jan-4713 BC 12:00 noon GMT" ;
+		time:standard_name = "time" ;
+		time:long_name = "time" ;
+		time:calendar = "Julian" ;
+	double lon(profile) ;
+		lon:standard_name = "longitude" ;
+		lon:long_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+	double lat(profile) ;
+		lat:standard_name = "latitude" ;
+		lat:long_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+	double z(z) ;
+		z:long_name = "depth" ;
+		z:standard_name = "depth" ;
+		z:units = "m" ;
+		z:postive = "down" ;
+		z:axis = "Z" ;
+	double Prz(profile, z) ;
+		Prz:_FillValue = -999.9 ;
+		Prz:standard_name = "sea_water_pressure" ;
+		Prz:long_name = "pressure" ;
+		Prz:units = "db" ;
+		Prz:coordinates = "time lon lat z" ;
+	double Tmp(profile, z) ;
+		Tmp:_FillValue = -999.9 ;
+		Tmp:standard_name = "sea_water_temperature" ;
+		Tmp:long_name = "temperature" ;
+		Tmp:units = "degree_Celsius" ;
+		Tmp:coordinates = "time lon lat z" ;
+	double Sal(profile, z) ;
+		Sal:_FillValue = -999.9 ;
+		Sal:standard_name = "sea_water_salinity" ;
+		Sal:long_name = "salinity" ;
+		Sal:units = "PSU" ;
+		Sal:coordinates = "time lon lat z" ;
+	double Oxy(profile, z) ;
+		Oxy:_FillValue = -999.9 ;
+		Oxy:standard_name = "volume_fraction_of_oxygen_in_sea_water" ;
+		Oxy:long_name = "oxygen, SBE 43" ;
+		Oxy:units = "ml/l" ;
+		Oxy:coordinates = "time lon lat z" ;
+	double Obs(profile, z) ;
+		Obs:_FillValue = -999.9 ;
+		Obs:standard_name = "" ;
+		Obs:long_name = "optical_backscatter" ;
+		Obs:units = "" ;
+		Obs:coordinates = "time lon lat z" ;
+		Obs:comment = "OPTICAL BACKSCATTER Sea Tech LS6000 Light Back-Scattering Sensor (LBSS). The instrument projects light into the sample volu
+me using two modulated 880 nm Light Emitting Diodes. Light back-scattered from the suspended particles inthe water column is measured with a solar-blind s
+ilicon detector. A light stop between the light source and the light detector prevents the measurement of direct transmitted light so that only back-scatt
+ered light from suspended particles in water are measured." ;
+
+// global attributes:
+		:featureType = "profile" ;
+data:
+...
+-----
+
+
+XML Code for +datasets.xml+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The +datasets.xml+ XML code for our example is:
+
+[source,xml]
+-----
+  <dataset type="EDDTableFromNcCFFiles" datasetID="profiles_6a07_93aa_5cda" active="true">
+    <reloadEveryNMinutes>10080</reloadEveryNMinutes>
+    <fileDir>/data/profiles/</fileDir>
+    <recursive>true</recursive>
+    <fileNameRegex>profile_handcorrected.nc</fileNameRegex>
+    <metadataFrom>last</metadataFrom>
+    <preExtractRegex></preExtractRegex>
+    <postExtractRegex></postExtractRegex>
+    <extractRegex></extractRegex>
+    <columnNameForExtract></columnNameForExtract>
+    <sortFilesBySourceNames></sortFilesBySourceNames>
+    <fileTableInMemory>false</fileTableInMemory>
+    <!-- sourceAttributes>
+        <att name="cdm_data_type">Profile</att>
+        <att name="cdm_profile_variables">profile, time, longitude, latitude, min_depth, max_depth</att>
+        <att name="featureType">profile</att>
+	<att name="subsetVariables">profile, time, longitude, latitude, min_depth, max_depth</att>
+    </sourceAttributes -->
+    <addAttributes>
+        <att name="cdm_data_type">Profile</att>
+        <att name="cdm_profile_variables">profile, time, longitude, latitude, min_depth, max_depth</att>
+        <att name="featureType">profile</att>
+        <att name="subsetVariables">profile, time, longitude, latitude, min_depth, max_depth</att>
+        <att name="Conventions">COARDS, CF-1.6, Unidata Dataset Discovery v1.0</att>
+        <att name="infoUrl">???</att>
+        <att name="institution">???</att>
+        <att name="keywords">backscatter, cast, chemistry, data, density, depth, dissolved, dissolved o2, fraction, local, maximum, minimum, o2, ocean, oceans,
+Oceans &gt; Ocean Chemistry &gt; Oxygen,
+Oceans &gt; Ocean Pressure &gt; Water Pressure,
+Oceans &gt; Ocean Temperature &gt; Water Temperature,
+Oceans &gt; Salinity/Density &gt; Salinity,
+optical, optical properties, oxygen, pressure, profile, properties, salinity, sbe, sea, sea_water_pressure, sea_water_salinity, sea_water_temperature, seawater, source., temperature, time, volume, volume_fraction_of_oxygen_in_sea_water, water</att>
+        <att name="keywords_vocabulary">GCMD Science Keywords</att>
+        <att name="license">[standard]</att>
+        <att name="Metadata_Conventions">COARDS, CF-1.6, Unidata Dataset Discovery v1.0</att>
+        <att name="sourceUrl">(local files)</att>
+        <att name="standard_name_vocabulary">CF-12</att>
+        <att name="summary">CTD Profile Data Example</att>
+        <att name="title">CTD Profile Data Example</att>
+    </addAttributes>
+    <dataVariable>
+        <sourceName>profile</sourceName>
+        <destinationName>profile</destinationName>
+        <dataType>String</dataType>
+        <!-- sourceAttributes>
+            <att name="cf_role">profile_id</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Unknown</att>
+            <att name="long_name">Profile</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>time</sourceName>
+        <destinationName>time</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="calendar">Julian</att>
+            <att name="long_name">time</att>
+            <att name="standard_name">time</att>
+            <att name="units">Minutes since 1-Jan-4713 BC 12:00 noon GMT</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Time</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>lon</sourceName>
+        <destinationName>longitude</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="axis">X</att>
+            <att name="long_name">longitude</att>
+            <att name="standard_name">longitude</att>
+            <att name="units">degrees_east</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">180.0</att>
+            <att name="colorBarMinimum" type="double">-180.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="long_name">Longitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>lat</sourceName>
+        <destinationName>latitude</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="axis">Y</att>
+            <att name="long_name">latitude</att>
+            <att name="standard_name">latitude</att>
+            <att name="units">degrees_north</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">90.0</att>
+            <att name="colorBarMinimum" type="double">-90.0</att>
+            <att name="ioos_category">Location</att>
+            <att name="long_name">Latitude</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>min_depth</sourceName>
+        <destinationName>min_depth</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">minimum_cast_depth</att>
+            <att name="units">m</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Location</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>max_depth</sourceName>
+        <destinationName>max_depth</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="long_name">maximum_cast_depth</att>
+            <att name="units">m</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="ioos_category">Location</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>z</sourceName>
+        <destinationName>depth</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="axis">Z</att>
+            <att name="long_name">depth</att>
+            <att name="postive">down</att>
+            <att name="standard_name">depth</att>
+            <att name="units">m</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">8000.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="colorBarPalette">OceanDepth</att>
+            <att name="ioos_category">Location</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>Prz</sourceName>
+        <destinationName>Prz</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="double">-999.9</att>
+            <att name="coordinates">time longitude latitude depth</att>
+            <att name="long_name">pressure</att>
+            <att name="standard_name">sea_water_pressure</att>
+            <att name="units">db</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">5000.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Pressure</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>Tmp</sourceName>
+        <destinationName>Tmp</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="double">-999.9</att>
+            <att name="coordinates">time longitude latitude depth</att>
+            <att name="long_name">temperature</att>
+            <att name="standard_name">sea_water_temperature</att>
+            <att name="units">degree_Celsius</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">32.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Temperature</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>Sal</sourceName>
+        <destinationName>Sal</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="double">-999.9</att>
+            <att name="coordinates">time longitude latitude depth</att>
+            <att name="long_name">salinity</att>
+            <att name="standard_name">sea_water_salinity</att>
+            <att name="units">PSU</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">37.0</att>
+            <att name="colorBarMinimum" type="double">32.0</att>
+            <att name="ioos_category">Salinity</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>Oxy</sourceName>
+        <destinationName>Oxy</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="double">-999.9</att>
+            <att name="coordinates">time longitude latitude depth</att>
+            <att name="long_name">oxygen, SBE 43</att>
+            <att name="standard_name">volume_fraction_of_oxygen_in_sea_water</att>
+            <att name="units">ml/l</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">10.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Dissolved O2</att>
+        </addAttributes>
+    </dataVariable>
+    <dataVariable>
+        <sourceName>Obs</sourceName>
+        <destinationName>Obs</destinationName>
+        <dataType>double</dataType>
+        <!-- sourceAttributes>
+            <att name="_FillValue" type="double">-999.9</att>
+            <att name="coordinates">time longitude latitude depth</att>
+            <att name="long_name">optical_backscatter</att>
+            <att name="standard_name"></att>
+            <att name="units"></att>
+            <att name="comment">OPTICAL BACKSCATTER Sea Tech LS6000 Light Back-Scattering Sensor (LBS
+S). The instrument projects light into the sample volume using two modulated 880 nm Light Emitting D
+iodes. Light back-scattered from the suspended particles inthe water column is measured with a solar
+-blind silicon detector. A light stop between the light source and the light detector prevents the m
+easurement of direct transmitted light so that only back-scattered light from suspended particles in
+ water are measured.</att>
+        </sourceAttributes -->
+        <addAttributes>
+            <att name="colorBarMaximum" type="double">10.0</att>
+            <att name="colorBarMinimum" type="double">0.0</att>
+            <att name="ioos_category">Dissolved O2</att>
+        </addAttributes>
+    </dataVariable>
+  </dataset>
+-----
+
+

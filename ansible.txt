@@ -1,0 +1,270 @@
+Ansible Notes
+=============
+Steven K. Baum
+0.1, Aug. 10, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+== Meta
+
+Wikipedia - https://en.wikipedia.org/wiki/Ansible_(software)[`https://en.wikipedia.org/wiki/Ansible_(software)`]
+
+Ansible - https://www.ansible.com/[`https://www.ansible.com/`]
+
+* Documentation - https://docs.ansible.com/[`https://docs.ansible.com/`]
+
+Github - https://github.com/ansible/ansible[`https://github.com/ansible/ansible`]
+
+== Overview
+
+=====
+Ansible is an open-source software provisioning, configuration management, and application-deployment tool enabling infrastructure as code. It runs on many Unix-like systems, and can configure both Unix-like systems as well as Microsoft Windows. It includes its own declarative language to describe system configuration. 
+
+Ansible is a Python-dependent configuration-management software, where both the controlling node and the target machine must have Python and its dependent packages installed. Ansible does not require a single controlling machine where orchestration begins. Ansible works against multiple systems in your infrastructure by selecting portions of Ansible's inventory, stored as edit-able, version-able ASCII text files. The inventory is configurable, and target machine inventory can be sourced dynamic or cloud-based sources or different formats (YAML, INI, etc.).
+
+The absence of a central-server requirement simplifies disaster-recovery planning. Nodes are managed by this controlling machine – typically over SSH. The controlling machine describes the location of nodes through its inventory. Sensitive data can be stored in encrypted files using Ansible Vault since 2014. In contrast with other popular configuration-management software — such as Chef, Puppet, and CFEngine — Ansible uses an agentless architecture, with Ansible software not normally running or even installed on the controlled node.
+
+Instead, Ansible orchestrates a node by installing and running modules on the node temporarily via SSH. For the duration of an orchestration task, a process running the module communicates with the controlling machine with a JSON-based protocol via its standard input and output. When Ansible is not managing a node, it does not consume resources on the node because no daemons are executing or software installed.
+=====
+
+
+== Install
+
+On your friendly neighborhood Fedora machine:
+
+-----
+su
+dnf install ansible*
+-----
+
+== Simple First Example
+
+This follows the example at:
+
+https://www.digitalocean.com/community/tutorials/creating-and-running-your-first-ansible-playbook
+
+If you're going to try running a playbook on your localhost, you need to have your public key in
+an `authorized_keys` file.
+
+-----
+cd ~/.ssh
+cat pub.localhost >> authorized.keys
+-----
+
+Next, make a directory for your test playbook files.
+
+-----
+mkdir ~/ANSIBLE
+cd ~/ANSIBLE
+-----
+
+Now create an `inventory` file containing your destinations, in this case `localhost`.
+An inventory is a description of the nodes that can be accessed by Ansible,
+and is described by a configuration file - here `inventory` - in INI or YAML format.
+The default location for the inventory file `hosts` is:
+
+-----
+/etc/ansible/hosts
+-----
+
+but this can be overridden to read a different file via `-i inventory`.
+
+
+-----
+cat localhost >> inventory
+-----
+
+Now create an initial playbook file `playbook.yml'.
+Playbooks are YAML files that express configurations, deployment, and orchestration in Ansible, and allow Ansible to perform operations on managed nodes. Each Playbook maps a group of hosts to a set of roles. Each role is represented by calls to Ansible tasks.
+
+-----
+---
+- hosts: all
+  tasks:
+    - name: Print message
+      debug:
+        msg: Hello Ansible World
+-----
+
+This and all playbooks are in YAML format, where plays are defined by a YAML list.
+
+Now run the playbook:
+
+-----
+ansible-playbook -i inventory playbook.yml
+
+
+PLAY [all] ******************************************************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************
+
+ok: [localhost]
+
+TASK [Print message] ********************************************************************************************
+ok: [localhost] => {
+    "msg": "Hello Ansible World"
+}
+
+PLAY RECAP ******************************************************************************************************
+localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+-----
+
+== TAMU Campus Authorization Example
+
+This example is contained within the playbook `campus_auth.yml`.
+
+-----
+---
+- hosts: login
+  gather_facts: no
+
+  tasks:
+  - name: install duo_unix and krb5 rpms
+    yum:
+      name: "{{ packages }}"
+      state: latest
+    vars:
+      packages:
+      - authselect
+      - sssd-krb5
+      - sssd-ad
+      - krb5-workstation
+      - krb5-libs
+
+  - name: copy other auth files
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: "{{ item.owner }}"
+      group: "{{ item.group }}"
+      mode: "{{ item.mode }}"
+    loop:
+      -  { src: krb5.conf, dest: /etc/krb5.conf, owner: root, group: root, mode: '0644' }
+
+  - name: setup sssd config
+    copy:
+      src: sssd.conf
+      dest: /etc/sssd/sssd.conf
+      owner: root
+      group: root
+      mode: 0600
+    notify:
+    - Run authselect
+    - Restart sssd
+
+  handlers:
+  - name: Run authselect
+    command: authselect select sssd --force
+
+  - name: Restart sssd
+    service:
+      name: sssd
+      state: restarted
+-----
+
+Running this obtains:
+
+-----
+ansible-playbook -i inventory campus_auth.yml
+
+PLAY [all] *******************************************************************************************************
+
+TASK [install duo_unix and krb5 rpms] ****************************************************************************
+deprecation_warnings=False in ansible.cfg.
+ok: [localhost]
+
+TASK [copy other auth files] *************************************************************************************
+ok: [localhost] => (item={'src': 'krb5.conf', 'dest': '/etc/krb5.conf', 'owner': 'root', 'group': 'root', 'mode': '0644'})
+
+TASK [setup sssd config] *****************************************************************************************
+ok: [localhost]
+
+PLAY RECAP *******************************************************************************************************
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+-----
+
+Checking if packages were installed:
+
+-----
+rpm -q authselect
+authselect-1.1-3.fc30.x86_64
+rpm -q sssd-krb5
+sssd-krb5-2.2.3-13.fc30.x86_64
+rpm -q sssd-ad
+sssd-ad-2.2.3-13.fc30.x86_64
+rpm -q krb5-workstation
+krb5-workstation-1.17-15.fc30.x86_64
+rpm -q krb5-libs
+krb5-libs-1.17-15.fc30.x86_64
+-----
+
+Checking the installation of `/etc/krb5.conf`.
+
+-----
+less /etc/krb5.conf
+
+# To opt out of the system crypto-policies configuration of krb5, remove the
+# symlink at /etc/krb5.conf.d/crypto-policies which will not be recreated.
+includedir /etc/krb5.conf.d/
+
+[logging]
+    default = FILE:/var/log/krb5libs.log
+    kdc = FILE:/var/log/krb5kdc.log
+    admin_server = FILE:/var/log/kadmind.log
+
+[libdefaults]
+    dns_lookup_realm = false
+    ticket_lifetime = 24h
+    renew_lifetime = 7d
+    forwardable = true
+    rdns = false
+    pkinit_anchors = FILE:/etc/pki/tls/certs/ca-bundle.crt
+    spake_preauth_groups = XXXXXXXXXXXX
+    default_ccache_name = KEYRING:persistent:%{uid}
+    default_realm = AUTH.TAMU.EDU
+    dns_lookup_kdc = true
+
+#[realms]
+# EXAMPLE.COM = {
+#     kdc = kerberos.example.com
+#     admin_server = kerberos.example.com
+# }
+
+#[domain_realm]
+# .example.com = EXAMPLE.COM
+# example.com = EXAMPLE.COM
+
+[appdefaults]
+  pam = {
+    debug = false
+    ticket_lifetime = 1d
+    renew_lifetime = 1d
+    forwardable = true
+    proxiable = false
+    retain_after_close = false
+    minimum_uid = 1000
+    try_first_pass = true
+  }
+-----
+
+Check the installation of `/etc/sssd/sssd.conf`.
+
+-----
+less /etc/sssd/sssd.conf
+
+[sssd]
+    services = nss, pam
+    domains = AUTH.TAMU.EDU
+
+[domain/AUTH.TAMU.EDU]
+    id_provider = files
+    auth_provider = krb5
+    krb5_realm = AUTH.TAMU.EDU
+-----
+
+
+

@@ -1,0 +1,51 @@
+DIY Books
+=========
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+DIY books.
+
+The List
+--------
+
+*BBB*
+
+http://www.amazon.com/Country-Craft-Tools-Percy-Blandford/dp/0715364871/[*Country
+Craft Tools*] (1974, 224) - Percy W. Blandford (Reprinted as *Country Tools
+and How to Use Them*.)
+
+http://www.amazon.com/Country-Tools-Dover-Craft-Books/dp/0486448444/[*Country
+Tools and How to Use Them*] (2006, 224) - Percy W. Blandford (Reprint of
+*Country Craft Tools*.)
+
+http://www.amazon.com/Old-Farm-Tools-Machinery-Illustrated/dp/0810320193/[*Old
+Farm Tools and Machinery: An Illustrated History*] (1976, 188) - Percy W. Blandford
+
+http://www.amazon.com/Home-Machinists-Handbook-Doug-Briney/dp/0830615733/[*Home
+Machinists Handbook*] (1974, 275) - Doug Briney
+
+*SSS*
+
+http://www.amazon.com/Dictionary-American-Hand-Tools-Collectors/dp/0764315927/[*Dictionary
+of American Hand Tools: A Pictorial Synopsis*] (2007, 546) - Alvin Sellens
+
+http://www.amazon.com/Museum-Early-American-Tools-Americana/dp/0486425606/[*A
+Museum of Early American Tools*] (2002, 128) - Eric Sloane (Dover reprint
+edition.)
+
+
+*WWW*
+
+http://www.amazon.com/Making-Tools-Alexander-G-Weygers/dp/0442293607[*The
+Making of Tools*] (1973, 93) - Alexander Weygers
+

@@ -1,0 +1,1229 @@
+OPeNDAP Server Capabilities and Limitations
+===========================================
+Steven K. Baum
+v0.1, 2012-11-11
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Executive Summary
+-----------------
+
+THREDDS OPeNDAP servers can be used to interactively download large datasets from
+remote locations.  They are limited, however, to downloading entire actual - i.e. not
+virtual - NetCDF files, and also limited to downloading (as NetCDF files)
+parts of virtual files
+no bigger than the available client RAM.  The PyDAP client can be used to
+programmatically do the same things as the THREDDS interactive server, but
+has the same RAM limitations.  It will also will not automatically download
+parts of virtual files as NetCDF files, although a client script can be constructed
+that can - given a THREDDS URL - download the metadata from a real or virtual
+dataset and iteratively reconstruct all or part of the dataset on the client
+side.
+
+Preface
+-------
+
+This document explains the use of PyDAP and the THREDDS OPeNDAP server to obtain
+remote datasets.
+The THREDDS Data Server (TDS) is a web server that provides metadata and data
+access for scientific datasets.
+OPeNDAP is a software framework for scientific data networking that
+allows simple access to remote datasets.
+Both THREDDS and OPeNDAP were designed to simplify finding local and
+remote datasets, obtaining metadata describing those datasets, and
+obtaining selected parts of those datasets.
+Neither was designed for the task of downloading huge - i.e. multi-terabyte -
+datasets as a matter of course, and they are limited to serving datasets
+no bigger than a specific maximum file size that is practically no bigger
+than the RAM size of the machine on which they are employed.
+
+The task of downloading entire very large datasets is the domain of tools
+that do such things incrementally, for example, +scp+, +bcpp+ and +wget+.  These
+tools can stream multi-terabyte files from one machine to another by
+moving part of the file from hard disk to RAM on the server, then transmitting
+that part over the internet to a client machine, and then moving that part
+from the RAM to the hard disk on the client machine.  This type of procedure
+is independent of RAM size.
+
+A built-in HTTP server within the THREDDS server does allow non-virtual,
+individual NetCDF binary files to be downloaded via the HTTP protocol, which
+transports them incrementally and is not critically dependent on RAM
+size.  This option is not available for virtual datasets wherein many
+individual NetCDF files have been combined into a larger, virtual dataset.
+Attempting to download portions of virtual datasets larger than the
+available RAM will tremendously slow down the client and server
+machines, and eventually crash them.
+
+:numbered:
+
+Maximum File Size Configurations
+--------------------------------
+
+There are both hardware and software considerations as to maximum
+file sizes that can usefully be handled via OPeNDAP servers and clients.
+
+Available Machine RAM
+~~~~~~~~~~~~~~~~~~~~~
+
+The RAM and swap size of the computer is the ultimate limitation on how high you
+can set the configuration parameters discussed below, although the slowdown
+will get more and more painfully significant as you incrementally exceed the size of the
+RAM.
+Basically, the higher above the RAM size you try to set the parameters below,
+the more you'll be swapping data back and forth between the RAM and a hard
+disk up to the total size of RAM plus swap.
+After that, you'll probably freeze or crash the computer.
+
+
+THREDDS OPeNDAP Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The maximum size of binary and ASCII files that can be served via the
+OPeNDAP server in THREDDS is configured in the +threddsConfig.xml+ file in
+the section:
+
+-----
+  <Opendap>
+    <ascLimit>50</ascLimit>
+    <binLimit>20000</binLimit>
+    <serverVersion>opendap/3.7</serverVersion>
+  </Opendap>
+-----
+
+The maximum size in megabtyes of binary files that can be downloaded is set
+within the +binLimit+ brackets.  Here the maximum is 20000 Mb or 20 Gb.
+
+Java/Tomcat Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A maximum file size can also be set via either the Java or Tomcat/Catalina
+configuration parameters.  This is usually (and best) done within the
++setenv.sh+ file within the +bin+ directory.  An example of this file
+is:
+
+-----
+export JAVA_HOME=/opt/jre
+export JAVA_OPTS='-server -Djava.awt.headless=true -Xmx16000M -Xms16000M -d64'
+export TOMCAT_HOME=/opt/tomcat6
+export CATALINA_HOME=/opt/tomcat6
+export CATALINA_OPTS="-Xms16394m -Xmx16394m"
+-----
+
+The +-Xms+ and +Xmx+ parameters set the maximum memory allocated at startup
+and the maximum total memory that can be allocated.  Setting them both
+the same shouldn't cause any problems.
+
+THREDDS/OPeNDAP
+---------------
+
+The THREDDS server has a built-in server that implements the OPeNDAP
+protocols.  It also has a built-in server that provides a NetCDF subset
+service for grids.  Both are practically limited by the size of the RAM
+on the machine as to the size of files they can serve.
+
+In the case of individual, non-virtual NetCDF files, there is a THREDDS
+implementation of an HTTP server that can be used to download entire files
+without having to move them entirely into RAM.  This option is not
+available, though, on virtual files such as the BP ROMS Gulf simulation
+results example below.
+
+PyDAP
+-----
+
+Introduction
+~~~~~~~~~~~~
+
+The PyDAP package is a Python library implementing the Data Access Protocol
+known as DODS or OPeNDAP.  It can be used as a client to access scientific
+datasets via the internet, or as a server to distribute them.
+The software is available at:
+
+http://pydap.org/[+http://pydap.org/+]
+
+It can be downloaded and installed via the usual Python module installation
+procedure, or via the +easy_install+ program, i.e.
+
++easy_install pydap+
+
+which will install the program in the standard Python library location and
+make it available for both interactive use and for scripting.
+
+The PyDAP library is an optimal tool to be used in combination with
+other Python libraries such as NumPy/SciPy for easily and elegantly
+extracting, analyzing and graphing parts of local and remote datasets via
+script files.
+
+The client mode of the PyDAP library enables you to easily connect to a
+real or virtual remote dataset, find and peruse its metadata, and extract
+portions of the data therein.  It works on the variable rather than file
+level, which is to say that it downloads arrays of data from the server
+rather than the entire file containing that data.  To download and recreate
+an entire NetCDF file using PyDAP would require interrogating the remote
+file to discover all the variables and attributes therein, downloading
+them one by one, and then creating another NetCDF file containing the same
+variables and attributes on the client end using, for example, the
++netcdf-python+ library.
+
+If you attempt to download a variable field that is too big for your
+OPeNDAP server configuration to handle, you will get an error message
+similar to:
+
+-----
+ServerError: 'Server error 403: "Request too big=96236.0 Mbytes, max=20000.0"'
+-----
+
+where the +max+ part is what you have configured in the
++threddsConfig.xml+ configuration file.
+
+PyDAP Usage Examples
+~~~~~~~~~~~~~~~~~~~~
+
+A typical PyDAP session would start by invoking Python or ipython and then
+loading the PyDAP library via:
+
+------
+> from pydap.client import open_url
+------
+
+Datasets are opened for use via the +open_url+ statement.  Here an object
++dataset+ is created that downloads and contains the meta-information in
+the chosen NetCDF dataset, i.e. +something.nc+.
+
+-----
+> dataset=open_url('http://machine.some.where:8080/thredds/dodsC/something.nc')
+-----
+
+A more concrete example involving the BP Gulf Forecast simulations on our
+THREDDS server at:
+
+http://barataria.tamu.edu/thredds/catalog.html[+http://barataria.tamu.edu/thredds/catalog.html+]
+
+would be - choosing the *Best Time Series* selection of the *Feature
+Collection* version of the BP files:
+
+-----
+> dataset=open_url('http://barataria.tamu.edu/thredds/catalog/fmrc/roms/out/catalog.html?dataset=fmrc/roms/out/ROMS_Output_Feature_Collection_Aggregation_best.ncd')
+-----
+
+Note that +ROMS_Output_Feature_Collection_Aggregation_best.ncd+ is a virtual
+dataset that the THREDDS server has constructed from various parts of the
+actual hundreds of NetCDF files to create a best available timeseries
+of the fields for the 78-hour prediction simulations performed more-or-less daily over
+the 2 month period.
+
+We can find and then peruse the variable names within the virtual file
++ROMS_Output_Feature_Collection_Aggregation_best.ncd+ via:
+
+-----
+> vars = dataset.keys()
+> print vars
+['ntimes', 'ndtfast', 'dt', 'dtfast', 'dstart', 'nHIS', 'ndefHIS', 'nRST',
+'Falpha', 'Fbeta', 'Fgamma', 'nl_tnu2', 'nl_visc2', 'Akt_bak', 'Akv_bak',
+'Akk_bak', 'Akp_bak', 'rdrg', 'rdrg2', 'Zob', 'Zos', 'Znudg', 'M2nudg',
+'M3nudg', 'Tnudg', 'FSobc_in', 'FSobc_out', 'M2obc_in', 'M2obc_out',
+'Tobc_in', 'Tobc_out', 'M3obc_in', 'M3obc_out', 'rho0', 'gamma2', 'spherical',
+'xl', 'el', 'Vtransform', 'Vstretching', 'theta_s', 'theta_b', 'Tcline', 'hc',
+'Cs_r', 'Cs_w', 'h', 'f', 'pm', 'pn', 'mask_rho', 'mask_u', 'mask_v',
+'mask_psi', 'zeta', 'ubar', 'vbar', 'u', 'v', 'w', 'temp', 'salt', 'dye_01',
+'dye_02', 'rho', 'AKv', 'AKt', 'AKs', 'shflux', 'ssflux', 'latent',
+'sensible', 'lwrad', 'EminusP', 'evaporation', 'rain', 'swrad', 'sustr',
+'svstr', 'time_offset', 'time1_offset', 's_rho', 's_w', 'lon_rho', 'lat_rho',
+'lon_u', 'lat_u', 'lon_v', 'lat_v', 'lon_psi', 'lat_psi', 'ocean_time',
+'time', 'time_run', 'time1', 'time1_run']
+-----
+
+From this information we can create an object for one of the available
+variables, for instance +u+, and then discover various things about that
+variable as well as download subsets of the variable field.  A tutorial on 
+accessing gridded data with PyDAP can be found at:
+
+http://pydap.org/client.html#accessing-gridded-data[+http://pydap.org/client.html#accessing-gridded-data+]
+
+-----
+> u = dataset['u']
+
+> u.shape
+(1014, 50, 660, 719)
+
+> u.type
+<class 'pydap.model.Float32'>
+u.dimensions
+('time', 's_rho', 'eta_u', 'xi_u')
+
+> u.attributes
+{'_FillValue': 9.999999933815813e+36,
+ 'coordinates': 'time_run time s_rho lat_u lon_u ',
+ 'field': 'u-velocity, scalar, series',
+ 'long_name': 'u-momentum component',
+ 'time': 'ocean_time',
+ 'units': 'meter second-1'}
+
+> u.units
+'meter second-1'
+> u.time
+'ocean_time'
+> u.coordinates
+'time_run time s_rho lat_u lon_u '
+-----
+
+Single field values can be extracted.
+
+-----
+> u[10,10,100,100]
+array([[[[ 0.04453143]]]], dtype=float32)
+-----
+
+Subsets can be extracted.
+
+-----
+> usub = u[0,10:15,100:125,200:220]
+> usub.shape
+(1, 5, 25, 20)
+-----
+
+
+A PyDAP Script to Download a General NetCDF File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We have all the pieces we need to construct a Python script that
+will - given a THREDDS real or virtual dataset URL - download the
+metadata and use that to iteratively reconstruct all or part of
+the remote dataset on the local system.
+
+A script similar to this undoubtedly exists under the hood of the
+THREDDS OPeNDAP server that creates spatial and temporal subsets
+of virtual datasets in NetCDF format and allows you to download
+them as such.  That server side script, however, is limited to the
+size of the RAM on the server.  This client side script, on the
+other hand, is limited only to the amount of disk space you have
+since the time iteration incrementally builds the file on your
+hard disc rather than in your RAM.
+
+-----
+#!/usr/bin/python2.7
+
+#  Installed via:  easy_install pydap
+
+from pydap.client import open_url
+
+# Obtained from: http://code.google.com/p/netcdf4-python/
+
+from netCDF4 import Dataset
+
+# Open an output file with netCDF4.
+
+ncout = Dataset('out.nc','w',format='NETCDF3_CLASSIC')
+
+#  Access the remote dataset and return a DatasetType object
+#  containing the file's metadata.
+
+ncin=open_url('http://barataria.tamu.edu/thredds/dodsC/fmrc/roms/out/catalog.html?dataset=fmrc/roms/out/ROMS_Output_Feature_Collection_Aggregation_best.ncd')
+
+
+#  Extract all the variable names in the array vars.
+
+vars = ncin.keys()
+
+#  Loop over all the variables since we want to reconstruct the entire
+#  file on the client end.
+
+for var in vars:
+
+#  Create an output file variable corresponding to the input variable.
+
+	var_in = ncin[var]
+
+#  Find the dimensions for variable var.
+
+	vardims = var_in.dimensions
+
+#  If the vardims tuple is empty, i.e. it has no dimensions, extract the variable name, value and
+#  attributes and write them to the output file.
+
+	if not vardims:
+
+		out_values = var_in[:]
+		out_name = var_in.name
+		out_att = var_in.attributes
+
+#  Extract the keys of the attribute dictionary into a list.
+
+		keys = out_att.keys()
+
+#  Create variable for output file.
+
+		var_out = ncout.createVariable(out_name)
+
+#  Write variable values to output file.
+
+		var_out = out_values
+
+#  Write all attribute name/value pairs by looping over the dictionary key list.
+		for key in keys:
+			out_var.key = out_att[key]
+
+#  If the variable has dimensions, extract everything and iterate as
+#  needed to print it to the output file.
+
+	else
+
+#  If the dimensioned variable has no time dimension, extract the variable
+#  name, value and attributes and write them to the output file.
+
+		if vardims[0] != "time":
+
+			out_values = var_in[:]
+			out_name = var_in.name
+			out_att = var_in.attributes
+
+#  Create dimensions and variables.
+
+			out_shape = var_in.shape
+			out_dims = var_in.dimensions
+			ncout.createDimension(out_dims[0],out_shape[0])
+			ncout.createDimension(out_dims[1],out_shape[1])
+                        var_out = ncout.createVariable(out_name,'f8',(out_dims[0],out_dims[1],))
+
+			var_out = out_values
+
+		else
+
+#  If the dimensioned variable has a time dimension, loop over time values
+#  while doing all of the above.
+
+#			out_values = var_in[:]
+			out_name = var_in.name
+			out_att = var_in.attributes
+			out_shape = var_in.shape
+			out_dims = var_in.dimensions
+
+#  Find the number of dimensions in this variable and create appropriately
+#  sized dimensions and variables.
+
+			out_no_dims = len(out_dims)
+			for nd in range(0,out_no_dims):
+				ncout.createDimension(out_dims[nd],out_shape[nd])
+			
+			if out_no_dims = 3:
+                                var_out = ncout.createVariable(out_name,'f8',(out_dims[0],out_dims[1],out_dims[2],))
+			else
+                                var_out = ncout.createVariable(out_name,'f8',(out_dims[0],out_dims[1],out_dims[2],out_dims[3],))
+
+#  Loop over time variable.
+
+			for nt in range(0,out_shape[0]):
+
+				out_values = var_in[nt,:]
+
+
+
+ncout.close()
+-----
+
+PyDAP Tests
+-----------
+
+Gridded Data
+~~~~~~~~~~~~
+
+Acessing an ETOPO File on ERDDAP Using open_url
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, an ETOPO file on gcoos1:
+
+-----
+>>> dataset=open_url('http://gcoos1.tamu.edu:8080/erddap/griddap/etopo360')
+>>> vars = dataset.keys()
+>>> print vars
+['latitude', 'longitude', 'altitude']
+>>> lat = dataset['latitude']
+>>> lon = dataset['longitude']
+>>> alt = dataset['altitude']
+>>> lat.shape
+(10801,)
+>>> lon.shape
+(21601,)
+>>> alt.shape
+(10801, 21601)
+>>> lat[:]
+array([-90.        , -89.98333333, -89.96666667, ...,  89.96666667,
+        89.98333333,  90.        ])
+alt[:]
+[...loooong pause...]
+[got tired waiting, although no crash]
+-----
+
+Accessing a WRF Dataset on THREDDS Using open_url
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now we access a WRF NetCDF file located on the THREDDS server on barataria.
+The dataset URL is:
+
+-----
+http://barataria.tamu.edu/thredds/catalog/WRF_Daily/07262012/catalog.html?dataset=All-WRF-Out/07262012/wrfout_0726_d01_2012-07-26.nc
+-----
+
+and the OpenDAP URL is:
+
+-----
+http://barataria.tamu.edu/thredds/dodsC/WRF_Daily/07262012/wrfout_0726_d01_2012-07-26.nc.html
+-----
+
+The PyDAP session starts by opening a URL that specifies the location
+of the dataset.  For OPeNDAP datasets this is the URL found in the
++Data URL+ box upon clicking
+on the OPENDAP entry on the TDS page for a specific dataset and
+obtaining the +OPeNDAP Dataset Access Form+.
+This statement returns a +DatasetType+ object containing information
+about the dataset rather than the dataset itself.  This object is a dictionary
+that stores other variables.
+
+-----
+dataset2=open_url('http://barataria.tamu.edu/thredds/dodsC/WRF_Daily/07262012/wrfout_0726_d01_2012-07-26.nc')
+-----
+
+We can check for the names of the variables within the
++DatasetType+ object or dictionary via:
+
+-----
+vars2 = dataset2.keys()
+print vars2
+['Times', 'LU_INDEX', 'ZNU', 'ZNW', 'ZS', 'DZS', 'VAR_SSO', 'LAP_HGT', 'U',
+'V', 'W', 'PH', 'PHB', 'T', 'HFX_FORCE', 'LH_FORCE', 'TSK_FORCE',
+'HFX_FORCE_TEND', 'LH_FORCE_TEND', 'TSK_FORCE_TEND', 'MU', 'MUB', 'NEST_POS',
+'P', 'PB', 'FNM', 'FNP', 'RDNW', 'RDN', 'DNW', 'DN', 'CFN', 'CFN1', 'P_HYD',
+'TH2', 'RDX', 'RDY', 'RESM', 'ZETATOP', 'CF1', 'CF2', 'CF3', 'ITIMESTEP',
+'XTIME', 'QVAPOR', 'QCLOUD', 'QRAIN', 'QICE', 'QSNOW', 'QGRAUP', 'SHDMAX',
+'SHDMIN', 'SNOALB', 'TSLB', 'SMOIS', 'SH2O', 'SMCREL', 'SEAICE', 'XICEM',
+'SFROFF', 'UDROFF', 'IVGTYP', 'ISLTYP', 'VEGFRA', 'GRDFLX', 'ACGRDFLX',
+'SNOW', 'SNOWH', 'CANWAT', 'SSTSK', 'LAI', 'MAPFAC_M', 'MAPFAC_U', 'MAPFAC_V',
+'MAPFAC_MX', 'MAPFAC_MY', 'MAPFAC_UX', 'MAPFAC_UY', 'MAPFAC_VX', 'MF_VX_INV',
+'MAPFAC_VY', 'F', 'E', 'SINALPHA', 'COSALPHA', 'HGT', 'TSK', 'P_TOP', 'T00',
+'P00', 'TLP', 'TISO', 'MAX_MSTFX', 'MAX_MSTFY', 'RAINSH', 'SNOWNC',
+'GRAUPELNC', 'HAILNC', 'CLDFRA', 'SWDOWN', 'SWNORM', 'ACLWUPT', 'ACLWUPTC',
+'ACLWDNT', 'ACLWDNTC', 'ACLWUPB', 'ACLWUPBC', 'ACLWDNB', 'ACLWDNBC',
+'I_ACLWUPT', 'I_ACLWUPTC', 'I_ACLWDNT', 'I_ACLWDNTC', 'I_ACLWUPB',
+'I_ACLWUPBC', 'I_ACLWDNB', 'I_ACLWDNBC', 'LWUPT', 'LWUPTC', 'LWDNT', 'LWDNTC',
+'LWUPB', 'LWUPBC', 'LWDNB', 'LWDNBC', 'OLR', 'XLAT', 'XLONG', 'XLAT_U',
+'XLONG_U', 'XLAT_V', 'XLONG_V', 'ALBEDO', 'CLAT', 'ALBBCK', 'NOAHRES', 'TMN',
+'XLAND', 'ACHFX', 'ACLHF', 'SNOWC', 'SR', 'SAVE_TOPO_FROM_REAL', 'SEED1',
+'SEED2', 'U10', 'V10', 'LANDMASK', 'SST']
+-----
+
+We can obtain information about specific variables such as their shape
+and attributes:
+
+-----
+>>> dataset2.U10.shape
+(24, 811, 856)
+>>> dataset2.U10.attributes
+{'description': 'U at 10 M', 'MemoryOrder': 'XY ', 'coordinates': 'XLONG XLAT', 'stagger': '', 'FieldType': 104, 'units': 'm s-1'}
+-----
+
+We can also find the details of a specific attribute:
+
+-----
+>>> dataset2.U10.units
+'m s-1'
+-----
+
+Instead of using the awkward construction +dataset2.U10+ we can reference
++U10+
+directly by defining a variable +u10+:
+
+----
+>>> u10 = dataset2.U10
+>>> u10
+<pydap.model.BaseType object at 0x16eabc90>
+>>> u10.type
+<class 'pydap.model.Float32'>
+>>> u10.attributes
+{'description': 'U at 10 M', 'MemoryOrder': 'XY ', 'coordinates': 'XLONG XLAT', 'stagger': '', 'FieldType': 104, 'units': 'm s-1'}
+>>> u10.shape
+(24, 811, 856)
+>>> u10.dimensions
+('Time', 'south_north', 'west_east')
+-----
+
+Only metadata has thus far been obtained.  The data is still
+on the server.
+We can access the data via Numpy syntax.  Knowing the shape, we can
+request the first value in the 3-D array via:
+
+-----
+>>> u10[0,0,0,0]
+array([[[ 2.27400947]]], dtype=float32)
+-----
+
+or via ranges of each value, e.g.
+
+-----
+>>> u10[0:2,0:5,0:3]
+rray([[[ 2.27400947,  2.10933924,  1.94712353],
+        [ 2.1078999 ,  1.96191895,  1.81634843],
+        [ 1.96110094,  1.82404447,  1.68834293],
+        [ 1.83247614,  1.70385969,  1.57843733],
+        [ 1.71597779,  1.59776998,  1.48444724]],
+
+       [[ 0.59239036,  0.50480115,  0.47152868],
+        [ 0.57871836,  0.51874101,  0.4930703 ],
+        [ 0.50359827,  0.50773901,  0.50025803],
+        [ 0.49451402,  0.51808214,  0.51833624],
+        [ 0.48281035,  0.51764947,  0.521864  ]]], dtype=float32)
+-----
+
+The data can also be obtained via the original +open_url+ request.
+We can ask for a subset using standard DODS syntax wherein the basic format
+is:
+
+-----
+http://something.or.other/thredds/dodsC/this/that/file.nc?var[ms:mi:me][ns:ni:ne]
+-----
+
+where +var+ is the variable of interest, +[ms:mi:me]+ contains the ordinal
+number of the starting value of the first dimension +ms+, the increment to use
++mi+, and the last desired value of the first dimension +me+.  The
++[ns:ni:ne]+ indicate the same for the second dimension, and so on.
+
+A small and simple example would be to obtain an array containing a subset
+consisting of just the first value in the 3D array, i.e. +[0:1:0][0:1:0][0:1:0]+.
+
+-----
+>>> dataset2=open_url('http://barataria.tamu.edu:8080/thredds/dodsC/WRF_Daily/07262012/wrfout_0726_d01_2012-07-26.nc?U10[0:1:0][0:1:0][0:1:0]')
+>>> dataset2.U10[:]
+array([[[ 2.27400947]]], dtype=float32)
+-----
+
+Accessing a MODIS Dataset at JPL Using open_url
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Next, a MODIS dataset at JPL.
+The dataset URL is:
+
+-----
+http://thredds.jpl.nasa.gov/thredds/podaac_catalogs/MODIS_AQUA_L3_SST_MID_IR_MONTHLY_4KM_NIGHTTIME_catalog.html?dataset=2002_MODIS_AQUA_L3_SST_MID_IR_MONTHLY_4KM_NIGHTTIME
+-----
+
+The PyDAP session is:
+
+-----
+>>> dataset2=open_url('http://thredds.jpl.nasa.gov/thredds/dodsC/sea_surface_temperature/2002_MODIS_AQUA_L3_SST_MID_IR_MONTHLY_4KM_NIGHTTIME.nc')
+>>> vars = dataset2.keys()
+>>> print.vars
+['time', 'l3m_data', 'l3m_qual', 'lon', 'lat']
+>>> d = dataset2['l3m_data']
+>>> d.shape
+(6, 4320, 8640)
+>>> d[1,1,1]
+{'l3m_data': <pydap.model.BaseType object at 0x2e387d0>, 'time':
+<pydap.model.BaseType object at 0x2e38250>, 'lat': <pydap.model.BaseType
+object at 0x2e38290>, 'lon': <pydap.model.BaseType object at 0x2e382d0>}
+>>> t = dataset2['time']
+>>> t.shape
+(6,)
+>>> t[:]
+array(['2002-07-01T00:00:00Z', '2002-08-01T00:00:00Z',
+       '2002-09-01T00:00:00Z', '2002-10-01T00:00:00Z',
+       '2002-11-01T00:00:00Z', '2002-12-01T00:00:00Z'], 
+      dtype='|S20')
+-----
+
+Now try an ERDDAP grid dataset on gcoos1.
+The URL of the page is:
+
+-----
+http://gcoos1.tamu.edu:8080/erddap/griddap/etopo180.html
+-----
+
+The PyDAP code is:
+
+-----
+>>> dataset2=open_url('http://gcoos1.tamu.edu:8080/erddap/griddap/etopo180')
+>>> vars = dataset2.keys()
+>>> print vars
+['latitude', 'longitude', 'altitude']
+-----
+
+Sequential Data
+~~~~~~~~~~~~~~~
+
+NetCDF files are subsumed under the +GridType+ datatype since they do indeed
+contain grids.  Datasets like the CAGES databases are subsumed under another
+datatype called +SequenceType+ for sequential data.
+The following extract from the developer docs illustrates how such a
+dataset might be created.
+
+Developer Documentation
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Following the developer docs at:
+
+http://www.pydap.org/developer.html[+http://www.pydap.org/developer.html+]
+
+we find that a +SequenceType+ is a kind of +StructureType+ holding sequential
+data.  The following sequence example holds two
+variables +a+ and +c+:
+
+-----
+>>> s = SequenceType(name='s')
+>>> s['a'] = BaseType(name='a')
+>>> s['c'] = BaseType(name='c')
+-----
+
+Data can be added to the sequence +s+ by adding data to its children, e.g.
+
+-----
+>>> s.a.data = [1,2,3]
+>>> s.c.data = [10,20,30]
+>>> s.data
+array([[1, 10],
+       [2, 20],
+       [3, 30]], dtype=object)
+-----
+
+NOAA ERDDAP Server Example Using open_dods
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This example is from a PyDAP email discussion at:
+
+https://groups.google.com/forum/#!topic/pydap/FH0UQ0QbwTw[+https://groups.google.com/forum/#!topic/pydap/FH0UQ0QbwTw+].
+
+Someone is attempting to retrieve data from the NOAA ERDDAP server:
+
+http://coastwatch.pfel.noaa.gov/erddap/griddap/erdTAssh1day.html[+http://coastwatch.pfel.noaa.gov/erddap/griddap/erdTAssh1day.html+]
+
+You use the *Data Access Form* page to construct the URL for the PyDAP open command.
+You choose the +.dods+ filetype from the pulldown *File type* menu, click on
+*Just generate the URL*, and copy and paste that into your interactive request command.
+An example that uses the default values on that page is:
+
+-----
+>>> d = open_dods('http://coastwatch.pfeg.noaa.gov/erddap/griddap/erdTAssh1day.dods?ssh[(2010-05-19T12:00:00Z):1:(2010-05-19T12:00:00Z)][(0.0):1:(0.0)][(17):1:(32)][(260):1:(281)],sshd[(2010-05-19T12:00:00Z):1:(2010-05-19T12:00:00Z)][(0.0):1:(0.0)][(17):1:(32)][(260):1:(281)]')
+-----
+
+which successfully extracts the chosen bits of the dataset as we can see with
+the following commands:
+
+-----
+>>> d
+{'ssh': {'ssh': <pydap.model.BaseType object at 0x1aed650>, 'time': <pydap.model.BaseType object at 0x1a73b90>, 'altitude': <pydap.model.BaseType object at 0x1aee890>, 'latitude': <pydap.model.BaseType object at 0x1aee910>, 'longitude': <pydap.model.BaseType object at 0x1aee8d0>}, 'sshd': {'sshd': <pydap.model.BaseType object at 0x1aee790>, 'time': <pydap.model.BaseType object at 0x1aee810>, 'altitude': <pydap.model.BaseType object at 0x1aee7d0>, 'latitude': <pydap.model.BaseType object at 0x1aee850>, 'longitude': <pydap.model.BaseType object at 0x1aee750>}}
+>>> d.ssh
+{'ssh': <pydap.model.BaseType object at 0x1aed650>, 'time': <pydap.model.BaseType object at 0x1a73b90>, 'altitude': <pydap.model.BaseType object at 0x1aee890>, 'latitude': <pydap.model.BaseType object at 0x1aee910>, 'longitude': <pydap.model.BaseType object at 0x1aee8d0>}
+>>> d.ssh.shape
+(1, 1, 61, 85)
+>>> d.ssh.type
+<class 'pydap.model.Float32'>
+-----
+
+Accessing the Louisiana CAGES Database on ERDDAP Using open_dods
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now we attempt to access a real sequential dataset using PyDAP.
+We start with the ERDDAP CAGES table dataset at the URL:
+
+-----
+http://gcoos1.tamu.edu:8080/erddap/tabledap/CAGES_Louisiana_Lengths_CPUE_IOOS_Standard_20130822.html
+-----
+
+using the following PyDAP commands to extract various metadata and data
+quantities.  Instead of attempting to create a complex URL string ourselves,
+we will use - as in the above example - the capability of the *Data Access
+Form* to create a URL for DODS access.  Go to the page, click on
+*Uncheck All*, check the box for +waterBody+, choose the +Filetype+
++.dods+ from the pulldown menu, and click *Just generate the URL*.
+This should obtain:
+
+-----
+http://gcoos1.tamu.edu:8080/erddap/tabledap/CAGES_Louisiana_Lengths_CPUE_IOOS_Standard_20130822.dods?waterBody&time>=2007-12-20T00:00:00Z&time<=2007-12-27T05:57:00Z
+-----
+
+Plug this URL into the +open_dods+ statement and issue the
+following commands:
+
+-----
+>>> dl = open_dods('http://gcoos1.tamu.edu:8080/erddap/tabledap/CAGES_Louisiana_Lengths_CPUE_IOOS_Standard_20130822.dods?waterBody&time>=2007-12-20T00:00:00Z&time<=2007-12-27T05:57:00Z')
+>>> dl
+{'s': {'waterBody': <pydap.model.BaseType object at 0x1aeb810>}}
+>>> dl.s
+{'waterBody': <pydap.model.BaseType object at 0x1aeb810>}
+>>> dl.s.waterBody
+<pydap.model.BaseType object at 0x1aeb810>
+>>> dl.s.waterBody[:]
+array(['Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Vermillion - Cote Blanche Bays', 'Vermillion - Cote Blanche Bays',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico', 'Gulf of Mexico', 'Gulf of Mexico',
+       'Gulf of Mexico'], dtype=object)
+>>> dl.s.waterBody[0]
+'Vermillion - Cote Blanche Bays'
+-----
+
+SequenceProxy Class Documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The documentation of the +SequenceProxy+ class from:
+
+https://github.com/robertodealmeida/pydap/blob/master/pydap/proxy.py[+https://github.com/robertodealmeida/pydap/blob/master/pydap/proxy.py+]
+
+is the following:
+
+-----
+ass SequenceProxy(VariableProxy, SequenceData):
+    """
+Proxy to an Opendap Sequence.
+
+This class simulates the behavior of a Numpy record array, proxying
+the data in an Opendap Sequence object (or a child variable inside
+a Sequence)::
+
+>>> from pydap.model import *
+>>> s = SequenceType(name='s')
+>>> s['id'] = BaseType(name='id')
+>>> s['x'] = BaseType(name='x')
+>>> s['y'] = BaseType(name='y')
+>>> s.data = SequenceProxy('s', 'http://example.com/dataset')
+>>> print s.data
+<SequenceProxy pointing to variable "s" at "http://example.com/dataset">
+>>> print s.x.data
+<SequenceProxy pointing to variable "s.x" at "http://example.com/dataset">
+
+We can use the same methods we would use if the data were local::
+
+>>> print s[0].x.data
+<SequenceProxy pointing to variable "s[0:1:0].x" at "http://example.com/dataset">
+>>> print s[10:20][2].y.data
+<SequenceProxy pointing to variable "s[12:1:12].y" at "http://example.com/dataset">
+>>> print s[ (s['id'] > 1) & (s.x > 10) ].data
+<SequenceProxy pointing to variable "s" at "http://example.com/dataset?s.id>1&s.x>10&">
+>>> print s[ ('y', 'x') ].data
+<SequenceProxy pointing to variable "s.y,s.x" at "http://example.com/dataset">
+>>> s2 = s[ ('y', 'x') ]
+>>> print s2[ s2.x > 10 ].x.data
+<SequenceProxy pointing to variable "s.x" at "http://example.com/dataset?s.x>10&">
+>>> print s[ ('y', 'x') ][0].data
+<SequenceProxy pointing to variable "s.y,s.x[0:1:0]" at "http://example.com/dataset">
+
+(While the last line may look strange, it's equivalent to
+``s.y[0:1:0],s.x[0:1:0]`` -- at least on Hyrax).
+
+"""
+    def __init__(self, id, url, slice_=None, children=None):
+        VariableProxy.__init__(self, id, url, slice_)
+        self.children = children or ()
+
+    def __repr__(self):
+        id_ = ','.join('%s.%s' % (self.id, child) for child in self.children) or self.id
+        return '<%s pointing to variable "%s%s" at "%s">' % (
+                self.__class__.__name__, id_, hyperslab(self._slice), self.url)
+
+    def __iter__(self):
+        scheme, netloc, path, query, fragment = urlsplit(self.url)
+        id_ = ','.join('%s.%s' % (self.id, child) for child in self.children) or self.id
+        url = urlunsplit((
+                scheme, netloc, path + '.dods',
+                id_ + hyperslab(self._slice) + '&' + query,
+                fragment))
+
+        resp, data = request(url)
+        dds, xdrdata = data.split('\nData:\n', 1)
+        dataset = DDSParser(dds).parse()
+        dataset.data = DapUnpacker(xdrdata, dataset).getvalue()
+        dataset._set_id()
+
+        # Strip any projections from the request id.
+        id_ = re.sub('\[.*?\]', '', self.id)
+        # And return the proper data.
+        for var in walk(dataset):
+            if var.id == id_:
+                data = var.data
+                if isinstance(var, SequenceType):
+                    order = [var.keys().index(k) for k in self.children]
+                    data = reorder(order, data, var._nesting_level)
+                return iter(data)
+
+    def __len__(self):
+        return len(list(self.__iter__()))
+
+    def __getitem__(self, key):
+        out = copy.deepcopy(self)
+        if isinstance(key, ConstraintExpression):
+            scheme, netloc, path, query, fragment = urlsplit(self.url)
+            out.url = urlunsplit((
+                    scheme, netloc, path, str(key & query), fragment))
+
+            if out._slice != (slice(None),):
+                warnings.warn('Selection %s will be applied before projection "%s".' % (
+                        key, hyperslab(out._slice)))
+        elif isinstance(key, basestring):
+            out._slice = (slice(None),)
+            out.children = ()
+            parent = self.id
+            if ',' in parent:
+                parent = parent.split(',', 1)[0].rsplit('.', 1)[0]
+            out.id = '%s%s.%s' % (parent, hyperslab(self._slice), key)
+        elif isinstance(key, tuple):
+            out.children = key[:]
+        else:
+            out._slice = combine_slices(self._slice, fix_slice(key, (sys.maxint,)))
+        return out
+
+    def __deepcopy__(self, memo=None, _nil=[]):
+        out = self.__class__(self.id, self.url, self._slice, self.children[:])
+        return out
+
+    # Comparisons return a ``ConstraintExpression`` object
+    def __eq__(self, other): return ConstraintExpression('%s=%s' % (self.id, encode_atom(other)))
+    def __ne__(self, other): return ConstraintExpression('%s!=%s' % (self.id, encode_atom(other)))
+    def __ge__(self, other): return ConstraintExpression('%s>=%s' % (self.id, encode_atom(other)))
+    def __le__(self, other): return ConstraintExpression('%s<=%s' % (self.id, encode_atom(other)))
+    def __gt__(self, other): return ConstraintExpression('%s>%s' % (self.id, encode_atom(other)))
+    def __lt__(self, other): return ConstraintExpression('%s<%s' % (self.id, encode_atom(other)))
+-----
+
+If we look for help on s:
+
+-----
+>>> help(s)
+
+Help on SequenceType in module pydap.model object:
+
+class SequenceType(StructureType)
+ |  An Opendap Sequence.
+ |  
+ |  Sequences are a special kind of constructor, holding records for
+ |  the stored variables. They are somewhat similar to record arrays
+ |  in Numpy::
+ |  
+ |      >>> s = SequenceType(name='s')
+ |      >>> s['id'] = BaseType(name='id', type=Int32)
+ |      >>> s['x'] = BaseType(name='x', type=Float64)
+ |      >>> s['y'] = BaseType(name='y', type=Float64)
+ |      >>> s['foo'] = BaseType(name='foo', type=Int32)
+ |  
+ |      >>> s.data = [(1, 10, 100, 42), (2, 20, 200, 43), (3, 30, 300, 44)]
+ |      >>> for struct_ in s: print struct_.data
+ |      (1, 10, 100, 42)
+ |      (2, 20, 200, 43)
+ |      (3, 30, 300, 44)
+ |      >>> del s['foo']
+ |      >>> print s.data
+ |      [[1 10 100]
+ |       [2 20 200]
+ |       [3 30 300]]
+ |      >>> print s['id'].data
+ |      [1 2 3]
+ |  
+ |  Note that we had to use ``s['id']`` to refer to the variable ``id``,
+ |  since ``s.id`` already points to the id of the Sequence.
+ |  
+ |  (An important point is that the ``data`` attribute must be copiable,
+ |  so don't use consumable iterables like older versions of Pydap
+ |  allowed.)
+ |  
+ |  Sequences are quite versatile; they can be indexed::
+ |  
+ |      >>> print s[0].data
+ |      [[1 10 100]]
+ |      >>> print s[0].x.data
+ |      [10]
+ |  
+ |  Or filtered::
+ |  
+ |      >>> print s[ (s['id'] > 1) & (s.x > 10) ].data
+ |      [[2 20 200]
+ |       [3 30 300]]
+ |  
+ |  Or even both::
+ |  
+ |      >>> print s[ s['id'] > 1 ][1].x.data
+ |      [30]
+ |  
+ |  If you mix indexing and filtering, be sure to use the right Sequence
+ |  on the filter::
+ |  
+ |      >>> print s[ s['id'] > 1 ][1].x.data
+ |      [30]
+ |      >>> print s[1][ s['id'] > 1 ].x.data
+ |      Traceback (most recent call last):
+ |          ...
+ |      IndexError: index (1) out of range (0<=index<0) in dimension 0
+ |      >>> print s[1][ s[1]['id'] > 1 ].x.data
+ |      [20]
+ |  
+ |  (Note that there's a difference between filtering first and then
+ |  slicing, and slicing first and then indexing. This might not be the
+ |  case always, since an Opendap server will always apply the filter
+ |  first, while in this case we're working locally with the data. Don't
+ |  worry, though: when this happens while accessing an Opendap server
+ |  a warning will be issued by the client.)
+ |  
+ |  When filtering a Sequence, don't use the Python extended comparison
+ |  syntax of ``1 < a < 2``, otherwise bad things will happen.
+|  
+ |  And of course, slices are also used to access children::
+ |  
+ |      >>> print s['x'] is s.x
+ |      True
+ |  
+ |  Method resolution order:
+ |      SequenceType
+ |      StructureType
+ |      pydap.util.odict.odict
+ |      __builtin__.dict
+ |      DapType
+ |      __builtin__.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __deepcopy__(self, memo=None, _nil=[])
+ |  
+ |  __delitem__(self, key)
+ |  
+ |  __getitem__(self, key)
+ |      Fancy Sequence slicing.
+ |      
+ |      The basic rule for Sequence slices is that it always return a new
+ |      variable -- either a child or a new Sequence. To select a child,
+ |      just use the common dictionary syntax::
+ |      
+ |          >>> s = SequenceType(name='s')
+ |          >>> s['a'] = BaseType(name='a')
+ |          >>> print s['a'].id
+ |          s.a
+ |      
+ |      A Sequence can also be filtered or indexed using the slice::
+ |      
+ |          >>> s['b'] = BaseType(name='b')
+ |          >>> s['c'] = BaseType(name='c')
+ |          >>> s.data = [(1, 10, 100), (2, 20, 200), (3, 30, 300)]
+ |          >>> print s[0].data
+|          [[1 10 100]]
+ |          >>> print s[2:10].data
+ |          [[3 30 300]]
+ |          >>> print s[ s.a > 10 ].data
+ |          []
+ |      
+ |      These will return new Sequence objects with the appropriate data.
+ |  
+ |  __init__(self, name='nameless', attributes=None, data=None)
+ |  
+ |  __iter__(self)
+ |      Return a Structure for each record in the Sequence.
+ |      
+ |      When a Sequence is iterated it returns Structure objects
+ |      containing each record.
+ |  
+ |  __setitem__(self, key, item)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  data
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from StructureType:
+ |  
+ |  __copy__(self)
+ |  
+ |  __getattr__(self, attr)
+ |      Allow lazy access to children.
+ |      
+ |      We override ``__getattr__`` to allow children variables
+ |      to be accessed using a lazy syntax::
+ |      
+ |          >>> s = StructureType(name='s')
+ |          >>> s['a'] = BaseType(name='a')
+ |          >>> print s.a.id
+ |          s.a
+ |  
+ |  walk = itervalues(self)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from pydap.util.odict.odict:
+ |  
+ |  __contains__(self, key)
+ |  
+ |  __len__(self)
+ |  
+ |  __repr__(self)
+ |  
+ |  __str__(self)
+ |  
+ |  clear(self)
+ |  
+ |  copy(self)
+ |  
+ |  fromkeys(keys, d=None)
+ |  
+ |  get(self, key, d=None)
+ |  
+ |  has_key(self, key)
+ |  
+ |  items(self)
+ |  
+ |  iteritems(self)
+ |  
+ |  iterkeys(self)
+ |  
+ |  itervalues(self)
+ |  
+ |  keys(self)
+ |  
+ |  pop(self, key, d=None)
+ |  
+ |  popitem(self)
+|  
+ |  setdefault(self, key, d=None)
+ |  
+ |  update(self, odict)
+ |  
+ |  values(self)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from pydap.util.odict.odict:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from __builtin__.dict:
+ |  
+ |  __cmp__(...)
+ |      x.__cmp__(y) <==> cmp(x,y)
+ |  
+ |  __eq__(...)
+ |      x.__eq__(y) <==> x==y
+ |  
+ |  __ge__(...)
+ |      x.__ge__(y) <==> x>=y
+ |  
+ |  __getattribute__(...)
+ |      x.__getattribute__('name') <==> x.name
+ |  
+ |  __gt__(...)
+ |      x.__gt__(y) <==> x>y
+ |  
+ |  __le__(...)
+ |      x.__le__(y) <==> x<=y
+ |  
+ |  __lt__(...)
+|      x.__lt__(y) <==> x<y
+ |  
+ |  __ne__(...)
+ |      x.__ne__(y) <==> x!=y
+ |  
+ |  __sizeof__(...)
+ |      D.__sizeof__() -> size of D in memory, in bytes
+ |  
+ |  viewitems(...)
+ |      D.viewitems() -> a set-like object providing a view on D's items
+ |  
+ |  viewkeys(...)
+ |      D.viewkeys() -> a set-like object providing a view on D's keys
+ |  
+ |  viewvalues(...)
+ |      D.viewvalues() -> an object providing a view on D's values
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from __builtin__.dict:
+ |  
+ |  __hash__ = None
+ |  
+ |  __new__ = <built-in method __new__ of type object>
+ |      T.__new__(S, ...) -> a new object with type S, a subtype of T
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from DapType:
+ |  
+ |  id
+ |      attrgetter(attr, ...) --> attrgetter object
+ |      
+ |      Return a callable object that fetches the given attribute(s) from its
+operand.
+ |      After, f=attrgetter('name'), the call f(r) returns r.name.
+ |      After, g=attrgetter('name', 'date'), the call g(r) returns (r.name,
+r.date).
+ |      After, h=attrgetter('name.first', 'name.last'), the call h(r) returns
+ |      (r.name.first, r.name.last).
+ |  
+ |  name
+-----
+
+So we try various things:
+
+-----
+>>> s.data
+<SequenceProxy pointing to variable "s" at "http://gcoos1.tamu.edu:8080/erddap/tabledap/CAGES_Texas_Trawls_Lengths_IOOS_Standard">
+
+>>> s['time']
+<pydap.model.BaseType object at 0x2e38a10>
+
+>>> s.modified
+<pydap.model.BaseType object at 0x2e2c210>
+
+>>> s.modified.attributes
+{'ioos_category': 'Time', 'description': 'The most recent date the data originator updated or verified the record, expressed in the standard ISO 8601:2004(E). Can be the record creation date or date of subsequent update or verification. If the data originator does not record or provide this information, IOOS will populate this date with the date the record became available to IOOS.', 'reference': 'dcterms:modified', 'time_origin': '01-JAN-1970 00:00:00', 'section': 'AdminAndId', 'long_name': 'Modified', 'units': 'seconds since 1970-01-01T00:00:00Z'}
+
+>>> s.modified[:]
+<SequenceProxy pointing to variable "s.modified[0:1:9223372036854775806]" at "http://gcoos1.tamu.edu:8080/erddap/tabledap/CAGES_Texas_Trawls_Lengths_IOOS_Standard">
+
+>>> s.modified.attributes['units']
+'seconds since 1970-01-01T00:00:00Z'
+
+>>> dataset.s.keys()
+['modified', 'dataset_ID', 'datasetName', 'higherInstitutionCode',
+'institutionCode', 'ownerInstitutionCode', 'collectionCode', 'time',
+'nominalObservationDateTime', 'nominalObservationDateTimeUncertainty',
+'latitude', 'longitude', 'coordinateUncertaintyInMeters', 'basisOfRecord',
+'geodeticDatum', 'minimumDepthInMeters', 'maximumDepthInMeters',
+'vernacularName', 'scientificName', 'individualCount',
+'observedIndividualLengthInCm', 'sampleID', 'subsampleID', 'samplingProtocol',
+'sampleShape', 'sampleWidthInMeters', 'sampleHeightInMeters',
+'samplingEffort', 'samplingConditions', 'quantificationType', 'waterBody',
+'locality']
+
+type(dataset.s)
+<class 'pydap.model.SequenceType'>
+
+
+-----
+
+
+
+

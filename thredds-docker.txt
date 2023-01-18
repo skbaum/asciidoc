@@ -1,0 +1,422 @@
+Running THREDDS with Docker
+===========================
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+Installation on Fedora
+----------------------
+
+These steps are detailed at:
+
+https://docs.docker.com/engine/install/fedora/[`https://docs.docker.com/engine/install/fedora/`]
+
+First, remove the old stuff.
+
+-----
+sudo dnf remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-selinux \
+                  docker-engine-selinux \
+                  docker-engine
+-----
+
+Add some `dnf` extras:
+
+-----
+sudo dnf -y install dnf-plugins-core
+
+sudo dnf config-manager \
+    --add-repo \
+    https://download.docker.com/linux/fedora/docker-ce.repo
+-----
+
+Install the Docker Community Edition:
+
+-----
+sudo dnf install docker-ce docker-ce-cli containerd.io
+-----
+
+Start the Docker daemon:
+
+-----
+sudo systemctl start docker
+-----
+
+Run the standard easy test:
+
+-----
+sudo docker run hello-world
+-----
+
+To remove the Docker software:
+
+-----
+sudo dnf remove docker-ce docker-ce-cli containerd.io
+-----
+
+To remove the Docker containers.
+
+-----
+sudo rm -rf /var/lib/docker
+-----
+
+Post-Installation Steps for Linux
+---------------------------------
+
+This is explained at:
+
+https://docs.docker.com/engine/install/linux-postinstall/[`https://docs.docker.com/engine/install/linux-postinstall/`]
+ 
+Add user baum to docker group to allow running docker containers as non-root.
+
+-----
+usermod -aG docker baum
+-----
+
+Activate group changes without logging the user out.
+
+-----
+newgrp docker
+-----
+
+Perhaps remove the original .docker subdirectory created via sudo.
+
+-----
+cd
+rm -r -f .docker
+mkdir .docker
+sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+sudo chmod g+rwx "$HOME/.docker" -R
+-----
+
+The above may not work.  We discover at:
+
+https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket[`https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket`]
+
+the suggestion to:
+
+-----
+sudo chmod 666 /var/run/docker.sock
+-----
+
+which clears things up and allows us to run docker as non-root.
+
+Configure docker to start on boot.
+
+-----
+sudo chkconfig docker on
+-----
+
+Installing THREDDS 
+------------------
+
+Initial Test Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The THREDDS Docker container is found at:
+
+https://github.com/Unidata/thredds-docker[`https://github.com/Unidata/thredds-docker`]
+
+The initial installation goes something like this:
+
+-----
+docker run -d -p 8080:8080 axiom/docker-erddap
+Unable to find image 'axiom/docker-erddap:latest' locally
+latest: Pulling from axiom/docker-erddap
+57df1a1f1ad8: Pull complete 
+71e126169501: Pull complete 
+1af28a55c3f3: Pull complete 
+03f1c9932170: Pull complete 
+881ad7aafb13: Pull complete 
+db6a1d457bc3: Pull complete 
+b7fe4ef08350: Pull complete 
+184fa67b56e0: Pull complete 
+7926b5878a24: Pull complete 
+a10cdf073ed6: Pull complete 
+9abf7c5d0741: Pull complete 
+ec6e37ac400b: Pull complete 
+7b60e08368b0: Pull complete 
+8e9b20036664: Pull complete 
+8c3999295651: Pull complete 
+bbaeef24557c: Pull complete 
+bf0a77ea966c: Pull complete 
+7ecb20f7952e: Pull complete 
+b3dbc25c2667: Pull complete 
+ef7356b23758: Pull complete 
+Digest: sha256:71f7f4eb721c33c52fea05624b172a47e2ad5ca3f4ee74a0b240fc6c2ee0b34a
+Status: Downloaded newer image for axiom/docker-erddap:latest
+1edfd38b7c20f2b3f11686e31e12afd67cb692a56ad8d82079083c6997ea84e1
+-----
+
+Check the running container.
+
+-----
+docker ps -l
+CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS                      PORTS               NAMES
+1a7ba169b5ff        unidata/thredds-docker:4.6.15   "/entrypoint.sh cata…"   15 hours ago        Exited (137) 15 hours ago                       thredds-docker_thredds-production_1
+-----
+
+Stop the running container using the container ID.
+
+-----
+docker stop 1a7ba169b5ff
+-----
+
+Remove the stopped container.
+
+-----
+docker rm 1a7ba169b5ff
+-----
+
+Using Docker Compose to Start the Container
+-------------------------------------------
+
+Obtaining the Software
+~~~~~~~~~~~~~~~~~~~~~~
+
+Unidata recommends installing `docker-compose` to run the THREDDS Docker container beyond a basic Docker setup.
+
+-----
+sudo dnf install docker-compose
+-----
+
+The use of `docker-compose` requires that we download the THREDDS Docker container source code
+from Github.
+
+-----
+git clone https://github.com/Unidata/thredds-docker.git
+-----
+
+Setting THREDDS Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit the `compose.env` file in the `thredds-docker` directory.
+The following shows the default values in the distribution file.
+
+-----
+### THREDDS related environment variables
+  
+# TDS Content root
+
+TDS_CONTENT_ROOT_PATH=/usr/local/tomcat/content
+
+# The minimum and maximum Java heap space memory to be allocated to the TDS
+THREDDS_XMX_SIZE=4G
+THREDDS_XMS_SIZE=4G
+
+# TDM related environment variables
+TDM_PW=CHANGEME!
+TDS_HOST=http://thredds.yourhost.net/
+
+# The minimum and maximum Java heap space memory to be allocated to the TDM
+TDM_XMX_SIZE=6G
+TDM_XMS_SIZE=1G
+
+# See https://github.com/Unidata/tomcat-docker#configurable-tomcat-uid-and-gid.
+# See https://denibertovic.com/posts/handling-permissions-with-docker-volumes/.
+TOMCAT_USER_ID=1000
+TOMCAT_GROUP_ID=1000
+-----
+
+For testing purposes we modify these to:
+
+-----
+TDS_CONTENT_ROOT_PATH=/home/baum/THREDDS/content
+THREDDS_XMX_SIZE=4G
+THREDDS_XMS_SIZE=4G
+TDM_PW=passwd
+TDS_HOST=http://localhost/
+TDM_XMX_SIZE=6G
+TDM_XMS_SIZE=1G
+TOMCAT_USER_ID=1000
+TOMCAT_GROUP_ID=1000
+-----
+
+Persistent Directories
+~~~~~~~~~~~~~~~~~~~~~~
+
+https://maximorlov.com/docker-compose-syntax-volume-or-bind-mount/[`https://maximorlov.com/docker-compose-syntax-volume-or-bind-mount/`]
+
+https://docs.docker.com/compose/compose-file/[`https://docs.docker.com/compose/compose-file/`]
+
+https://docs.docker.com/storage/[`https://docs.docker.com/storage/`]
+
+Overview and Motivation
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Docker containers are ephemeral.  The default behavior is that everything in a container
+subdirectory disappears between instantiations.
+Docker data volumes and bind mounts are special directories within a container that bypass the
+Union File System (UFS) of the container and allow files to be stored in the host
+machine rather than in the container.
+Data volumes and bind mounts allow you to persist data between container runs.
+This is useful if you want to save things like the THREDDS content directory containing
+the `catalog.xml` configuration file between container runs.
+It is also useful for sharing code folders from the host system to the
+container during development, especially given the arcane subdirectory structure within
+a running Docker container.
+
+The features of data volumes are:
+
+* A data volume is stored in a part of the host filesystem that is managed by Docker, i.e.
+`/var/lib/docker/volumes/` that remains unchanged between docker runs.
+* A created volume is stored within a directory on the host, and this directory is what is
+mounted into the container when the volume is mounted into the container.
+* A data volume is not automatically removed when a container that uses it is removed.  These
+volumes must be separately and explicitly removed with another command.
+* If you mount an empty volume into a directory in a container in which files or directories
+exist, these are automatically copied into the volume.
+* If you start a container and specify a volume that doesn't exist, an empty volume is
+automatically created. 
+* If you mount a non-empty volume into a container directory wherein files and/or
+directories already exist, these will be obscured - but NOT removed or altered - by the mount.
+* Recommended use cases for data volumes include: sharing data among multiple running containers,
+when the host machine doesn't have a guaranteed (i.e. UNIX) directory or file structure,
+when you want to store container data on a remote host and not locally,
+and when you need to back up, restore, or migrate data from one Docker host to another.
+* The official documentation bluntly tells us, "Volumes are the best way to persist data in Docker."
+
+The features of bind mounts are:
+
+* Their functionality is limited compared to data volumes.
+* Specifying a bind mount causes a file or directory on the host machine to be mounted
+into a container, with the mount referenced by its full path on the host machine.
+* If the file or directory doesn't already exist on the host filesystem, it is created
+on demand.
+* Bind mounts cannot be directly managed using the Docker command line.
+* Bind mounts allow the host filesystem to be changed via processes running within
+a container, with the obvious security implications.
+* A bind mount can be stored anywhere on the host system.  These can be modified by
+non-Docker processes on the host system or a Docker container.
+* If you mount a bind-mount into a container directory wherein files and/or
+directories already exist, these will be obscured - but NOT removed or altered - by the mount.
+* Recommended use cases include sharing configuration files from the host machine
+to containers, sharing source code or build artifcats between a development environment
+on the host and a container, and when you have a standard UNIX filesystem structure.
+
+Specifying Mounts via Docker Compose Overview
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Docker container can be configured via convoluted Docker syntax or by a slightly less
+convoluted Docker Compose syntax that hides the Docker black box behind another marginally
+less confusing black box.
+
+The official source for this is:
+
+https://docs.docker.com/compose/compose-file/[`https://docs.docker.com/compose/compose-file/`]
+
+The `docker-compose` configuration file is a YAML file that defines services, networks
+and volumes.  In the THREDDS Docker distribution is is named `docker-compose.yaml`.
+An annotated version of the default example on the Compose documentation pages is
+show below.  Note that both data volumes and bind mounts are defined under the
+`volumes` key in the Compose YAML syntax.
+
+-----
+#  Specify the Compose version being used.
+version: "3.8"
+#  Top level key for listing available services.
+services:
+#  An arbitrary name given to the service being defined.
+  web:
+#  The name of the Docker image that provides the defined service.
+    image: nginx:alpine
+#
+#  Long syntax volumes example.
+#
+#  Mount host paths or named volumes.
+    volumes:
+#  The mount type: volume, bind, tmpfs, npipe
+      - type: volume
+#  The source of the mount, in this case a volume name defined in the top-level volumes key.
+        source: mydata
+#  The path in the container where the volume is mounted.
+        target: /data
+#  Additional volume options.
+        volume:
+#  Disables copying of data from a container when the volume is created.
+          nocopy: true
+#  Another arbitrary service name.
+  db:
+    image: postgres:latest
+#
+#  Short syntax volumes example.
+#
+#  Short syntax via [SOURCE:]TARGET[:MODE] format.
+    volumes:
+#  The source is a host path and the target is the container path where it is mounted.
+      - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
+#  The source is a named volume and the target is the container mounting point.
+      - "dbdata:/var/lib/postgresql/data"
+#  Named volumes must also be listed under a top level volumes key.
+volumes:
+  mydata:
+  dbdata:
+-----
+
+Specifying Mounts via Compose for THREDDS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The default `docker-compose.yaml` configuration file in the THREDDS Docker distribution is
+shown below.  The `thredds-quickstart` service is a quick way to check to see if your
+THREDDS Docker container is working properly in its default configuration.
+The `thredds-production` service adds a custom `container_name` to replace the generated
+default name, and defines some `volumes` so the THREDDS configuration and data files
+that should persist will persist between container runs.  It also defines
+a custom `env_file` name, although it uses the default `compose.env` file if
+`THREDDS_COMPOSE_ENV_LOCAL` hasn't been defined.
+
+-----
+version: '3.7'
+
+services:
+  thredds-quickstart:
+    image: unidata/thredds-docker:4.6.15
+#  Specify the host and container ports in HOST:CONTAINER format.
+    ports:
+      - "80:8080"
+      - "443:8443"
+      - "8443:8443"
+
+  thredds-production:
+    image: unidata/thredds-docker:4.6.15
+    ports:
+      - "80:8080"
+      - "443:8443"
+      - "8443:8443"
+    container_name: thredds
+    volumes:
+      - /path/to/your/tomcat/logs/:/usr/local/tomcat/logs/
+      - /path/to/your/thredds/logs/:/usr/local/tomcat/content/thredds/logs/
+      - /path/to/your/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - /path/to/your/thredds/directory:/usr/local/tomcat/content/thredds
+      - /path/to/your/data/directory1:/path/to/your/data/directory1
+      - /path/to/your/data/directory2:/path/to/your/data/directory2
+    env_file:
+      - "compose${THREDDS_COMPOSE_ENV_LOCAL}.env"
+-----
+
+Some more specific choices for the `volumes` section are shown below.
+
+-----
+    volumes:
+      - /home/baum/THREDDS/content:/usr/local/tomcat/content
+      - /home/baum/THREDDS/tomcat/conf:/usr/local/tomcat/conf
+      - /home/baum/THREDDS/tomcat/logs/:/usr/local/tomcat/logs/
+#      - /home/baum/THREDDS/thredds/logs/:/usr/local/tomcat/content/thredds/logs/
+#      - /home/baum/THREDDS/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+#      - /home/baum/THREDDS/content:/usr/local/tomcat/content/thredds
+#      - /home/baum/THREDDS/data:/data
+-----
+
+
+

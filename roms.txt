@@ -1,0 +1,750 @@
+ROMS Tutorial
+=============
+Steven K. Baum
+v0.1, 2020-08-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+The Region Ocean Modeling System (ROMS) is an ocean circulation model used for regional rather than global
+numerical simulations of ocean currents.  This is a tutorial for beginners.
+
+Downloading
+-----------
+
+After going to:
+
+https://www.myroms.org/[`https://www.myroms.org/`]
+
+and obtaining a username and a password, the ROMS distribution is downloaded via:
+
+----
+svn checkout [--username username] https://www.myroms.org/svn/src/trunk ROMS
+----
+
+which will prompt you for your ROMS password before you can start downloading.
+
+The argument `--username username` is needed only if the username on the machine to which
+you are downloading ROMS is different than your ROMS username.
+The `ROMS` is whatever you choose to name the directory into which you're downloading
+the package.
+
+Preparing to Compile ROMS
+-------------------------
+
+This section will explain how to work your way through some issues that
+might be tricky so you can compile ROMS for the first time.
+
+When you move into the `ROMS` directory via `cd ROMS` you will find the
+following:
+
+-----
+Build_roms
+Compilers
+Data
+ESM
+Lib
+makefile
+Master
+ROMS
+romsS
+User
+Waves
+-----
+
+If all the stars are correctly aligned, you can type make
+and the `makefile` will compile a binary for the
+default `upwelling` test case, which is specified in the default
+distribution `makefile` as:
+
+    ROMS_APPLICATION ?= UPWELLING
+
+In the real world, you'll probably have to modify a thing or two.
+
+Specifying a Fortran Compiler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The first thing you'll want to ascertain is which Fortran compiler
+you're going to use.  Once you do you need to edit the `makefile` and
+change the line:
+
+     FORT ?= gfortran
+
+to indicate the Fortran compiler you're using.  The `Compiler` subdirectory
+contains a list of operating system/compiler combination specification files
+that have been used and tested.  These are included in the `makefile` based on
+your choice for the `FORT` variable.
+
+The Linux section of this subdirectory looks like:
+
+-----
+Linux-ftn-cray.mk
+Linux-ftn-gnu.mk
+Linux-ftn-intel.mk
+Linux-ftn.mk
+Linux-g95.mk
+Linux-gfortran.mk
+Linux-ifc.mk
+Linux-ifort.mk
+Linux-necsx.mk
+Linux-path.mk
+Linux-pgi.mk
+-----
+
+All you need to specify is the compiler string after the `Linux-` since the
+`makefile` internally finds the operating system.  You need to either specify your
+compiler exactly like it is shown in the compiler include file between the
+`Linux-` and the `.mk`, or copy the include file closest to what you need and
+change the name to what you want to instead specify.
+
+netCDF Problems
+~~~~~~~~~~~~~~~
+
+The netCDF libraries are an extremely important and critical part of the ROMS
+package.  Specifying their location has always been a tricky part of using the
+netCDF Fortran library.  The appropriate section in the `Linux-gfortran.mk` file
+is:
+
+-----
+ifdef USE_NETCDF4
+        NF_CONFIG ?= /usr/bin/nf-config
+    NETCDF_INCDIR ?= $(shell $(NF_CONFIG) --prefix)/include
+             LIBS += $(shell $(NF_CONFIG) --flibs)
+           INCDIR += $(NETCDF_INCDIR) $(INCDIR)
+else
+    NETCDF_INCDIR ?= /opt/gfortransoft/serial/netcdf3/include
+    NETCDF_LIBDIR ?= /opt/gfortransoft/serial/netcdf3/lib
+      NETCDF_LIBS ?= -lnetcdf
+             LIBS += -L$(NETCDF_LIBDIR) $(NETCDF_LIBS)
+           INCDIR += $(NETCDF_INCDIR) $(INCDIR)
+endif
+-----
+
+where it decides whether you're using netCDF3 or netCDF4 based on how you
+specify:
+
+    USE_NETCDF4 ?= on
+
+where the `on` indicates you're using netCDF4 and `off` otherwise.
+
+In the netCDF4 distribution there is a program called `nf-config` which provides
+the following information:
+
+-----
+  --help        display this help message and exit
+  --all         display all options
+  --cc          C compiler
+  --fc          Fortran compiler
+  --cflags      pre-processor and compiler flags
+  --fflags      flags needed to compile a Fortran program
+  --has-dap     whether OPeNDAP is enabled in this build
+  --has-nc2     whether NetCDF-2 API is enabled
+  --has-nc4     whether NetCDF-4/HDF-5 is enabled in this build
+  --has-f90     whether Fortran 90 API is enabled in this build
+  --has-f03     whether Fortran 2003 API is enabled in this build
+  --flibs       libraries needed to link a Fortran program
+  --prefix      Install prefix
+  --includedir  Include directory
+  --version     Library version
+-----
+
+If it provides this information accurately, then the `makefile` will automatically
+determine the location of the netCDF libraries and include files.  If not, you'll
+have to modify the `Linux-gfortran.mk` file.
+
+In the case of a Fedora 30 Linux distribution where the netCDF libraries were
+obtained via the `yum` or `dnf` commands, the automatic determination does not work.
+The necessary netCDF libraries are installed via:
+
+    yum install netcdf netcdf-devel netcdf-fortran netcdf-fortran-devel
+
+which provides a `nf-config` command that gets the library location right when
+called in `Linux-gfortran.mk` but gets the include file location wrong.
+Thus the `Linux-gfortran.mk` file needed to be modified with the line:
+
+    NETCDF_INCDIR ?= $(shell $(NF_CONFIG) --prefix)/include
+
+replaced by:
+
+    NETCDF_INCDIR ?= /usr/lib64/gfortran/modules
+
+with the latter location ascertained via:
+
+    rpm -ql netcdf-fortran-devel | grep mod
+
+This is just one example of a problem you might face getting the `makefile` to
+find the netCDF libraries and how to solve it.
+
+Compiling the Default Upwelling Case
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Only a couple of changes have been made to the default ROMS distribution to
+prepare for compling the default upwelling case.  Now that the Fortran compiler
+has been specified and the netCDF libraries located we can compile this case.
+
+Compile the binary file entering in the top level directory:
+
+    make
+
+which will compile a binary file called `romsS` that will be placed in
+that directory.
+
+All the source files needed to compile this example are fetched from their
+permanent locations into the `Build_roms` subdirectory.  Their intermediate
+forms - called object files - are compiled in that directory and finally linked
+into the full binary in the top level directory.
+This method enables the binary to be quickly recompiled if changes are made to
+a single or very few files.  Only the files that have changed will be compiled, and
+then linked to all of the unchanged previously compiled files.
+
+Running the Default Upwelling Case
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The upwelling case can now be run via:
+
+    ./romsS < ROMS/External/roms_upwelling.in &> upwelling.out
+
+with the out file containing:
+
+-----
+--------------------------------------------------------------------------------
+ Model Input Parameters:  ROMS/TOMS version 3.9  
+                          Monday - September 14, 2020 - 12:36:04 PM
+--------------------------------------------------------------------------------
+
+ Wind-Driven Upwelling/Downwelling over a Periodic Channel
+
+ Operating system  : Linux
+ CPU/hardware      : x86_64
+ Compiler system   : gfortran
+ Compiler command  : /usr/bin/gfortran
+ Compiler flags    : -frepack-arrays -O3 -ffast-math -
+
+ SVN Root URL     : https://www.myroms.org/svn/src/trunk
+ SVN Revision     : 1037
+
+ Local Root       : /home/baum/ROMS/ROMS
+ Header Dir       : /home/baum/ROMS/ROMS/ROMS/Include
+ Header file      : upwelling.h
+ Analytical Dir   : /home/baum/ROMS/ROMS/ROMS/Functionals
+
+ Resolution, Grid 01: 41x80x16,  Parallel Threads: 1,  Tiling: 1x1
+
+Physical Parameters, Grid: 01
+ =============================
+
+       1440  ntimes            Number of timesteps for 3-D equations.
+    300.000  dt                Timestep size (s) for 3-D equations.
+         30  ndtfast           Number of timesteps for 2-D equations between
+                                 each 3D timestep.
+          1  ERstr             Starting ensemble/perturbation run number.
+          1  ERend             Ending ensemble/perturbation run number.
+          0  nrrec             Number of restart records to read from disk.
+          T  LcycleRST         Switch to recycle time-records in restart file.
+        288  nRST              Number of timesteps between the writing of data
+                                 into restart fields.
+          1  ninfo             Number of timesteps between print of information
+                                 to standard output.
+          T  ldefout           Switch to create a new output NetCDF file(s).
+         72  nHIS              Number of timesteps between the writing fields
+                                 into history file.
+          0  nQCK              Number of timesteps between the writing fields
+                                 into quicksave file.
+          1  ntsAVG            Starting timestep for the accumulation of output
+                                 time-averaged data.
+         72  nAVG              Number of timesteps between the writing of
+                                 time-averaged data into averages file.
+          1  ntsDIA            Starting timestep for the accumulation of output
+                                 time-averaged diagnostics data.
+         72  nDIA              Number of timesteps between the writing of
+                                 time-averaged data into diagnostics file.
+ 0.0000E+00  nl_tnu2(01)       NLM Horizontal, harmonic mixing coefficient
+                                 (m2/s) for tracer 01: temp
+ 0.0000E+00  nl_tnu2(02)       NLM Horizontal, harmonic mixing coefficient
+                                 (m2/s) for tracer 02: salt
+ 5.0000E+00  nl_visc2          NLM Horizontal, harmonic mixing coefficient
+                                 (m2/s) for momentum.
+          F  LuvSponge         Turning OFF sponge on horizontal momentum.
+          F  LtracerSponge(01) Turning OFF sponge on tracer 01: temp
+          F  LtracerSponge(02) Turning OFF sponge on tracer 02: salt
+ 1.0000E-06  Akt_bak(01)       Background vertical mixing coefficient (m2/s)
+                                 for tracer 01: temp
+ 1.0000E-06  Akt_bak(02)       Background vertical mixing coefficient (m2/s)
+                                 for tracer 02: salt
+ 1.0000E-05  Akv_bak           Background vertical mixing coefficient (m2/s)
+                                 for momentum.
+ 3.0000E-04  rdrg              Linear bottom drag coefficient (m/s).
+ 3.0000E-03  rdrg2             Quadratic bottom drag coefficient.
+ 2.0000E-02  Zob               Bottom roughness (m).
+          2  Vtransform        S-coordinate transformation equation.
+          4  Vstretching       S-coordinate stretching function.
+ 3.0000E+00  theta_s           S-coordinate surface control parameter.
+ 0.0000E+00  theta_b           S-coordinate bottom  control parameter.
+     25.000  Tcline            S-coordinate surface/bottom layer width (m) used
+                                 in vertical coordinate stretching.
+   1025.000  rho0              Mean density (kg/m3) for Boussinesq approximation.
+      0.000  dstart            Time-stamp assigned to model initialization (days).
+       0.00  time_ref          Reference time for units attribute (yyyymmdd.dd)
+ 0.0000E+00  Tnudg(01)         Nudging/relaxation time scale (days)
+                                 for tracer 01: temp
+ 0.0000E+00  Tnudg(02)         Nudging/relaxation time scale (days)
+                                 for tracer 02: salt
+ 0.0000E+00  Znudg             Nudging/relaxation time scale (days)
+                                 for free-surface.
+ 0.0000E+00  M2nudg            Nudging/relaxation time scale (days)
+                                 for 2D momentum.
+ 0.0000E+00  M3nudg            Nudging/relaxation time scale (days)
+                                 for 3D momentum.
+ 0.0000E+00  obcfac            Factor between passive and active
+                                 open boundary conditions.
+          F  VolCons(1)        NLM western  edge boundary volume conservation.
+          F  VolCons(2)        NLM southern edge boundary volume conservation.
+          F  VolCons(3)        NLM eastern  edge boundary volume conservation.
+          F  VolCons(4)        NLM northern edge boundary volume conservation.
+     14.000  T0                Background potential temperature (C) constant.
+     35.000  S0                Background salinity (PSU) constant.
+   1027.000  R0                Background density (kg/m3) used in linear Equation
+                                 of State.
+ 1.7000E-04  Tcoef             Thermal expansion coefficient (1/Celsius).
+ 0.0000E+00  Scoef             Saline contraction coefficient (1/PSU).
+      1.000  gamma2            Slipperiness variable: free-slip (1.0) or 
+                                                      no-slip (-1.0).
+          F  LuvSrc            Turning OFF momentum point Sources/Sinks.
+          F  LwSrc             Turning OFF volume influx point Sources/Sinks.
+          F  LtracerSrc(01)    Turning OFF point Sources/Sinks on tracer 01: temp
+          F  LtracerSrc(02)    Turning OFF point Sources/Sinks on tracer 02: salt
+          F  LsshCLM           Turning OFF processing of SSH climatology.
+          F  Lm2CLM            Turning OFF processing of 2D momentum climatology.
+          F  Lm3CLM            Turning OFF processing of 3D momentum climatology.
+          F  LtracerCLM(01)    Turning OFF processing of climatology tracer 01: temp
+          F  LtracerCLM(02)    Turning OFF processing of climatology tracer 02: salt
+          F  LnudgeM2CLM       Turning OFF nudging of 2D momentum climatology.
+          F  LnudgeM3CLM       Turning OFF nudging of 3D momentum climatology.
+          F  LnudgeTCLM(01)    Turning OFF nudging of climatology tracer 01: temp
+          F  LnudgeTCLM(02)    Turning OFF nudging of climatology tracer 02: salt
+
+          T  Hout(idFsur)      Write out free-surface.
+          T  Hout(idUbar)      Write out 2D U-momentum component.
+          T  Hout(idVbar)      Write out 2D V-momentum component.
+          T  Hout(idUvel)      Write out 3D U-momentum component.
+          T  Hout(idVvel)      Write out 3D V-momentum component.
+          T  Hout(idWvel)      Write out W-momentum component.
+          T  Hout(idOvel)      Write out omega vertical velocity.
+          T  Hout(idTvar)      Write out tracer 01: temp
+          T  Hout(idTvar)      Write out tracer 02: salt
+
+          T  Aout(idFsur)      Write out averaged free-surface.
+          T  Aout(idUbar)      Write out averaged 2D U-momentum component.
+          T  Aout(idVbar)      Write out averaged 2D V-momentum component.
+          T  Aout(idUvel)      Write out averaged 3D U-momentum component.
+          T  Aout(idVvel)      Write out averaged 3D V-momentum component.
+          T  Aout(idWvel)      Write out averaged W-momentum component.
+          T  Aout(idOvel)      Write out averaged omega vertical velocity.
+          T  Aout(idTvar)      Write out averaged tracer 01: temp
+          T  Aout(idTvar)      Write out averaged tracer 02: salt
+
+          T  Dout(M2rate)      Write out 2D momentum acceleration.
+          T  Dout(M2pgrd)      Write out 2D momentum pressure gradient.
+          T  Dout(M2fcor)      Write out 2D momentum Coriolis force.
+          T  Dout(M2hadv)      Write out 2D momentum horizontal advection.
+          T  Dout(M2xadv)      Write out 2D momentum horizontal X-advection.
+          T  Dout(M2yadv)      Write out 2D momentum horizontal Y-advection.
+          T  Dout(M2hvis)      Write out 2D momentum horizontal viscosity.
+          T  Dout(M2xvis)      Write out 2D momentum horizontal X-viscosity.
+          T  Dout(M2yvis)      Write out 2D momentum horizontal Y-viscosity.
+          T  Dout(M2sstr)      Write out 2D momentum surface stress.
+          T  Dout(M2bstr)      Write out 2D momentum bottom stress.
+
+          T  Dout(M3rate)      Write out 3D momentum acceleration.
+          T  Dout(M3pgrd)      Write out 3D momentum pressure gradient.
+          T  Dout(M3fcor)      Write out 3D momentum Coriolis force.
+          T  Dout(M3hadv)      Write out 3D momentum horizontal advection.
+          T  Dout(M3xadv)      Write out 3D momentum horizontal X-advection.
+          T  Dout(M3yadv)      Write out 3D momentum horizontal Y-advection.
+          T  Dout(M3vadv)      Write out 3D momentum vertical advection.
+          T  Dout(M3hvis)      Write out 3D momentum horizontal viscosity.
+          T  Dout(M3xvis)      Write out 3D momentum horizontal X-viscosity.
+          T  Dout(M3yvis)      Write out 3D momentum horizontal Y-viscosity.
+          T  Dout(M3vvis)      Write out 3D momentum vertical viscosity.
+
+          T  Dout(iTrate)      Write out rate of change of tracer 01: temp
+          T  Dout(iTrate)      Write out rate of change of tracer 02: salt
+          T  Dout(iThadv)      Write out horizontal advection, tracer 01: temp
+          T  Dout(iThadv)      Write out horizontal advection, tracer 02: salt
+          T  Dout(iTxadv)      Write out horizontal X-advection, tracer 01: temp
+          T  Dout(iTxadv)      Write out horizontal X-advection, tracer 02: salt
+          T  Dout(iTyadv)      Write out horizontal Y-advection, tracer 01: temp
+          T  Dout(iTyadv)      Write out horizontal Y-advection, tracer 02: salt
+          T  Dout(iTvadv)      Write out vertical advection, tracer 01: temp
+          T  Dout(iTvadv)      Write out vertical advection, tracer 02: salt
+          T  Dout(iThdif)      Write out horizontal diffusion, tracer 01: temp
+          T  Dout(iThdif)      Write out horizontal diffusion, tracer 02: salt
+          T  Dout(iTxdif)      Write out horizontal X-diffusion, tracer 01: temp
+          T  Dout(iTxdif)      Write out horizontal X-diffusion, tracer 02: salt
+          T  Dout(iTydif)      Write out horizontal Y-diffusion , tracer 01: temp
+          T  Dout(iTydif)      Write out horizontal Y-diffusion , tracer 02: salt
+          T  Dout(iTvdif)      Write out vertical diffusion, tracer 01: temp
+          T  Dout(iTvdif)      Write out vertical diffusion, tracer 02: salt
+
+ Output/Input Files:
+
+               Output Restart File:  roms_rst.nc
+               Output History File:  roms_his.nc
+              Output Averages File:  roms_avg.nc
+           Output Diagnostics File:  roms_dia.nc
+  ROMS I/O variables Metadata File:  ROMS/External/varinfo.dat
+
+ Tile partition information for Grid 01:  41x80x16  tiling: 1x1
+
+     tile     Istr     Iend     Jstr     Jend     Npts
+
+        0        1       41        1       80    52480
+
+ Tile minimum and maximum fractional coordinates for Grid 01:
+   (interior points only)
+
+     tile     Xmin     Xmax     Ymin     Ymax     grid
+
+        0    -1.50    42.50     0.50    81.50  RHO-points
+
+        0    -2.00    42.00     0.50    81.50    U-points
+
+        0    -1.50    42.50     0.00    81.00    V-points
+
+ Tracer Advection Scheme: NLM
+ ========================
+
+ Variable               Grid  Horizontal         Vertical
+ ---------              ----  ------------       ------------
+
+ temp                     1   Upstream3          Centered4
+
+ salt                     1   Upstream3          Centered4
+
+ Akima4     Fourth-order Akima advection
+ Centered2  Second-order centered differences advection
+ Centered4  Fourth-order centered differences advection
+ HSIMT      Third High-order Spatial Inteporlation at Middle Time Advection with TVD limiter
+ MPDATA     Multidimensional Positive Definite Advection Algorithm, recursive method
+ Splines    Conservative Parabolic Splines Reconstruction Advection (only vertical; not recommended)
+ Split_U3   Split third-order Upstream Advection
+ Upstream3  Third-order Upstream-biased Advection (only horizontal)
+
+
+ Lateral Boundary Conditions: NLM
+ ============================
+
+ Variable               Grid  West Edge    South Edge   East Edge    North Edge
+ ---------              ----  ----------   ----------   ----------   ----------
+
+ zeta                     1   Periodic     Closed       Periodic     Closed
+
+ ubar                     1   Periodic     Closed       Periodic     Closed
+
+ vbar                     1   Periodic     Closed       Periodic     Closed
+
+ u                        1   Periodic     Closed       Periodic     Closed
+
+ v                        1   Periodic     Closed       Periodic     Closed
+
+ temp                     1   Periodic     Closed       Periodic     Closed
+
+ salt                     1   Periodic     Closed       Periodic     Closed
+
+ Activated C-preprocessing Options:
+
+ UPWELLING               Wind-Driven Upwelling/Downwelling over a Periodic Channel
+ ANA_BSFLUX              Analytical kinematic bottom salinity flux
+ ANA_BTFLUX              Analytical kinematic bottom temperature flux
+ ANA_GRID                Analytical grid set-up
+ ANA_INITIAL             Analytical initial conditions
+ ANA_SMFLUX              Analytical kinematic surface momentum flux
+ ANA_SSFLUX              Analytical kinematic surface salinity flux
+ ANA_STFLUX              Analytical kinematic surface temperature flux
+ ANA_VMIX                Analytical vertical mixing coefficients
+ ASSUMED_SHAPE           Using assumed-shape arrays
+ AVERAGES                Writing out time-averaged nonlinear model fields
+ DIAGNOSTICS_TS          Computing and writing tracer diagnostic terms
+ DIAGNOSTICS_UV          Computing and writing momentum diagnostic terms
+ DJ_GRADPS               Parabolic Splines density Jacobian (Shchepetkin, 2002)
+ DOUBLE_PRECISION        Double precision arithmetic numerical kernel.
+ MIX_S_TS                Mixing of tracers along constant S-surfaces
+ MIX_S_UV                Mixing of momentum along constant S-surfaces
+ NONLINEAR               Nonlinear Model
+ !NONLIN_EOS             Linear Equation of State for seawater
+ POWER_LAW               Power-law shape time-averaging barotropic filter
+ PROFILE                 Time profiling activated
+ !RST_SINGLE             Double precision fields in restart NetCDF file
+ SALINITY                Using salinity
+ SOLVE3D                 Solving 3D Primitive Equations
+ SPLINES_VDIFF           Parabolic Spline Reconstruction for Vertical Diffusion
+ SPLINES_VVISC           Parabolic Spline Reconstruction for Vertical Viscosity
+ TS_DIF2                 Harmonic mixing of tracers
+ UV_ADV                  Advection of momentum
+ UV_COR                  Coriolis term
+ UV_U3HADVECTION         Third-order upstream horizontal advection of 3D momentum
+ UV_C4VADVECTION         Fourth-order centered vertical advection of momentum
+ UV_LDRAG                Linear bottom stress
+ UV_VIS2                 Harmonic mixing of momentum
+ VAR_RHO_2D              Variable density barotropic mode
+
+ Process Information:
+
+ Thread #    0 (pid=   18099) is active.
+
+ INITIAL: Configuring and initializing forward nonlinear model ...
+ *******
+
+    ANA_GRID    - x-location of PSI-points: x_psi
+                   (Grid = 01, Min =  0.00000000E+00 Max =  4.00000000E+04)
+    ANA_GRID    - y-location of PSI-points: y_psi
+                   (Grid = 01, Min =  0.00000000E+00 Max =  8.00000000E+04)
+    ANA_GRID    - x-location of RHO-points: x_rho
+                   (Grid = 01, Min =  5.00000000E+02 Max =  4.05000000E+04)
+    ANA_GRID    - y-location of RHO-points: y_rho
+                   (Grid = 01, Min = -5.00000000E+02 Max =  8.05000000E+04)
+    ANA_GRID    - x-location of U-points: x_u
+                   (Grid = 01, Min =  0.00000000E+00 Max =  4.00000000E+04)
+    ANA_GRID    - y-location of U-points: y_u
+                   (Grid = 01, Min = -5.00000000E+02 Max =  8.05000000E+04)
+    ANA_GRID    - x-location of V-points: x_v
+                   (Grid = 01, Min =  5.00000000E+02 Max =  4.05000000E+04)
+    ANA_GRID    - y-location of V-points: y_v
+                   (Grid = 01, Min =  0.00000000E+00 Max =  8.00000000E+04)
+    ANA_GRID    - reciprocal XI-grid spacing: pm
+                   (Grid = 01, Min =  1.00000000E-03 Max =  1.00000000E-03)
+    ANA_GRID    - reciprocal ETA-grid spacing: pn
+                   (Grid = 01, Min =  1.00000000E-03 Max =  1.00000000E-03)
+    ANA_GRID    - angle between XI-axis and EAST: angler
+                   (Grid = 01, Min =  0.00000000E+00 Max =  0.00000000E+00)
+    ANA_GRID    - Coriolis parameter at RHO-points: f
+                   (Grid = 01, Min = -8.26000000E-05 Max = -8.26000000E-05)
+    ANA_GRID    - bathymetry at RHO-points: h
+                   (Grid = 01, Min =  2.52004887E+01 Max =  1.50000000E+02)
+
+ Vertical S-coordinate System, Grid 01:
+
+ level   S-coord     Cs-curve   Z   at hmin       at hc    half way     at hmax
+
+    16   0.0000000   0.0000000        0.000       0.000       0.000       0.000
+    15  -0.0625000  -0.0019442       -0.809      -0.806      -1.348      -1.589
+    14  -0.1250000  -0.0078455       -1.668      -1.661      -2.966      -3.687
+    13  -0.1875000  -0.0179119       -2.580      -2.568      -4.867      -6.321
+    12  -0.2500000  -0.0324983       -3.549      -3.531      -7.077      -9.535
+    11  -0.3125000  -0.0521190       -4.581      -4.558      -9.630     -13.397
+    10  -0.3750000  -0.0774659       -5.686      -5.656     -12.573     -17.996
+     9  -0.4375000  -0.1094327       -6.875      -6.837     -15.967     -23.445
+     8  -0.5000000  -0.1491465       -8.162      -8.114     -19.889     -29.890
+     7  -0.5625000  -0.1980075       -9.564      -9.506     -24.435     -37.512
+     6  -0.6250000  -0.2577387      -11.104     -11.034     -29.721     -46.531
+     5  -0.6875000  -0.3304460      -12.808     -12.724     -35.892     -57.218
+     4  -0.7500000  -0.4186931      -14.709     -14.609     -43.121     -69.903
+     3  -0.8125000  -0.5255915      -16.846     -16.726     -51.622     -84.987
+     2  -0.8750000  -0.6549105      -19.266     -19.124     -61.651    -102.953
+     1  -0.9375000  -0.8112096      -22.028     -21.859     -73.518    -124.388
+     0  -1.0000000  -1.0000000      -25.200     -25.000     -87.600    -150.000
+
+ Time Splitting Weights for Grid 01:    ndtfast =  30    nfast =  42
+ ==================================
+
+    Primary            Secondary            Accumulated to Current Step
+
+  1-0.0008094437383769 0.0333333333333333-0.0008094437383769 0.0333333333333333
+  2-0.0014053566728197 0.0333603147912792-0.0022148004111966 0.0666936481246126
+  3-0.0017877524645903 0.0334071600137066-0.0040025528757869 0.1001008081383191
+  4-0.0019566842408176 0.0334667517625262-0.0059592371166046 0.1335675599008453
+  5-0.0019122901320372 0.0335319745705535-0.0078715272486418 0.1670995344713988
+  6-0.0016548570247459 0.0335957175749547-0.0095263842733877 0.2006952520463536
+  7-0.0011849025289723 0.0336508794757796-0.0107112868023600 0.2343461315221331
+  8-0.0005032751608631 0.0336903762267453-0.0112145619632232 0.2680365077488784
+  9 0.0003887272597151 0.0337071520654408-0.0108258347035081 0.3017436598143192
+ 10 0.0014892209965583 0.0336941944901169-0.0093366137069498 0.3354378543044362
+ 11 0.0027955815694920 0.0336445537902317-0.0065410321374578 0.3690824080946679
+ 12 0.0043042707117221 0.0335513677379153-0.0022367614257357 0.4026337758325831
+ 13 0.0060106451121704 0.0334078920475245 0.0037738836864347 0.4360416678801076
+ 14 0.0079087469427945 0.0332075372104522 0.0116826306292293 0.4692492050905598
+ 15 0.0099910761708920 0.0329439123123590 0.0216737068001212 0.5021931174029188
+ 16 0.0122483446563884 0.0326108764399960 0.0339220514565096 0.5348039938429148
+ 17 0.0146692120341107 0.0322025982847830 0.0485912634906203 0.5670065921276978
+ 18 0.0172400033810439 0.0317136245503127 0.0658312668716642 0.5987202166780105
+ 19 0.0199444086685725 0.0311389577709445 0.0857756755402367 0.6298591744489550
+ 20 0.0227631639997064 0.0304741441486588 0.1085388395399431 0.6603333185976138
+ 21 0.0256737146312910 0.0297153720153352 0.1342125541712341 0.6900486906129490
+ 22 0.0286498597812016 0.0288595815276255 0.1628624139524357 0.7189082721405746
+ 23 0.0316613792205220 0.0279045862015855 0.1945237931729577 0.7468128583421600
+ 24 0.0346736416507075 0.0268492068942347 0.2291974348236651 0.7736620652363948
+ 25 0.0376471948657328 0.0256934188392112 0.2668446296893979 0.7993554840756060
+ 26 0.0405373376992232 0.0244385123436867 0.3073819673886211 0.8237939964192927
+ 27 0.0432936737565711 0.0230872677537126 0.3506756411451922 0.8468812641730054
+ 28 0.0458596469320356 0.0216441452951603 0.3965352880772278 0.8685254094681656
+ 29 0.0481720587108284 0.0201154903974257 0.4447073467880562 0.8886408998655914
+ 30 0.0501605672561820 0.0185097551070648 0.4948679140442381 0.9071506549726561
+ 31 0.0517471682814030 0.0168377361985254 0.5466150823256412 0.9239883911711815
+ 32 0.0528456577069106 0.0151128305891453 0.5994607400325517 0.9391012217603267
+ 33 0.0533610761022577 0.0133513086655816 0.6528218161348094 0.9524525304259084
+ 34 0.0531891349131379 0.0115726061288397 0.7060109510479473 0.9640251365547481
+ 35 0.0522156244733761 0.0097996349650684 0.7582265755213234 0.9738247715198165
+ 36 0.0503158038019031 0.0080591141492892 0.8085423793232265 0.9818838856691057
+ 37 0.0473537721847153 0.0063819206892258 0.8558961515079418 0.9882658063583315
+ 38 0.0431818225418188 0.0048034616164019 0.8990779740497606 0.9930692679747335
+ 39 0.0376397765791564 0.0033640675316746 0.9367177506289170 0.9964333355064081
+ 40 0.0305543017255206 0.0021094083123694 0.9672720523544377 0.9985427438187775
+ 41 0.0217382098544505 0.0010909315881854 0.9890102622088881 0.9996336754069629
+ 42 0.0109897377911119 0.0003663245930371 1.0000000000000000 1.0000000000000000
+
+ ndtfast, nfast =   30  42   nfast/ndtfast =  1.40000
+
+ Centers of gravity and integrals (values must be 1, 1, approx 1/2, 1, 1):
+
+    1.000000000000 1.047601458608 0.523800729304 1.000000000000 1.000000000000
+
+ Power filter parameters, Fgamma, gamma =  0.28400   0.18933
+
+ Metrics information for Grid 01:
+ ===============================
+
+ Minimum X-grid spacing, DXmin =  1.00000000E+00 km
+ Maximum X-grid spacing, DXmax =  1.00000000E+00 km
+ Minimum Y-grid spacing, DYmin =  1.00000000E+00 km
+ Maximum Y-grid spacing, DYmax =  1.00000000E+00 km
+ Minimum Z-grid spacing, DZmin =  8.08965824E-01 m
+ Maximum Z-grid spacing, DZmax =  2.56123321E+01 m
+
+ Minimum barotropic Courant Number =  2.22358627E-01
+ Maximum barotropic Courant Number =  5.42494240E-01
+ Maximum Coriolis   Courant Number =  2.47800000E-02
+
+    ANA_INITIAL - vertically integrated u-momentum component: ubar
+                   (Grid = 01, Min =  0.00000000E+00 Max =  0.00000000E+00)
+    ANA_INITIAL - vertically integrated v-momentum component: vbar
+                   (Grid = 01, Min =  0.00000000E+00 Max =  0.00000000E+00)
+    ANA_INITIAL - free-surface: zeta
+                   (Grid = 01, Min =  0.00000000E+00 Max =  0.00000000E+00)
+    ANA_INITIAL - u-momentum component: u
+                   (Grid = 01, Min =  0.00000000E+00 Max =  0.00000000E+00)
+    ANA_INITIAL - v-momentum component: v
+                   (Grid = 01, Min =  0.00000000E+00 Max =  0.00000000E+00)
+    ANA_INITIAL - potential temperature: temp
+                   (Grid = 01, Min =  1.45204834E+01 Max =  2.19365219E+01)
+    ANA_INITIAL - salinity: salt
+                   (Grid = 01, Min =  3.50000000E+01 Max =  3.50000000E+01)
+
+ Basin information for Grid 01:
+
+ Maximum grid stiffness ratios:  rx0 =   6.931666E-02 (Beckmann and Haidvogel)
+                                 rx1 =   8.661243E-01 (Haney)
+
+ Initial domain volumes:  TotVolume =  3.8843755884E+11 m3
+                         MinCellVol =  8.4521383562E+05 m3
+                         MaxCellVol =  2.5612332106E+07 m3
+                            Max/Min =  3.0302783777E+01
+
+ NL ROMS/TOMS: started time-stepping: (Grid: 01 TimeSteps: 000000000001 - 000000001440)
+
+
+ TIME-STEP YYYY-MM-DD hh:mm:ss.ss  KINETIC_ENRG   POTEN_ENRG    TOTAL_ENRG    NET_VOLUME
+                     C => (i,j,k)       Cu            Cv            Cw         Max Speed
+
+         0 0001-01-01 00:00:00.00  0.000000E+00  6.585677E+02  6.585677E+02  3.884376E+11
+                       (00,00,00)  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+      DEF_HIS     - creating  history      file, Grid 01: roms_his.nc
+      WRT_HIS     - wrote history     fields (Index=1,1) in record = 1
+      DEF_AVG     - creating  average      file, Grid 01: roms_avg.nc
+      DEF_DIAGS   - creating  diagnostics  file, Grid 01: roms_dia.nc
+         1 0001-01-01 00:05:00.00  6.479408E-13  6.585677E+02  6.585677E+02  3.884376E+11
+                       (01,01,01)  1.069435E-09  1.950204E-06  0.000000E+00  9.216783E-06
+         2 0001-01-01 00:10:00.00  9.293195E-12  6.585677E+02  6.585677E+02  3.884376E+11
+                       (01,02,08)  6.735167E-08  1.785829E-06  1.433648E-05  3.660353E-05
+    ...
+      1439 0001-01-05 23:55:00.00  2.445970E-02  6.585713E+02  6.585958E+02  3.884376E+11
+                       (02,02,10)  1.603922E-01  8.281658E-03  4.642367E-02  6.424906E-01
+      1440 0001-01-06 00:00:00.00  2.448524E-02  6.585713E+02  6.585958E+02  3.884376E+11
+                       (03,02,10)  1.604228E-01  8.313453E-03  4.693175E-02  6.425970E-01
+      WRT_HIS     - wrote history     fields (Index=1,1) in record = 21
+      WRT_AVG     - wrote averaged    fields             in record = 20
+      WRT_DIAGS   - wrote diagnostics fields             in record = 20
+      WRT_RST     - wrote re-start    fields (Index=1,1) in record = 1
+
+Elapsed wall CPU time for each process (seconds):
+
+ Thread #    0 CPU:     173.485
+ Total:                 173.485
+
+ Nonlinear model elapsed CPU time profile, Grid: 01
+
+  Allocation and array initialization ..............         0.065  ( 0.0373 %)
+  Ocean state initialization .......................         0.009  ( 0.0053 %)
+  Reading of input data ............................         0.004  ( 0.0026 %)
+  Processing of input data .........................         0.065  ( 0.0373 %)
+  Processing of output time averaged data ..........         8.913  ( 5.1375 %)
+  Computation of vertical boundary conditions ......         0.045  ( 0.0261 %)
+  Computation of global information integrals ......         1.845  ( 1.0632 %)
+  Writing of output data ...........................         0.811  ( 0.4673 %)
+  Model 2D kernel ..................................        85.719  (49.4103 %)
+  2D/3D coupling, vertical metrics .................         1.640  ( 0.9453 %)
+  Omega vertical velocity ..........................         1.286  ( 0.7410 %)
+  Equation of state for seawater ...................         1.344  ( 0.7749 %)
+  3D equations right-side terms ....................         8.875  ( 5.1159 %)
+  3D equations predictor step ......................        21.684  (12.4991 %)
+  Pressure gradient ................................         4.724  ( 2.7231 %)
+  Harmonic mixing of tracers, S-surfaces ...........         1.939  ( 1.1175 %)
+  Harmonic stress tensor, S-surfaces ...............         3.328  ( 1.9181 %)
+  Corrector time-step for 3D momentum ..............        16.801  ( 9.6843 %)
+  Corrector time-step for tracers ..................        11.220  ( 6.4674 %)
+                                              Total:       170.316   98.1734 %
+
+  Unique kernel(s) regions profiled ................       170.316   98.1734 %
+  Residual, non-profiled code ......................         3.169    1.8266 %
+
+
+ All percentages are with respect to total time =          173.485
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+ Dynamic and Automatic memory (MB) usage for Grid 01:  41x80x16  tiling: 1x1
+
+     tile          Dynamic        Automatic            USAGE
+
+        0            77.16             3.87            81.04
+
+    TOTAL            77.16             3.87            81.04
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+ ROMS/TOMS - Output NetCDF summary for Grid 01:
+             number of time records written in HISTORY file = 21
+             number of time records written in RESTART file = 2
+             number of time records written in AVERAGE file = 20
+
+ Analytical header files used:
+
+     ROMS/Functionals/ana_btflux.h
+     ROMS/Functionals/ana_grid.h
+     ROMS/Functionals/ana_initial.h
+     ROMS/Functionals/ana_smflux.h
+     ROMS/Functionals/ana_stflux.h
+     ROMS/Functionals/ana_vmix.h
+
+ ROMS/TOMS: DONE... Monday - September 14, 2020 - 12:38:59 PM
+-----
+
+Test Cases
+----------
+
+The multitude of available ROMS test cases are listed at:
+
+https://www.myroms.org/wiki/Test_Cases[`https://www.myroms.org/wiki/Test_Cases`]
+
+
+
+
+
+
+

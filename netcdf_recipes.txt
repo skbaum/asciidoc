@@ -1,0 +1,923 @@
+NetCDF Recipes
+==============
+Steven K. Baum
+v0.2, 2015-09-28
+:doctype: book
+:toc:
+:icons:
+:source-highlighter: coderay
+
+:numbered!:
+
+Overview
+--------
+
+Recipes for dealing with creating, reading and transmogrifying netCDF files using netCDF operators (NC),
+the Python interface (netcdf4-python), and xarray.
+
+NCO
+---
+
+Other Documentation
+~~~~~~~~~~~~~~~~~~~
+
+http://nco.sourceforge.net/nco.html[+http://nco.sourceforge.net/nco.html+]
+
+* +ncks+ - http://nco.sourceforge.net/nco.html#ncks-netCDF-Kitchen-Sink[+http://nco.sourceforge.net/nco.html#ncks-netCDF-Kitchen-Sink+]
+
+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/nco.pdf[+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/nco.pdf+]
+
+Finding the Format of a NetCDF File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The five formats supported by NetCDF are:
+
+* +CLASSIC+ - the traditional 32-bit offset written by NetCDF3
+* +NETCDF4+ - uses HDF5 as the file storage layer
+* +NETCDF4_CLASSIC+ - uses HDF5 as the file storage layer, but uses only NetCDF3 features
+* +64BIT_OFFSET+
+* +64BIT_DATA+
+
+The six extended or underlying formats accessible via the NetCDF API are:
+
+* +NC_FORMATX_NC3+ - classic and 64-bit versions of http://www.digitalpreservation.gov/formats/fdd/fdd000330.shtml[NetCDF3] formats
+* +NC_FORMATX_NC_HDF5+ - classic and extended versions of http://www.unidata.ucar.edu/software/netcdf/[NetCDF4], and pure https://www.hdfgroup.org/HDF5/[HDF5] format
+* +NC_FORMATX_NC_HDF4+ - https://www.hdfgroup.org/products/hdf4/[HDF4] format
+* +NC_FORMATX_PNETCDF+ - https://trac.mcs.anl.gov/projects/parallel-netcdf[PnetCDF] format
+* +NC_FORMATX_DAP2+ - http://opendap.org/[DAP2] protocol
+* +NC_FORMATX_DAP4+ - http://docs.opendap.org/index.php/DAP4:_Specification_Volume_1[DAP4] protocol
+
+The internal format of a NetCDF file can be determined via +ncks+.
+
+=====
++ncks -M in.nc | grep filetype+
+
++Summary of in.nc: filetype = NC_FORMAT_NETCDF4...+
+=====
+
+The +ncdump+ command can also be used for this:
+
+=====
++ncdump -k in.nc+
+
++netCDF-4+
+=====
+
+The extended format can also be found via +ncks+.
+
+=====
++ncks -D 2 -M hdf.hdf+
+
++Summary of hdf.hdf: filetype = NC_FORMAT_NETCDF4 (representation of extended/underlying filetype NC_FORMAT_HDF4)...+
+=====
+
+Converting a File from One NetCDF Format to Another
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+From +CLASSIC+ to +NETCDF4+:
+
+=====
++ncks -4 in3.nc out4.nc+
+=====
+
+From +NETCDF4+ to +CLASSIC+:
+
+=====
++ncks -3 out4.nc out3.nc+
+=====
+
+From +CLASSIC+ to +NETCDF4_CLASSIC+:
+
+=====
++ncks -7 in3.nc out4c.nc+
+=====
+
+From +CLASSIC+ to +64BIT_OFFSET+:
+
+=====
++ncks -6 in3.nc out364off.nc+
+=====
+
+From +CLASSIC+ to +64BIT_DATA+:
+
+=====
++ncks -5 in3.nc out364dat.nc+
+=====
+
+Down-Conversion from NetCDF4 to NetCDF3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many legacy applications do not support NetCDF4, although many files are created in NetCDF4
+format to take advantage of features not present in NetCDF3.  These features include atomic
+variable types, multiple record (i.e. unlimited) dimensions, and groups.  NCO uses three
+algorithms to handle each of these three extended NetCDF4 capabilities when down-converting
+to NetCDF3.
+
+Atomic variable conversions are done automatically for all numeric types, and work for both
+attributes and variables of any rank.  String conversions work for attributes but not for
+variables, so arrays of character variables will not be correctly converted.  These atomic type conversions
+are done via:
+
+=====
++ncks -3 in.nc4 out.nc3+
+=====
+
+An additional argument must be specified to convert multiple record dimensions to fixed dimensions.
+All of the record dimensions will be converted via:
+
+=====
++ncks -3 --fix_rec_dmn=all in.nc4 out.nc3+
+=====
+
+A single record dimension - e.g. +dim1+ - can be converted via:
+
+=====
++ncks -3 --fix_rec_dmn=dim1 in.nc4 out.nc3+
+=====
+
+The present NCO documentation is unclear about how to proceed if you desire to convert two out of three
+record dimensions to fixed dimensions.  Perhaps using the previous command twice with, say, +dim1+ and
++dim2+, would work.
+
+An additional argument is also required to flatten or remove groups.  A group is a set of variables
+given a special name within a NetCDF4 file such that it becomes a hierarchical file.  A command that will
+remove the groups and thus flatten the hierarchical file is:
+
+=====
++ncks -3 -G : in.nc4 out.nc3+
+=====
+
+A command to simultaneously deal with all three extensions is:
+
+=====
++ncks -3 -G : --fix_rec_dmn=all in.nc4 out.nc3+
+=====
+
+Modifying Default Behaviors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some of the default NCO behaviors can be annoying.  Here's how to turn off the things that are most annoying.
+
+Turning Off Default Alphabetization of Extracted Fields
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Switches ‘--no_abc’ and ‘--no-abc’ turn-off the default alphabetization of extracted fields in ncks only.
+Prior to NCO version 4.7.1 these were '-a', '--abc', and '--alphabetize'.
+
+Turning Off Automatic Appending of Command to Global History Attribute
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+All operators have an optional switch (‘-h’, ‘--hst’, or ‘--history’) to override automatically appending the history attribute
+ 
+Extracting a Single Variable from a File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+====
+ncks -h -a -v singlevariable infile.nc outfile_with_singlevariable.nc
+====
+
+Extracting All Variables Except a Single Variable from a File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+====
+ncks -h -a -x -v singlevariable infile.nc outfile_with_everything_but_singlevariable.nc
+====
+
+Extracting a Time/Space Subset of a NetCDF File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This extracts the first 100 time steps of in.nc into out.nc,
+where the full argument syntax for d is: -d dim,[min][,[max][,[stride]].
+
+====
+ncks -d time,100 in.nc out.nc
+====
+
+This extracts
+
+
+
+Changing Variable, Dimension or Attribute Names
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note:  As of 2016, the NCO documentation says that that the netCDF4 library contains
+limitations that can prevent NCO from correctly renaming variables, dimensions and
+attributes.  They suggest that a workaround would be to convert the file to netCDF3 format,
+do the renaming, and then convert back to netCDF4 format.
+
+To change variable name +temp+ to +temperature+ in +file.nc+:
+
+=====
++ncrename -h -O -v temp,temperature file.nc+
+=====
+
+To change dimension name +dim1+ to +stations+ in +file.nc+:
+
+=====
++ncrename -h -O -d dim1,stations file.nc+
+=====
+
+To change attribute name +comment+ to +description+ in +file.nc+:
+
+=====
++ncrename -h -O -a comment,description file.nc+
+=====
+
+Note that +ncrename+ makes no distinction between global and variable attributes, and
+does no more than rename all global and/or variable attributes with the given old name to
+the given new name.
+
+Problems and Solutions
+^^^^^^^^^^^^^^^^^^^^^^
+
+Versions 4.0.0–4.7.4 of the netCDF library contain bugs that sometimes prevent NCO from correctly
+renaming coordinate variables, dimensions, and groups in netCDF4 files.
+A symptom of this is obtaining an unreadable netCDF file when you attempt to rename, say, a dimension in a netCDF4
+file.  This is outlined at:
+
+http://nco.sourceforge.net/nco.html#bug_nc4_rename[+http://nco.sourceforge.net/nco.html#bug_nc4_rename+]
+
+as is a workaround that usually works.  Just change the netCDF4 file to a netCDF3 file via:
+
+=====
++ncks --no-abc -3 file4.nc file3.nc+
+=====
+
+and then perform whatever renaming you desire.  Then convert it back via:
+
+=====
++ncks --no-abc -4 file3.nc file4.nc+
+=====
+
+The +--no-abc+ argument stops the +ncks+ default behavior of alphabetizing the 
+variable order in your file,
+although this precaution is moot if you use +ncrename+ to rename a dimension, variable or
+attribute since there is no argument for +ncrename+ to prevent the default alphabetiztion of the
+variables in the resulting file.
+
+If you want to preserve the variable order in your file, there is an alternative for renaming
+via the +netCDF4-python+ package.  Here is a simple example script to rename a dimension.  It
+takes three arguments: (1) a netCDF filename, (2) the old dimension name you want replaced, and
+(3) the new dimension name you desire.  It will also nag you if you don't supply enough
+arguments.  This can be modified for changing variable names by replacing +renameDimension+
+to +renameVariable+.
+
+This script will additionally automatically check the version of your netCDF file.
+If the file is a version 3 file
+it will go ahead and do the renaming.  If it is not version 3 file, it
+will automatically convert it to version 3, perform the renaming, and then convert it back to
+version 4.  Either way, it will also create a backup version of your original file in
+the form +file.nc-back+ so you will not lose the original file if something goes wrong.
+You're welcome. 
+
+[source,python]
+-----
+from netCDF4 import Dataset
+import sys,os
+
+# Check to see if the argument count is sufficient.
+if (len(sys.argv) < 4):
+        print(" Not enough arguments for the renaming procedure.")
+        print(" Need: filename, old_name, new_name")
+        sys.exit()
+
+# Read arguments into variables.
+filename = sys.argv[1]
+old_name = sys.argv[2]
+new_name = sys.argv[3]
+
+# Check for existence of supplied filename.
+try:
+        f=Dataset(filename,'r+')
+except:
+        print(" Filename: ",filename," can not be located.  Exiting.")
+        sys.exit()
+
+# Create a temporary backup version of the original file in case something goes wrong.
+filename_back = filename + "-back"
+os.system(" cp " + filename + " " + filename_back)
+
+# Find netCDF version of the input file.
+
+# If it is NETCDF3_CLASSIC, do the renaming.
+# If is is not, convert to NETCDF3_CLASSIC and then do the renaming.
+netcdf_version = f.data_model
+if (netcdf_version != "NETCDF3_CLASSIC"):
+        print(" This is not NETCDF3_CLASSIC.  Converting file before renaming.")
+# Create a temporary netCDF3 version of the original file and open the netCDF3 version.
+        filename3 = filename + "3"
+#   The -h argument prevents this from being appended to the global 'history' attribute.
+#   The --no-abc argument prevents ncks from alphabetizing the variables in the file.
+        os.system("ncks -h --no-abc -3 " + filename + " " + filename3)
+        f3=Dataset(filename3,'r+')
+# Do the renaming.
+        f3.renameDimension(old_name,new_name)
+# Convert the renamed file back to netCDF4 format.
+        filename4 = filename + "4"
+        os.system("ncks -h --no-abc -4 " + filename3 + " " + filename4)
+# Overwrite the original file with the renamed file.
+        os.system("mv " + filename4 + " " + filename)
+        os.system("rm " + filename3)
+        f3.close()
+else:
+        print(" This is NETCDF3_CLASSIC. Will rename without file conversion.")
+        f.renameDimension(old_name,new_name)
+
+#
+print(" The file with the renamed dimension is: ",filename)
+print(" The original file has been backed up as: ",filename_back)
+print(" Check your work twice before discarding the latter file.")
+
+f.close()
+-----
+
+
+
+Working With Global and Variable Attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The general form of attribute diddling with NCO is:
+
+=====
++ncatted [-h] -a att_nm,var_nm,mode,att_type,att_val file.nc+ 
+=====
+
+where
+
+* +att_nm+ is the name of the attribute being created or modified
+
+* +var_nm+ is the name of the variable or +global+ for a global attribute
+
+* +mode+ is the editing mode:
+
+** +a+ - append +att_val+ to current +var_nm+ attribute +att_nm+, or create the attribute if it doesn't exist
+
+** +c+ - create attribute +att_nm+ for variable +var_nm+ with value +att_val+ if the attribute doesn't exist, and
+if it does exist there is no change
+
+** +d+ - delete variable +var_nm+ attribute +att_nm+, and if +att_nm+ is left blank all attributes for variable
++var_nm+ are deleted, with the +att_type+ and +att_val+ arguments left blank
+
+** +m+ - change the present +var_nm+ attribute +att_nm+ to value +att_val+, with no effect if +var_nm+ has no
+attribute +att_nm+
+
+** +n+ - if +att_nm+ already exists this does nothing, if it doesn't exist this behaves like mode +a+
+
+** +o+ - (default mode) write attribute +att_nm+ with value +att_val+ to variable +var_nm+, overwriting existing attribute
++att_nm+ if it exists
+
+* +att_type+ - one of the twelve primitive http://www.unidata.ucar.edu/software/netcdf/docs/data_type.html[netCDF data types] indicating the type of the attribute value you're adding:
+
+** +f+ - netCDF type +NC_FLOAT+
+
+** +d+ - netCDF type +NC_DOUBLE+
+
+** +i+ (or +l+) - netCDF type +NC_INT+
+
+** +s+ - netCDF type +NC_SHORT+
+
+** +c+ - netCDF type +NC_CHAR+
+
+** +b+ - netCDF type +NC_BYTE+
+
+** +ub+ - netCDF type +NC_UBYTE+
+
+** +us+ - netCDF type +NC_USHORT+
+
+** +u+ (or +ui+ or +ul+) - netCDF type +NC_UINT+
+
+** +ll+ (or +int64) - netCDF type +NC_INT64+
+
+** +ull+ (or +uint64+) - netCDF type +NC_UINT64+
+
+** +sng+ (or +string+) - netCDF type +NC_STRING+
+
+* +att_val+ - the value of the attribute you are diddling
+
+Creating a Global Attribute
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Creating (c) the global attribute (-a) +originator_type+ with the character (c) value +person+ without
+adding this change to the +history+ attribute (-h).
+
+=====
++ncatted -h -a originator_type,global,c,c,"person" file.nc+
+=====
+
+Creating a Variable Attribute
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Creating the variable attribute (-a) +description+ with the character (c) value +"An abbreviated name for the dataset."+
+to the variable +dataSetID+ without adding this change to the +history+ attribute (-h).
+
+=====
++ncatted -h -a description,dataSetID,c,c,"An abbreviated name for the dataset." file.nc+
+=====
+
+Overwriting a Variable Attribute Value
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using +ncatted+ to change the +long_name+ attribute of variable +T+ from whatever it
+was to +temperature+.
+
+=====
++ncatted -a long_name,T,o,c,temperature in.nc+
+=====
+
+Replacing One Variable Attribute Name With Another
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is a two-step process in which we first nuke the old attribute +_FillValue+ and
+then create a replacement attribute +missing_value+.
+
+=====
++ncatted -O -a _FillValue,zlev,d,f," " test.nc+
+=====
+
+=====
++ncatted -O -a missing_value,zlev,c,f,"-9999." test.nc+
+=====
+
+Adding a Variable from One File to Another
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This appends to contents of +file1+ to the contents of +file2+.
+
+=====
+ncks -A file1.nc file2.nc
+=====
+
+Converting a Non-Record Dimension Time Variable to a Record Dimension Time Variable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://stackoverflow.com/questions/28598485/how-to-convert-fixed-size-dimension-to-unlimited-in-a-netcdf-file[+https://stackoverflow.com/questions/28598485/how-to-convert-fixed-size-dimension-to-unlimited-in-a-netcdf-file+]
+
+=====
++ncks --mk_rec_dmn time_counter myfile.nc -o myfileunlimited.nc ; mv myfileunlimited.nc myfile.nc+
+=====
+
+Going the other way:
+
+=====
++ncks --fix_rec_dmn time_counter myfile.nc -o myfilefixedsize.nc ; mv myfilefixedsize.nc myfile.nc+
+=====
+
+Downloading Large Subsets from OpenDAP Servers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://my.usgs.gov/confluence/pages/viewpage.action?pageId=537496478[+https://my.usgs.gov/confluence/pages/viewpage.action?pageId=537496478+]
+
+Obtain a subset from the PRISM data server:
+
+=====
++nccopy -k 3 -d 1 -c time/1,lat/30,lon/30 -u http://cida.usgs.gov/thredds/dodsC/prism_v2?lon[0:1:1404],lat[0:1:620],time[0:1:1],ppt[0:1:1][0:1:620][0:1:1404] prism_ppt.nc+
+=====
+
+where:
+
+* +-k 3+ specifies a netCDF4 classic data model file
+* +-d 1+ specifies deflation level 1
+* +-c time/1,lat/30,lon/30+ - specifies 30 chunks of data per time step that can be individually compressed
+
+This returns a file that is 2.0M in size.
+
+If we skip the deflation and chunking via:
+
+=====
++nccopy -u http://cida.usgs.gov/thredds/dodsC/prism_v2?lon[0:1:1404],lat[0:1:620],time[0:1:1],ppt[0:1:1][0:1:620][0:1:1404] prism_ppt.nc+
+=====
+
+we will get a file 6.7M in size.
+
+netCDF4-python
+--------------
+
+Other Documentation
+~~~~~~~~~~~~~~~~~~~
+
+http://unidata.github.io/netcdf4-python/[+http://unidata.github.io/netcdf4-python/+]
+
+http://pyhogs.github.io/intro_netcdf4.html[+http://pyhogs.github.io/intro_netcdf4.html+]
+
+http://snowball.millersville.edu/\~adecaria/ESCI386P/esci386-lesson14-Reading-NetCDF-files.pdf[+http://snowball.millersville.edu/~adecaria/ESCI386P/esci386-lesson14-Reading-NetCDF-files.pdf+]
+
+http://schubert.atmos.colostate.edu/\~cslocum/netcdf_example.html[+http://schubert.atmos.colostate.edu/~cslocum/netcdf_example.html+]
+
+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/11_create_netcdf_python.pdf[+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/11_create_netcdf_python.pdf+]
+
+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/10_read_netcdf_python.pdf[+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/10_read_netcdf_python.pdf+]
+
+Set the Value of a Variable Attribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+=====
+stat = nc.createVariable('station',str,'station')
+stat.cf_role = "profile_id"
+=====
+
+If you attempt to use an attribute name that is reserved, then
+use the alternate form.  For example, 'name' is reserved so
+the form:
+
+=====
+stat.name = "station identification number"
+=====
+
+would cause an error, while the alternate form:
+
+=====
+stat.setncattr("name","station identification number")
+=====
+
+would not.
+
+
+Find the Value of a Global Attribute in an Input File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Open the file.
+
+-----
+>>> in = "infile.nc"
+>>> nc = netCDF4.Dataset(infile, 'r', format='NETCDF4')
+-----
+
+Get list of attribute names.
+
+-----
+>>> nc.ncattrs()
+[u'ncei_template_version', u'featureType', u'cdm_data_type' ... ]
+-----
+
+Find value of chosen attribute, in this case 'time_coverage_start'.
+
+-----
+>>> getattr(nc,'time_coverage_start')
+u'2014-04-12 3:25:00'
+>>> str(getattr(nc,'time_coverage_start'))
+'2014-04-12 3:25:00'
+-----
+
+or
+
+-----
+>>> atts = nc.__dict__
+>>> atts.items()
+[(u'ncei_template_version', u'NCEI_NetCDF_Profile_Orthogonal_Template_v2.0'), ... ]
+>>> atts['time_coverage_start']
+u'2014-04-12 3:25:00'
+>>> str(atts['time_coverage_start'])
+'2014-04-12 3:25:00'
+-----
+
+Get All Global Attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+from netCDF4 import Dataset
+inf = Dataset("fk1994_3.nc","r")
+atts = inf.__dict__
+atts
+OrderedDict([('ncei_template_version', 'NCEI_NetCDF_Point_Template_v2.0')])
+for att,val in atts.items():
+	print (att,val)
+.....
+ncei_template_version NCEI_NetCDF_Point_Template_v2.0
+-----
+
+Copy All Global Attributes from Input File to Output File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+from netCDF4 import Dataset
+inf = Dataset("fk1994_3.nc","r")
+outf = Dataset("test.nc","w")
+
+inf.__dict__
+OrderedDict([('ncei_template_version', 'NCEI_NetCDF_Point_Template_v2.0')])
+
+outf.setncatts(inf.__dict__)
+
+outf.__dict__
+OrderedDict([('ncei_template_version', 'NCEI_NetCDF_Point_Template_v2.0')])
+-----
+
+Copy Dimensions from Input File to Output File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+from netCDF4 import Dataset
+inf = Dataset("fk1994_3.nc","r")
+outf = Dataset("test.nc","w")
+for dimname,dim in inf.dimensions.items():
+	outf.createDimension(dimname,len(dim))
+outf.close()
+
+ncdump test.nc
+
+netcdf test {
+dimensions:
+        Samples = 55776 ;
+        len35 = 35 ;
+        len55 = 55 ;
+        len10 = 10 ;
+        Len10 = 10 ;
+        len01 = 1 ;
+        len40 = 40 ;
+        len20 = 20 ;
+        len30 = 30 ;
+        len15 = 15 ;
+        len50 = 50 ;
+        len60 = 60 ;
+}
+-----
+
+Copy an Entire Input File to an Output File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This follows from the examples in the +utils.py+ file in the +netCDF4+ directory
+of the +netcdf4-python+ distribution.
+
+https://github.com/Unidata/netcdf4-python/blob/master/netCDF4/utils.py[+https://github.com/Unidata/netcdf4-python/blob/master/netCDF4/utils.py+]
+
+-----
+from netCDF4 import Dataset
+inf = Dataset("test_in.nc","r")
+outf = Dataset("test_out.nc","w")
+
+#  Copy global attributes.
+
+outf.setncatts(inf.__dict__)
+
+#  Copy dimensions.
+
+for dimname,dim in inf.dimensions.items():
+        outf.createDimension(dimname,len(dim))
+
+#  Copy variables and variable attributes.
+
+FillValue = 999.999
+
+for varname,ncvar in inf.variables.items():
+	var = outf.createVariable(varname,ncvar.dtype,ncvar.dimensions)
+	attdict = ncvar.__dict__
+	var.setncatts(attdict)
+	var[:] = ncvar[:]
+	outf.sync()
+outf.close()
+-----
+
+Create a Record Length Variable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Specify +None+ instead of an integer when creating the appropriate dimension.
+First, the dimension:
+
+=====
++time = ncfile.createDimension("time", None)+
+=====
+
+Next, the variable:
+
+=====
++times = ncfile.createVariable("time","f8",("time",))+
+=====
+
+Create a Scalar Variable
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Omit the third argument in +createVariable+ to create a scalar variable as in:
+
+-----
+sn = nc.createVariable('station_name',str)
+sn.long_name = "station_name"
+sn.cf_role = "timeseries_id"
+-----
+
+which will create:
+
+-----
+string station_name ;
+        station_name:long_name = "station_name"
+        station_name:cf_role = "timeseries_id"
+-----
+
+Siphon
+------
+
+Siphon is a collection of Python utilities for downloading data from remote data services. Much of Siphon’s current functionality focuses on access to data hosted on a THREDDS Data Server. It also provides clients to a variety of simple web services.
+
+Obtain a 2D Field from a THREDDS NetCDF Subset Service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Import the required modules.
+
+-----
+from datetime import datetime
+from netCDF4 import num2date
+import numpy as np
+from siphon.catalog import TDSCatalog
+-----
+
+Construct a TDSCatalog instance pointing to our dataset of interest.
+
+-----
+best_gfs = TDSCatalog('http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml?dataset=grib/NCEP/GFS/Global_0p25deg/Best') 
+-----
+
+Pull out the dataset and get the NCSS access point.
+
+-----
+best_ds = best_gfs.datasets[0]
+ncss = best_ds.subset()
+-----
+
+Use the +ncss+ object to create a query object, and construct a query asking for data corresponding to a latitude and longitude box where 43 lat is the northern extent, 35 lat is the southern extent, -111 long is the western extent, -100 is the eastern extent, and the time is the current time.
+We also ask for a netCDF4 file and the +Temperature_surface+ variable.
+
+-----
+query = ncss.query()
+query.lonlat_box(north=43, south=35, east=-100, west=-111).time(datetime.utcnow())
+query.accept('netcdf4')
+query.variables('Temperature_surface')
+-----
+
+Request the data from the server using this query, and print a list of the variables returned.
+
+-----
+data = ncss.get_data(query)
+print(list(data.variables))
+-----
+
+CDO (Climate Data Operators)
+----------------------------
+
+Other Documentation
+~~~~~~~~~~~~~~~~~~~
+
+https://code.zmaw.de/projects/cdo/embedded/index.html[+https://code.zmaw.de/projects/cdo/embedded/index.html+]
+
+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/cdo.pdf[+http://www.ceda.ac.uk/static/media/uploads/ncas-reading-2015/cdo.pdf+]
+
+cf-python
+---------
+
+Other Documentation
+~~~~~~~~~~~~~~~~~~~
+
+https://cfpython.bitbucket.io/[+https://cfpython.bitbucket.io/+]
+
+
+xarray
+------
+
+=====
+A Python package that aims to bring the labeled data power of pandas to the physical sciences, by providing N-dimensional variants of the core pandas data structures.
+
+Our goal is to provide a pandas-like and pandas-compatible toolkit for analytics on multi-dimensional arrays, rather than the tabular data for which pandas excels. Our approach adopts the Common Data Model for self- describing scientific data in widespread use in the Earth sciences: xarray.Dataset is an in-memory representation of a netCDF file.
+=====
+
+Other Documentation
+~~~~~~~~~~~~~~~~~~~
+
+http://xarray.pydata.org/en/stable/[+http://xarray.pydata.org/en/stable/+]
+
+Datasets and DataArrays
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A DataArray is the xarray implementation of a labeled, multi-dimensional array.
+Its key properties are +values+, +dims+, +coords+ and +attrs+.
+
+A Dataset is the xarray multi-dimensional equivalent of the DataFrame found in
+the Pandas module.  It is a dict-like container of labeled arrays - i.e. DataArray
+objects - with aligned dimensions.  It is specifically designed as an in-memory
+representation of the data model used by the netCDF file format.
+
+Reading and Writing netCDF Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Reading and writing files with xarray requires both
+https://www.scipy.org/[scipy] and the
+https://github.com/Unidata/netcdf4-python[netCDF4-Python] module.
+
+Dataset
+^^^^^^^
+
+An xarray Dataset +ds+ object can be saved to disk in
+netCDF4 format via:
+
+-----
+ds.to_netcdf('saved_on_disk.nc')
+-----
+
+NetCDF files can be read from a disk into xarray using +open_dataset+.
+
+-----
+ds_disk = xr.open_dataset('saved_on_disk.nc')
+-----
+
+DataArray
+^^^^^^^^^
+
+A DataArray can also be written to disk via:
+
+-----
+DataArray.to_netcdf('saved_on_disk.nc')
+-----
+
+and then read from disk via:
+
+-----
+da_disk = xr.open_dataarray('saved_on_disk.nc')
+-----
+
+In this case the DataArray is converted to a Dataset before writing,
+and converted back from a Dataset to a DataArray when loading.
+
+Adding a Variable to a netCDF File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+How to add a `depth` variable to a netCDF file and give it the same dimensions as the
+other variables in the file.
+
+------
+import numpy as np
+import xarray as xr
+
+#  Read the netCDF file into the ds object.
+
+ds = xr.open_dataset('infile.nc')
+
+#  Create the depth variable with size and dimension names based on those in the input file.
+
+depth = xr.DataArray(np.empty([1,ds.latitude.values.size], dtype='f8'),dims=['trajectory','observations'])
+
+#  Set all depth values to 0.0.
+
+depth[:] = 0.0
+
+#  Add the depth variable to the ds object.
+
+ds['depth'] = depth
+
+#  Add whatever attributes are needed.
+
+ds.depth.attrs['standard_name'] = 'depth'
+ds.depth.attrs['units'] = 'm'
+ds.depth.attrs['axis'] = 'Z'
+ds.depth.attrs['positive'] = 'down'
+ds.depth.attrs['long_name'] = 'depth below mean sea level'
+
+#  Write a netCDF file with everything from infile.nc plus the new depth variable.
+
+ds.to_netcdf('outfile.nc')
+------
+
+
+PyNIO
+-----
+
+PyNIO is best installed via conda:
+
+-----
+conda install -c dbrown pynio
+-----
+
+Zarr
+----
+
+Zarr is a Python package providing an implementation of chunked, compressed, N-dimensional arrays.
+
+When used in conjunction with xarray, reading data from zarr looks and feels identical to reading traditional netCDF files. However, there are major advantage to the zarr format:
+
+* Metadata is kept separate from data in a lightweight .json format
+* Arrays are stored in a flexible chunked / compressed binary format
+* Individual chunks can be retrieved independently in a thread-safe manner
+
+http://alimanfoo.github.io/2016/04/14/to-hdf5-and-beyond.html[+http://alimanfoo.github.io/2016/04/14/to-hdf5-and-beyond.html+]
+
+https://agu.confex.com/agu/fm18/meetingapp.cgi/Paper/390015[+https://agu.confex.com/agu/fm18/meetingapp.cgi/Paper/390015+]
+
+Convert netCDF Files to Zarr Stores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/jonahjoughin/netcdf-to-zarr[+https://github.com/jonahjoughin/netcdf-to-zarr+]
+
+-----
+import zarr
+from netCDF4 import Dataset
+
+from convert import netcdf_to_zarr
+
+ds_1, ds_2 = 'path_to_ds_1.nc', 'path_to_ds_2.nc'
+store = zarr.DirectoryStore('store.zarr')
+netcdf_to_zarr([ds_1, ds_2], store, 'Time')
+-----
+
+
+
+
+
+
+
+

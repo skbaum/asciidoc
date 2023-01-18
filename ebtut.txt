@@ -1,0 +1,1969 @@
+
+= EasyBuild Notes
+:doctype: book
+:toc:
+:icons:
+:sectlinks
+:source-highlighter: pygments
+
+== Introduction
+
+This is a tutorial on how to construct and use `easyconfig` files in the
+EasyBuild system.  EasyBuild compiles packages based on the contents of these files
+so it is very important to get them right.
+This tutorial will proceed by examples, with each containing one or more
+features not explained in previous examples as well as more in-depth looks
+at features that were only briefly explained previously.
+We will proceed from the simple to the complex to gain a full understanding
+of how to construct `easyconfig` files.
+
+There are also sections in the latter part of the document that go into much
+more detail about some of the features.
+
+This is based on the very useful tutorial at:
+
+https://hprc.tamu.edu/wiki/SW:EasyBuild:Building_Your_Own_Software:Another_Example_-\_LLVM[`https://hprc.tamu.edu/wiki/SW:EasyBuild:Building_Your_Own_Software:Another_Example_-\_LLVM`]
+
+=== Useful Links
+
+==== Official Sites
+
+* EasyBuild Home - https://easybuild.io/[`https://easybuild.io/`]
+
+* Official Documentation - https://docs.easybuild.io/en/latest/index.html#[`https://docs.easybuild.io/en/latest/index.html#`]
+
+** Using the EasyBuild Command Line - https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html`]
+
+*** Available easyconfig Parameters - https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html#easyconfig-params[`https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html#easyconfig-params`]
+
+*** List of Known Toolchains - https://docs.easybuild.io/en/latest/version-specific/toolchains.html#vsd-list-toolchains[`https://docs.easybuild.io/en/latest/version-specific/toolchains.html#vsd-list-toolchains`]
+
+*** List of easyblocks - https://docs.easybuild.io/en/latest/eb_list_easyblocks.html#basic-usage-easyblocks[`https://docs.easybuild.io/en/latest/eb_list_easyblocks.html#basic-usage-easyblocks`]
+
+** Writing easyconfig Files - https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html`]
+
+** Implementing easyblocks - https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html`]
+
+* GitHub - https://github.com/easybuilders[`https://github.com/easybuilders`]
+
+** easyconfig archive - https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs`]
+
+** easyblock archive - https://github.com/easybuilders/easybuild-easyblocks/tree/develop/easybuild/easyblocks[`https://github.com/easybuilders/easybuild-easyblocks/tree/develop/easybuild/easyblocks`]
+
+==== Tutorials
+
+* *How to Troubleshoot a Failed Easybuild Compilation* - https://confluence.clarkson.edu/display/OITKB/How+to+Troubleshoot+a+Failed+Easybuild+Compilation[`https://confluence.clarkson.edu/display/OITKB/How+to+Troubleshoot+a+Failed+Easybuild+Compilation`]
+
+* *ISC Tutorial 2021* - https://easybuilders.github.io/easybuild-tutorial/2021-isc21/[`https://easybuilders.github.io/easybuild-tutorial/2021-isc21/`]
+
+* *LUST Tutorial 2021* - https://easybuilders.github.io/easybuild-tutorial/2021-lust/[`https://easybuilders.github.io/easybuild-tutorial/2021-lust/`]
+
+* *ISC Tutorial 2020* - https://easybuilders.github.io/easybuild-tutorial/2020-06-isc20/[`https://easybuilders.github.io/easybuild-tutorial/2020-06-isc20/`]
+
+* *Writing/Contributing EasyConfigs* (PDF) - https://users.ugent.be/\~kehoste/EasyBuild_20190130_tutorial-easyconfigs.pdf[`https://users.ugent.be/~kehoste/EasyBuild_20190130_tutorial-easyconfigs.pdf`]
+
+* 2020 Video Tutorial
+
+** 0: Practical Information - https://www.youtube.com/watch?v=CiQ-bfFL2FA[`https://www.youtube.com/watch?v=CiQ-bfFL2FA`]
+** 1: Introduction - https://www.youtube.com/watch?v=gdG4smrZgjc[`https://www.youtube.com/watch?v=gdG4smrZgjc`]
+** 2: Installing EasyBuild - https://www.youtube.com/watch?v=qFaBB6esk9k[`https://www.youtube.com/watch?v=qFaBB6esk9k`]
+** 3: Configuring EasyBuild - https://www.youtube.com/watch?v=1bxlgkQfc_g[`https://www.youtube.com/watch?v=1bxlgkQfc_g`]
+** 4: Basic Usage - https://www.youtube.com/watch?v=armwW68kHHg[`https://www.youtube.com/watch?v=armwW68kHHg`]
+** 5: Troubleshooting Installations - https://www.youtube.com/watch?v=5DOQm_1K4vU[`https://www.youtube.com/watch?v=5DOQm_1K4vU`]
+** 6: Hierarchical Module Naming Schemes - https://www.youtube.com/watch?v=LNukZ8xceUc[`https://www.youtube.com/watch?v=LNukZ8xceUc`]
+** 7: Easybuild at Julich Supercomputing Centre - https://www.youtube.com/watch?v=fOqZWRZM5PA[`https://www.youtube.com/watch?v=fOqZWRZM5PA`]
+** 9: The EasyBuild Community - https://www.youtube.com/watch?v=l6_vUR56RJg[`https://www.youtube.com/watch?v=l6_vUR56RJg`]
+** 8: EasyBuild at ComputeCanada - https://www.youtube.com/watch?v=sauTmalY9Hg[`https://www.youtube.com/watch?v=sauTmalY9Hg`]
+** 10: Adding Support for Additional Software - https://www.youtube.com/watch?v=3D0JfbXBljY[`https://www.youtube.com/watch?v=3D0JfbXBljY`]
+** 11: Contributing to EasyBuild - https://www.youtube.com/watch?v=kCQHPkEWNSw[`https://www.youtube.com/watch?v=kCQHPkEWNSw`]
+** 12: Comparison with Other Tools - https://www.youtube.com/watch?v=hHqyc1_Wz3I[`https://www.youtube.com/watch?v=hHqyc1_Wz3I`]
+** 13: Getting Help - https://www.youtube.com/watch?v=AQ3h0X8I4yk[`https://www.youtube.com/watch?v=AQ3h0X8I4yk`]
+
+* 2021 LUMI User Tutorial
+
+** 1: Introduction (2:29:36)  - https://www.youtube.com/watch?v=JTRw8hqi6x0[`https://www.youtube.com/watch?v=JTRw8hqi6x0`]
+** 2: Using EasyBuild (2:36:59) - https://www.youtube.com/watch?v=C3S8aCXrIMQ[`https://www.youtube.com/watch?v=C3S8aCXrIMQ`]
+** 3: Advanced Topics (2:23:48) - https://www.youtube.com/watch?v=KbcvHa4uO1Y[`https://www.youtube.com/watch?v=KbcvHa4uO1Y`]
+** 4: EasyBuild on Cray Systems (2:36:35) - https://www.youtube.com/watch?v=uRu7X_fJotA[`https://www.youtube.com/watch?v=uRu7X_fJotA`]
+
+* 2016 Video Tutorial
+
+** 1: Introduction (55:20) - https://www.youtube.com/results?search_query=easybuild+tutorial[`https://www.youtube.com/results?search_query=easybuild+tutorial`]
+** 2: Getting Started (45:59) - https://www.youtube.com/watch?v=yo_KwlDtg0w&t=50s[`https://www.youtube.com/watch?v=yo_KwlDtg0w&t=50s`]
+
+== A Hierarchy of Methods
+
+There is a hierarchy of methods for attempting to compile and install a software package.
+This hierarchy ranges from discovering an already installed package to bypassing EasyBuild
+and building a package from scratch from the source code to finding and running a docker file
+with Singularity.  While EasyBuild also basically
+builds a package from scratch, it is typically easier when one is starting out with EasyBuild
+to build and install a package from scratch yourself until you're sufficiently familiar with
+all the magical incantations needed to create an easyconfig file to do it for you.
+
+=== Using an Already Installed Package
+
+==== The Short Version
+
+If a software package named `Armadillo` is requested, look for already installed versions via:
+
+-----
+module spider Armadillo
+-----
+
+Find out how to load a specific version - with the default being the most recent one - via:
+
+-----
+module spider Armadillo/10.7.5
+-----
+
+Load the software version and the listed dependencies via:
+
+-----
+module load GCC/10.3.0  OpenMPI/4.1.1 Armadillo/10.7.5
+-----
+
+If this doesn't work look for help in the following section.
+
+==== The Long Version
+
+One should first check to see if a requested software package is already locally installed.
+This can be done via the command:
+
+-----
+module spider packagename
+-----
+
+A specific example is:
+
+-----
+module spider Armadillo/10.7.5
+-----
+
+which obtains:
+
+-----
+----------------------------------------------------------------------------------------------
+  Armadillo:
+----------------------------------------------------------------------------------------------
+    Description:
+      Armadillo is an open-source C++ linear algebra library (matrix maths) aiming towards a good balance between speed and ease of use. Integer, floating point and
+      complex numbers are supported, as well as a subset of trigonometric and statistics functions.
+
+     Versions:
+        Armadillo/9.700.2
+        Armadillo/9.880.1
+        Armadillo/9.900.1
+        Armadillo/10.5.3
+        Armadillo/10.7.5
+
+----------------------------------------------------------------------------------------------
+  For detailed information about a specific "Armadillo" package (including how to load the modules) use the module's full name.
+  Note that names that have a trailing (E) are extensions provided by other modules.
+  For example:
+
+     $ module spider Armadillo/10.7.5
+----------------------------------------------------------------------------------------------
+...
+-----
+
+There can be many available versions of a software package already installed.
+If a specific version is not requested the default choice should be the most recent version.
+
+The available versions can also be found by locating the installation directory and listing the versions contained therein.
+
+-----
+ls -l /sw/eb/sw/Armadillo
+
+dr-xr-sr-x 6 baum     staff 4096 Sep  6  2021 10.5.3-foss-2020b
+dr-xr-sr-x 6 baum     staff 4096 Dec 21  2021 10.7.5-foss-2021a
+dr-xr-sr-x 6 j-perdue staff 4096 Jan  1  2021 9.700.2-foss-2019a
+dr-xr-sr-x 6 j-perdue staff 4096 Dec 31  2020 9.880.1-foss-2020a
+dr-xr-sr-x 6 j-perdue staff 4096 Dec 23  2020 9.900.1-foss-2019b
+dr-xr-sr-x 6 j-perdue staff 4096 Dec 27  2020 9.900.1-foss-2020a
+-----
+
+A final check can be made by checking the easyconfig files available in the appropriate
+cleaned directory.  
+The last two elements of the path shown below indicate the cluster on
+which the installation is being performed - in this case `grace` - and
+the name of the software being installation - in this case `Armadillo`.
+There is a possibility that a version found in the installation
+directory didn't complete the installation process, in which case it will not
+be listed in the cleaned directory.
+
+-----
+ls -l /sw/eb/ebfiles_repo_cleaned/grace/Armadillo/
+
+-rw-rw-r-- 1 francis staff 728 Sep  6  2021 Armadillo-10.5.3-foss-2020b.eb
+-rw-rw-r-- 1 francis staff 721 Dec 21  2021 Armadillo-10.7.5-foss-2021a.eb
+-rw-rw-r-- 1 francis staff 895 Jan  1  2021 Armadillo-9.700.2-foss-2019a.eb
+-rw-rw-r-- 1 francis staff 895 Dec 31  2020 Armadillo-9.880.1-foss-2020a.eb
+-rw-rw-r-- 1 francis staff 894 Dec 30  2020 Armadillo-9.900.1-foss-2019b.eb
+-rw-rw-r-- 1 francis staff 894 Dec 30  2020 Armadillo-9.900.1-foss-2020a.eb
+-----
+
+After the appropriate software package and/or version has been found you can
+find what other packages might also be required via:
+
+-----
+module spider Armadillo/10.7.5
+
+...
+    You will need to load all module(s) on any one of the lines below before the "Armadillo/10.7.5" module is available to load.
+
+      GCC/10.3.0  OpenMPI/4.1.1
+...
+-----
+
+at which point you can load your package and its dependencies via:
+
+-----
+module load GCC/10.3.0  OpenMPI/4.1.1 Armadillo/10.7.5
+-----
+
+and check to see what has been loaded via:
+
+-----
+module list
+
+Currently Loaded Modules:
+  1) GCCcore/10.3.0     10) OpenSSL/1.1       19) ScaLAPACK/2.1.0-fb
+  2) zlib/1.2.11        11) libevent/2.1.12   20) bzip2/1.0.8
+  3) binutils/2.36.1    12) UCX/1.10.0        21) ICU/69.1
+  4) GCC/10.3.0         13) libfabric/1.12.1  22) Boost/1.76.0
+  5) numactl/2.0.14     14) PMIx/3.2.3        23) Eigen/3.3.9
+  6) XZ/5.2.5           15) OpenMPI/4.1.1     24) arpack-ng/3.8.0
+  7) libxml2/2.9.10     16) OpenBLAS/0.3.15   25) Armadillo/10.7.5
+  8) libpciaccess/0.16  17) FlexiBLAS/3.0.4
+  9) hwloc/2.4.1        18) FFTW/3.3.9
+-----
+
+A considerable number of packages can be loaded based on the dependencies.
+
+If the package is not already installed we must move on to the next section wherein
+we will attempt to install a package via its easyconfig file.
+
+=== Installing from an Available Easyconfig File
+
+==== Finding an Easyconfig File
+
+A step up in complexity is installing a package from an available easyconfig file.
+It involves searching the available easyconfig files that are archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs`]
+
+to see if one is available for the desired software package.
+The packages are kept in separate alphanumerical subdirectories on Github.
+Click on the appropriate letter/number and scroll down or search the subdirectory for your software
+package name.  Note that packages whose names start with capital letters are listed before the
+lower-case names.
+
+If you can't find the package name by scrolling try searching for it since you can
+never be sure what combination of upper- and lower-case letters are being used.
+If you're uncertain about the name try using the Github search box on the upper left
+to simultaneously search through all the subdirectories.
+If you still can't find it then it's probably not there and you'll have to proceed to
+further sections.
+
+==== Compiling/Installing an Easyconfig File
+
+=== Modifying an Existing Easyconfig File
+
+=== Creating a New Easyconfig File Using an Existing File as a Template
+
+Making small modifications to an existing easyconfig file works quite well when you are attempting
+to install a new version of a software package that isn't yet available in the EB archives, or if
+you want to update the compiler chain for an older version.
+If there is not an existing easyconfig file for any version of a software package you wish to
+install, you need to take the next step of using an existing easyconfig file that includes the
+easyblock file you will need for your particular instance.
+
+In the first example below, we're attempting to install a Python module for which there is no
+official EB easyconfig file available.  Our strategy is to find an existing easyconfig file that uses
+the easyblock file we require - in this example the `PythonBundle` easyblock file - and extensively modify it
+to meet our needs.
+
+==== Installing Python Modules Via the PythonBundle Easyblock
+
+===== Finding a Template
+
+The PythonBundle easyblock is a starting point for installing Python modules that are not yet
+available as easyconfig files.  The easyconfig file for `statsmodels` will serve as a template.
+
+-----
+easyblock = 'PythonBundle'
+
+name = 'statsmodels'
+version = '0.12.1'
+
+homepage = 'https://www.statsmodels.org/'
+description = """Statsmodels is a Python module that allows users to explore data, estimate statistical models,
+and perform statistical tests."""
+
+toolchain = {'name': 'foss', 'version': '2020b'}
+
+dependencies = [
+    ('Python', '3.8.6'),
+    ('SciPy-bundle', '2020.11'),
+]
+
+use_pip = True
+sanity_pip_check = True
+
+exts_list = [
+    ('patsy', '0.5.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    (name, version, {
+        'checksums': ['a271b4ccec190148dccda25f0cbdcbf871f408fc1394a10a7dc1af4a62b91c8e'],
+    }),
+]
+
+moduleclass = 'math'
+-----
+
+===== Modifying the Template
+
+A real-world example involves the installation of a Python module called *Colossus* that is a
+toolkit for calculations pertaining to cosmology, the large-scale structure of the universe, and the properties of dark matter halos.
+The installation page for *Colossus* at:
+
+https://bdiemer.bitbucket.io/colossus/installation.html[`https://bdiemer.bitbucket.io/colossus/installation.html`]
+
+tells us that it requires *Numpy*, *SciPy* and *Six*, and that the *Astropy* and *Camb* packages are optional.
+
+The various parts of the *statsmodels* easyconfig file will now be modified to obtain an easyconfig
+file for *Colossus*.
+
+First, we change the `name` and `version` values appropriately.  Version numbers are not given to this package so
+the date of the most recent update is used.
+We also change `homepage` and `description` to match the package.
+
+-----
+name = 'Colossus'
+version = '2022-08-02'
+
+homepage = 'https://bdiemer.bitbucket.io/colossus/index.html'
+description = """Colossus is a python toolkit for calculations pertaining to cosmology,
+the large-scale structure of the universe, and the properties of dark matter halos."""
+-----
+
+Next, we update the `toolchain` if a more recent one is available.  In this case we've updated from `foss/2020b` to
+`foss/2021b`.  We may not always choose the most recent version of the toolchain, though, since the various
+required modules may only be readily available as already-installed EB packages in an earlier version of the
+toolchain.
+
+-----
+toolchain = {'name': 'foss', 'version': '2021b'}
+-----
+
+Keep `Python` and `SciPy-bundle` in the `dependencies` section.  We upgrade the version of `Python`
+from `3.8.6` to `3.9.6`, the version that corresponds to `foss/2021b`.  We can find the compiler used in
+`foss/2021b` by loading and then listing the loaded modules via:
+
+-----
+module purge
+module load foss/2021b
+module list
+Currently Loaded Modules:
+  1) EasyBuild/4.6.0     12) OpenSSL/1.1
+  2) EasyBuild-faster/0  13) libevent/2.1.12
+  3) GCCcore/11.2.0      14) UCX/1.11.2
+  4) zlib/1.2.11         15) libfabric/1.13.2
+  5) binutils/2.37       16) PMIx/4.1.0
+  6) GCC/11.2.0          17) OpenMPI/4.1.1
+  7) numactl/2.0.14      18) OpenBLAS/0.3.18
+  8) XZ/5.2.5            19) FlexiBLAS/3.0.4
+  9) libxml2/2.9.10      20) FFTW/3.3.10
+ 10) libpciaccess/0.16   21) ScaLAPACK/2.1.0-fb
+ 11) hwloc/2.5.0         22) foss/2021b
+-----
+
+which shows us that `foss/2021b` corresponds to `GCC/11.2.0`.  Now we need to find a Python
+version 
+
+
+
+Similarly, we upgrade
+`SciPy-bundle` from `2020.11` to `2021.10`.
+The EB `Python` easyconfig file includes dozens of modules in additional to basic Python, and one of them is `six`
+which satisfies that requirement.  All the required modules are now includes.
+
+* The optional module `astropy` is available as 
+
+-----
+easyblock = 'PythonBundle'
+
+name = 'Colossus'
+version = '2022-08-02'
+
+homepage = 'https://bdiemer.bitbucket.io/colossus/index.html'
+description = """Colossus is a python toolkit for calculations pertaining to cosmology, the large-scale structure
+of the universe, and the properties of dark matter halos."""
+
+toolchain = {'name': 'foss', 'version': '2021b'}
+
+dependencies = [
+    ('Python', '3.8.6'),
+    ('SciPy-bundle', '2020.11'),
+]
+
+use_pip = True
+sanity_pip_check = True
+
+exts_list = [
+    ('patsy', '0.5.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    (name, version, {
+        'checksums': ['a271b4ccec190148dccda25f0cbdcbf871f408fc1394a10a7dc1af4a62b91c8e'],
+    }),
+]
+
+moduleclass = 'math'
+-----
+
+
+=== Compiling/Installing a Package in a Python/R Environment
+
+==== Systemwide Installation
+
+==== Userspace Installation
+
+=== Compiling a Package from the Source Code With Make/CMake
+
+==== Systemwide Installation
+
+==== Userspace Installation
+
+=== Finding and Running a Docker Image Using Singularity
+
+== Using eb on the Command Line
+
+The main tool to interact with the EasyBuild framework is the command-line program `eb`.
+There are three main ways the `eb` program can be used to build and install modules.
+
+=== General Methods for Building Modules
+
+==== Via easyconfig Files
+
+The most common and basic use of `eb` is to supply the name of an easyconfig file
+containing parameters that specify how to build a module.
+An example to build and install version 2.0 of `HPL` using version 1.4.10 of the `goolf` toolchain is:
+
+-----
+eb HPL-2.0-goolf-1.4.10.eb --robot
+-----
+
+All easyconfig filenames follow the format:
+
+-----
+<name>-<version>-<toolchain>-<versionsuffix>.eb
+-----
+
+Multiple easyconfig files can also be specified as arguments to `eb`:
+
+-----
+eb HPCG-2.1-goolf-1.4.10.eb GCC-4.8.3.eb
+-----
+
+An easyconfig file is a plain text file in Python syntax that mostly
+contains easyconfig parameters defining `key-value` assignments.
+Around 50 generic easyconfig parameters are supported, and can be separated into
+a handful of mandatory parameters and much more than a handful of optional parameters.
+Only a small subset of the optional parameters are commonly used, with the rest used to
+solve vexing issues with packages that are built in uncommon ways.
+Examples of ways to build packages are those using the `make` or `cmake` commands,
+with more or less everything else being uncommmon.
+A list of all of the available parameters can be found at:
+
+https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html[`https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html`]
+
+This list can also be obtained via `eb -a`.
+
+Constructing easyconfig files is at best an easy matter of using or modifying an
+already existing file, and at worst a neverending search through the official documentation,
+tutorials, the archives of user groups, and the Github archive of thousands of files to find the Holy Grail
+that will finally allow your file to successfully compile a module.
+One good way to learn how to construct these files is via a set of example files, starting with the nearly
+trivial and moving on to increasingly complex examples.
+This is attempted in the <<Learning How to Build easyconfig Files Through Examples>> section below.
+
+==== Via Command-Line Options
+
+All of the parameters available to use within easyconfig files can also be specified on
+the command line.  A simple example of this is:
+
+-----
+eb --software-name=HPCG --toolchain=goolf,1.4.10
+-----
+
+==== Via Github Pull Requests
+
+An easyconfig file that is added or modified by a Github pull request to the
+EasyBuild `easybuild-easyconfigs` repository can be used via:
+
+-----
+eb --from-pr 1177
+-----
+
+which would use the GCC 4.9.2 easyconfig file contributed via pull request number 1177.
+The `easybuild-easyconfigs` repository is located at:
+
+https://github.com/easybuilders/easybuild-easyconfigs[`https://github.com/easybuilders/easybuild-easyconfigs`]
+
+and it would be useful to become familiar with the workings of Github for this and
+many other reasons.
+
+=== Specifying Locations of Easyconfig Files
+
+==== Present Working Directory
+
+If `eb` is run with the name of an easyconfig file as the only argument in a directory
+that contains that file, it will use that file for processing.  Say we have
+the easyconfig file `M4-1.4.19.eb` in the directory `/home/baum/eb/TEST` and while in
+that directory we run:
+
+-----
+cd /home/baum/eb/TEST
+eb M4-1.4.19.eb
+
+== Temporary log file in case of crash /tmp/baum/logs/easybuild-MvzIxw.log
+== resolving dependencies ...
+== processing EasyBuild easyconfig /home/baum/eb/TEST/M4-1.4.19.eb
+...
+-----
+
+and see that the `M4-1.4.19.eb` in the directory is processed.
+
+==== EasyBuild Standard Location(s)
+
+If the `M4-1.4.19.eb` was not in that directory we would see instead:
+
+-----
+cd /home/baum/eb
+eb M4-1.4.19.eb
+
+== Temporary log file in case of crash /tmp/baum/logs/easybuild-_fyV_p.log
+== resolving dependencies ...
+== processing EasyBuild easyconfig /sw/eb/ebfiles_repo_cleaned/grace/M4/M4-1.4.19.eb
+...
+-----
+
+where the easyconfig file in a standard location in the EasyBuild installation
+is used.  This standard location is specified via the environment
+variable `EASYBUILD_ROBOT`, which can be found via:
+
+-----
+env | grep EASYBUILD_ROBOT
+EASYBUILD_ROBOT=/sw/eb/ebfiles_repo_cleaned/grace
+-----
+
+==== Arbitrary Directories
+
+You can specify any directory within which `eb` will look for
+easyconfig files via the `-r PATH` or `--robot=PATH` option.  For example,
+if you are not in the `/home/baum/eb/TEST` directory and want to install
+a hypothetical easyconfig file `M4-1.4.19.eb` therein you can enter:
+
+-----
+cd /home/baum/eb
+eb -r /home/baum/eb/TEST M4-1.4.19.eb
+-----
+
+and the `M4-1.4.19.eb` file will be fetched and used from that directory.
+
+Also, if the environment variable `EASYBUILD_ROBOT` were not already set as in
+the previous example, this would be used to appraise `eb` of its location via:
+
+-----
+eb -r /sw/eb/ebfiles_repo_cleaned/grace M4-1.4.19.eb
+-----
+
+=== Options for Testing Before Installing
+
+==== Dry Runs
+
+To print a build overview for a dry run including dependencies use the argument `-D`.
+This yields little information for the `M4-1.4.19` module since it has no dependencies
+other than the `SYSTEM` toolchain.
+
+-----
+eb -D M4-1.4.19.eb
+
+== Temporary log file in case of crash /tmp/baum/logs/easybuild-xhlhlg.log
+Dry run: printing build status of easyconfigs and dependencies
+CFGS=/home/baum/eb/TEST
+ * [ ] $CFGS/M4-1.4.19.eb (module: Core | M4/1.4.19)
+== Temporary log file(s) /tmp/baum/logs/easybuild-xhlhlg.log* have been removed.
+== Temporary directory /tmp/baum/tmp/eb-1jEupK has been removed.
+-----
+
+A module like `GCC-11.2.0` with many dependencies will yield significantly
+more information.  Building `GCC-11.2.0` involves a bootstrapping process wherein
+dependencies like `M4`, `zlib`, `binutils`, etc. are first built using the
+`SYSTEM` toolchain to enable `GCCcore-11.2.0` to be install, and then built again
+using the newly installed `GCCcore-11.2.0`
+toolchain.  
+
+-----
+eb -D GCC-11.2.0.eb
+
+== Temporary log file in case of crash /tmp/baum/logs/easybuild-NCvQnY.log
+Dry run: printing build status of easyconfigs and dependencies
+ * [ ] /sw/eb/ebfiles_repo_cleaned/grace/M4/M4-1.4.19.eb (module: Core | M4/1.4.19)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/zlib/zlib-1.2.11.eb (module: Core | zlib/1.2.11)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/help2man/help2man-1.47.4.eb (module: Core | help2man/1.47.4)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/M4/M4-1.4.18.eb (module: Core | M4/1.4.18)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/Bison/Bison-3.7.6.eb (module: Core | Bison/3.7.6)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/Bison/Bison-3.3.2.eb (module: Core | Bison/3.3.2)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/flex/flex-2.6.4.eb (module: Core | flex/2.6.4)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/binutils/binutils-2.37.eb (module: Core | binutils/2.37)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/GCCcore/GCCcore-11.2.0.eb (module: Core | GCCcore/11.2.0)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/zlib/zlib-1.2.11-GCCcore-11.2.0.eb (module: Compiler/GCCcore/11.2.0 | zlib/1.2.11)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/help2man/help2man-1.48.3-GCCcore-11.2.0.eb (module: Compiler/GCCcore/11.2.0 | help2man/1.48.3)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/M4/M4-1.4.19-GCCcore-11.2.0.eb (module: Compiler/GCCcore/11.2.0 | M4/1.4.19)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/Bison/Bison-3.7.6-GCCcore-11.2.0.eb (module: Compiler/GCCcore/11.2.0 | Bison/3.7.6)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/flex/flex-2.6.4-GCCcore-11.2.0.eb (module: Compiler/GCCcore/11.2.0 | flex/2.6.4)
+ * [x] /sw/eb/ebfiles_repo_cleaned/grace/binutils/binutils-2.37-GCCcore-11.2.0.eb (module: Compiler/GCCcore/11.2.0 | binutils/2.37)
+ * [x] /home/baum/eb/TEST/GCC-11.2.0.eb (module: Core | GCC/11.2.0)
+== Temporary log file(s) /tmp/baum/logs/easybuild-NCvQnY.log* have been removed.
+== Temporary directory /tmp/baum/tmp/eb-vm0vO9 has been removed.
+-----
+
+==== Testing a Build Without Installing
+
+To actually go through all the steps in the process up to the installation step
+we use the `-s` argument which can stop the process after any of the steps, with
+the available steps being `fetch`, `ready`, `source`, `patch`, `prepare`, `configure`,
+`build`, `test`, `install`, `extensions`, `postiter`, `postproc`, `sanitycheck`,
+`cleanup`, `module`, `permissions`, `package` and `testcases`.
+We now do this with `M4-1.4.19` and stop before installation using `-s test` since
+`test` is the step before `install`.
+Note that if the module you are testing is already installed you must also
+insert the argument `-f` to force it to continue even after detecting that it is
+already installed.
+
+-----
+eb [-f] -s test M4-1.4.19.eb
+
+== Temporary log file in case of crash /tmp/baum/logs/easybuild-g9Z6Lm.log
+== resolving dependencies ...
+== processing EasyBuild easyconfig /sw/eb/ebfiles_repo_cleaned/grace/M4/M4-1.4.19.eb
+== building and installing Core/M4/1.4.19...
+== fetching files...
+== creating build dir, resetting environment...
+== ... (took 2 secs)
+== unpacking...
+== patching...
+== preparing...
+== configuring...
+== ... (took 38 secs)
+== building...
+== ... (took 2 secs)
+== testing...
+== COMPLETED: Installation STOPPED successfully (took 44 secs)
+== Results of the build can be found in the log file(s) /tmp/baum/easybuild/M4/1.4.19/system-system/easybuild/easybuild-M4-1.4.19-20210915.141948.log
+== Build succeeded for 1 out of 1
+== Temporary log file(s) /tmp/baum/logs/easybuild-g9Z6Lm.log* have been removed.
+== Temporary directory /tmp/baum/tmp/eb-FCeCpj has been removed.
+-----
+
+=== Options for Obtaining Information
+
+The `eb` command is also used to obtain information about available options and easyconfig and easyblock files.
+Although not all of these topics have been covered, it is useful to have informational options
+with examples grouped together in a single location.
+
+The most basic information
+option is:
+
+-----
+eb [-h|--help]
+-----
+
+which prints a list of all available options, informative and otherwise.
+
+==== Show List of Parameters
+
+A list of available easyconfig parameters is obtainable via:
+
+-----
+eb [-a|--available-easyconfig-params]
+-----
+
+which can be found online at:
+
+https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html[`https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html`]
+
+A list of parameters specific to a given easyblock, say `EB_WRF` can be found via:
+
+-----
+eb -a -e EB_WRF | grep "* "
+-----
+
+which prints:
+
+-----
+buildtype*     Specify the type of build (serial, smpar (OpenMP), dmpar (MPI), dm+sm (hybrid OpenMP/MPI)). [default: None]
+rewriteopts*   Replace -O3 with CFLAGS/FFLAGS [default: True]
+runtest*       Build and run WRF tests [default: True]
+-----
+
+If you do not use `grep` to isolate the asterisk-marked easyblock specific parameters you will get a list of
+all parameters within which the specific ones are buried.
+
+==== Show List of Toolchains
+
+A list of available toolchains can be obtained via:
+
+-----
+eb --list-toolchains
+-----
+
+This list is also available in the officials docs at:
+
+https://docs.easybuild.io/en/latest/version-specific/toolchains.html[`https://docs.easybuild.io/en/latest/version-specific/toolchains.html`]
+
+==== Show Toolchain Options
+
+The options available for any of the toolchains listed as available by `eb --list-toolchains` can
+be obtained via:
+
+-----
+eb --avail-toolchain-opts GCC
+-----
+
+which will provide:
+
+-----
+Available options for GCC toolchain:
+    32bit: Compile 32bit target (default: False)
+    cciscxx: Use CC as CXX (default: False)
+    cstd: Specify C standard (default: None)
+...
+    vectorize: Enable compiler auto-vectorization, default except for noopt and lowopt (default: None)
+    verbose: Verbose output (default: False)
+    veryloose: Very loose precision (default: False)
+-----
+
+==== Show List of Easyblocks
+
+A list of available easyblocks is obtained via:
+
+-----
+eb --list-easyblocks
+-----
+
+with that list also available in the official docs at:
+
+https://docs.easybuild.io/en/latest/eb_list_easyblocks.html[`https://docs.easybuild.io/en/latest/eb_list_easyblocks.html`]
+
+==== Search for an easyconfig File
+
+If you're looking to see if EasyBuild has an easyconfig file for a software package of interest, you
+can do so via:
+
+-----
+eb [-S|--search]
+-----
+
+For example, a search for `ArviZ` - a package for the exploratory analysis of Bayesian models
+with Python - via:
+
+-----
+eb -S ArviZ
+-----
+
+will yield something like:
+
+-----
+ * $CFGS1/ArviZ-0.7.0-foss-2019b-Python-3.7.4.eb
+ * $CFGS2/ArviZ-0.7.0-intel-2019b-Python-3.7.4.eb
+ * $CFGS2/ArviZ-0.11.1-intel-2020b.eb
+-----
+
+Once you have obtained this information, you can discover how to load one of these modules via:
+
+-----
+module spider ArviZ/0.7.0
+-----
+
+which will tell you something like:
+
+-----
+  ArviZ: ArviZ/0.7.0-Python-3.7.4
+
+    Description:
+      Exploratory analysis of Bayesian models with Python
+
+
+    You will need to load all module(s) on any one of the lines below before the "ArviZ/0.7.0-Python-3.7.4" module is available to load.
+
+      GCC/8.3.0  OpenMPI/3.1.4
+      iccifort/2019.5.281  impi/2018.5.288
+-----
+
+You can also use regular expressions to narrow your search.  For example,
+to search for which easyconfig files are available for `GCC v4.6.x` without listing easyconfig files
+that use `GCC v4.6.x` as a toolchain you would enter:
+
+-----
+eb -S ^GCC-4.6
+-----
+
+and to find all easyconfig files for Python versions 2.7.8 and 2.7.9 that use the intel toolchain:
+
+-----
+eb -S '^Python-2.7.[89].*intel'
+-----
+
+==== List Available easyconfig Constants
+
+A list of constants that can be used in easyconfig files is found via:
+
+-----
+eb --avail-easyconfig-constants
+-----
+
+This presently (7/21) yields:
+
+-----
+    ARCH: x86_64 (CPU architecture of current system (aarch64, x86_64, ppc64le, ...))
+    EXTERNAL_MODULE: EXTERNAL_MODULE (External module marker)
+    HOME: /home/baum (Home directory ($HOME))
+    OS_NAME: centos linux (System name (e.g. 'fedora' or 'RHEL'))
+    OS_PKG_IBVERBS_DEV: ('libibverbs-dev', 'libibverbs-devel', 'rdma-core-devel') (OS packages providing ibverbs/infiniband development support)
+    OS_PKG_OPENSSL_BIN: openssl (OS packages providing the openSSL binary)
+    OS_PKG_OPENSSL_DEV: ('openssl-devel', 'libssl-dev', 'libopenssl-devel') (OS packages providing openSSL developement support)
+    OS_PKG_OPENSSL_LIB: ('libssl', 'libopenssl') (OS packages providing openSSL libraries)
+    OS_PKG_PAM_DEV: ('pam-devel', 'libpam0g-dev') (OS packages providing Pluggable Authentication Module (PAM) developement support)
+    OS_TYPE: Linux (System type (e.g. 'Linux' or 'Darwin'))
+    OS_VERSION: 7.9.2009 (System version)
+    SYSTEM: {'version': 'system', 'name': 'system'} (System toolchain)
+    SYS_PYTHON_VERSION: 2.7.5 (System Python version (platform.python_version()))
+-----
+
+==== List Available easyconfig Templates
+
+Getting a list of all template names and constants that can be usd in easyconfig files is done via:
+
+-----
+eb --available-easyconfig-templates
+-----
+
+which will obtain something like:
+
+-----
+Template names/values derived from easyconfig instance
+    %(module_name)s: Module name
+    %(nameletter)s: First letter of software name
+...
+    SOURCELOWER_PY2_WHL: Generic (non-compiled) Python 2 wheel package with lowercase name (%(namelower)s-%(version)s-py2-none-any.whl)
+    SOURCE_PY3_WHL: Generic (non-compiled) Python 3 wheel package (%(name)s-%(version)s-py3-none-any.whl)
+    SOURCELOWER_PY3_WHL: Generic (non-compiled) Python 3 wheel package with lowercase name (%(namelower)s-%(version)s-py3-none-any.whl)
+-----
+
+==== Show the Current EasyBuild Configuration
+
+The current EasyBuild environment configuration can be found via:
+
+-----
+eb --show-config
+-----
+
+On a local cluster named `grace`, we load a configuration via:
+
+-----
+module load EasyBuild-grace
+-----
+
+which running `eb --show-config` shows contains the following configuration parameters:
+
+-----
+#
+# Current EasyBuild configuration
+# (C: command line argument, D: default value, E: environment variable, F: configuration file)
+#
+buildpath            (E) = /tmp/baum/easybuild/
+containerpath        (E) = /sw/eb/containers
+deprecated           (E) = 2.0
+installpath          (E) = /sw/eb
+installpath-modules  (E) = /sw/eb/mods
+installpath-software (E) = /sw/eb/sw
+minimal-toolchains   (E) = True
+module-naming-scheme (E) = HierarchicalMNS
+packagepath          (E) = /sw/eb/packages
+prefix               (E) = /sw/eb
+read-only-installdir (E) = True
+repositorypath       (E) = /sw/eb/ebfiles_repo/grace
+robot                (E) = /sw/eb/ebfiles_repo_cleaned/grace, /sw/eb/sw/EasyBuild/4.4.0/easybuild/easyconfigs
+robot-paths          (E) = /sw/eb/ebfiles_repo_cleaned/grace, /sw/eb/sw/EasyBuild/4.4.0/easybuild/easyconfigs
+sourcepath           (E) = /sw/eb/sources
+tmp-logdir           (E) = /tmp/baum/logs/
+tmpdir               (E) = /tmp/baum/tmp/
+-----
+
+==== Show Default Module Classes
+
+An optional parameter in easyconfig files is `moduleclass`, which specifies the
+category to which the software belongs.  The default is the `base` class, although it is
+recommended to replace that with a more appropriate choice from the list of
+available options.  EasyBuild enforces that only known module classes can
+be specified, so providing one not on the list will throw an error.
+A list of the available classes can be obtained via:
+
+-----
+eb --show-default-moduleclasses
+-----
+
+-----
+Default available module classes:
+
+        base:      Default module class
+        astro:     Astronomy, Astrophysics and Cosmology
+...
+        tools:     General purpose tools
+        vis:       Visualization, plotting, documentation and typesetting
+-----
+
+[[building_easycofig_files]]
+== Learning How to Build easyconfig Files Through Examples
+
+EasyBuild builds software packages based on the specifications provided in
+what are called `easyconfig` files.  The official documentation for `easyconfig` files can
+be found at:
+
+* Writing `easyconfig` Files
+
+https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html`]
+
+* Implementing `easyconfig` Files
+
+https://docs.easybuild.io/en/latest/Implementing-easyblocks.html[`https://docs.easybuild.io/en/latest/Implementing-easyblocks.html`]
+
+An easyconfig file provides a build specification for EasyBuild.
+It is a plaintext file in Python syntax that is mostly key-value assignment
+statements to define easyconfig parameters.
+
+=== Example 1 - Inspecting the Parts of an Existing File
+
+The following is a relatively simple example `easyconfig` file for a specific version of `bzip2`
+that can be found on `grace` at:
+
+-----
+/sw/eb/sw/bzip2/1.0.8-GCCcore-10.2.0/easybuild/reprod/bzip2-1.0.8-GCCcore-10.2.0.eb
+-----
+
+It consists of mandatory parameters plus other common optional parameters needed
+to sufficiently supply a build specification.
+This example contains comments not found in the actual file to help with
+understanding what is going on.
+Most of the comments suffice at this point to explain the contents of the file,
+although there will be additional sections following to go into a little more
+depth on the source code and dependency sections.
+
+.An Example `easyconfig` file for `bzip2`
+[source,python]
+-----
+# Mandatory: The name of the software package to build.
+name = 'bzip2'
+# Mandatory: The version of the software package to build.
+version = '1.0.8'
+
+# Mandatory: A URL of a homepage for the software.
+homepage = 'https://sourceware.org/bzip2'
+# Mandatory: A brief description of the software package.
+description = """
+ bzip2 is a freely available, patent free, high-quality data compressor. It
+ typically compresses files to within 10% to 15% of the best available
+ techniques (the PPM family of statistical compressors), whilst being around
+ twice as fast at compression and six times faster at decompression.
+"""
+
+# Mandatory: The toolchain to be used to compile the software package.
+toolchain = {'name': 'GCCcore', 'version': '10.2.0'}
+# Optional: A list of extra options for the compiler.
+toolchainopts = {'pic': True}
+
+# Optional: A list of URLs from where the source code file(s) can be obtained.
+source_urls = ['https://sourceware.org/pub/%(name)s/']
+# Optional: A list of source file names.
+sources = [SOURCE_TAR_GZ]
+# Optional: A list of patches to apply.
+patches = ['%(name)s-%(version_major_minor)s.6-pkgconfig.patch']
+# Optional: A list of checksums for the software and patches.
+checksums = [
+    'ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269',  # %(name)s-%(version)s.tar.gz
+    '5a823e820b332eca3684416894f58edc125ac3dace9f46e62f98e45362aa8a6d',  # %(name)s-%(version_major_minor)s.6-pkgconfig.patch
+]
+
+# A list of build dependencies.
+builddependencies = [
+    ('binutils', '2.35'),
+]
+
+# Optional: The module class to be used for this software.
+moduleclass= 'tools'
+-----
+
+==== The Source Code Parameters
+
+If the source code for a package is not available locally, then it can
+be downloaded from a source URL.
+This is specified by some combination of the `sources`, `source_urls`,
+`patches` and `checksums` parameters.
+
+In this example the URL of the directory from which the `bzip2` package
+can be obtained is created from the `source_urls` value of
+
+-----
+https://sourceware.org/pub/%(name)s/
+-----
+
+by substituting in the value of `name` to obtain:
+
+=====
+https://sourceware.org/pub/bzip2/[`https://sourceware.org/pub/bzip2/`]
+=====
+
+The source file name is obtained from the `sources` template constant
+`SOURCE_TAR_GZ` by evaluating the expression for which the constant is
+the shorthand form.  In this case the expression is:
+
+-----
+%(name)s-%(version)s.tar.gz
+-----
+
+which becomes - after substituting in the values for `name` and `version` - the
+source file name:
+
+-----
+bzip2-1.0.8.tar.gz
+-----
+
+The value for the `checksums` for the `bzip2-1.0.8.tar.gz` file can be tediously
+created by inspecting the site where the source originates, but is much
+easier to allow EasyBuild to automatically create it.
+
+For this particular case it was created via the command:
+
+-----
+eb bzip2-1.0.8-GCCcore-10.2.0.eb --inject-checksums
+-----
+
+We can check this by copying the file to a local directory:
+
+-----
+cp /sw/eb/sw/bzip2/1.0.8-GCCcore-10.2.0/easybuild/bzip2-1.0.8-GCCcore-10.2.0.eb bzip2.eb
+-----
+
+and then editing the `bzip2.eb` to comment out the checksum parameter section.
+If we then run:
+
+-----
+eb bzip2.eb --inject-checksums
+-----
+
+we should find within the `bzip2.eb` file:
+
+[source,python]
+-----
+checksums = [
+    'ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269',  # bzip2-1.0.8.tar.gz
+    '5a823e820b332eca3684416894f58edc125ac3dace9f46e62f98e45362aa8a6d',  # bzip2-1.0.6-pkgconfig.patch
+]
+
+#checksums = [
+#    'ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269',  # bzip2-1.0.8.tar.gz
+#    '5a823e820b332eca3684416894f58edc125ac3dace9f46e62f98e45362aa8a6d',  # bzip2-1.0.6-pkgconfig.patch
+#]
+-----
+
+Under the hood the following command was run to create the checksum
+for the `bzip2-1.0.8.tar.gz` file.
+
+-----
+sha256sum bzip2-1.0.8.tar.gz
+-----
+
+which produces:
+
+-----
+ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269
+-----
+
+which matches what we see in the example file.
+More detailed information about how EasyBuild handles checksums can be found at:
+
+https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html#checksums[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html#checksums`]
+
+
+The `patches` value in the test example works out - after making the
+appropriate substitutions - to `bzip2-1.0.8.6-pkgconfig.patch`, although as of this
+writing that patch file no longer exists at the source URL.
+It is good to first check your `easyconfig` file for any `patches` values
+specified therein and check to see if they still exist, although EasyConfig
+will probably just ignore any patches that aren't there and issue a warning.
+
+==== The Dependencies
+
+The dependency section is discussed at:
+
+https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html#dependencies[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html#dependencies`]
+
+While there are four kinds of dependencies available for use, only two
+are commonly used.
+
+The `dependencies` parameter is used for build and
+runtime dependencies. For runtime dependencies,
+`module load` statements are included in the generated module file.
+There are no `dependencies` in this example.
+
+The `builddependencies` parameter is used for build-only dependencies.  These are loaded into the
+build environment defined by the `easyconfig` file.  
+In this example only `binutils/2.35` is included as a build dependency.
+
+=== Example 2 - Modifying an Existing File for a New Software Version
+
+The next example will detail how to modify a previously successful
+`easyconfig` file for ArrayFire to compile it with a more recent
+compiler chain.  
+The specific goal is to modify the file to update the file from compiling ArrayFire with
+`foss/2018b` to compiling it with `foss/2020b'.
+The previously successful file is at:
+
+-----
+/sw/eb/sw/ArrayFire/3.6.4-foss-2018b/easybuild/ArrayFire-3.6.4-foss-2018b.eb
+-----
+
+and is:
+
+[source,python]
+-----
+easyblock = 'CMakeMake'
+
+name = 'ArrayFire'
+version = '3.6.4'
+
+homepage = 'https://arrayfire.com/'
+
+description = """
+ ArrayFire is a general-purpose library that simplifies the process of
+ developing software that targets parallel and massively-parallel architectures
+ including CPUs, GPUs, and other hardware acceleration devices.
+"""
+
+toolchain = {'name': 'foss', 'version': '2018b'}
+
+source_urls = ['http://%(namelower)s.com/%(namelower)s_source/']
+sources = ['%(namelower)s-full-%(version)s.tar.bz2']
+checksums = ['30b17cdcd148335342b5bab767f03006d38fd69d4f0df4078bd8479a933a36ba']
+
+builddependencies = [
+    ('CMake', '3.12.1'),
+    ('Doxygen', '1.8.14'),
+    ('pkg-config', '0.29.2'),
+]
+
+dependencies = [
+    ('Boost', '1.67.0'),
+]
+
+separate_build_dir = True
+
+sanity_check_paths = {
+    'files': ['include/af/version.h', 'lib64/libaf.%s' % SHLIB_EXT],
+    'dirs': ['share/ArrayFire/doc/html/examples']
+}
+
+moduleclass = 'math'
+-----
+
+We will proceed through the file making changes to each line that needs
+to be changed.
+
+==== Modifying `version`
+
+First we need to check if a newer version of ArrayFire is available.
+We go to the official download page at:
+
+https://arrayfire.com/download/[`https://arrayfire.com/download/`]
+
+and discover - as of this writing in June 2021 - that there is a choice
+between binary
+installers for various platforms or building from source via the GitHub
+repository at:
+
+https://github.com/arrayfire/arrayfire[`https://github.com/arrayfire/arrayfire`]
+
+We want to compile ArrayFire so we go to GitHub and look at the column on the right
+side of the screen.  The second category down is *Releases* and we discover that the
+latest release is version 3.7.3.  With this information we change:
+
+-----
+version = '3.6.4'
+-----
+
+to 
+
+-----
+version = '3.7.3
+-----
+
+==== Modifying `toolchain`
+
+Our stated goal quickly allows us to change:
+
+-----
+toolchain = {'name': 'foss', 'version': '2018b'}
+-----
+
+to
+
+-----
+toolchain = {'name': 'foss', 'version': '2020b'}
+-----
+
+==== Modifying the Source Section
+
+In this section we will explain three different ways that could be used
+to downwload the source for this particular package.
+This is done to demonstrate how 
+there is typically more than one way to obtain the source, as well as to finally
+demonstrate a recently introduced EasyBuild feature that allows the source to
+be obtained via cloning it from GitHub.
+
+The first method is to use the procedure that's already in the old `easybuild` file.
+The `source_urls` value - once the substitutions have been performed - is:
+
+-----
+http://arrayfire.com/arrayfire_source/
+-----
+
+If we visit this URL we find it takes us to an Amazon AWS page 
+that contains many past source code
+releases, with the most recent being - as of 6/21 - 3.7.0.
+Our visit to the GitHub page has already showed us that the most recent version
+available there is 3.7.3, so to keep to our goal as well as to make this
+example more pedagogically useful we'll move on to downloading
+the source from GitHub.
+
+If we were to proceed with this method the present `sources` parameter value - after
+substituting our desired version number - i.e.
+
+-----
+arrayfire-full-3.7.3.tar.bz2
+-----
+
+would not suffice for downloading the source package unless we changed 3.7.3 to
+the latest version available there, which is 3.7.0
+
+Moving on the GitHub options, the second method is to download a packaged release from GitHub.
+Returning to GitHub and clicking on the latest release number in
+the *Releases* section takes us to:
+
+https://github.com/arrayfire/arrayfire/releases/tag/v3.7.3[`https://github.com/arrayfire/arrayfire/releases/tag/v3.7.3`]
+
+where we find version 3.7.3 available for download at:
+
+https://github.com/arrayfire/arrayfire/releases/download/v3.7.3/arrayfire-full-3.7.3.tar.bz2[`https://github.com/arrayfire/arrayfire/releases/download/v3.7.3/arrayfire-full-3.7.3.tar.bz2`]
+
+If we desired to download the source code from here we would have to change the `source_urls`
+parameter to:
+
+-----
+source_urls = ['https://github.com/%(namelower)s/%(namelower)s/releases/download/v%(version)s/']
+-----
+
+while keeping the same value for `sources`.
+We will also skip using this method and proceed to a more recent and somewhat
+more complicated method.
+
+The third method is to clone the source code from GitHub.
+This procedure is explained at:
+
+https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html[`https://docs.easybuild.io/en/latest/Writing_easyconfig_files.html`]
+
+We'll start by skipping to the conclusion and show the `sources` parameter we'll need
+to clone the source.
+
+-----
+sources = [{
+    'filename': 'arrayfire-3.7.3.tar.gz',
+    'git_config': {
+        'url': 'https://github.com/arrayfire',
+        'repo_name': 'arrayfire',
+        'tag': 'v3.7.3',
+        'recursive': 'True',
+    },
+}]
+-----
+
+The `filename` is a parameter whose value is the name you desire for
+the tarred and compressed version of the cloned source directory hierarchy
+from GitHub that EasyBuild will automatically create.  EasyBuild is designed to
+start with tarred and compressed packages, so one must be created when using
+this `sources` method.
+
+The `git_conf` parameter is a Python dictionary that contains further parameters or keys
+needed to correctly obtain the source code via cloning.
+The `git_conf` parameters are:
+
+* `url` - (REQUIRED) the URL where the base Git repository is located, in this case `https://github.com/arrayfire`
+* `repo_name` - (REQUIRED) the name of the repository, in this case `arrayfire`, which is combined with `url` form the full repository URL of `https://github.com/arrayfire/arrayfire`
+* `tag` - (REQUIRED) the specific tag to download, in this case `v3.7.3` from the *Releases* section of the GitHub page
+* `recursive` - a switch to activate if a recursive checkout of the repository is required, which is typically indicated in the GitHub page section explaining the source installation procedure
+
+Either a `tag` or `commit` key is required, with the former being a branch name or an actual tag and the latter a specific commit ID to download.  In this case `v3.7.3` is an actual tag, although it could be a branch name such as `main`.
+Another optional key is `keep_git_dir` which retains the `.git` directory containing the Git
+metadata if set to `True`.
+
+==== Modifying the Dependencies Section
+
+The dependencies section in the original `ArrayFire-3.6.4-foss-2018b.eb` file is:
+
+[source,python]
+-----
+builddependencies = [
+    ('CMake', '3.12.1'),
+    ('Doxygen', '1.8.14'),
+    ('pkg-config', '0.29.2'),
+]
+
+dependencies = [
+    ('Boost', '1.67.0'),
+]
+-----
+
+These dependencies are based on the `foss/2018b` compiler toolchain that is
+specified in the `toolchain` parameter.
+To deal with dependencies, it is useful to know exactly
+what packages and versions are contained within the
+toolchain being used.
+There is no obvious way to obtain a list with these details directly via `module` or '`b`,
+although it can be easily obtained by loading the toolchain and then examining a list
+of what was loaded.
+
+[source,bash]
+-----
+module purge
+module load foss/2018b
+module list
+
+Currently Loaded Modules:
+  1) GCCcore/7.3.0    6) XZ/5.2.4           11) OpenBLAS/0.3.1
+  2) zlib/1.2.11      7) libxml2/2.9.8      12) FFTW/3.3.8
+  3) binutils/2.30    8) libpciaccess/0.14  13) ScaLAPACK/2.0.2-OpenBLAS-0.3.1
+  4) GCC/7.3.0-2.30   9) hwloc/1.11.10      14) foss/2018b
+  5) numactl/2.0.11  10) OpenMPI/3.1.1
+-----
+
+Now we examine the details about the compiler chain used for one of the
+dependencies.  The `module spider package/version` command tells us which
+compiler was used to create the dependency package.
+
+-----
+module spider CMake/3.12.1
+...
+    You will need to load all module(s) on any one of the lines below before the "CMake/3.12.1" module is available to load.
+
+      GCCcore/7.3.0
+...
+-----
+
+We see that `GCCcore/7.3.0` matches the compiler version found in the listing
+obtained after loading `foss/2018b`.  This informs us that version 3.12.1 of CMake
+was chosen for inclusion in the `builddependencies` because the version of the
+compiler used to create it matches the version of the compiler specified
+in `toolchain`.  This gives us a method for discovering what changes we
+need to make in the dependencies when we change the compiler toolchain.
+
+We begin the modification procedure by find out what's in
+the `foss/2020b` toolchain.
+
+-----
+module purge
+module load foss/2020b
+module list
+
+Currently Loaded Modules:
+  1) GCCcore/10.2.0   6) XZ/5.2.5           11) UCX/1.9.0         16) FFTW/3.3.8
+  2) zlib/1.2.11      7) libxml2/2.9.10     12) libfabric/1.11.0  17) ScaLAPACK/2.1.0
+  3) binutils/2.35    8) libpciaccess/0.16  13) PMIx/3.1.5        18) foss/2020b
+  4) GCC/10.2.0       9) hwloc/2.2.0        14) OpenMPI/4.0.5
+  5) numactl/2.0.13  10) libevent/2.1.12    15) OpenBLAS/0.3.12
+-----
+
+The compiler used is `GCCcore/10.2.0`.  We now work backwards from before to
+discover which version of `CMake` will be required for `builddependencies`.
+First, we get a list of which versions of `CMake` are available.
+Note that `mla` is a command that searches a cache that lists available software
+and versions that is updated on a regular basis.
+It is typically faster than using `module spider` and also produces
+much more succinct output.
+
+-----
+mla CMake
+CMake/3.11.1
+CMake/3.11.4
+CMake/3.12.1
+CMake/3.13.3
+CMake/3.15.3
+CMake/3.16.4
+CMake/3.18.4
+-----
+
+Since the `foss/2020b` is the most recent version of the `foss` toolchain it
+makes sense to first check the most recent version of `CMake` for the compiler
+used to compile it.
+
+-----
+module spider CMake/3.18.4
+...
+    You will need to load all module(s) on any one of the lines below before the "CMake/3.18.4" module is available to load.
+
+      GCCcore/10.2.0
+...
+-----
+
+We have a match with the compiler used for `foss/2020b`, so we can replace
+version `3.12.1` of `CMake` in `builddependencies` with version `3.18.4`.
+
+In a similar vein we can discover that we need version `1.8.20` of
+`Doxygen`, version `0.29.2` of `pkg-config`, and version `1.74.0` of
+`Boost`. This will produce
+the following modified dependencies section.
+
+-----
+builddependencies = [
+    ('CMake', '3.18.4'),
+    ('Doxygen', '1.8.20'),
+    ('pkg-config', '0.29.2'),
+]
+
+dependencies = [
+    ('Boost', '1.74.0'),
+]
+-----
+
+Note that while previous versions of these packages might work to provide
+a successful compilation, there is no guarantee of this.
+It is good form and prevents backtracking to keep the compiler version
+the same throughout the `easyconfig` file.
+
+=== Example 3 - Compiling Instead of Loading Dependencies
+
+This example file for the Glasgow Haskell Compiler (GHC) demonstrates compiling rather than loading
+dependencies.  The GitHub location for this is:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GHC/GHC-8.6.5-x86_64.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GHC/GHC-8.6.5-x86_64.eb`]
+
+and the lengthy discussion leading to its final form is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/pull/11310[`https://github.com/easybuilders/easybuild-easyconfigs/pull/11310`]
+
+It is useful to read through such discussions as they give insight into how such problems are
+approached and finally resolved.  The procedure is typically not at all a monotonically progressive one,
+one can learn as much from failed attempts as from successful ones.
+
+The GMP and ncurses dependencies are compiled along with GHC instead of
+loading them.  As is explained in the comments, they are compiled to avoid diving even
+deeper into dependency hell.  
+Note the general structure used for such procedures in the
+template shown below.
+This structure uses some of the extra EasyConfig parameters specific to the `Bundle` EasyBlock
+as documented at:
+
+https://docs.easybuild.io/en/latest/version-specific/generic_easyblocks.html#bundle[`https://docs.easybuild.io/en/latest/version-specific/generic_easyblocks.html#bundle`]
+
+Default specifications to be used for every component are listed in the `default_component_specs`
+parameter.  The `start_dir` is the path in which the make process is to be started.
+The `components` parameter contains a list of the components to install.  This is a list of
+tuples with the `name`, `version`, `source_urls` and all of the other required and
+additional parameters used to specify individual source files.
+
+[source,python]
+.Multiple Compilations Template
+-----
+default_component_specs = {
+    'start_dir': '%(namelower)s-%(version)s',
+}
+components = [
+    ('GMP', '6.2.0', {
+        'source_urls': [GNU_SOURCE],
+        ...
+    }),
+    ('ncurses', '5.9', {
+        'source_urls': [GNU_SOURCE],
+        ...
+    }),
+    (name, version, {
+        'source_urls': ['https://downloads.haskell.org/~ghc/%(version)s/'],
+        ...
+    }),
+]
+-----
+
+While the whole point of EasyBuild is to enable you to compile one package at a time
+via specifying already compiled dependencies rather than backpedaling who knows how many
+times into the rabbit hole of dependency compilations, occasionally the compiled dependency hole
+can be a twisty maze all by itself.  Thus the ability to compromise as in this example.
+
+[source,python]
+.Example easyconfig File for GHC
+-----
+# This is a binary install that requires a './configure' and 'make install' steps for GHC.
+# We pull the centos7 binary tarball as is the one built against oldest system libs,
+# making it upwards compatible with newer distros.
+#
+# To get a functional 'ghc' binary on the SYSTEM toolchain we need
+# gmp headers and ncurses libtinfo.so.5, to avoid requiring extra OS deps for them
+# we include them in this bundle.
+# Binaries obtained with ghc do not require them, so it should be possible to use this bundle
+# just as builddep among different toolchains.
+#
+# For details, see the PR discussion:
+# https://github.com/easybuilders/easybuild-easyconfigs/pull/11310
+
+easyblock = 'Bundle'
+
+name = 'GHC'
+version = '8.6.5'
+versionsuffix = '-x86_64'
+
+homepage = 'https://haskell.org/ghc/'
+description = """The Glorious/Glasgow Haskell Compiler"""
+
+toolchain = SYSTEM
+
+builddependencies = [
+    ('binutils', '2.32'),
+]
+
+default_easyblock = 'ConfigureMake'
+
+local_distro_tarball = 'centos7'
+
+default_component_specs = {
+    'start_dir': '%(namelower)s-%(version)s',
+}
+components = [
+    ('GMP', '6.2.0', {
+        'source_urls': [GNU_SOURCE],
+        'sources': [SOURCELOWER_TAR_BZ2],
+        'checksums': ['f51c99cb114deb21a60075ffb494c1a210eb9d7cb729ed042ddb7de9534451ea'],
+        'configopts': ' --enable-cxx',
+    }),
+    ('ncurses', '5.9', {
+        'source_urls': [GNU_SOURCE],
+        'sources': [SOURCE_TAR_GZ],
+        'patches': [
+            'ncurses-%(version)s_configure_darwin.patch',
+            'ncurses-%(version)s_fix-missing-const.patch',
+        ],
+        'checksums': [
+            '9046298fb440324c9d4135ecea7879ffed8546dd1b58e59430ea07a4633f563b',
+            '8c471fc2b1961a6e6e5981b7f7b3512e7fe58fcb04461aa4520157d4c1159998',
+            '027f7bd5876b761b48db624ddbdd106fa1c535dfb2752ef5a0eddeb2a8896cfd',
+        ],
+        'preconfigopts': "export CPPFLAGS='-P' && ",
+        'configopts': ' --with-shared --enable-overwrite --with-termlib=tinfo',
+    }),
+    (name, version, {
+        'source_urls': ['https://downloads.haskell.org/~ghc/%(version)s/'],
+        'sources': ['%%(namelower)s-%%(version)s-x86_64-%s-linux.tar.xz' % local_distro_tarball],
+        'checksums': ['80ab566f4411299f9e5922d60749ca80f989d697db19e03ed875619d699f0edf'],
+        # ghc-8.6.5-x86_64-centos7-linux.tar.xz
+        'skipsteps': ['build'],
+        'preinstallopts': 'LD_LIBRARY_PATH="%(installdir)s/lib:$LD_LIBRARY_PATH" ',
+    }),
+]
+
+local_ncurses_libs = ["form", "menu", "ncurses", "panel", "tinfo"]
+
+sanity_check_paths = {
+    'files': ['lib/lib%s.%s' % (x, y) for x in ['gmp', 'gmpxx'] for y in [SHLIB_EXT, 'a']] +
+             ['include/gmp.h', 'include/gmpxx.h'] +
+             ['lib/lib%s%s.a' % (x, y) for x in local_ncurses_libs for y in ['', '_g']] +
+             ['lib/lib%s.%s' % (x, y) for x in local_ncurses_libs for y in [SHLIB_EXT]] +
+             ['bin/ghc', 'bin/ghci', 'bin/ghc-pkg', 'bin/runghc', 'bin/runhaskell'],
+    'dirs': ['bin', 'lib', 'share', 'include'],
+}
+
+sanity_check_commands = ['ghc --version']
+
+moduleclass = 'compiler'
+-----
+
+=== Available Easyconfig Parameters
+
+A list of all available parameters can be obtained via:
+
+-----
+eb [-a|--avail-easyconfig-params]
+-----
+
+The list is also available in the official documentation.
+
+https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html[`https://docs.easybuild.io/en/latest/version-specific/easyconfig_parameters.html`]
+
+=== Easyconfig Parameters Specific to a Software Package
+
+In addition to the `easyconfig` parameters commonly available to all software
+packages, there can be additional parameters available for a particular package.
+A list of `easyconfig` parameters specific to a particular `easyblock` - in this
+case the one for `bzip2` - can
+be found via:
+
+-----
+eb -a --easyblock EB_bzip2 | grep \*
+-----
+
+This will produce:
+
+-----
+Available easyconfig parameters (* indicates specific to the EB_bzip2 easyblock):
+build_cmd*              Build command to use [default: "make"]
+build_type*             Value to provide to --build option of configure script, e.g., x86_64-pc-linux-gnu (determined by config.guess shipped with EasyBuild if None, False implies to leave it up to the configure script) [default: None]
+configure_cmd*          Configure command to use [default: "./configure"]
+configure_cmd_prefix*   Prefix to be glued before ./configure [default: ""]
+host_type*              Value to provide to --host option of configure script, e.g., x86_64-pc-linux-gnu (determined by config.guess shipped with EasyBuild if None, False implies to leave it up to the configure script) [default: None]
+install_cmd*            Build command to use [default: "make install"]
+prefix_opt*             Prefix command line option for configure script ('--prefix=' if None) [default: None]
+tar_config_opts*        Override tar settings as determined by configure. [default: False]
+with_shared_libs*       Also build shared libraries [default: True]
+-----
+
+=== Easyconfig Templates
+
+In the `bzip2` example we see the `source` parameter specified as
+`[SOURCE_TAR_GZ]`.  This is an example of one of the many templates available
+for the `easyconfig` file.  A list of all of them can be
+obtained via:
+
+-----
+eb --avail-easyconfig-templates
+-----
+
+and also in the official documentation at:
+
+https://docs.easybuild.io/en/latest/version-specific/easyconfig_templates.html[`https://docs.easybuild.io/en/latest/version-specific/easyconfig_templates.html`]
+
+This `source` parameter value is an example of a template constant that is
+a convenient shorthand for a common value.  The value of:
+
+-----
+[SOURCE_TAR_GZ]
+-----
+
+is shorthand for:
+
+-----
+%(name)s-%(version)s.tar.gz
+-----
+
+with the latter expression evaluated by substituting the values of the `easyconfig` parameters
+`name` and `source` into the expression to obtain:
+
+-----
+bzip2-1.0.8.tar.gz
+-----
+
+
+
+
+== Easyblocks
+
+=== Introduction to easyblock Files
+
+https://docs.easybuild.io/en/latest/Implementing-easyblocks.html[`https://docs.easybuild.io/en/latest/Implementing-easyblocks.html`]
+
+The implementation of a particular software build and install procedure is done in a Python module called
+an easyblock.
+Each easyblock extends or replaces one or more of the
+basic functions in the general procedure used by the EasyBuild framework.
+
+There are software-specific and generic easyblocks.  The software-specific easyblocks implement
+a procedure customized for a single software package such as WRF.
+The generic easyblocks implement procedures that use standard tools such as CMake.
+
+When an easyconfig file is used to implement a build via `eb`, the EasyBuild framework will determine
+which easyblock should be used via either:
+
+* the value of the `easyblock` parameter specified within the easyconfig file; or
+
+* the name of the software package if the `easyblock` parameter is not specified.
+
+=== Obtaining a List of the easyblock File Used in Each easyconfig File
+
+It can be useful to have a list of easyconfig files that specify the use
+of a specific easyblock file.  Herein we'll obtain this information via the
+usual command-line wizardry.
+
+First, clone the easybuild_easyconfigs repository into your Github directory.
+Next, clone that into your local machine via:
+
+-----
+git clone https://github.com/skbaum/easybuild-easyconfigs
+-----
+
+Next, enter that directory and run `git grep` to find instances of `easyblock =` in each
+of the easyconfig files:
+
+-----
+cd easybuild-easyconfigs
+git grep "easyblock =" easybuild-easyconfigs-v4.4.0 | grep -v __archive__ | sed 's@.*/@@' > easyblocks_for_easyconfigs.txt
+-----
+
+The `easyblocks_for_easyconfigs.txt` file will contain nearly 10,000 lines looking something like this:
+
+-----
+to2-1.1.1-foss-2016b-Python-2.7.12.eb:easyblock = 'PythonPackage'
+3to2-1.1.1-intel-2016b-Python-2.7.12.eb:easyblock = 'PythonPackage'
+3to2-1.1.1-intel-2017a-Python-2.7.13.eb:easyblock = 'PythonPackage'
+4ti2-1.6.9-GCC-8.2.0-2.31.1.eb:easyblock = 'ConfigureMake'
+...
+zstd-1.4.4-GCCcore-9.3.0.eb:easyblock = 'ConfigureMake'
+zstd-1.4.5-GCCcore-10.2.0.eb:easyblock = 'ConfigureMake'
+zstd-1.4.9-GCCcore-10.3.0.eb:easyblock = 'ConfigureMake'
+-----
+
+To create lists of easyconfig files that use each easyblock type, first get a sorted list of all
+easyblock files (without the extraneous hierarchy apparatus):
+
+-----
+eb --list-easyblocks -t | awk '{ print $NF }' | sort > list_of_easyblocks.txt
+-----
+
+which will obtain:
+
+-----
+BinariesTarball
+Binary
+BuildEnv
+Bundle
+CMakeMake
+...
+Tarball
+Toolchain
+VersionIndependentPythonPackage
+VersionIndependentPythonPackage
+VSCPythonPackage
+VSCPythonPackage
+Waf
+-----
+
+Finally, here's a script that will will use both `list_of_easyblocks.txt` and
+`easyblocks_for_easyconfigs.txt` to enable you to interactively obtain a list of
+all easyconfig files that use a given easyblock file.  It will also allow you to optionally
+choose to automatically download one of them from the Github repository.
+
+-----
+#!/bin/sh
+
+basedir=/home/baum/eb
+cd $basedir
+
+if [ $# -eq 0 ]
+then
+   echo " "
+   echo " No easyblock name specified on command line. Choose from this list."
+   echo "   "
+   echo `cat $basedir/list_of_easyblocks.txt`
+   echo " "
+else
+   ebsort="easyconfigs_with_$1.txt"
+   echo " "
+   echo " Finding easyconfigs that use $1:"
+   echo "*****" > $ebsort
+   echo "* $1" >> $ebsort
+   echo "*****" >> $ebsort
+   cat $basedir/easyblocks_for_easyconfigs.txt | grep "'$1'" | sed "s/:.*//" >> $ebsort
+   echo " "
+   cat $basedir/easyblocks_for_easyconfigs.txt | grep "'$1'" | sed "s/:.*//"
+   echo " "
+   echo " These have been saved in the file: $ebsort"
+   echo " "
+   echo " Enter full name of one of these to download it.  Enter nothing to exit."
+   echo " "
+   read -r ebdownload
+   if [ -z "$ebdownload" ]
+   then
+     exit
+   else
+     ebd="${ebdownload:0:1}"
+     name=`echo $ebdownload | sed 's/-[[:digit:]].*//g'`
+
+     wget https://raw.githubusercontent.com/easybuilders/easybuild-easyconfigs/develop/easybuild/easyconfigs/${ebd,}/$name/$ebdownload
+   fi
+fi
+-----
+
+== Installation
+
+
+
+=== Prerequisites
+
+
+
+==== Lua
+
+
+The Lmod installation instructions are at:
+
+https://lmod.readthedocs.io/en/latest/030_installing.html[`https://lmod.readthedocs.io/en/latest/030_installing.html`]
+
+and start with the installation of Lua.
+This is done on RedHat/CentOS/etc. variants via:
+
+-----
+dnf install lua lua*-bitop lua*-devel lua*-json lua*-lpeg lua*-posix lua*-term
+-----
+
+
+=== Lmod
+
+*How to Transition to Lmod (or how too test Lmod without installing it for all)* - https://lmod.readthedocs.io/en/latest/045_transition.html[`https://lmod.readthedocs.io/en/latest/045_transition.html`]
+
+You download Lmod at the ever-changing and -annoying SourceForge at:
+
+https://sourceforge.net/projects/lmod/[`https://sourceforge.net/projects/lmod/`]
+
+After watching the fascinating countdown and perusing the ads you will obtain
+something like:
+
+-----
+Lmod-8.5.tar.bz2
+-----
+
+==== Quick Default Installation
+
+To perform a quick install of Lmod with default configuration options:
+
+-----
+mkdir ~/easybuild
+mv Lmod-8.5.tar.bz2 ~/easybuild
+cd ~/easybuild
+tar xjvf Lmod-8.5.tar.bz2
+cd Lmod-8.5
+./configure --prefix=/home/baum/easybuild
+-----
+
+The configuration step will result in the usual tests scrolling by with a summary
+like the following at the end:
+
+-----
+----------------------------------- SUMMARY ----------------------------------
+
+Package version............................................. : Lmod-8.5
+Package version (git) ...................................... :
+
+LUA_INCLUDE................................................. : /usr/include
+Lua executable.............................................. : /usr/bin/lua
+Luac executable............................................. : /usr/bin/luac
+User Controlled Prefix...................................... : no
+Prefix...................................................... : /home/baum/easybuild
+Actual Install dir.......................................... : /home/baum/easybuild/lmod/8.5
+
+MODULEPATH_ROOT............................................. : /home/baum/easybuild/modulefiles
+Wait (s) before rebuilding cache............................ : 86400
+Allow Duplicate Paths....................................... : no
+Do not save Cache if build time < .......................... : 2
+SPIDER_CACHE_DIRS........................................... :
+Prepending multiple dirs (NORMAL / REVERSED)................ : normal
+Colorized output supported.................................. : yes
+File that is touched when system is updated................. :
+Allow duplicate entry in PATHs.............................. : no
+Allow tcl modulefiles....................................... : yes
+ZSH Tab Completion Functions Site Directory................. :
+Use Dot files in ~/.lmod.d.................................. : yes
+Full Settarg support........................................ : no
+Have lua-term............................................... : yes
+Have luafilesystem.......................................... :
+Support Auto Swap when using families....................... : yes
+Export the module shell function in Bash.................... : yes
+Disable same name autoswapping.............................. : no
+Use Spider Cache on Loads................................... : no
+Pager used inside Lmod...................................... : /usr/bin/less
+System LD_PRELOAD........................................... :
+System LD_LIBRARY_PATH...................................... : /usr/lib64/mpich/lib
+Hashsum program used........................................ : /usr/bin/sha1sum
+Site Name................................................... : <empty>
+SYSHOST..................................................... : <empty>
+Site Message file........................................... : <empty>
+Override $LANG Language for error etc....................... : <empty>
+Which LuaFileSystem is being used........................... : Built-in
+Use italic instead of faint for hidden modules.............. : no
+If path entry is already there then don't prepend........... : no
+Use Tmod Find First rule instead of Find Best for defaults.. : no
+MODULEPATH Initial file..................................... : @PKG@/init/.modulespath
+Use built-in lua packages instead of system provided pkgs... : no
+Silence shell debugging output for bash/zsh................. : no
+Allow root to use Lmod...................................... : yes
+Support KSH................................................. : no
+Use the fast TCL interpreter................................ : yes
+Display Extensions w/ module avail.......................... : yes
+Allow for extended default.(ml intel/17 #-> intel/17.0.4)... : yes
+------------------------------------------------------------------------------
+-----
+
+******************************************************************************
+
+Lmod overwrites the env var BASH_ENV to make the module command available in
+bash scripts. If your site does not set BASH_ENV then you can ignore the
+comments below.
+
+If your site already uses BASH_ENV to point to a site specific script, please
+consider sourcing Lmod's init/bash from your site's file.
+
+BASH_ENV is defined both in:
+   /home/baum/easybuild/lmod/8.5/init/profile
+   /home/baum/easybuild/lmod/8.5/init/cshrc
+
+******************************************************************************
+
+
+******************************************************************************
+
+Lmod is exporting the module command for Bash users. Some sites may have some
+problems. First:
+
+* Make sure that all your machines have shellshock bash patch.
+
+If that does not fix things then you have two choices:
+
+* You configure Lmod not to export the module command.
+* You can filter out the exported functions in the users environment
+       during job submission
+
+If there is a way to do step 2, please try to do so. Otherwise do step 1.
+The advantage of exporting the module command is that it is defined in
+/bin/sh scripts. Because Lmod defines BASH_ENV to point to init/bash,
+it will be defined for /bin/bash scripts.  The trouble is that users
+have to remember to put #!/bin/bash at the first line of their shell
+script to make that work. We used to see tickets where users would
+submit jobs as /bin/sh scripts and wonder why the module command did
+not work.
+
+******************************************************************************
+
+
+Configure complete, Now do:
+
+-----
+    $ make install       # -> A complete install
+-----
+or
+-----
+    $ make pre-install   # -> Install everything but the symbolic link
+-----
+
+https://www.linode.com/docs/guides/patching-bash-for-the-shellshock-vulnerability/[`https://www.linode.com/docs/guides/patching-bash-for-the-shellshock-vulnerability/`]
+
+
+
+
+

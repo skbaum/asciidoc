@@ -1,0 +1,303 @@
+
+= Technical Documentation
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Cartopy Recipes
+
+Cartopy is a Python package designed for geospatial data processing in order to produce maps and other geospatial data analyses.
+Here are some recipes about how to do basic things since most of the examples found on the internet combine several
+things, typically to the point of confusion.
+
+http://pong.tamu.edu/\~baum/cartopy.html[`http://pong.tamu.edu/~baum/cartopy.html`]
+
+== Conda Recipes
+
+A beginner's guide and reference for using Conda.
+
+http://pong.tamu.edu/\~baum/conda.html[`http://pong.tamu.edu/~baum/conda.html`]
+
+== CTD Data Storage and Serving Options
+
+An overview of the options for storing Conductivity/Temperature/Depth (CTD) files (e.g. in netCDF files) as
+well as ways to serve them on the web.  Somewhat dated.
+
+http://pong.tamu.edu/\~baum/ctd.html[`http://pong.tamu.edu/~baum/ctd.html`]
+
+== Dash Recipes
+
+http://pong.tamu.edu/\~baum/dash.html[`http://pong.tamu.edu/~baum/dash.html`]
+
+== Docker for Beginners
+
+How to install and spin up on Docker, although the jury's still out on its usefulness.
+
+http://pong.tamu.edu/\~baum/docker.html[`http://pong.tamu.edu/~baum/docker.html`]
+
+== ERDDAP/THREDDS
+
+=== ADCP Files on ERDDAP
+
+How to make ADCP files available via ERDDAP.
+
+http://pong.tamu.edu/\~baum/adcp_erddap.html[`http://pong.tamu.edu/~baum/adcp_erddap.html`]
+
+=== CAGES Data in ERDDAP
+
+A detailed look at how CAGES data in mySQL and PostgreSQL formats was prepared for serving via ERDDAP.
+
+http://pong.tamu.edu/\~baum/cages.html[`http://pong.tamu.edu/~baum/cages.html`]
+
+=== CF on ERDDAP
+
+How the CF discrete sampling geometry conventions are used with ERDDAP.
+
+http://pong.tamu.edu/\~baum/cf_erddap.html[`http://pong.tamu.edu/~baum/cf_erddap.html`]
+
+=== CTD Files on ERDDAP
+
+How to make CTD files available on ERDDAP.
+This has been superseded by the GCOOS ERDDAP guide.
+
+http://pong.tamu.edu/\~baum/ctd_erddap.html[`http://pong.tamu.edu/~baum/ctd_erddap.html`]
+
+=== ERDDAP Overview
+
+An overview of how to install ERDDAP and prepare and serve datasets.  Somewhat dated.
+
+http://pong.tamu.edu/\~baum/erddap.html[`http://pong.tamu.edu/~baum/erddap.html`]
+
+=== GCOOS ERDDAP Guide
+
+This document details the basic steps for setting up ERDDAP and preparing and serving CF-compliant netCDF files from it.
+It was created specifically for preparing datasets to meet GCOOS standards, but has more general applicability.
+
+http://pong.tamu.edu/\~baum/erd.html[`http://pong.tamu.edu/~baum/erd.html`]
+
+=== GRIIDC Attribute Requirements
+
+An overview of netCDF attribute requires for GRIIDC versus other requirements.
+
+http://pong.tamu.edu/\~baum/attributes.html[`http://pong.tamu.edu/~baum/attributes.html`]
+
+=== THREDDS Documentation
+
+A distillation of the greatly scattered THREDDS documentation into a single and hopefully coherent whole.
+Somewhat dated.
+
+http://pong.tamu.edu/\~baum/thredds2.html[`http://pong.tamu.edu/~baum/thredds2.html`]
+
+=== THREDDS Examples
+
+Several examples on how to prepare the configuration files for THREDDS.
+
+http://pong.tamu.edu/\~baum/thredds_examples.html[`http://pong.tamu.edu/~baum/thredds_examples.html`]
+
+=== THREDDS for Satellite Data
+
+How the HDF and netCDF files from LSU/ESL and USF/IMaRS were prepared for THREDDS.
+
+http://pong.tamu.edu/\~baum/thredds-hdf-lsu.html[`http://pong.tamu.edu/~baum/thredds-hdf-lsu.html`]
+
+=== THREDDS on Docker
+
+How to run THREDDS using Docker.
+
+http://pong.tamu.edu/\~baum/thredds-docker.html[`http://pong.tamu.edu/~baum/thredds-docker.html`]
+
+=== WAF for ERDDAP
+
+An overview of the Web Accessible Folder (WAF) and its usage with ERDDAP.
+
+http://pong.tamu.edu/\~baum/waf.html[`http://pong.tamu.edu/~baum/waf.html`]
+
+== Git for Beginners
+
+How to start with git.
+
+http://pong.tamu.edu/\~baum/git.html[`http://pong.tamu.edu/~baum/git.html`]
+
+== Intel Python Notes
+
+How to obtain, install and use the Intel Python Anaconda distribution.
+
+http://pong.tamu.edu/\~baum/intel_python.html[`http://pong.tamu.edu/~baum/intel_python.html`]
+
+== Julia Software for Geoscience  Etc.
+
+Julia software that is useful for geoscience applications.
+
+http://pong.tamu.edu/\~baum/geojulia.html[`http://pong.tamu.edu/~baum/geojulia.html`]
+
+== Jupyter Notes
+
+How to set up and run Jupyter for single and multiple users, and a listing
+of extensions.
+
+http://pong.tamu.edu/\~baum/jupyter.html[`http://pong.tamu.edu/~baum/jupyter.html`]
+
+== Lagrangian Methods in Oceanography
+
+The increasing usage of Lagrangian methods in oceanography to find coherent structures, etc.
+
+http://pong.tamu.edu/\~baum/lagrangian.html[`http://pong.tamu.edu/~baum/lagrangian.html`]
+
+== Machines
+
+Information about machines being administrated.
+
+http://pong.tamu.edu/\~baum/machines.html[`http://pong.tamu.edu/~baum/machines.html`]
+
+== GCOOS Mapserver Report
+
+Final report on how Mapserver was set up to provide GCOOS products.
+
+http://pong.tamu.edu/\~baum/gcoos.html[`http://pong.tamu.edu/~baum/gcoos.html`]
+
+=== Mapserver and OGC
+
+How to set up Mapserver to supply various OGC services.
+
+http://pong.tamu.edu/\~baum/ogc.html[`http://pong.tamu.edu/~baum/ogc.html`]
+
+== NAM/NARR Grids
+
+The details of the curvilinear grids used by the NOAA NAM and NARR regional atmospheric circulation models.
+These are used to force the TGLO/TABS ROMS model in the Gulf of Mexico, and the surface wind from them is
+used as forcing for ROMS.  The NAM grid must be interpolated to the ROMS grid.
+
+http://pong.tamu.edu/\~baum/nam_grid.html[`http://pong.tamu.edu/~baum/nam_grid.html`]
+
+=== NARR Fields
+
+An earlier overview of how the NARR files were processed.
+
+http://pong.tamu.edu/\~baum/narr.html[`http://pong.tamu.edu/~baum/narr.html`]
+
+== NetCDF Recipes
+
+Recipes for dealing with creating, reading and transmogrifying netCDF files using netCDF operators (NC),
+the Python interface (netcdf4-python), and xarray.
+
+http://pong.tamu.edu/\~baum/netcdf_recipes.html[`http://pong.tamu.edu/~baum/netcdf_recipes.html`]
+
+== NFS on Linux
+
+How to install and use NFS on Linux.
+
+http://pong.tamu.edu/\~baum/nfs.html[`http://pong.tamu.edu/~baum/nfs.html`]
+
+== OPeNDAP Overview
+
+An overview of the capabilities of the OPeNDAP server for geoscience data.
+
+http://pong.tamu.edu/\~baum/bp.html[`http://pong.tamu.edu/~baum/bp.html`]
+
+== Python Software for Geoscience
+
+Python software that is useful for geoscience applications.
+
+http://pong.tamu.edu/\~baum/geopy.html[`http://pong.tamu.edu/~baum/geopy.html`]
+
+== Python Software
+
+A mind-numbingly long list of interesting Python software started at SciPy 2015.
+
+http://pong.tamu.edu/\~baum/soft-new.html[`http://pong.tamu.edu/~baum/soft-new.html`]
+
+== Python Software for HPC
+
+Python sofware that takes advantage of multiple cores, clusters and/GPUs to speed things up.
+
+http://pong.tamu.edu/\~baum/pyhpc.html[`http://pong.tamu.edu/~baum/pyhpc.html`]
+
+== River Discharge Data
+
+The details of how the acquisition of river discharge data was automated via Python tools.
+
+http://pong.tamu.edu/\~baum/river.html[`http://pong.tamu.edu/~baum/river.html`]
+
+== ROCKS Guide
+
+A guide to using the NPACI ROCKS software to spin up a machine cluster.  Somewhat dated.
+
+http://pong.tamu.edu/\~baum/npaci.html[`http://pong.tamu.edu/~baum/npaci.html`]
+
+== ROMS for Beginners
+
+The Region Ocean Modeling System (ROMS) is an ocean circulation model used for regional rather than global
+numerical simulations of ocean currents.  This is a tutorial for beginners.
+
+http://pong.tamu.edu/\~baum/roms.html[`http://pong.tamu.edu/~baum/roms.html`]
+
+== ROMS TGLO/TABS Forcing
+
+How the forcing fields are obtained and processed from NOAA for the TGLO/TABS Gulf of Mexico simulations.
+
+http://pong.tamu.edu/\~baum/forcing.html[`http://pong.tamu.edu/~baum/forcing.html`]
+
+== ROMS QuikSCAT Winds
+
+How the QuikSCAT winds were obtained and prepared for ROMS.
+
+http://pong.tamu.edu/\~baum/quikscat.html[`http://pong.tamu.edu/~baum/quikscat.html`]
+
+== SSH Notes
+
+An introduction to SSH and how to install and maintain OpenSSH on CentOS servers.
+
+http://pong.tamu.edu/\~baum/ssh.html[`http://pong.tamu.edu/~baum/ssh.html`]
+
+== SSL Certificates on CentOS
+
+How to obtain and install SSL certificates on CentOS servers.
+
+http://pong.tamu.edu/\~baum/cert.html[`http://pong.tamu.edu/~baum/cert.html`]
+
+== TABS Scripts
+
+A listing of the scripts written and used by Matt Howard on the former abcmgr machine to create various
+output products from the ROMS TGLO/TABS Gulf of Mexico simulations.
+
+http://pong.tamu.edu/\~baum/tabs_system.html[`http://pong.tamu.edu/~baum/tabs_system.html`]
+
+== TGLO/TABS Manual
+
+A manual of how the TGLO/TABS Gulf of Mexico surface circulation prediction system works, and how to use it.
+
+http://pong.tamu.edu/\~baum/manual.html[`http://pong.tamu.edu/~baum/manual.html`]
+
+== TeX Software
+
+Tex-related software that extends or uses TeX for typsetting tasks.
+
+http://pong.tamu.edu/\~baum/texstuff.html[`http://pong.tamu.edu/~baum/texstuff.html`]
+
+== Unstructured Grids
+
+The various ways used to handled unstructured grids - that is, anything that is not rectangular - in the geosciences.
+
+http://pong.tamu.edu/\~baum/grids.html[`http://pong.tamu.edu/~baum/grids.html`]
+
+== Virtual Environments and Software Package Managers
+
+A listing of available virtual software environments such as conda, modules and software collections.
+A virtual environment is a tool that helps to keep dependencies required by different projects separate by creating isolated spaces for them that contain per-project dependencies for them.
+Also listed are package managers such as easybuild, spack and nix, which are collections of software tools that automates the process of installing, upgrading, configuring, and removing computer programs for a computer's operating system in a consistent manner.
+There is some overlap between the two concepts.
+
+http://pong.tamu.edu/\~baum/virtenv.html[`http://pong.tamu.edu/~baum/virtenv.html`]
+
+== Wavelets
+
+A guide to wavelets and wavelet literature.  Somewhat dated.
+
+http://pong.tamu.edu/\~baum/wavelets.html[`http://pong.tamu.edu/~baum/wavelets.html`]
+
+
+

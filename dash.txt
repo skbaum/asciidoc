@@ -1,0 +1,436 @@
+Dash
+====
+Steven K. Baum
+v0.1, 2021-01-19
+:doctype: book
+:toc:
+:icons:
+:source-highlighter: coderay
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+Dash is a productive Python framework for building web analytic applications.
+Written on top of Flask, Plotly.js, and React.js, Dash is ideal for building data visualization apps with highly custom user interfaces in pure Python.
+
+Example
+~~~~~~~
+
+https://dash.plotly.com/layout[`https://dash.plotly.com/layout`]
+
+The dash library must be installed:
+
+-----
+pip install dash
+-----
+
+[source,python]
+-----
+# -*- coding: utf-8 -*-
+
+# Run this app with `python app.py` and
+# visit http://127.0.0.1:8050/ in your web browser.
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import plotly.express as px
+import pandas as pd
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# assume you have a "long-form" data frame
+# see https://plotly.com/python/px-arguments/ for more options
+df = pd.DataFrame({
+    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+    "Amount": [4, 1, 2, 2, 4, 5],
+    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+})
+
+fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+
+app.layout = html.Div(children=[
+    html.H1(children='Hello Dash'),
+
+    html.Div(children='''
+        Dash: A web application framework for Python.
+    '''),
+
+    dcc.Graph(
+        id='example-graph',
+        figure=fig
+    )
+])
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+If you point the browser at:
+
+http://127.0.0.1:8050/
+
+you will see the resulting web page.
+
+Multiple Graphs Example
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This example uses Dash building blocks and the Quandl stats library,  which must be separately installed as:
+
+-----
+pip install dash_building_blocks
+pip install quandl
+-----
+
+https://dash-building-blocks.readthedocs.io/en/latest/examples/multigraph.html
+
+[source,python]
+-----
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_building_blocks as dbb
+
+import quandl
+
+class Graph(dbb.Block):
+
+    def layout(self):
+        return html.Div([
+            dcc.Dropdown(
+                id=self.register('dropdown'),
+                options=self.data.options,
+                value=self.data.value
+            ),
+            dcc.Graph(id=self.register('graph'))
+        ], style={'width': '500'})
+
+    def callbacks(self):
+        @self.app.callback(
+            self.output('graph', 'figure'),
+            [self.input('dropdown', 'value')]
+        )
+        def update_graph(selected_dropdown_value):
+            df = quandl.get(selected_dropdown_value)
+            return {
+                'data': [{
+                'x': df.index,
+                'y': df.Last
+                }],
+                'layout': {'margin': {'l': 40, 'r': 0, 't': 20, 'b': 30}}
+            }
+
+app = dash.Dash('Hello World')
+
+options=[
+    {'label': 'Poxel', 'value': 'EURONEXT/POXEL'},
+    {'label': 'Orange', 'value': 'EURONEXT/ORA'},
+    {'label': 'TechnipFMC', 'value': 'EURONEXT/FTI'}
+]
+
+data = {
+    'options': options,
+    'value': 'EURONEXT/POXEL'
+}
+
+n_graphs = 2
+graphs = [Graph(app, data) for _ in range(n_graphs)]
+
+app.layout = html.Div(
+    [html.Div(graph.layout, className='six columns')
+    for graph in graphs],
+    className='container'
+)
+
+for graph in graphs:
+    graph.callbacks()
+
+app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+Grid of Graphs
+~~~~~~~~~~~~~~
+
+https://dash-bootstrap-components.opensource.faculty.ai/
+
+https://stackoverflow.com/questions/60299299/grid-dashboard-with-plotly-dash
+
+https://dash-bootstrap-components.opensource.faculty.ai/docs/components/layout/
+
+The Dash bootstrap components must be installed:
+
+-----
+pip install dash-bootstrap-components
+-----
+
+A minimal example is:
+
+[source,python]
+-----
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
+
+#  The stylesheet is required to get the columns to work correctly.
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+app.layout = html.Div(
+    [
+        dbc.Row(
+            [
+                dbc.Col(html.Div("Row 0, Column 0"),width=4),
+                dbc.Col(html.Div("Row 0, Column 1"),width=4),
+                dbc.Col(html.Div("Row 0, Column: 2"),width=4)
+            ]
+        )
+     ]
+   )
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+A more complex example is:
+
+[source,python]
+-----
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
+
+#  The stylesheet is required to get the columns to work correctly.
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+def create_card(card_id, title, description):
+    return dbc.Card(
+        dbc.CardBody(
+            [
+                html.H4(title, id=card_id + "-" + title),
+                html.H2("100", id=card_id + "- 100"),
+                html.P(description, id=card_id + "-" + description)
+            ]
+        )
+    )
+
+app.layout = html.Div([
+    dbc.Row([
+        dbc.Col([create_card('card1', 'Title1', 'Description1')]),
+        dbc.Col([create_card('card2', 'Title2', 'Description2']])
+    ]),
+    dbc.Row([
+        dbc.Col([create_card('card3', 'Title3', 'Description3')]),
+        dbc.Col([create_card('card4', 'Title4', 'Description4')])
+    ])
+])
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+Graph Grid Generator 2
+~~~~~~~~~~~~~~~~~~~~~~
+
+https://community.plotly.com/t/show-and-tell-dash-grid-generator/10148
+
+This is installed as:
+
+-----
+pip install dash-ui
+-----
+
+[source, python]
+-----
+from dash import Dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+import dash_ui as dui
+import pandas as pd
+import plotly.graph_objs as go
+
+df = pd.read_csv(
+    'https://gist.githubusercontent.com/chriddyp/'
+    'c78bf172206ce24f77d6363a2d754b59/raw/'
+    'c353e8ef842413cae56ae3920b8fd78468aa4cb2/'
+    'usa-agricultural-exports-2011.csv')
+
+app = Dash()
+my_css_urls = [
+  "https://codepen.io/rmarren1/pen/mLqGRg.css",
+]
+
+for url in my_css_urls:
+    app.css.append_css({
+        "external_url": url
+    })
+
+grid = dui.Grid(grid_id="grid", num_rows=12, num_cols=12, grid_padding=5)
+
+grid.add_graph(col=1, row=1, width=3, height=4, graph_id="all-pie")
+
+grid.add_graph(col=4, row=1, width=9, height=4, graph_id="all-bar")
+
+grid.add_graph(col=1, row=5, width=4, height=4, graph_id="produce-pie")
+
+grid.add_element(
+    col=5, row=5, width=4, height=4,
+    element=html.Div([
+        html.H1("Dash UI Grid: US Agriculture Example"),
+        html.H3("Choose a State"),
+        dcc.Dropdown(
+            id="state-dropdown",
+            options=[{'label': x.title(), 'value': x}
+                     for x in df["state"].tolist()],
+            value=df["state"].tolist()[0])
+        ], style={
+            "background-color": "Azure",
+            "border-radius": "5px",
+            "height": "100%",
+            "width": "100%",
+            "padding": "2px",
+            "text-align": "center"})
+    )
+
+grid.add_graph(col=9, row=5, width=4, height=4, graph_id="animal-pie")
+
+grid.add_graph(col=1, row=9, width=9, height=4, graph_id="total-exports-bar")
+
+grid.add_graph(col=10, row=9, width=3, height=4, graph_id="total-exports-pie")
+
+
+app.layout = html.Div(grid.get_component(), style={
+    "height": "calc(100vh - 20px)",
+    "width": "calc(100vw - 20px)"
+})
+
+#... plot callbacks ...
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+Display Image Files
+~~~~~~~~~~~~~~~~~~~
+
+https://community.plotly.com/t/adding-local-image/4896/9
+
+The correct approach with the current version of dash is to use the assets system. You can
+put your image files in the assets folder, and use `app.get_asset_url('my-image.png')` to
+get the url to the image.
+The assets folder is created relative to your application file, e.g.
+
+-----
+app.py
+assets/
+-----
+
+and the image file is referenced as:
+
+[source,python]
+-----
+import dash
+import dash_html_components as html
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div(html.Img(src=app.get_asset_url('yoda_gloves.jpg')))
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+You can also encode an image as a base64 string.
+This will display the image `bornholio.jpg` at the designated URL and port.
+Note that the `assets` subdirectory is not used here.
+
+[source,python]
+-----
+import dash
+import dash_html_components as html
+import dash_core_components as dcc
+import dash_bootstrap_components as dbc
+import base64
+
+#app = dash.Dash(__name__])
+app = dash.Dash()
+
+image_filename = '/home/baum/Downloads/borgholio.jpg'
+encoded_image = base64.b64encode(open(image_filename, 'rb').read())
+
+app.layout = html.Div([
+    html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()))
+])
+
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port='8050',debug=True)
+-----
+
+Add Matplotlib Plots
+~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/4QuantOSS/DashIntro/blob/master/notebooks/Tutorial.ipynb
+
+[source,python]
+-----
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np
+from io import BytesIO
+import base64
+def fig_to_uri(in_fig, close_all=True, **save_args):
+    # type: (plt.Figure) -> str
+    """
+    Save a figure as a URI
+    :param in_fig:
+    :return:
+    """
+    out_img = BytesIO()
+    in_fig.savefig(out_img, format='png', **save_args)
+    if close_all:
+        in_fig.clf()
+        plt.close('all')
+    out_img.seek(0)  # rewind file
+    encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
+    return "data:image/png;base64,{}".format(encoded)
+app_iplot = dash.Dash()
+
+app_iplot.layout = html.Div([
+    dcc.Input(id='plot_title', value='Type title...', type="text"),
+    dcc.Slider(
+        id='box_size',
+        min=1,
+        max=10,
+        value=4,
+        step=1,
+        marks=list(range(0, 10))
+    ),
+    html.Div([html.Img(id = 'cur_plot', src = '')],
+             id='plot_div')
+])
+
+@app_iplot.callback(
+    Output(component_id='cur_plot', component_property='src'),
+    [Input(component_id='plot_title', component_property='value'), Input(component_id = 'box_size', component_property='value')]
+)
+def update_graph(input_value, n_val):
+    fig, ax1 = plt.subplots(1,1)
+    np.random.seed(len(input_value))
+    ax1.matshow(np.random.uniform(-1,1, size = (n_val,n_val)))
+    ax1.set_title(input_value)
+    out_url = fig_to_uri(fig)
+    return out_url
+
+show_app(app_iplot)
+-----
+
+

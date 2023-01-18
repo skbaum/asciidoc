@@ -1,0 +1,211 @@
+How to Obtain and Install an SSL Certificate
+============================================
+Steven K. Baum
+v0.1, 2016-08-07
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Summary
+-------
+
+This is a quick and dirty guide to obtaining a signed SSL certificate for a machine
+in the +tamu.edu+ hierarchy, and then installing it on a CentOS 7 machine running the
+Apache HTTPD server.  If this isn't your exact situation, then your mileage may very well
+vary.
+
+Obtaining the Certificate
+-------------------------
+
+Go to:
+
+https://cert.tamu.edu[+https://cert.tamu.edu+]
+
+Sign in.
+
+Go to the CSR resource page at:
+
+https://cert.tamu.edu/docs/csr/[+https://cert.tamu.edu/docs/csr/+]
+
+and cut and paste the Python script found there into +cert.py+.
+Make +cert.py+ executable via:
+
++chmod a+x cert.py+
+
+As root, run the script as follows:
+
++./cert.py machine.tamu.edu > cert.machine+
+
+where +machine+ is the name of the machine.
+
+Self-Signed Certificate
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This will create the file:
+
+-----
+/etc/pki/tls/certs/machine.tamu.edu.cert
+-----
+
+This is the self-signed certificate.  It is created in PEM format, which is the standard format for OpenSSL and many other SSL tools. This format is designed to be safe for inclusion in ascii or even rich-text documents, such as emails. This means that you can simple copy and paste the content of a pem file to another document and back.
+
+In the script this is created with the command:
+
+-----
+openssl req -config cnffile -new -nodes -key keyfile -out csrfile
+-----
+
+Certificate Service Request File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+and the file:
+
+-----
+/etc/pki/tls/certs/machine.tamu.edu.csr
+-----
+
+This is the Certificate Service Request (CSR) file that will be inserted into the
+certificate request page at https://cert.tamu.edu/request/add/[+https://cert.tamu.edu/request/add/+].
+It is created in PEM format.
+
+
+RSA Private Key File
+~~~~~~~~~~~~~~~~~~~~
+
+-----
+/etc/pki/tls/private/machine.tamu.edu.key
+-----
+
+This is the RSA private key file.  It is created in PEM format.
+
+or if there are one or more alternate names for the machine:
+
+-----
+gcoos3.tamu.edu-san.key
+-----
+
+Go to the page for submitting new requests at:
+
+https://cert.tamu.edu/request/add/[+https://cert.tamu.edu/request/add/+]
+
+and cut and paste the +machine.tamu.edu.csr+ file into the *Request* box.
+
+If the machine has one or more aliases, check the *Unified Communications Certificate*
+box and enter the aliases into the *Alternate Names* box that will appear.  
+
+Click the *Submit Request* button, and check the *Open Requests* page at:
+
+https://cert.tamu.edu/request/[+https://cert.tamu.edu/request/+]
+
+to see if the request showed up there, and to see the status of the request.  It will
+initially say *New Request*, but after a day or so it will change to
+*Certificate Ready for Download*.  When it does so, click on the machine name to go
+to the request page for that machine, and then click on the *Download Certificate* link
+at the bottom of the page.
+
+This will take you to the *Certificate Manager* page where you will be given a choice
+to download the certificate in several formats.  The choices and the resulting form of the
+file name are shown below.
+
+*PKCS#7 Binary*: +machine_tamu_edu.p7b+
+
+*PKCS#7 Base 64*: +machine_tamu_edu.crt+
+
+*X509 Base64*:  +machine_tamu_edu.cer+
+
+*X509 Base64 Certificate only*:  +machine_tamu_edu_cert.cer+
+
+*X509 Base64 Intermediates only*:  +machine_tamu_edu_interm.cer+
+
+The ones needed for CentOS/Apache HTTPD are +machine_tamu_edu_cert.cer+ and
++machine_tamu_edu_interm.cer+.
+
+
+Installing the Certificates into the Apache Configuration
+---------------------------------------------------------
+
+Copy the +machine_tamu_edu_cert.cer+ and
++machine_tamu_edu_interm.cer+ files to +/etc/pki/tls/certs/+.
+
+Edit the file:
+
++/etc/httpd/conf.d/ssl.conf+
+
+and add the following lines:
+
+-----
+SSLCertificateFile /etc/pki/tls/certs/machine_tamu_edu_cert.cer
+SSLCertificateKeyFile /etc/pki/tls/private/machine.tamu.edu.key
+SSLCertificateChainFile /etc/pki/tls/certs/machine_tamu_edu_interm.cer
+-----
+
+Testing the Certificate
+-----------------------
+
+Restart the HTTP server via:
+
++systemctl restart httpd+
+
+and attempt to access the server via:
+
++https://machine.tamu.edu+
+
+which should work the same as attempting to access:
+
++http://machine.tamu.edu+
+
+Debugging
+---------
+
+If (i.e. when) something doesn't work, look in the SSL logs, i.e.
+
+-----
+/var/log/httpd/ssl_error_log
+/var/log/httpd/ssl_access_log
+-----
+
+A general procedure is to attempt to restarted the HTTPD server in one terminal via:
+
++systemctl restart httpd+
+
+while looking at the error log in another terminal:
+
++tail -f /var/log/httpd/ssl_error_log+
+
+Using the Wrong File for the Certificate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When I initially used the wrong file as +SSLCertificateFile+ I found the following
+error message found in +/var/log/httpd/ssl_error_log+:
+
+-----
+[Wed Aug 10 13:08:53.592164 2016] [ssl:warn] [pid 19494] AH01909: RSA certificate configured for machine.tamu.edu:443 does NOT include an ID which matches the server name
+-----
+
+A bit of searching led to the following diagnostic suggestion:
+
++openssl x509 -in [SSLCertificateFile name] -noout -subject+
+
+The file I first tried to use as the +SSLCertificateFile+ was +machine_tamu_edu.cer+ which gave me:
+
+-----
+openssl x509 -in machine_tamu_edu.cer -noout -subject
+subject= /C=SE/O=AddTrust AB/OU=AddTrust External TTP Network/CN=AddTrust External CA Root
+-----
+
+The +CN+ in the correct certificate file should be followed by the fully qualified
+domain name (FQDN).  When I used the correct certificate file +machine_tamu_edu_cert.cer+ I
+obtained:
+
+-----
+openssl x509 -in machine_tamu_edu_cert.cer -noout -subject
+subject= /C=US/postalCode=77843-3363/ST=TX/L=College Station/street=MS 3363/street=Texas A&M IT/street=Texas A&M University/O=Texas A & M University/OU=Texas A&M IT/CN=machine.tamu.edu
+-----
+
+which does contain the FQDN after +CN+.  I was able to successfully restart the HTTPD server
+when this file was used for +SSLCertificateFile+ in +/etc/httpd/conf.d/ssl.conf+.
+

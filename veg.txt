@@ -1,0 +1,425 @@
+
+Vegetable References
+====================
+:doctype: article
+:toc:
+:icons:
+
+General Vegetable
+-----------------
+
+Reports
+~~~~~~~
+
+Commercial production of vegetable transplants (2017) - https://extension.uga.edu/publications/detail.html?number=B1144[`https://extension.uga.edu/publications/detail.html?number=B1144`]
+
+Commercial freeze protection for fruits and vegetables (2017) - https://extension.uga.edu/publications/detail.html?number=B1479[`https://extension.uga.edu/publications/detail.html?number=B1479`]
+
+=====
+Freeze protection efforts should be based on the type of freeze, temperature, and wind speed that is impacting your crop. To apply frost protection, consider your crop value, the freeze protection capacity of your system, and the crop’s susceptibility to injury at each growth stage.
+=====
+
+Crops of Texas (2005) - https://aggie-horticulture.tamu.edu/vegetable/guides/the-crops-of-texas/[`https://aggie-horticulture.tamu.edu/vegetable/guides/the-crops-of-texas/`]
+
+=====
+"This publication provides information on nearly 200 food and non-food crops in Texas."
+=====
+
+Fertilizing the home vegetable garden (2020) - https://extension.uga.edu/publications/detail.html?number=C1179[`https://extension.uga.edu/publications/detail.html?number=C1179`]
+
+Growing vegetables organically (2017) - https://extension.uga.edu/publications/detail.html?number=B1011[`https://extension.uga.edu/publications/detail.html?number=B1011`]
+
+=====
+This publication is a comprehensive guide to growing vegetables organically, including location, planning, irrigation, soil preparation, composting, fertilizers, successive planting and crop rotation, mulching and insect control.
+=====
+
+Pollination of vegetable crops (2014) - https://extension.uga.edu/publications/detail.html?number=C934[`https://extension.uga.edu/publications/detail.html?number=C934`]
+
+Principles of irrigation and scheduling for vegetable crops in Georgia (2019) - https://extension.uga.edu/publications/detail.html?number=B1511[`https://extension.uga.edu/publications/detail.html?number=B1511`]
+
+Specialty crops of Texas (?) - https://aggie-horticulture.tamu.edu/vegetable/guides/specialty-vegetables/[`https://aggie-horticulture.tamu.edu/vegetable/guides/specialty-vegetables/`]
+
+=====
+A list of over two dozen specialty vegetables that can be grown in Texas, with each list entry a
+link to a separate page containing information about that vegetable.
+=====
+
+(Texas) organic vegetable production guide (2010) - https://aggie-horticulture.tamu.edu/vegetable/guides/organic-vegetable-production-guide/[`https://aggie-horticulture.tamu.edu/vegetable/guides/organic-vegetable-production-guide/`]
+
+=====
+"Organically grown is still in its infancy in Texas with a reported 1500 A of total production. However, based on the interest of conventional producers to capitalize on this increasing popularity, acreage is expected to increase steadily in the near future. Therefore, the intent of this publication is to serve as a guide to help producers make an informed decision as to whether or not organic production is a vital option for their operation."
+=====
+
+Texas vegetable-growers handbook (2009) - https://aggie-horticulture.tamu.edu/vegetable/guides/texas-vegetable-growers-handbook/[`https://aggie-horticulture.tamu.edu/vegetable/guides/texas-vegetable-growers-handbook/`]
+
+Trap-cropping for small-market vegetable growers (2017) - https://extension.uga.edu/publications/detail.html?number=C1118[`https://extension.uga.edu/publications/detail.html?number=C1118`]
+
+Troubleshooting vegetable production problems in the southeast (2014) - https://extension.uga.edu/publications/detail.html?number=C1054[`https://extension.uga.edu/publications/detail.html?number=C1054`]
+
+Herbs
+-----
+
+Popular and Reports
+~~~~~~~~~~~~~~~~~~~
+
+Herbs in southern gardens - https://extension.uga.edu/publications/detail.html?number=B1170[`https://extension.uga.edu/publications/detail.html?number=B1170`]
+
+Beans
+-----
+
+Reports
+~~~~~~~
+
+Commercial snap bean production in Georgia (2013) - https://extension.uga.edu/publications/detail.html?number=B1369[`https://extension.uga.edu/publications/detail.html?number=B1369`]
+
+Growing green beans in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/green-beans/[`https://agrilifeextension.tamu.edu/library/gardening/green-beans/`]
+
+=====
+"Green beans are a popular, warm-season, vegetable crop for home gardens. They grow well in most Texas soils. Like most vegetables, green beans grow best in well-drained soil and with plenty of sunlight."
+=====
+
+Brassicas
+---------
+
+Reports
+~~~~~~~
+
+Commercial production of cabbage and leafy greens (2017) - https://extension.uga.edu/publications/detail.html?number=B1181[`https://extension.uga.edu/publications/detail.html?number=B1181`]
+
+=====
+"The 11 topics covered in this bulletin are all integral parts of a successful cabbage/leafy greens management program. Each topic focuses on a particular aspect of production and provides information on the latest management technology for that phase of production. It is hoped that the information contained in this publication will assist growers in improving profitability."
+=====
+
+Growing cole crops in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/cole-crops/[`https://agrilifeextension.tamu.edu/library/gardening/cole-crops/`]
+
+=====
+"Cole crops include broccoli, cabbage, cauliflower, and Brussels sprouts. They are all cool-season crops that can be grown successfully in most Texas home gardens if the right varieties are planted at the right time.
+
+Brussels sprouts and cauliflower are the hardest to grow, while broccoli and cabbage are the easiest. For most gardens, broccoli is an ideal choice because it produces quickly, and each plant can be harvested several times."
+=====
+
+Growing collard greens in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/collard-greens/[`https://agrilifeextension.tamu.edu/library/gardening/collard-greens/`]
+
+=====
+"Collards are one of the most nutritious vegetables. They are low in calories and high in protein, vitamins, and minerals. Although they are a member of the cabbage family, collards do not form heads. They are grown for their leaves.
+
+Collards tolerate more heat and cold than most other vegetables grown in Texas. They are easy to grow, productive, and well suited to either large or small gardens. Collards grow best in cool weather and need as much sunlight as possible."
+=====
+
+Cucumbers
+---------
+
+Cucumbers (wikipedia) - https://en.wikipedia.org/wiki/Cucumber[`https://en.wikipedia.org/wiki/Cucumber`]
+
+Cucurbit problem solver (for Texas) (2009) - https://aggie-horticulture.tamu.edu/vegetable/problem-solvers/cucurbit-problem-solver/[`https://aggie-horticulture.tamu.edu/vegetable/problem-solvers/cucurbit-problem-solver/`]
+
+Growing cucumbers in home gardens (in Minnesota) (2018) - https://extension.umn.edu/vegetables/growing-cucumbers[`https://extension.umn.edu/vegetables/growing-cucumbers`]
+
+Growing cucumbers in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/cucumbers/[`https://agrilifeextension.tamu.edu/library/gardening/cucumbers/`]
+
+=====
+"Cucumbers are grown for eating fresh or preserved as pickles. They mature quickly and are best suited to larger gardens. However, they can be grown in small areas if the plants are caged or trellised."
+=====
+
+How to grow cucumbers (2020) - https://bonnieplants.com/how-to-grow/growing-cucumbers/[`https://bonnieplants.com/how-to-grow/growing-cucumbers/`]
+
+Videos
+~~~~~~
+
+How to prune your cucumbers for best production - https://www.youtube.com/watch?v=aEZfZ2GL89Y[`https://www.youtube.com/watch?v=aEZfZ2GL89Y`]
+
+Garlic
+------
+
+Popular and Reports
+~~~~~~~~~~~~~~~~~~~
+
+Garlic: An Herb Society of America Guide (2006) - https://www.herbsociety.org/hsa-learn/hsa-publications/hsa-essential-guides.html[`https://www.herbsociety.org/hsa-learn/hsa-publications/hsa-essential-guides.html`]
+
+Garlic Production for the Gardener (2015) - https://extension.uga.edu/publications/detail.html?number=C854&title=Garlic%20Production%20for%20the%20Gardener[`https://extension.uga.edu/publications/detail.html?number=C854&title=Garlic%20Production%20for%20the%20Gardener`]
+
+=====
+An extension report produced at the University of Georgia.
+=====
+
+Growing Great Garlic in Alaska (?) - https://www.alaskamastergardeners.org/plant_culture_tips.html[`https://www.alaskamastergardeners.org/plant_culture_tips.html`]
+
+Production and management of garlic, elephant garlic and leeks (2017) - https://extension.uga.edu/publications/detail.html?number=C852[`https://extension.uga.edu/publications/detail.html?number=C852`] 
+
+Melons
+------
+
+Reports
+~~~~~~~
+
+Cantaloupe and specialty melons (2017) - https://extension.uga.edu/publications/detail.html?number=B1179[`https://extension.uga.edu/publications/detail.html?number=B1179`]
+
+=====
+This publication was compiled to meet the growing cantaloupe industry in Georgia. Its 10 chapters represent the latest information available on successful cantaloupe and specialty melon production. 
+=====
+
+Cucurbit problem solver (for Texas) (2009) - https://aggie-horticulture.tamu.edu/vegetable/problem-solvers/cucurbit-problem-solver/[`https://aggie-horticulture.tamu.edu/vegetable/problem-solvers/cucurbit-problem-solver/`]
+
+Growing melons in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/melons/[`https://agrilifeextension.tamu.edu/library/gardening/melons/`]
+
+=====
+"Melons most commonly grown in Texas include honeydew, muskmelon and watermelon. Muskmelons are often mistakenly called cantaloupes, but the true cantaloupe is a small, warty fruit and is not usually grown in the United States."
+=====
+
+Okra
+----
+
+Reports
+~~~~~~~
+
+Commercial okra production (2017) - https://extension.uga.edu/publications/detail.html?number=C627[`https://extension.uga.edu/publications/detail.html?number=C627`]
+
+=====
+Okra is grown in every county in Georgia. This popular vegetable can be found in both home and commercial gardens. A large acreage is planted under contract for the soup and frozen food industry.
+
+Okra can be a profitable crop when recommended production practices are followed. It can return an income over a 10- to 12- week period after harvest starts.
+=====
+
+Growing okra in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/okra/[`https://agrilifeextension.tamu.edu/library/gardening/okra/`]
+
+=====
+"Okra is a warm-season vegetable that grows well in most Texas soils. A fair source of vitamin A, it can be eaten in many ways, including boiled, fried, and cooked in soups, gumbos, and casseroles."
+=====
+
+Onions
+------
+
+Reports
+~~~~~~~
+
+Onion production guide (2017) - https://extension.uga.edu/publications/detail.html?number=B1198[`https://extension.uga.edu/publications/detail.html?number=B1198`]
+
+Roots
+-----
+
+Reports
+~~~~~~~
+
+Commercial production and management of carrots (2012) - https://extension.uga.edu/publications/detail.html?number=B1175[`https://extension.uga.edu/publications/detail.html?number=B1175`]
+
+=====
+"The 13 topics covered in this bulletin are all integral parts of a successful carrot management program. Each topic is designed to focus on a particular aspect of production and provide the latest management technology for that phase of production. It is hoped that the information contained in this publication will assist growers in improving profitability in carrot production."
+=====
+
+Growing beets in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/beets/[`https://agrilifeextension.tamu.edu/library/gardening/beets/`]
+
+=====
+"Beets are a cool-season crop and grow well in the cool temperatures of spring and fall. They do poorly in hot weather. Beets are well suited to large or small home gardens since they require little room. They are grown for both the roots which usually are pickled and the young tops which are used as greens. About 10 feet of row per person will provide enough beets to use fresh or for canning."
+=====
+
+Growing carrots in Texas (?) - https://agrilifeextension.tamu.edu/library/gardening/carrots/[`https://agrilifeextension.tamu.edu/library/gardening/carrots/`]
+
+=====
+"Carrots are an excellent source of vitamin A and add color to a meal. They can be served cooked or raw, by themselves or in salads or other dishes. For home planting, 5 to 10 feet of row per person should supply enough fresh carrots for table use. One foot of row will yield about 1 pound of carrots."
+=====
+
+Squash
+------
+
+Reports
+~~~~~~~
+
+Commercial production and management of pumpkins and gourds (in Georgia) (2017) - https://extension.uga.edu/publications/detail.html?number=B1180[`https://extension.uga.edu/publications/detail.html?number=B1180`]
+
+Commercial squash production (in Georgia) (2017) - https://extension.uga.edu/publications/detail.html?number=C527[`https://extension.uga.edu/publications/detail.html?number=C527`]
+
+Controlling insects on summer squash in the home garden (in Georgia) (2020) - https://extension.uga.edu/publications/detail.html?number=C1177[`https://extension.uga.edu/publications/detail.html?number=C1177`]
+
+=====
+Summer squash is one of the most popular warm season vegetables grown in home gardens. Unfortunately, the levels of insect attacks on summer squash have risen dramatically over the last 10 years. Safe and effective controls are needed to help produce this important crop with all of the pressures of insect pests. This publication will discuss both organic and non-organic solutions for homeowners to try in their home garden, including the use of barriers, trap crops and chemical controls.
+=====
+
+Cucurbit problem solver (for Texas) (2009) - https://aggie-horticulture.tamu.edu/vegetable/problem-solvers/cucurbit-problem-solver/[`https://aggie-horticulture.tamu.edu/vegetable/problem-solvers/cucurbit-problem-solver/`]
+
+Homegrown pumpkins (in Georgia) (2020) - https://extension.uga.edu/publications/detail.html?number=C1206[`https://extension.uga.edu/publications/detail.html?number=C1206`]
+
+=====
+"While pumpkins are edible and grown for both their flesh and seeds, they are more commonly used as fall decorations. This member of the cucurbit family can be found in a variety of shapes, sizes, and colors. While pumpkins are not very difficult to grow, they do require a substantial amount of space for their sprawling vines. Selecting the right cultivar and following good cultural practices are key to successfully growing pumpkins."
+=====
+
+Homegrown summer and winter squash (in Georgia) (2016) - https://extension.uga.edu/publications/detail.html?number=C993[`https://extension.uga.edu/publications/detail.html?number=C993`]
+
+Sweet Potatoes
+--------------
+
+Reports
+~~~~~~~
+
+How the farmer can save his sweet potatoes and ways of preparing them for the table (1937) - https://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-sweetpotatoes/[`https://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-sweetpotatoes/`]
+
+-----
+The fourth edition of a guide to growing and preparing sweet potatoes written by George Washington Carver
+and published in 1937.
+-----
+
+Tomato
+------
+
+Popular
+~~~~~~~
+
+Agrobiodiversity: The living library (2017) - https://www.nature.com/articles/544S8a[`https://www.nature.com/articles/544S8a`]
+
+Charley Rick's hunt for wild tomato genes - https://www.motherearthgardener.com/profiles/people/tomato-zm0z18uzsphe[`https://www.motherearthgardener.com/profiles/people/tomato-zm0z18uzsphe`]
+
+Close relative of the cultivated tomato is resistant to many insects (2018) - https://phys.org/news/2018-04-relative-cultivated-tomato-resistant-insects.html[`https://phys.org/news/2018-04-relative-cultivated-tomato-resistant-insects.html`]
+
+=====
+A wild tomato species from the Galapagos Islands has been discovered by scientists from Wageningen University & Research to be resistant to a wide range of pest insects. This species is closely related to the cultivated tomato, making the resilience easier to interbreed into the latter and ultimately making it resistant to many different types of insects.
+=====
+
+It's been a long journey for wild tomatoes (2019) - https://vegetablegrowersnews.com/news/its-been-a-long-journey-for-wild-tomatoes/[`https://vegetablegrowersnews.com/news/its-been-a-long-journey-for-wild-tomatoes/`]
+
+Modern tomatoes are very different from their wild ancestors - https://theconversation.com/modern-tomatoes-are-very-different-from-their-wild-ancestors-and-we-found-missing-links-in-their-evolution-130041[`https://theconversation.com/modern-tomatoes-are-very-different-from-their-wild-ancestors-and-we-found-missing-links-in-their-evolution-130041`]
+
+Scientists Assemble Pan-Genome of Cultivated Tomato and Its Wild Relatives (2019) - http://www.sci-news.com/genetics/tomato-pan-genome-07184.html[`http://www.sci-news.com/genetics/tomato-pan-genome-07184.html`]
+
+The tale of a wild tomato's discovery (2020) - https://sustainable-secure-food-blog.com/2020/09/22/the-tale-of-a-wild-tomatos-discovery/[`https://sustainable-secure-food-blog.com/2020/09/22/the-tale-of-a-wild-tomatos-discovery/`]
+
+=====
+Charles Rick was a plant geneticist at UC Davis. His research and collecting efforts over a 50-year career led to the establishment of the C.M. Rick Tomato Genetics Resource Center. It is a seed bank of tomato germplasm. This center at UC Davis now maintains nearly 1,200 wild tomato accessions representing 16 different taxonomic species. Many of these wild accessions were collected by Rick and his colleagues during 15 major collecting expeditions. Thanks to their efforts, today’s breeders have rich sources of genetic diversity with which to study and improve crop plants.
+
+This is the story of how one wild tomato relative, a rare and endangered nightshade from the Atacama Desert of Chile, was (re)discovered and bred (eventually) with tomato.
+
+Why is this wild, pea-sized tomato so important? - https://www.smithsonianmag.com/travel/why-wild-tiny-pimp-tomato-so-important-180955911/[`https://www.smithsonianmag.com/travel/why-wild-tiny-pimp-tomato-so-important-180955911/`]
+=====
+
+Reports
+~~~~~~~
+
+Commercial tomato production handbook (2017) - https://extension.uga.edu/publications/detail.html?number=B1312[`https://extension.uga.edu/publications/detail.html?number=B1312`]
+
+=====
+A report produced at the University of Georgia.
+=====
+
+Future food - https://www.nhm.ac.uk/our-science/our-work/sustainability/future-food.html[`https://www.nhm.ac.uk/our-science/our-work/sustainability/future-food.html`]
+
+=====
+Museum scientists are seeking out wild relatives of food plants native to Peru to help breeders prepare stronger crops for the future.
+=====
+
+Genetic resources of tomatoes and wild relatives. A global report (1981) - https://www.bioversityinternational.org/e-library/publications/detail/genetic-resources-of-tomatoes-and-wild-relatives-a-global-report/[`https://www.bioversityinternational.org/e-library/publications/detail/genetic-resources-of-tomatoes-and-wild-relatives-a-global-report/`]
+
+Georgia homegrown tomatoes (2015) - https://extension.uga.edu/publications/detail.html?number=B1271[`https://extension.uga.edu/publications/detail.html?number=B1271`]
+
+Growing tomatoes in Texas (?) - https://agrilifeextension.tamu.edu/browse/featured-solutions/gardening-landscaping/tomatoes/[`https://agrilifeextension.tamu.edu/browse/featured-solutions/gardening-landscaping/tomatoes/`]
+
+=====
+Tomatoes are the most popular garden vegetable crop in Texas. They are a good source of vitamin A and fair source of vitamin C. Fresh tomatoes are popular in salads, on sandwiches and sliced. They can be cooked and used in many ways. 
+=====
+
+Growing tomatoes in the home garden (in California) (2005) - https://anrcatalog.ucanr.edu/Details.aspx?itemNo=8159[`https://anrcatalog.ucanr.edu/Details.aspx?itemNo=8159`]
+
+How to grow the tomato and 115 ways to prepare it for the table (2nd Ed.) (1936) - https://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-tomato/[`https://aggie-horticulture.tamu.edu/vegetable/additional-resources/carver-tomato/`]
+
+-----
+A report on how to grow and prepare tomatoes originally written by George Washington Carver in 1918.
+This is the revised second edition of 1936.
+-----
+
+Staking and pruning tomatoes in the home garden (in Georgia) (2019) - https://extension.uga.edu/publications/detail.html?number=C1150[`https://extension.uga.edu/publications/detail.html?number=C1150`]
+
+=====
+A home garden simply is not complete without a few tomato plants. At times, it can be a little challenging to keep tomatoes healthy, but no other vegetable comes close to bearing as much produce in such a limited space. Staking and pruning are two common practices that can help tomatoes stay healthier and produce larger fruit. The system of staking you choose and how vigorously you prune your crop depends on the type of tomatoes you are growing.
+=====
+
+Troubleshooting cultural problems in tomatoes (2016) - https://extension.uga.edu/publications/detail.html?number=C1089[`https://extension.uga.edu/publications/detail.html?number=C1089`]
+
+=====
+This publication is intended for general use audiences, including homeowners, civic groups, and master gardeners. It covers the basic troubleshooting procedures for solving common problems while growing tomatoes. It includes a description of both cultural and physiological problems and solutions.
+=====
+
+Web Sites
+~~~~~~~~~
+
+Frogsleap Farm Tomato Breeding Blog - http://frogsleapfarm.blogspot.com/[`http://frogsleapfarm.blogspot.com/`]
+
+Integrated pest management (IPM) for tomatoes (in California) - https://www2.ipm.ucanr.edu/agriculture/tomato/[`https://www2.ipm.ucanr.edu/agriculture/tomato/`]
+
+PSU Tomato Production - https://extension.psu.edu/tomato-production[`https://extension.psu.edu/tomato-production`]
+
+Solanum lycopersicum at Genesys - https://www.genesys-pgr.org/c/tomato[`https://www.genesys-pgr.org/c/tomato`]
+
+=====
+Genesys is a database which allows users to explore the world’s crop diversity conserved in genebanks through a single website.
+=====
+
+Tomatoes Are Wild: Natural Diversity in Wild Crop Relatives - https://moylelab.sitehost.iu.edu/tomato_species.html[`https://moylelab.sitehost.iu.edu/tomato_species.html`]
+
+Tomato Genetics Resource Center - https://tgrc.ucdavis.edu/[`https://tgrc.ucdavis.edu/`]
+
+UC Vegetable Research and Information Center Tomato Page - https://vric.ucdavis.edu/veg_info_crop/tomato.htm[`https://vric.ucdavis.edu/veg_info_crop/tomato.htm`]
+
+-----
+Over a hundred reports on every imaginable aspect of growing tomatoes.
+-----
+
+Wikipedia
+~~~~~~~~~
+
+Lycopersicon - https://en.wikipedia.org/wiki/Lycopersicon[`https://en.wikipedia.org/wiki/Lycopersicon`]
+
+
+Journal Articles
+~~~~~~~~~~~~~~~~
+
+Diverse Traits Contribute to Salinity Tolerance of Wild Tomato Seedlings from the Galapagos Islands (2020) - http://www.plantphysiol.org/content/182/1/534[`http://www.plantphysiol.org/content/182/1/534`]
+
+Domestication and Breeding of Tomatoes: What have We Gained and What Can We Gain in the Future? - https://academic.oup.com/aob/article/100/5/1085/136832[`https://academic.oup.com/aob/article/100/5/1085/136832`]
+
+=====
+It has been shown that a large variation is present and exploitable from wild Solanum species but most of it is still untapped. Considering the thousands of Solanum accessions in different gene banks and probably even more that are still untouched in the Andes, it is a challenge to exploit the diversity of tomato. What have we gained from tomato domestication and breeding and what can we gain in the future?
+=====
+
+Eocene lantern fruits from Gondwanan Patagonia and the early origins of Solanaceae (2017) - https://science.sciencemag.org/content/355/6320/71[`https://science.sciencemag.org/content/355/6320/71`]
+
+=====
+The Solanaceae (or nightshades) are one of the best-studied plant families, yet their evolutionary origins have thus far been relatively obscure. Corroborative fossil evidence of molecular phylogenetic divergence dates has been lacking. Wilf et al. present 52-million-year-old fossils of lantern fruits from Argentina, which they ascribe to the modern genus Physalis. These fossil finds suggest a much earlier origin of the lantern fruit lineage and indicate that the Solanaceae may have diversified before the final breakup of the Gondwanan supercontinent.
+=====
+
+Exploiting the diversity of tomato (2020) - https://www.nature.com/articles/s41438-020-0291-7[`https://www.nature.com/articles/s41438-020-0291-7`]
+
+=====
+A collection of 163 accessions, including Solanum pimpinellifolium, Solanum lycopersicum var. cerasiforme and Solanum lycopersicum var. lycopersicum, was selected to represent the genetic and morphological variability of tomato at its centers of origin and domestication: Andean regions of Peru and Ecuador and Mesoamerica. The collection is enriched with S. lycopersicum var. cerasiforme from the Amazonian region that has not been analyzed previously nor used extensively. The collection has been morphologically characterized showing diversity for fruit, flower and vegetative traits. Their genomes were sequenced in the Varitome project and are publicly available.
+=====
+
+Exploration of wild relatives of tomato for enhanced stress tolerance - https://library.wur.nl/WebQuery/wurpubs/389580[`https://library.wur.nl/WebQuery/wurpubs/389580`]
+
+Genetic diversity in tomato and its wild relatives - https://www.intechopen.com/books/genetic-diversity-in-plants/genetic-diversity-in-tomato-solanum-lycopersicum-and-its-wild-relatives[`https://www.intechopen.com/books/genetic-diversity-in-plants/genetic-diversity-in-tomato-solanum-lycopersicum-and-its-wild-relatives`]
+
+Genome sequence of the wild tomato Solanum pimpinellifolium - https://www.frontiersin.org/articles/10.3389/fpls.2018.01402/full[`https://www.frontiersin.org/articles/10.3389/fpls.2018.01402/full`]
+
+Genomic variation in tomato, from wild ancestors to contemporary breeding accessions - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4404671/[`https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4404671/`]
+
+Production and characterisation of tomato derived from interspecific hybridisation - https://www.tandfonline.com/doi/full/10.1080/14620316.2019.1689182[`https://www.tandfonline.com/doi/full/10.1080/14620316.2019.1689182`]
+
+Relationships among wild relatives of tomato, potato, and pepino - https://pubag.nal.usda.gov/catalog/62490[`https://pubag.nal.usda.gov/catalog/62490`]
+
+=====
+With ca. 200 species, the informally named Potato clade represents one of the larger subgroups of the enormous genus Solanum. Because its members include the potato (Solanum tuberosum), tomato (S. lycopersicum), and pepino (S. muricatum), it is the most economically important clade in the genus. These crop species and their close relatives have been the focus of intensive research, but relationships among major lineages of the Potato clade remain poorly understood. In this study, we use sequences from the nuclear ITS and waxy (GBSSI) and plastid trnT–trnF and trnS–trnG to estimate a phylogeny and further explore relationships within the Potato clade. With increased sampling over past studies, the Potato clade emerges as a strongly supported clade and comprises 12–13 subclades which, for the most part, correspond to traditionally recognized sections. Solanum sect. Regmandra is sister to the rest of the lineages of the Potato clade which are, in turn, organized into two major subclades: (i) sections Herpystichum and Pteroidea, and (ii) sections Anarrhichomenum, Articulatum, Basarthrum, Etuberosum, Juglandifolia, Lycopersicoides, Lycopersicon, and Petota. As in all other studies including these groups, sections Etuberosum, Juglandifolia, Lycopersicoides, Lycopersicon, and Petota form a strongly supported clade. Solanum oxycoccoides, a high-elevation species endemic to north central Peru, was previously tentatively assigned to several groups within Solanum based on morphological evidence, but instead the species represents an independent lineage sister to the second major subclade. A key to the sections of the Potato clade is provided.
+=====
+
+Salt tolerenace in the wild relatives of the cultivate tomato - https://www.sciencedirect.com/science/article/pii/S0044328X80802583[`https://www.sciencedirect.com/science/article/pii/S0044328X80802583`]
+
+Taxonomy of wild tomatoes and their relatives - https://www.researchgate.net/publication/260181536_Taxonomy_of_Wild_Tomatoes_and_Their_Relatives_Solanum_sect_Lycopersicoides_sect_Juglandifolia_sect_Lycopersicon_Solanaceae[`https://www.researchgate.net/publication/260181536_Taxonomy_of_Wild_Tomatoes_and_Their_Relatives_Solanum_sect_Lycopersicoides_sect_Juglandifolia_sect_Lycopersicon_Solanaceae`]
+
+The tomato and its botanical relatives (2016) - https://nhm.openrepository.com/handle/10141/622703[`https://nhm.openrepository.com/handle/10141/622703`]
+
+
+
+
+
+
+
+
+
+
+
+
+

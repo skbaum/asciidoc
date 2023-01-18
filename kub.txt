@@ -1,0 +1,142 @@
+Kubernetes Notes
+================
+Steven K. Baum
+0.1, Aug. 10, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+== Meta
+
+*Past, Present and Future of Kubernetes on Raspberry Pi* - https://www.youtube.com/watch?v=jfUpF40--60[`https://www.youtube.com/watch?v=jfUpF40--60`]
+
+*State of Netbooting Raspberry Pi in 2021* - https://blog.alexellis.io/state-of-netbooting-raspberry-pi-in-2021/[`https://blog.alexellis.io/state-of-netbooting-raspberry-pi-in-2021/`]
+
+*Argo CD for Raspberry Pi k3s Cluster* - https://johansiebens.dev/posts/2020/08/argo-cd-for-your-private-raspberry-pi-k3s-cluster/[`https://johansiebens.dev/posts/2020/08/argo-cd-for-your-private-raspberry-pi-k3s-cluster/`]
+
+== Overview
+
+
+== Software
+
+=== arkade
+
+https://github.com/alexellis/arkade[`https://github.com/alexellis/arkade`]
+
+https://blog.alexellis.io/kubernetes-marketplace-two-year-update/[`https://blog.alexellis.io/kubernetes-marketplace-two-year-update/`]
+
+=====
+A portable marketplace for downloading your favourite devops CLIs and installing helm charts, with a single command.
+=====
+
+=== Fleet
+
+https://github.com/rancher/fleet/[`https://github.com/rancher/fleet/`]
+
+=====
+Fleet is GitOps at scale. Fleet is designed to manage up to a million clusters. It's also lightweight enough that it works great for a single cluster too, but it really shines when you get to a large scale. By large scale we mean either a lot of clusters, a lot of deployments, or a lot of teams in a single organization.
+
+Fleet can manage deployments from git of raw Kubernetes YAML, Helm charts, or Kustomize or any combination of the three. Regardless of the source all resources are dynamically turned into Helm charts and Helm is used as the engine to deploy everything in the cluster. This gives a high degree of control, consistency, and auditability. Fleet focuses not only on the ability to scale, but to give one a high degree of control and visibility to exactly what is installed on the cluster.
+=====
+
+=== k3s
+
+https://k3s.io/[`https://k3s.io/`]
+
+https://github.com/k3s-io/k3s[`https://github.com/k3s-io/k3s`]
+
+=====
+K3s is a fully conformant production-ready Kubernetes distribution with the following changes:
+
+* It is packaged as a single binary.
+* It adds support for sqlite3 as the default storage backend. Etcd3, MySQL, and Postgres are also supported.
+* It wraps Kubernetes and other components in a single, simple launcher.
+* It is secure by default with reasonable defaults for lightweight environments.
+* It has minimal to no OS dependencies (just a sane kernel and cgroup mounts needed).
+* It eliminates the need to expose a port on Kubernetes worker nodes for the kubelet API by exposing this API to the Kubernetes control plane nodes over a websocket tunnel.
+
+K3s bundles the following technologies together into a single cohesive distribution:
+
+* Containerd & runc
+* Flannel for CNI
+* CoreDNS
+* Metrics Server
+* Traefik for ingress
+* Klipper-lb as an embedded service load balancer provider
+* Kube-router for network policy
+* Helm-controller to allow for CRD-driven deployment of helm manifests
+* Kine as a datastore shim that allows etcd to be replaced with other databases
+* Local-path-provisioner for provisioning volumes using local storage
+* Host utilities such as iptables/nftables, ebtables, ethtool, & socat
+
+These technologies can be disabled or swapped out for technologies of your choice.
+=====
+
+==== k3sup
+
+https://github.com/alexellis/k3sup[`https://github.com/alexellis/k3sup`]
+
+=====
+A light-weight utility to get from zero to KUBECONFIG with k3s on any local or remote VM. All you need is ssh access and the k3sup binary to get kubectl access immediately.
+
+The tool is written in Go and is cross-compiled for Linux, Windows, MacOS and even on Raspberry Pi.
+=====
+
+=== MinIO
+
+https://min.io/[`https://min.io/`]
+
+https://github.com/minio/minio[`https://github.com/minio/minio`]
+
+https://en.wikipedia.org/wiki/MinIO[`https://en.wikipedia.org/wiki/MinIO`]
+
+https://blocksandfiles.com/2021/08/09/minio-the-smartphone-camera-of-object-storage/[`https://blocksandfiles.com/2021/08/09/minio-the-smartphone-camera-of-object-storage/`]
+
+https://tech.marksblogg.com/minio-aws-s3-hdfs.html[`https://tech.marksblogg.com/minio-aws-s3-hdfs.html`]
+
+=====
+MinIO offers high-performance, S3 compatible object storage. Native to
+Kubernetes, MinIO is the only object storage suite available on every public
+cloud, every Kubernetes distribution, the private cloud and the edge. MinIO
+is software-defined and is 100% open source under GNU AGPL v3.
+=====
+
+=== OpenEBS
+
+https://github.com/openebs/openebs[`https://github.com/openebs/openebs`]
+
+=====
+OpenEBS is the most widely deployed and easy to use open-source storage solution for Kubernetes.
+
+OpenEBS is the leading open-source example of a category of cloud native storage solutions sometimes called Container Attached Storage.
+
+Some key aspects that make OpenEBS different compared to other traditional storage solutions:
+
+* Built using the micro-services architecture like the applications it serves. OpenEBS is itself deployed as a set of containers on Kubernetes worker nodes. Uses Kubernetes itself to orchestrate and manage OpenEBS components.
+* Built completely in userspace making it highly portable to run across any OS/platform.
+* Completely intent-driven, inheriting the same principles that drive the ease of use with Kubernetes.
+* OpenEBS supports a range of storage engines so that developers can deploy the storage technology appropriate to their application design objectives. Distributed applications like Cassandra can use the LocalPV engine for lowest latency writes. Monolithic applications like MySQL and PostgreSQL can use the ZFS engine (cStor) for resilience. Streaming applications like Kafka can use the NVMe engine Mayastor for best performance in edge environments. Across engine types, OpenEBS provides a consistent framework for high availability, snapshots, clones and manageability.
+=====
+
+=== OpenFaaS
+
+https://github.com/openfaas/faas[`https://github.com/openfaas/faas`]
+
+=====
+OpenFaaS® makes it easy for developers to deploy event-driven functions and microservices to Kubernetes without repetitive, boiler-plate coding. Package your code or an existing binary in an OCI-compatible image to get a highly scalable endpoint with auto-scaling and metrics.  The features include:
+
+* Ease of use through UI portal and one-click install
+* Write services and functions in any language with Template Store or a Dockerfile
+* Build and ship your code in an OCI-compatible/Docker image
+* Portable: runs on existing hardware or public/private cloud by leveraging Kubernetes
+* CLI available with YAML format for templating and defining functions
+* Auto-scales as demand increases including to zero
+=====
+
+
+
+
+

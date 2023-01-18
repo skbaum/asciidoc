@@ -1,0 +1,210 @@
+Compiler Benchmarks
+===================
+Steven K. Baum
+0.1, Oct.. 10, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+Codes that are already instrumented for OpenMP use via pragmas can also be offloaded to GPUs
+without further coding.
+
+*Analysis of OpenMP 4.5 Offloading in Implementations* - https://www.osti.gov/servlets/purl/1648853[`https://www.osti.gov/servlets/purl/1648853`]
+
+*Best Practices for OpenMP on NVIDIA GPUs* - https://www.youtube.com/watch?v=9w_2tj2uD4M[`https://www.youtube.com/watch?v=9w_2tj2uD4M`]
+
+== GCC
+
+https://gcc.gnu.org/wiki/Offloading[`https://gcc.gnu.org/wiki/Offloading`]
+
+https://fortran-lang.discourse.group/t/gfortran-gpu-offload-with-openmp/314[`https://fortran-lang.discourse.group/t/gfortran-gpu-offload-with-openmp/314`]
+
+GCC 11 supports OpenMP offloading to Intel MIC, Nvidia PTX and AMD GCN targets.
+
+=====
+The main option to control offloading is:
+
+* `foffload=<targets>=<options>`
+
+By default, GCC will build offload images for all offload targets specified in configure with non-target-specific options passed to host compiler. (However, in most Linux distributions: by default, offloading is disabled (executed on the host) and `-foffload=<targets>` is required to compile to enable the offloading to accelerators.) This option is used to control offload targets and options for them. It can be used in a few ways:
+
+* `-foffload=disable` - Tells GCC to disable offload support. Target regions will be run in host fallback mode.
+
+* `-foffload=<targets>` - Tells GCC to build offload images for `<targets>`. They will be built with non-target-specific options passed to host compiler.
+
+* `-foffload=<options>` - Tells GCC to build offload images for all targets specified in configure. They will be built with non-target-specific options passed to host compiler plus <options>.
+
+* `-foffload=<targets>=<options>` - Tells GCC to build offload images for `<targets>`. They will be built with non-target-specific options passed to host compiler plus <options>.
+
+`<targets>` are separated by commas. Several <options> can be specified by separating them by spaces. Options specified by `-foffload` are appended to the end of option set, so in case of option conflicts they have more priority. The `-foffload` flag can be specified several times, and you have to do that to specify different `<options>` for different `<targets>`.
+
+*Note*: You may need to specify `-foffload=-lm` and for Fortran `-foffload=-lgfortran`, if the offloaded code uses math functions or Fortran-library procedures.
+
+*Note*: If you use atomics directly or indirectly, you may need to specify `-foffload=-latomic` or, if only one target needs it, e.g., `-foffload=nvptx-none=-latomic`. 
+
+For AMD GCN devices, you have to specify additionally the GPU to be used: `-march=<name>` where name is either `carrizo` or `fiji` (both: third generation) – or the fifth-generation `VEGA` (gfx900 or gfx906). In order to apply this setting to the AMD GCN offloading target, only, and not to the host (`-march=…`) or all other offloading targets (as with `-foffload=-march=…`), use `-foffload=amdgcn-amdhsa=<options>`. For instance: `-foffload=amdgcn-amdhsa="-march=gfx906"`. [NOTE: the target-triplet can be set when building the compiler and might differ between vendors; it can also be, e.g., `amdgcn-unknown-amdhsa`.]
+=====
+
+== Intel
+
+*Get Started with OpenMP* Offload to GPU* - https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html[`https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-cpp-fortran-compiler-openmp/top.html`]
+
+https://www.intel.com/content/www/us/en/developer/videos/three-quick-practical-examples-openmp-offload-gpus.html#gs.drs907[`https://www.intel.com/content/www/us/en/developer/videos/three-quick-practical-examples-openmp-offload-gpus.html#gs.drs907`]
+
+=====
+The OpenMP* Offload to GPU feature of the Intel® oneAPI DPC++/C++ Compiler and the Intel® Fortran Compiler
+(Beta) compiles OpenMP source files for a wide range of accelerators. Only the icx
+and ifx compilers support the OpenMP Offload feature.
+...
+Intel supports two new options:
+
+* `-qopenmp`
+* `-fopenmp-targets=spir64`
+
+that support OpenMP and offloading execution on CPU and GPU. The `-qopenmp`
+option enables a middle-end that supports the transformation of OpenMP
+in LLVM* (but not in the Clang* front-end). The `-fopenmp-targets=spir64`
+option enables the compiler to generate a x86 + SPIR64
+fat binary for the GPU device binary generation.
+=====
+
+
+=== Compiling and Running an Example
+
+The following code is instrumented for OpenMP via various pragmas:
+
+-----
+// matmul.cpp: Matrix Multiplication Example using OpenMP Offloading 
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+#define MAX 128
+int A[MAX][MAX], B[MAX][MAX], C[MAX][MAX], C_SERIAL[MAX][MAX];
+
+typedef int BOOL;
+typedef int TYPE;
+
+BOOL check_result(TYPE *actual, TYPE *expected, unsigned n) {
+    for (unsigned i = 0; i < n; i++) {
+        if(actual[i] != expected[i]) {
+            printf("Value mismatch at index = %d. Expected: %d"
+                   ", Actual: %d.\n", i, expected[i], actual[i]);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void __attribute__ ((noinline)) Compute()
+{
+  #pragma omp target teams distribute parallel for map(to: A, B) map(tofrom: C) \
+                                                   thread_limit(128)
+  {
+    for (int i = 0; i < MAX; i++)
+    for (int j = 0; j < MAX; j++)
+    for (int k = 0; k < MAX; k++)
+         C[i][j] += A[i][k] * B[k][j];
+  }
+}
+
+int main() {
+  for (int i = 0; i < MAX; i++)
+    for (int j = 0; j < MAX; j++) {
+      A[i][j] = i + j - 1;
+      B[i][j] = i - j + 1;
+    }
+
+  for (int i = 0; i < MAX; i++)
+  for (int j = 0; j < MAX; j++)
+  for (int k = 0; k < MAX; k++)
+       C_SERIAL[i][j] += A[i][k] * B[k][j];
+
+  Compute();
+
+  if (!check_result((int*) &C[0][0], (int*) &C_SERIAL[0][0], MAX * MAX)) {
+    printf("FAILED\n");
+    return 1;
+  }
+
+  printf("PASSED\n");
+  return 0;
+}
+-----
+
+==== Compiling the Code
+
+This code `matmul_offload.cpp` is compiled for GPU offloading via:
+
+-----
+icpx -qopenmp -fopenmp-targets=spir64 matmul_offload.cpp -o matmul
+-----
+
+C codes are compiled for this using `icx`, Fortran codes with `ifx`, and Cpp codes with `ifx`.
+
+==== Set the Environment Variable
+
+The `OMP_TARGET_OFFLOAD` environment variable must be set to force offloading or fail via:
+
+-----
+export OMP_TARGET_OFFLOAD=MANDATORY
+-----
+
+==== Run the Compiled Code
+
+The compiled binary `matmul` is run via:
+
+-----
+./matmul
+PASSED
+-----
+
+and will produced the output `PASSED` if successful.
+
+=== Integration of GPU-Optimized LIBM Functions
+
+The compilers provide a way to choose some GPU-optimized math functions as an alternative
+to the standard math libraries.
+
+== NVIDIA
+
+*Thinking OpenMP with HPC Compilers* - https://www.nas.nasa.gov/assets/nas/pdf/ams/2021/AMS_20210504_Ozen.pdf[`https://www.nas.nasa.gov/assets/nas/pdf/ams/2021/AMS_20210504_Ozen.pdf`]
+
+The NVIDIA `nvc++`, `nvc` and `nvfortran` compilers can be enabled for OpenMP and target GPU and
+multicure via:
+
+-----
+nvc -mp=gpu -gpu=[target] -Minfo=mp
+-----
+
+An environmental variable must also be set:
+
+-----
+set NVCOMPILER_ACC_NOTIFY 1/2/3
+-----
+
+
+
+
+
+
+== Clang
+
+https://hpc-wiki.info/hpc/Building_LLVM/Clang_with_OpenMP_Offloading_to_NVIDIA_GPUs[`https://hpc-wiki.info/hpc/Building_LLVM/Clang_with_OpenMP_Offloading_to_NVIDIA_GPUs`]
+
+https://github.com/pc2/OMP-Offloading[`https://github.com/pc2/OMP-Offloading`]
+
+https://llvm.org/docs/CompileCudaWithLLVM.html[`https://llvm.org/docs/CompileCudaWithLLVM.html`]
+
+== AOMP
+
+https://github.com/ROCm-Developer-Tools/aomp[`https://github.com/ROCm-Developer-Tools/aomp`]
+
+=====
+AOMP is a scripted build of LLVM and supporting software. It has support for OpenMP target offload on AMD GPUs. Since AOMP is a clang/llvm compiler, it also supports GPU offloading with HIP, CUDA, and OpenCL.
+=====
+
+

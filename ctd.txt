@@ -1,0 +1,1946 @@
+CTD Data Storage, Display and Processing Options
+================================================
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Executive Summary
+-----------------
+
+A reasonable expection of a web interface for profile data is that it
+be able to store (or at least provide an interface to storage modes),
+display, and provide selective output of datasets.
+It is unreasonable to expect substantial data analysis capabilities - e.g.
+interpolation between/among profiles, create contoured horizontal fields
+from essentially randomly scattered profile stations, etc. - from a web
+interface.  
+
+Of the options explored, the ERDDAP web interface is the best currently
+available option.  It can ingest CTD or other profile data in many different
+formats, and transform them into an even larger range of output formats
+including NetCDF.  It allows enables the user to select temporal and
+spatial subsets of the available variables.
+
+All applicable options investigated require that individual stations in
+separate data files be combined into a single file.
+The method used to combine a set of Gulf Integrated Spill Research (GISR)
+CTD profiles - each of which originally existed in a single NetCDF file - into
+a single NetCDF file is xref:example[detailed below].
+
+Overview of the Problem
+-----------------------
+
+How do we store, display, analyze and extract data from a disparate set of
+CTD files?
+
+Let's break this down into separate considerations.
+
+Storage
+~~~~~~~
+
+Use of NetCDF
+^^^^^^^^^^^^^
+
+*What*: The files need to be stored in NetCDF files following the
+proper CF and ACDD conventions for such things.  An additional nice feature
+would be the use of the appropriate NODC NetCDF Template for profile data,
+which is already CF and ACDD compliant.
+
+*Why*: NetCDF is recognized and ingested by most of the data processing
+and analysis programs used in the geosciences. The CF conventions are essential for storing the data in a form that can be
+simply and easily accessed and obtained by downstream users and programs.  The ACDD and
+NODC conventions are essential for enabling those who would like to use the
+data to be able to easily locate it.
+
+*Who*: Getting the data into NetCDF files that follow these conventions should
+be the task of the original data providers.  Some modifications
+can be performed on the archival end, e.g. using NcML with THREDDS, although
+this is largely limited to fixing metadata problems and cannot fix problems
+such as the use of improper array structures.
+
+Overview of Conventions
+^^^^^^^^^^^^^^^^^^^^^^^
+
+*CF Conventions* - http://cfconventions.org/[+http://cfconventions.org/+]
+
+These define metadata that provide a definitive description of what the data
+in each variable represents, and the spatial and temporal properties of the
+data. This enables users of data from different sources to decide which
+quantities are comparable.
+
+*ACDD Conventions* - http://wiki.esipfed.org/index.php/Category:Attribute_Conventions_Dataset_Discovery[+http://wiki.esipfed.org/index.php/Category:Attribute_Conventions_Dataset_Discovery+]
+
+These conventions identify and define a list of NetCDF global attributes
+recommended for describing a NetCDF dataset to discovery systems such as
+Digital Libraries.
+
+*NODC NetCDF Templates* - http://www.nodc.noaa.gov/data/formats/netcdf/v1.1/[+http://www.nodc.noaa.gov/data/formats/netcdf/v1.1/+]
+
+These templates add to the CF and ACDD established conventions by providing
+several recommendations for both netCDF variables and attributes. 
+These are basically best practices conventions for providing long-term
+preservation, scientific quality control, product development, and multiple
+data re-use beyond its original intent. 
+
+Storage Format
+^^^^^^^^^^^^^^
+
+Typically CTD profiles are stored one cast per NetCDF file.  In the test
+dataset we're using for this work, the files are mostly CF-1.6 compliant
+and contain one cast apiece.  Only the depths over which the CTD cast has
+valid readings are included in each file.  That is, if the CTD readings
+started at 10 m and ended at 1344 m, then the depth variable in the file
+only goes from 10 m to 1344 m.  Also, the depth range is divided into half
+meter intervals on the meter and half-meter.
+
+One vs. Many CTD Casts Per NetCDF File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+At this point is is necessary for the use of the ERDDAP interface to combine
+the group of 46 files in our test dataset into a single NetCDF file.
+Additional requirements within the file are:
+
+* the same depth range for every CTD cast, with the deepest cast controlling
+the range and the non-data depths of the shallower casts containing a fill
+value in place of data;
+
+* the same depth intervals for every CTD cast, which we have within each
+of the separate CTD files in this particular set.
+
+
+
+
+Depth Range in File(s)
+^^^^^^^^^^^^^^^^^^^^^^
+
+* Is the data stored in a standard depth range amongst the files - with
+the points outside the depth range flagged as missing data points - or does
+each file contain only the depth range of the particular CTD cast?
+
+Display
+~~~~~~~
+
+Desired views of profile data include a plan view of the
+geographic locations a set of profiles, and variable vs. depth or variable vs.
+variable plots of the actual data.  The plan view will allow the user to
+choose one or more profile data locations to further investigate the data via the
+variable plots.
+
+The http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.graph[+Make a Graph+] GUI page for our test dataset on the ERDDAP
+server enables these manipulations.  Any variable in the dataset can be
+plotted against any other variable, and the appearance of the graph
+can also be significantly modified.  The resulting graph can be
+downloaded in several formats.
+
+
+
+
+
+Extraction
+~~~~~~~~~~
+
+Once we have viewed the spatial extent and visually explored the variables in our
+combined dataset, we will probably want to extract some or all of the
+data we have seen.  Our desired web interface should have the capability of 
+doing this.
+
+The ERDDAP interface allows the instruction of the whole or subset parts of
+a given dataset, and has a couple of dozen different formats into which the
+data and/or a graphical representation of it can be extracted.  Importantly,
+three of these formats are NetCDF variants:
+
+* a flat, table-like file with COARDS/CF/ACDD metadata;
+* a discrete sampling geometries file in
+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#idp8367584[contiguous ragged array format]; and
+* a discrete sampling geometries file in
+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#idp8355216[multidimensional array format].
+
+A valuable use for these formats - since the data can be supplied to ERDDAP
+in many non-NetCDF formats - is to use ERDDAP as a translator to create
+NetCDF datasets from non-NetCDF datasets.
+
+
+Analysis
+~~~~~~~~
+
+Expecting a web interface to CTD data to be capable of analysis as well as
+inspection and downloading is asking too much.  Even if we have a common
+depth range and intervals for all our individual files, the latitudes and
+longitudes will be essentially random.  This makes it difficult if not
+impossible to perform tasks like interpolation between or among casts
+since such algorithms require monotonically increasing lat and lon arrays.
+
+
+
+
+
+Options
+-------
+
+ERDDAP
+~~~~~~
+
+Our test dataset can be found as the +CTD Profile Data Example+ at:
+
+http://gcoos1.tamu.edu:8080/erddap/info/index.html[+http://gcoos1.tamu.edu:8080/erddap/info/index.html+]
+
+with the +Make a Graph Page+ at:
+
+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.graph[+http://gcoos1.tamu.edu:8080/erddap/tabledap/profiles_6a07_93aa_5cda.graph+]
+
+Features
+^^^^^^^^
+
+* All of the metadata for the dataset are available.
+* An initial plan view of the geographic location of all the CTD stations.
+* The capability to plot any of the available variables against any of the
+other variables.
+* The capability to constrain the range used for any of the variables being
+used for display.
+* The capability to change graph settings and attributes to fine tune the
+appearance of the graph.
+* The capability to download any graph as an image in several formats.
+* The capability to download the entire or any subset of the data in a couple
+of dozen formats.
+
+Limitations
+^^^^^^^^^^^
+
+* CTD data at different stations must be combined into a single NetCDF
+file with a common depth range to obtain the full feature set outlined.
+* No numerical analysis capabilities such as interpolation between stations
+are available.
+
+
+Dapper/DChart
+~~~~~~~~~~~~~
+
+The Dapper/DChart investigations are detailed at:
+
+http://stommel.tamu.edu/&#126;baum/dapper.html[+http://stommel.tamu.edu/~baum/dapper.html+]
+
+Limitations
+^^^^^^^^^^^
+
+* Development stopped in late 2009 due to lack of support.
+* The distribution is not in the form of a WAR file that can simply be
+dropped into the appropriate Tomcat directory and immediately used in the same
+manner as we do with THREDDS and ERDDAP.  It
+contains its own Tomcat distribution and it is not at all obvious how
+one might convert it to a drop-in distribution.  A query about how to
+do this to the Dapper help list elicited a response that basically said
+it was too complicated to do.
+* The CF discrete sampling geometry types are not a supported input
+format.  Either the profile files would have to be converted to one of the
+supported formats, or the unsupported program would have to be modified
+to accept the CF formats.
+* A very limited number of output formats.
+
+THREDDS
+~~~~~~~
+
+Our test dataset is available on a THREDDS server at:
+
+http://barataria.tamu.edu:8080/thredds/catalog/ctd/catalog.html?dataset=ctd/profile_latest.nc[+http://barataria.tamu.edu:8080/thredds/catalog/ctd/catalog.html?dataset=ctd/profile_latest.nc+]
+
+Features
+^^^^^^^^
+
+* The dataset can be accessed via the THREDDS OPeNDAP server.
+
+
+Limitations
+^^^^^^^^^^^
+
+* The NetCDF subsetting part of THREDDS does not yet support the profile
+feature type in the discrete sampling geometries classification system.
+This is demonstrated by clicking on the +NetcdfSubset+ option
+at: http://barataria.tamu.edu:8080/thredds/catalog/ctd/catalog.html?dataset=ctd/profile_latest.nc[+http://barataria.tamu.edu:8080/thredds/catalog/ctd/catalog.html?dataset=ctd/profile_latest.nc+]
+
+
+
+Python/Scipy/IRIS
+~~~~~~~~~~~~~~~~~
+
+The Scipy scientific and numerical extensions to the Python language are
+becoming the de facto computer language of the geosciences, and as such
+many useful ancillary/add-on packages have become available.
+One of these packages is IRIS, a Python library for analyzing and
+visualizing meteorological and oceanographic datasets.  The primary
+documentation can be found at:
+
+http://scitools.org.uk/iris/docs/latest/index.html[+http://scitools.org.uk/iris/docs/latest/index.html+]
+
+Our investigation into the use of IRIS with CTD data can be found in the
+IRIS section below.
+
+
+
+[[example]]
+Test CTD File Dataset
+---------------------
+
+The test files are a set of Gulf Integrated Spill Research
+(GISR) CTD files collected in November 2012.
+Each CTD is contained within a single NetCDF file and
+contains the variables +Pressure+, +Temperature+,
++Conductivity+, +BeamTransmission+, +Voltage0+,
++Flurorescence+, +Voltage1+, +Oxygen+,
++Voltage2+, +OBS+ (optical backscatter),
++Voltage4+, +Altimeter+, +Salinity+, +Density+,
++Depth+, +PotentialTemperature+ and
++Descent_rate+.  Not all of the files contain each
+of these variables.
+
+The sections herein will examine:
+
+* the xref:example_problems[example problems] encountered making the
+original file set sufficiently CF compliant;
+
+* a xref:example_header[typical NetCDF header] of an example test file;
+
+* a xref:example_python[Python script] created to combine the separate
+NetCDF CTD files into a single NetCDF file containing all the CTD profiles;
+
+* the xref:example_combined[NetCDF header] of the combined CTD file.
+
+Initial Files
+~~~~~~~~~~~~~
+
+The original GISR CTD files were obtained at:
+
+http://abcmgr.tamu.edu/griidc_gisr/[+http://abcmgr.tamu.edu/griidc_gisr/+]
+
+[[example_problems]]
+Latest Files and Problems
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We went through several iterations to create a set of initial files
+that were more CF-compliant, and thus easier to combine into a single
+file and to be ingested by various servers.
+
+The latest issue is that the OBS and Voltage4 fields are missing
+from the following files:
+
+-----
+np =  34  f =  PE1315T08601.nc
+np =  35  f =  PE1315T08701.nc
+np =  36  f =  PE1315T09101.nc
+np =  37  f =  PE1315T09601.nc
+np =  38  f =  PE1315T10001.nc
+np =  39  f =  PE1315T10401.nc
+np =  40  f =  PE1315T10802.nc
+np =  41  f =  PE1315T11202.nc
+np =  42  f =  PE1315T11602.nc
+np =  43  f =  PE1315T11901.nc
+np =  44  f =  PE1315T12001.nc
+np =  45  f =  PE1315T12302.nc
+-----
+
+C.Y. was notified on 11/10/2014 and told it wasn't a high priority since
+those fields aren't presently being used.
+
+[[example_header]]
+Typical NetCDF Header of a Test File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+netcdf PE1315T00101 {
+dimensions:
+	Z = 2030 ;
+	Time = 1 ;
+variables:
+	double Times(Time) ;
+		Times:axis = "T" ;
+		Times:calendar = "gregorian" ;
+		Times:long_name = "time" ;
+		Times:standard_name = "time" ;
+		Times:units = "seconds since 1970-01-01 00:00:00" ;
+	double lon(Time) ;
+		lon:axis = "X" ;
+		lon:long_name = "Longitude" ;
+		lon:standard_name = "Longitude" ;
+		lon:units = "degrees_east" ;
+	double lat(Time) ;
+		lat:axis = "Y" ;
+		lat:long_name = "Latitude" ;
+		lat:standard_name = "Latitude" ;
+		lat:units = "degrees_north" ;
+	double Pressure(Z) ;
+		Pressure:_FillValue = 9.96920996838687e+36 ;
+		Pressure:axis = "Z" ;
+		Pressure:long_name = "Pressure" ;
+		Pressure:observation_type = "" ;
+		Pressure:positive = "down" ;
+		Pressure:standard_name = "sea_water_pressure" ;
+		Pressure:units = "dbar" ;
+		Pressure:valid_max = 1098.151 ;
+		Pressure:valid_min = 77.025 ;
+	double Temperature(Z) ;
+		Temperature:_FillValue = 9.96920996838687e+36 ;
+		Temperature:coordinates = "lon lat time pressure" ;
+		Temperature:grid_mapping = "crs" ;
+		Temperature:instrument = "instrument_ctd" ;
+		Temperature:long_name = "Temperature" ;
+		Temperature:observation_type = "measured" ;
+		Temperature:standard_name = "sea_water_temperature" ;
+		Temperature:units = "ITS-90, deg C" ;
+		Temperature:valid_max = 23.3539 ;
+		Temperature:valid_min = 4.7374 ;
+	double Conductivity(Z) ;
+		Conductivity:_FillValue = 9.96920996838687e+36 ;
+		Conductivity:coordinates = "lon lat time pressure" ;
+		Conductivity:grid_mapping = "crs" ;
+		Conductivity:instrument = "instrument_ctd" ;
+		Conductivity:long_name = "Conductivity" ;
+		Conductivity:observation_type = "measured" ;
+		Conductivity:standard_name = "sea_water_electrical_conductivity" ;
+		Conductivity:units = "S/m" ;
+		Conductivity:valid_max = 5.322047 ;
+		Conductivity:valid_min = 3.365574 ;
+	double BeamTransmission(Z) ;
+		BeamTransmission:_FillValue = 9.96920996838687e+36 ;
+		BeamTransmission:coordinates = "lon lat time pressure" ;
+		BeamTransmission:grid_mapping = "crs" ;
+		BeamTransmission:instrument = "instrument_ctd" ;
+		BeamTransmission:long_name = "Beam_transmission" ;
+		BeamTransmission:observation_type = "measured" ;
+		BeamTransmission:standard_name = "sea_water_transmission" ;
+		BeamTransmission:units = "%" ;
+		BeamTransmission:valid_max = 90.9274 ;
+		BeamTransmission:valid_min = 86.5531 ;
+	double Voltage0(Z) ;
+		Voltage0:_FillValue = 9.96920996838687e+36 ;
+		Voltage0:coordinates = "lon lat time pressure" ;
+		Voltage0:grid_mapping = "crs" ;
+		Voltage0:instrument = "instrument_ctd" ;
+		Voltage0:long_name = "Voltage_0_transmissometer" ;
+		Voltage0:observation_type = "measured" ;
+		Voltage0:standard_name = "" ;
+		Voltage0:units = " " ;
+		Voltage0:valid_max = 4.5189 ;
+		Voltage0:valid_min = 4.3044 ;
+	double Fluorescence(Z) ;
+		Fluorescence:_FillValue = 9.96920996838687e+36 ;
+		Fluorescence:coordinates = "lon lat time pressure" ;
+		Fluorescence:grid_mapping = "crs" ;
+		Fluorescence:instrument = "instrument_ctd" ;
+		Fluorescence:long_name = "Fluorescence" ;
+		Fluorescence:observation_type = "measured" ;
+		Fluorescence:standard_name = "fluorescence" ;
+		Fluorescence:units = "ug/l" ;
+		Fluorescence:valid_max = 0.09 ;
+		Fluorescence:valid_min = -0. ;
+	double Voltage1(Z) ;
+		Voltage1:_FillValue = 9.96920996838687e+36 ;
+		Voltage1:coordinates = "lon lat time pressure" ;
+		Voltage1:grid_mapping = "crs" ;
+		Voltage1:instrument = "instrument_ctd" ;
+		Voltage1:long_name = "Voltage_1_fluorometer" ;
+		Voltage1:observation_type = "measured" ;
+		Voltage1:standard_name = "" ;
+		Voltage1:units = " " ;
+		Voltage1:valid_max = 1.0831 ;
+		Voltage1:valid_min = 0.3022 ;
+	double Oxygen(Z) ;
+		Oxygen:_FillValue = 9.96920996838687e+36 ;
+		Oxygen:coordinates = "lon lat time pressure" ;
+		Oxygen:grid_mapping = "crs" ;
+		Oxygen:instrument = "instrument_ctd" ;
+		Oxygen:long_name = "Oxygen, SBE 43" ;
+		Oxygen:observation_type = "measured" ;
+		Oxygen:standard_name = "volume_fraction_of_oxygen_in_sea_water" ;
+		Oxygen:units = "ml/l" ;
+		Oxygen:valid_max = 4.31334 ;
+		Oxygen:valid_min = 1.85187 ;
+	double Voltage2(Z) ;
+		Voltage2:_FillValue = 9.96920996838687e+36 ;
+		Voltage2:coordinates = "lon lat time pressure" ;
+		Voltage2:grid_mapping = "crs" ;
+		Voltage2:instrument = "instrument_ctd" ;
+		Voltage2:long_name = "Voltage_2_oxygen" ;
+		Voltage2:observation_type = "measured" ;
+		Voltage2:standard_name = "" ;
+		Voltage2:units = " " ;
+		Voltage2:valid_max = 1.8393 ;
+		Voltage2:valid_min = 1.0826 ;
+	double OBS(Z) ;
+		OBS:_FillValue = 9.96920996838687e+36 ;
+		OBS:comment = "OPTICAL BACKSCATTER Sea Tech LS6000 Light Back-Scattering Sensor (LBSS). The instrument projects light into the sample volume using two modulated 880 nm Light Emitting Diodes. Light back-scattered from the suspended particles inthe water column is measured with a solar-blind silicon detector. A light stop between the light source and the light detector prevents the measurement of direct transmitted light so that only back-scattered light from suspended particles in water are measured." ;
+		OBS:coordinates = "lon lat time pressure" ;
+		OBS:grid_mapping = "crs" ;
+		OBS:instrument = "instrument_ctd" ;
+		OBS:long_name = "OBS, Seatech LS6000" ;
+		OBS:observation_type = "measured" ;
+		OBS:standard_name = "" ;
+		OBS:units = " " ;
+		OBS:valid_max = 1.2888 ;
+		OBS:valid_min = 1.1493 ;
+	double Voltage4(Z) ;
+		Voltage4:_FillValue = 9.96920996838687e+36 ;
+		Voltage4:coordinates = "lon lat time pressure" ;
+		Voltage4:grid_mapping = "crs" ;
+		Voltage4:instrument = "instrument_ctd" ;
+		Voltage4:long_name = "Voltage_4_optical_backscatterance" ;
+		Voltage4:observation_type = "measured" ;
+		Voltage4:standard_name = "" ;
+		Voltage4:units = " " ;
+		Voltage4:valid_max = 0.8592 ;
+		Voltage4:valid_min = 0.7662 ;
+	double Altimeter(Z) ;
+		Altimeter:_FillValue = 9.96920996838687e+36 ;
+		Altimeter:coordinates = "lon lat time pressure" ;
+		Altimeter:grid_mapping = "crs" ;
+		Altimeter:instrument = "instrument_ctd" ;
+		Altimeter:long_name = "Altimeter" ;
+		Altimeter:observation_type = "measured" ;
+		Altimeter:standard_name = "altimeter_range" ;
+		Altimeter:units = "m" ;
+		Altimeter:valid_max = 99.34 ;
+		Altimeter:valid_min = 34.84 ;
+	double Salinity(Z) ;
+		Salinity:_FillValue = 9.96920996838687e+36 ;
+		Salinity:coordinates = "lon lat time pressure" ;
+		Salinity:grid_mapping = "crs" ;
+		Salinity:instrument = "instrument_ctd" ;
+		Salinity:long_name = "Salinity" ;
+		Salinity:observation_type = "measured" ;
+		Salinity:standard_name = "sea_water_salinity" ;
+		Salinity:units = "PSU" ;
+		Salinity:valid_max = 36.5619 ;
+		Salinity:valid_min = 34.8984 ;
+	double Density(Z) ;
+		Density:_FillValue = 9.96920996838687e+36 ;
+		Density:comment = "sigma-t, Value = density - 1000" ;
+		Density:coordinates = "lon lat time pressure" ;
+		Density:grid_mapping = "crs" ;
+		Density:instrument = "instrument_ctd" ;
+		Density:long_name = "Density" ;
+		Density:observation_type = "measured" ;
+		Density:standard_name = "sea_water_density" ;
+		Density:units = "sigma-t, kg/m^3" ;
+		Density:valid_max = 27.6617 ;
+		Density:valid_min = 24.8957 ;
+	double Depth(Z) ;
+		Depth:_FillValue = 9.96920996838687e+36 ;
+		Depth:coordinates = "lon lat time pressure" ;
+		Depth:grid_mapping = "crs" ;
+		Depth:instrument = "instrument_ctd" ;
+		Depth:long_name = "Depth" ;
+		Depth:observation_type = "measured" ;
+		Depth:positive = "down" ;
+		Depth:standard_name = "depth" ;
+		Depth:units = "salt water, m" ;
+		Depth:valid_max = 1088. ;
+		Depth:valid_min = 76.5 ;
+	double PotentialTemperature(Z) ;
+		PotentialTemperature:_FillValue = 9.96920996838687e+36 ;
+		PotentialTemperature:coordinates = "lon lat time pressure" ;
+		PotentialTemperature:grid_mapping = "crs" ;
+		PotentialTemperature:instrument = "instrument_ctd" ;
+		PotentialTemperature:long_name = "Potential_temperature" ;
+		PotentialTemperature:observation_type = "measured" ;
+		PotentialTemperature:standard_name = "sea_water_potential_temperature" ;
+		PotentialTemperature:units = "ITS-90, deg C" ;
+		PotentialTemperature:valid_max = 23.3376 ;
+		PotentialTemperature:valid_min = 4.6466 ;
+	double Descent_rate(Z) ;
+		Descent_rate:_FillValue = 9.96920996838687e+36 ;
+		Descent_rate:coordinates = "lon lat time pressure" ;
+		Descent_rate:grid_mapping = "crs" ;
+		Descent_rate:instrument = "instrument_ctd" ;
+		Descent_rate:long_name = "Descent_rate" ;
+		Descent_rate:observation_type = "measured" ;
+		Descent_rate:standard_name = "" ;
+		Descent_rate:units = "m/s" ;
+		Descent_rate:valid_max = 1.973 ;
+		Descent_rate:valid_min = 0.251 ;
+
+// global attributes:
+		:Conventions = "CF-1.6" ;
+		:Instrument = "instrument_ctd" ;
+		:Metadata_Conventions = "Unidata Dataset Discovery v1.0" ;
+		:acknowledgment = "" ;
+		:cdm_data_type = "Profile" ;
+		:comment = "" ;
+		:contributor_name = "James Ledwell, Matthew Howard, Chuan-Yuan Hsu" ;
+		:contributor_role = "Principal Investigator, Data Manager, Data Manager" ;
+		:creator_email = "chsu1@neo.tamu.edu" ;
+		:creator_name = "Chuan-Yuan Hsu" ;
+		:creator_url = "http://gcoos.tamu.edu/?p=6401" ;
+		:featureType = "Profile" ;
+		:geospatial_lat_max = 27.683 ;
+		:geospatial_lat_min = 27.683 ;
+		:geospatial_lat_resolution = "point" ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_max = -89.4 ;
+		:geospatial_lon_min = -89.4 ;
+		:geospatial_lon_resolution = "point" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_max = 1088. ;
+		:geospatial_vertical_min = 76.5 ;
+		:geospatial_vertical_positive = "down" ;
+		:geospatial_vertical_resolution = "point" ;
+		:geospatial_vertical_units = "meters" ;
+		:history = "Created on 2014-08-26T10:54:07Z" ;
+		:id = "GISR03" ;
+		:institution = "Woods Hole Oceanographic Institution" ;
+		:keywords = "" ;
+		:keywords_vocabulary = "GCMD Science Keywords" ;
+		:license = "" ;
+		:metadata_link = "" ;
+		:naming_authority = "Texas A&M University" ;
+		:nodc_template_version = "NODC_NetCDF_Profile_Orthogonal_Template_v1.0" ;
+		:platform = "" ;
+		:processing_level = " Quality control from the raw data" ;
+		:project = "Gulf Integrated Spill Research" ;
+		:reference = "" ;
+		:sea_name = "Northern Gulf of Mexico" ;
+		:source = "Observational data from a CTD" ;
+		:standard_name_vocabulary = "CF-1.6" ;
+		:summary = "1. To deploy six deepwater current meter moorings in the Mississippi Fan region of the Northern Gulf of Mexico. 2. To make shipboard observations of current velocity (ADCP:75 and 300 kHz), flow-through thermosalinography, fluorometer (chlorophyll), Meteorology. 3. To Collect water samples using Niskin bottles for chemical analyses." ;
+		:time_coverage_end = "2012-11-28T17:28:06" ;
+		:time_coverage_resolution = "" ;
+		:time_coverage_start = "2012-11-28T17:28:06" ;
+		:title = "Gulf Integrated Spill Research" ;
+		:uuid = "" ;
+}
+-----
+
+[[example_python]]
+Python/Scipy Program to Combine CTD Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This Python script combines the separate CTD casts in separate NetCDF
+files into a single NetCDF file.
+
+Missing Fields
+^^^^^^^^^^^^^^
+
+At present we're only including the +pressure+, +temperature+, +salinity+
+and +oxygen+ variables, although the remainder can be included.
+
+One of the reasons the remainder of the variables are not presently included
+is that the +OBS+ and +Voltage4+ fields are missing from 12 of the original
+files.  Combining all the separate CTD files into a single combined CTD
+file works best when the individual files are identical.  When fields are
+missing - and basically at random - extra coding needs to be performed to, for
+example, create in the combined file a placeholder field for the field
+missing from the original file, with the *missing value* attribute used
+to fill in the missing field values.
+
+Vertical Resolution and Range
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is fortunate that in this particular set of CTD files the original
+data was processed such that the vertical resolution is standard amongst
+the files.  That is, all the files contain data at integral 1 meter depth
+intervals.  Were this not the case, it would be impossible to combine
+all the CTDs into a single file without performing additional interpolations.
+
+The files do not feature a single, standard depth range.  That is, the first
+and last depths in each file differ among the files.  This requires that a
+maximum depth for all the CTD files be identified and all the files extended
+to that depth range, with the appropriate missing value specified where the
+file doesn't extend to that maximum depth.
+
+Attributes
+^^^^^^^^^^
+
+The CF conventions require that some appropriate variable contain an
+attribute +cf_role+ with the value +profile_id+.
+The character variable +profile+ has been created to contain that
+attribute, and contains the name of each file - sans the +.nc+ suffix - as
+the ID for each CTD profile.
+
+A +_FillValue+ of +-999.9+ is specified for the depths of the profiles that
+do not reach the maximum depth of the group of profiles.
+
+A +coordinates+ attribute with values +time lon lat z+ is specified for
+each of the profile variables.
+
+Program Listing
+^^^^^^^^^^^^^^^
+
+A Python program to combine CTD files is:
+
+[source,python]
+-----
+#!/usr/bin/python2.7
+
+#  Combines NetCDF files containing separate CTD profiles into
+#  a single NetCDF file containing many profiles.
+
+import numpy as np
+import netCDF4
+
+mv = -999.9
+
+#  Create a Python list containing the names of the profile files.
+#infiles = ['test1.nc','test2.nc','test3.nc','test4.nc']
+#inf = ['PE1315T00101.nc','PE1315T00202.nc','PE1315T00301.nc','PE1315T00401.nc']
+infiles = ['test1.nc']
+inf = ['PE1315T00101.nc']
+#  Calculate the number of stations.
+nprofiles = len(infiles)
+
+#  Create an output NetCDF file profile.nc and add a global attribute.
+nc = netCDF4.Dataset('profile.nc', 'w', format='NETCDF3_CLASSIC')
+nc.featureType = "profile"
+
+#  Create an array of z values from 0 to 2000m by 0.5m increments.
+zlev = np.arange(0,2000.5,0.5)
+nzlev = zlev.size
+
+#  Create the dimensions 'z' and 'profile'.
+nc.createDimension('z',nzlev)
+nc.createDimension('profile',len(infiles))
+nc.createDimension('idchar',12)
+
+#  Create the variables profile, time, lon, lat, z, pressure, temperature and
+#  humidity.
+prof = nc.createVariable('profile','S1',('profile','idchar',))
+prof.cf_role = "profile_id"
+
+mindep = nc.createVariable('min_depth','f8',('profile',))
+mindep.units = "m"
+mindep.long_name = "minimum_cast_depth"
+
+maxdep = nc.createVariable('max_depth','f8',('profile',))
+maxdep.units = "m"
+maxdep.long_name = "maximum_cast_depth"
+
+otime = nc.createVariable('time','f8',('profile',))
+otime.units = "Minutes since 1-Jan-4713 BC 12:00 noon GMT"
+otime.standard_name = "time"
+otime.long_name = "time"
+otime.calendar = "Julian"
+
+olon = nc.createVariable('lon','f8',('profile',))
+olon.standard_name = "longitude"
+olon.long_name = "longitude"
+olon.units = "degrees_east"
+olon.axis = "X"
+
+olat = nc.createVariable('lat','f8',('profile',))
+olat.standard_name = "latitude"
+olat.long_name = "latitude"
+olat.units = "degrees_north"
+olat.axis = "Y"
+
+oDep = nc.createVariable('z','f8',('z',))
+oDep.long_name = "depth"
+oDep.standard_name = "depth"
+oDep.units = "m"
+oDep.postive = "down"
+oDep.axis = "Z"
+
+oPrz = nc.createVariable('Prz','f8',('profile','z',),fill_value=mv)
+oPrz.standard_name = "sea_water_pressure"
+oPrz.long_name = "pressure"
+oPrz.units = "db"
+oPrz.coordinates = "time lon lat z"
+
+oTmp = nc.createVariable('Tmp','f8',('profile','z',),fill_value=mv)
+oTmp.standard_name = "sea_water_temperature"
+oTmp.long_name = "temperature"
+oTmp.units = "degree_Celsius"
+oTmp.coordinates = "time lon lat z"
+
+oSal = nc.createVariable('Sal','f8',('profile','z',),fill_value=mv)
+oSal.standard_name = "sea_water_salinity"
+oSal.long_name = "salinity"
+oSal.units = "PSU"
+oSal.coordinates = "time lon lat z"
+
+oOxy = nc.createVariable('Oxy','f8',('profile','z',),fill_value=mv)
+oOxy.standard_name = "volume_fraction_of_oxygen_in_sea_water"
+oOxy.long_name = "oxygen, SBE 43"
+oOxy.units = "ml/l"
+oOxy.coordinates = "time lon lat z"
+
+oObs = nc.createVariable('Obs','f8',('profile','z',),fill_value=mv)
+oObs.standard_name = ""
+oObs.long_name = "optical_backscatter"
+oObs.units = ""
+oObs.coordinates = "time lon lat z"
+oObs.comment = "OPTICAL BACKSCATTER Sea Tech LS6000 Light Back-Scattering
+Sensor (LBSS). The instrument projects light into the sample volume using two
+modulated 880 nm Light Emitting Diodes. Light back-scattered from the
+suspended particles inthe water column is measured with a solar-blind silicon
+detector. A light stop between the light source and the light detector
+prevents the measurement of direct transmitted light so that only
+back-scattered light from suspended particles in water are measured."
+
+np = 0
+#  Loop over number of profiles.
+for f in infiles:
+
+        print "np = ",np," f = ",f
+        nc_in = netCDF4.Dataset(f, 'r', format='NETCDF3_CLASSIC')
+
+        time_in = nc_in.variables['time'][:]
+        lat_in = nc_in.variables['lat'][:]
+        lon_in = nc_in.variables['lon'][:]
+        Prz = nc_in.variables['Prz'][:]
+        Tmp = nc_in.variables['Tmp'][:]
+#       Cod = nc_in.variables['Cod'][:]
+#       Xms = nc_in.variables['Xms'][:]
+#       V0 = nc_in.variables['V0'][:]
+#       F1c = nc_in.variables['F1c'][:]
+#       V1 = nc_in.variables['V1'][:]
+        Oxy = nc_in.variables['Oxy'][:]
+#       V2 = nc_in.variables['V2'][:]
+        Obs = nc_in.variables['Obs'][:]
+#       V4 = nc_in.variables['V4'][:]
+#       PAR = nc_in.variables['PAR'][:]
+#       V5 = nc_in.variables['V5'][:]
+#       Alt = nc_in.variables['Alt'][:]
+        Sal = nc_in.variables['Sal'][:]
+#       Sig = nc_in.variables['Sig'][:]
+        Dep = nc_in.variables['Dep'][:]
+#       Ptp = nc_in.variables['Ptp'][:]
+#       Des = nc_in.variables['Des'][:]
+        nzpts = len(nc_in.dimensions['z'])
+
+#  Find the ordinal value in zlev where the Dep values begin.
+        nz = 0
+        for z in zlev:
+                if (z == Dep[0]):
+                        break
+                else:
+                        nz = nz + 1
+
+        print " Profile ",np," begins at ",z," m at nz = ",nz
+
+#  Find the ordinal value in zlev where the Dep values end.
+        nzlast = Dep.size - 1
+        nzl = nz + nzlast + 1
+
+#  Remove all non-monotonic depths and corresponding variable values.
+
+#       for n in range(1,nzpts-1):
+        for n in range(1,nzpts):
+#               print " n = ",Dep[n]," n - 1 = ",Dep[n-1]
+                if (Dep[n] <= Dep[n-1]):
+                        for nn in range(n+1,nzpts):
+                                print " Changing depth ",nn," to ",mv
+                                Dep[nn] = mv
+                                Prz[nn] = mv
+                                Tmp[nn] = mv
+                                Sal[nn] = mv
+
+        print " Profile ",np," ends at ",z," m at nz = ",nzl
+
+        print " Looping from ",0," to ",nz-1
+#  Add undefined value to depths above CTD range.
+#       for n in range(0,nz,1):
+        for n in range(0,nz,1):
+                oSal[np,n] = mv
+                oPrz[np,n] = mv
+                oTmp[np,n] = mv
+                oOxy[np,n] = mv
+                oObs[np,n] = mv
+                oDep[n] = zlev[n]
+
+        print " Looping from ",nz," to ",nzl
+
+#  Add CTD values to depths where the CTD has values.
+        nn = 0
+#       for n in range(nz+1,nzl,1):
+        for n in range(nz,nzl,1):
+                oSal[np,n] = Sal[nn]
+                oPrz[np,n] = Prz[nn]
+                oTmp[np,n] = Tmp[nn]
+                oOxy[np,n] = Oxy[nn]
+                oObs[np,n] = Obs[nn]
+                oDep[n] = zlev[n]
+                nn = nn + 1
+
+        print " Looping from ",nzl+1," to ",nzlev
+#  Add undefined value to depths below CTD range.
+        for n in range(nzl,nzlev,1):
+#               print " np = ",np," n = ",n
+                oSal[np,n] = mv
+                oPrz[np,n] = mv
+                oTmp[np,n] = mv
+                oOxy[np,n] = mv
+                oObs[np,n] = mv
+                oDep[n] = zlev[n]
+
+# Write the profile number, time, lon and lat to the NetCDF file.
+
+# Create a character array from the part of the filename before .nc.
+                profno = list(inf[np].split('.')[0])
+                prof[np] = profno
+                mindep[np] = Dep[0]
+                maxdep[np] = Dep[nzlast]
+                otime[np] = float(time_in)
+                olon[np] = float(lon_in)
+                olat[np] = float(lat_in)
+
+# Close the station data file.
+        #       nc_in.close()
+        np = np + 1
+
+
+nc.close()
+-----
+
+[[example_combined]]
+Header of Combined GISR_G03_TAMU_CTD Files 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The header for the file that contains all the CTD files in:
+
+-----
+/home/baum/CTD/TMP/GISR_G03_HYDROGRAPHY/GISR_G03_CTD_Bottle_Tracer/GISR_G03_TAMU_CTD
+-----
+
+is:
+
+-----
+netcdf profile {
+dimensions:
+	z = 7001 ;
+	profile = 46 ;
+	idchar = 12 ;
+variables:
+	char profile(profile, idchar) ;
+		profile:cf_role = "profile_id" ;
+	double min_depth(profile) ;
+		min_depth:units = "m" ;
+		min_depth:long_name = "minimum_cast_depth" ;
+	double max_depth(profile) ;
+		max_depth:units = "m" ;
+		max_depth:long_name = "maximum_cast_depth" ;
+	double time(profile) ;
+		time:units = "Minutes since 1-Jan-4713 BC 12:00 noon GMT" ;
+		time:standard_name = "time" ;
+		time:long_name = "time" ;
+		time:calendar = "Julian" ;
+	double lon(profile) ;
+		lon:standard_name = "longitude" ;
+		lon:long_name = "longitude" ;
+		lon:units = "degrees_east" ;
+		lon:axis = "X" ;
+	double lat(profile) ;
+		lat:standard_name = "latitude" ;
+		lat:long_name = "latitude" ;
+		lat:units = "degrees_north" ;
+		lat:axis = "Y" ;
+	double z(z) ;
+		z:long_name = "depth" ;
+		z:standard_name = "depth" ;
+		z:units = "m" ;
+		z:postive = "down" ;
+		z:axis = "Z" ;
+	double Prz(profile, z) ;
+		Prz:_FillValue = -999.9 ;
+		Prz:standard_name = "sea_water_pressure" ;
+		Prz:long_name = "pressure" ;
+		Prz:units = "db" ;
+		Prz:coordinates = "time lon lat z" ;
+	double Tmp(profile, z) ;
+		Tmp:_FillValue = -999.9 ;
+		Tmp:standard_name = "sea_water_temperature" ;
+		Tmp:long_name = "temperature" ;
+		Tmp:units = "degree_Celsius" ;
+		Tmp:coordinates = "time lon lat z" ;
+	double Sal(profile, z) ;
+		Sal:_FillValue = -999.9 ;
+		Sal:standard_name = "sea_water_salinity" ;
+		Sal:long_name = "salinity" ;
+		Sal:units = "PSU" ;
+		Sal:coordinates = "time lon lat z" ;
+	double Oxy(profile, z) ;
+		Oxy:_FillValue = -999.9 ;
+		Oxy:standard_name = "volume_fraction_of_oxygen_in_sea_water" ;
+		Oxy:long_name = "oxygen, SBE 43" ;
+		Oxy:units = "ml/l" ;
+		Oxy:coordinates = "time lon lat z" ;
+	double Obs(profile, z) ;
+		Obs:_FillValue = -999.9 ;
+		Obs:standard_name = "" ;
+		Obs:long_name = "optical_backscatter" ;
+		Obs:units = "" ;
+		Obs:coordinates = "time lon lat z" ;
+		Obs:comment = "OPTICAL BACKSCATTER Sea Tech LS6000 Light Back-Scattering Sensor (LBSS). The instrument projects light into the sample 
+volume using two modulated 880 nm Light Emitting Diodes. Light back-scattered from the suspended particles inthe water column is measured with a solar
+-blind silicon detector. A light stop between the light source and the light detector prevents the measurement of direct transmitted light so that onl
+y back-scattered light from suspended particles in water are measured." ;
+
+// global attributes:
+		:featureType = "profile" ;
+-----
+
+The minimum and maximum depths are:
+
+-----
+min_depth = 76.5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 5, 5, 5, 5, 5, 
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2.5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+    5, 5 ;
+
+ max_depth = -999.9, 1538.5, 1607, -999.9, 1431, 1217.5, 1224.5, 1743, 1598, 
+    1719, 1810, 1472.5, 1142.5, -999.9, 1483, 1824.5, 2416.5, 3048, 1916.5, 
+    1527.5, 1315, 1193.5, 1202, 1340.5, 2485.5, 3101.5, 3238, 3082.5, 2895, 
+    2438.5, -999.9, 1085, -999.9, 1218.5, 2376.5, 2267, 1244, 1883.5, 2351.5, 
+    2725.5, 3067, 3069.5, 2852.5, 3374.5, 3325, 2697 ;
+
+ time = 2456260.22797457, 2456260.22797457, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456260.84394677, 
+    2456260.84394677, 2456260.84394677, 2456260.84394677, 2456274.45436343, 
+    2456274.45436343, 2456274.45436343, 2456274.45436343, 2456274.45436343, 
+    2456274.45436343, 2456274.45436343, 2456274.45436343, 2456274.45436343, 
+    2456274.45436343, 2456274.45436343, 2456274.45436343 ;
+
+ lon = -90.5999984741211, -90.5999984741211, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -91.4166641235352, -91.4166641235352, 
+    -91.4166641235352, -87.9660034179688, -87.9660034179688, 
+    -87.9660034179688, -87.9660034179688, -87.9660034179688, 
+    -87.9660034179688, -87.9660034179688, -87.9660034179688, 
+    -87.9660034179688, -87.9660034179688, -87.9660034179688, -87.9660034179688 ;
+
+ lat = 27.6833324432373, 27.6833324432373, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 27.2333335876465, 
+    27.2333335876465, 27.2333335876465, 27.2333335876465, 28.1846675872803, 
+    28.1846675872803, 28.1846675872803, 28.1846675872803, 28.1846675872803, 
+    28.1846675872803, 28.1846675872803, 28.1846675872803, 28.1846675872803, 
+    28.1846675872803, 28.1846675872803, 28.1846675872803 ;
+-----
+
+IRIS
+----
+
+http://scitools.org.uk/iris/docs/latest/userguide/index.html[+http://scitools.org.uk/iris/docs/latest/userguide/index.html+]
+
+Installing IRIS Using Conda
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rich Signell's Binstar repository for Conda packages is at:
+
+https://conda.binstar.org/rsignell/linux-64[+https://conda.binstar.org/rsignell/linux-64+]
+
+and the recipe for installing Iris is at:
+
+https://binstar.org/rsignell/iris[+https://binstar.org/rsignell/iris+]
+
+It is:
+
+-----
+conda install -c https://conda.binstar.org/rsignell iris
+-----
+
+Running this from the +conda+ binary in the latest Anaconda environment gives:
+
+-----
+/opt/anaconda/bin/conda install -c https://conda.binstar.org/rsignell iris
+Fetching package metadata: ...
+Solving package specifications: .
+Package plan for installation in environment /opt/anaconda:
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    biggus-0.6.0               |       np18py27_0          43 KB
+    cartopy-0.11.1             |       np18py27_0         7.5 MB
+    distribute-0.6.45          |           py27_1         517 KB
+    geos-3.3.3                 |                0        14.5 MB
+    iris-1.7.0                 |       np18py27_1        26.2 MB
+    libnetcdf-4.2.1.1          |                1         859 KB
+    netcdf4-1.0.8              |       np18py27_0         1.0 MB
+    owslib-0.8.7               |           py27_0         270 KB
+    proj4-4.8.0                |                0         835 KB
+    pyke-1.1.1                 |           py27_0         193 KB
+    pyshp-1.2.0                |           py27_0          28 KB
+    python-2.7.8               |                0        11.3 MB
+    python-dateutil-2.2        |           py27_0         257 KB
+    pytz-2014.4                |           py27_0         172 KB
+    shapely-1.3.2              |           py27_0         177 KB
+    six-1.7.3                  |           py27_0          15 KB
+    udunits2-2.2.6             |                0         133 KB
+    ------------------------------------------------------------
+                                           Total:        64.0 MB
+
+The following packages will be UN-linked:
+
+    package                    |            build
+    ---------------------------|-----------------
+    python-2.7.7               |                0
+    pytz-2014.3                |           py27_0
+    six-1.6.1                  |           py27_0
+
+The following packages will be linked:
+
+    package                    |            build
+    ---------------------------|-----------------
+    biggus-0.6.0               |       np18py27_0   hard-link
+    cartopy-0.11.1             |       np18py27_0   hard-link
+    distribute-0.6.45          |           py27_1   hard-link
+    geos-3.3.3                 |                0   hard-link
+    iris-1.7.0                 |       np18py27_1   hard-link
+    libnetcdf-4.2.1.1          |                1   hard-link
+    netcdf4-1.0.8              |       np18py27_0   hard-link
+    owslib-0.8.7               |           py27_0   hard-link
+    proj4-4.8.0                |                0   hard-link
+    pyke-1.1.1                 |           py27_0   hard-link
+    pyshp-1.2.0                |           py27_0   hard-link
+    python-2.7.8               |                0   hard-link
+    python-dateutil-2.2        |           py27_0   hard-link
+    pytz-2014.4                |           py27_0   hard-link
+    shapely-1.3.2              |           py27_0   hard-link
+    six-1.7.3                  |           py27_0   hard-link
+    udunits2-2.2.6             |                0   hard-link
+
+Proceed ([y]/n)? y
+
+Fetching packages ...
+biggus-0.6.0-n 100% |##################################################################################| Time: 0:00:00 501.76 kB/s
+cartopy-0.11.1 100% |##################################################################################| Time: 0:00:00   8.74 MB/s
+distribute-0.6 100% |##################################################################################| Time: 0:00:00   1.06 MB/s
+geos-3.3.3-0.t 100% |##################################################################################| Time: 0:00:01  10.60 MB/s
+iris-1.7.0-np1 100% |##################################################################################| Time: 0:00:01  17.37 MB/s
+libnetcdf-4.2. 100% |##################################################################################| Time: 0:00:01 786.47 kB/s
+netcdf4-1.0.8- 100% |##################################################################################| Time: 0:00:01 613.67 kB/s
+owslib-0.8.7-p 100% |##################################################################################| Time: 0:00:00 395.04 kB/s
+proj4-4.8.0-0. 100% |##################################################################################| Time: 0:00:01 847.95 kB/s
+pyke-1.1.1-py2 100% |##################################################################################| Time: 0:00:00 902.33 kB/s
+pyshp-1.2.0-py 100% |##################################################################################| Time: 0:00:00 652.54 kB/s
+python-2.7.8-0 100% |##################################################################################| Time: 0:00:02   4.90 MB/s
+python-dateuti 100% |##################################################################################| Time: 0:00:00   1.00 MB/s
+pytz-2014.4-py 100% |##################################################################################| Time: 0:00:00 302.85 kB/s
+shapely-1.3.2- 100% |##################################################################################| Time: 0:00:00 252.69 kB/s
+six-1.7.3-py27 100% |##################################################################################| Time: 0:00:00 173.98 kB/s
+udunits2-2.2.6 100% |##################################################################################| Time: 0:00:00 765.44 kB/s
+Extracting packages ...
+[      COMPLETE      ] |####################################################################################################| 100%
+Unlinking packages ...
+[      COMPLETE      ] |####################################################################################################| 100%
+Linking packages ...
+[      COMPLETE      ] |####################################################################################################| 100%
+-----
+
+
+Loading Cubes
+~~~~~~~~~~~~~
+
+The NetCDF files in:
+
+-----
+/home/baum/CTD/GISR_G03_HYDROGRAPHY/GISR_G03_CTD_Bottle_Tracer/GISR_G03_TAMU_CTD
+-----
+
+should be amenable to being loaded in the following manner:
+
+-----
+>>> import iris
+>>> filename = iris.sample_data_path('uk_hires.pp')
+>>> cubes = iris.load(filename)
+>>> print cubes
+0: air_potential_temperature / (K)     (time: 3; model_level_number: 7; grid_latitude: 204; grid_longitude: 187)
+1: surface_altitude / (m)              (grid_latitude: 204; grid_longitude: 187)
+-----
+
+
+Loading One CTD File
+~~~~~~~~~~~~~~~~~~~~
+
+The test file is:
+
+-----
+/home/baum/CTD/TMP/PE1315T00101.nc
+-----
+
+and a session to load it is:
+
+-----
+>>> import iris
+>>> file = '/home/baum/CTD/TMP/PE1315T00101.nc'
+>>> cubes = iris.load(file)
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Tmp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Tmp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Cod'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Cod'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Xms'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Xms'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'V0'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'V0'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Flc'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Flc'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'V1'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'V1'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Oxy'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Oxy'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'V2'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'V2'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Obs'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Obs'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'V4'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'V4'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'PAR'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'PAR'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'V5'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'V5'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Alt'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Alt'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Sal'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Sal'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'Dst', referenced by netCDF variable u'Sig'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'Sigt', referenced by netCDF variable u'Sig'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Dep'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Dep'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Ptp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Ptp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'boolean_flag_variable', referenced by netCDF variable u'Des'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:269: UserWarning: Missing CF-netCDF ancillary data variable u'enumerated_flag_variable', referenced by netCDF variable u'Des'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Tmp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Cod'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Xms'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'V0'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Flc'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'V1'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Oxy'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'V2'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Obs'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'V4'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'PAR'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'V5'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Alt'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Sal'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Sig'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Ptp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:310: UserWarning: Missing CF-netCDF auxiliary coordinate variable u'z', referenced by netCDF variable u'Des'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Tmp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Cod'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Xms'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'V0'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Flc'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'V1'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Oxy'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'V2'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Obs'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'V4'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'PAR'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'V5'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Alt'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Sal'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Sig'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Dep'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Ptp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603: UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by netCDF variable u'Des'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Tmp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Cod'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Xms'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'V0'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Flc'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'V1'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Oxy'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'V2'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Obs'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'V4'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'PAR'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'V5'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Alt'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Sal'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Sig'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Ptp'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:640: UserWarning: Missing CF-netCDF label variable u'z', referenced by netCDF variable u'Des'
+  warnings.warn(message % (name, nc_var_name))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/_pyke_rules/compiled_krb/fc_rules_cf_fc.py:1195: UserWarning: Ignoring netCDF variable 'Sal' invalid units 'PSU'
+  warnings.warn(msg.format(msg_name, msg_units))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/_pyke_rules/compiled_krb/fc_rules_cf_fc.py:1195: UserWarning: Ignoring netCDF variable 'Xms' invalid units 'percentage'
+  warnings.warn(msg.format(msg_name, msg_units))
+>>> cubes
+[<iris 'Cube' of descent_rate / (m s^-1) (-- : 2030)>,
+<iris 'Cube' of voltage_0_transmissometer / (unknown) (-- : 2030)>,
+<iris 'Cube' of voltage_1_fluorometer / (unknown) (-- : 2030)>,
+<iris 'Cube' of voltage_2_oxygen / (unknown) (-- : 2030)>,
+<iris 'Cube' of voltage_5_par / (unknown) (-- : 2030)>,
+<iris 'Cube' of voltage_4_optical_backscatterance / (unknown) (-- : 2030)>,
+<iris 'Cube' of fluorescence / (mg m^-3) (-- : 2030)>,
+<iris 'Cube' of OBS, Seatech LS6000 / (unknown) (-- : 2030)>,
+<iris 'Cube' of beam_transmission / (unknown) (-- : 2030)>,
+<iris 'Cube' of altimeter_range / (m) (-- : 2030)>,
+<iris 'Cube' of depth / (m) (-- : 2030)>,
+<iris 'Cube' of omnidirectional_photosynthetic_spherical_irradiance_in_sea_water / (W m^-2) (-- : 2030)>,
+<iris 'Cube' of sea_water_density / (kg m^-3) (-- : 2030)>,
+<iris 'Cube' of sea_water_electrical_conductivity / (S m^-1) (-- : 2030)>,
+<iris 'Cube' of sea_water_potential_temperature / (degree_Celsius) (-- : 2030)>,
+<iris 'Cube' of sea_water_pressure / (db) (-- : 2030)>,
+<iris 'Cube' of sea_water_salinity / (unknown) (-- : 2030)>,
+<iris 'Cube' of sea_water_temperature / (degree_Celsius) (-- : 2030)>,
+<iris 'Cube' of volume_fraction_of_oxygen_in_sea_water / (ml/l) (-- : 2030)>]
+>>> descent_rate = cubes[0]
+>>> print descent_rate
+descent_rate / (m s^-1)             (-- : 2030)
+     Attributes:
+          Conventions: CF-1.6
+          Fillvalue: -9999.0
+          Metadata_Conventions: Unidata Dataset Discovery v1.0
+          acknowledgment:  
+          cdm_altitude_proxy: z
+          cdm_data_type: Profile
+          cdm_profile_variables: longitude, latitude
+          comment:  
+          contributor_name:  
+          contributor_role:  
+          creator_email: sdimarco@tamu.edu
+          creator_name: Dr. Steven DiMarco
+          creator_url: http://ocean.tamu.edu/profile/SDiMarco
+          date_created:  
+          date_modified:  
+          featureType: profile
+          geospatial_lat_max: 27.6833
+          geospatial_lat_min: 27.6833
+          geospatial_lat_resolution: point
+          geospatial_lat_units: degrees_north
+          geospatial_lon_max: -90.6
+          geospatial_lon_min: -90.6
+          geospatial_lon_resolution: point
+          geospatial_lon_units: degrees_east
+          geospatial_vertical_max: 1088.0
+          geospatial_vertical_min: 76.5
+          geospatial_vertical_positive: down
+          geospatial_vertical_resolution:  
+          geospatial_vertical_units: meter
+          history:  
+          id: GISR01
+          institution: Texas A&M University
+          instrument: CTD Info
+          invalid_standard_name:  
+          keywords:  
+          keywords_vocabulary:  
+          license:  
+          metadata_link:  
+          naming_authority: ocean.tamu.edu
+          nodc_name:  
+          nodc_template_version: NODC_NetCDF_Profile_Orthogonal_Template_v1.0
+          platform:  
+          processing_level:  
+          project: Gulf Integrated Spill Research
+          publisher_email: Chuan-Yuan Hsu <chsu1@hotmail.com>
+          publisher_name: GISR
+          publisher_url: http://gisr.tamu.edu/
+          references:  
+          sea_name: Northern Gulf of Mexico
+          source:  
+          standard_name_vocabulary: CF-1.6
+          summary: 1. To deploy six deepwater current meter moorings in the Mississippi Fan...
+          time_coverage_end: 2012/11/28 17:28:06
+          time_coverage_resolution:  
+          time_coverage_start: 2012/11/28 17:28:06
+          title: Gulf Integrated Spill Research
+          uuid:  
+>>>
+-----
+
+Fixes
+~~~~~
+
+The variables do not have the requisite +coordinates+ attribute as specified
+by the CF standards at, e.g.
+
+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#coordinate-types[+http://cfconventions.org/Data/cf-conventions/cf-conventions-1.6/build/cf-conventions.html#coordinate-types+]
+
+with an example being:
+
+-----
+   float pressure(profile, z) ; 
+          pressure:standard_name = "air_pressure" ;
+          pressure:long_name = "pressure level" ;
+          pressure:units = "hPa" ;
+          pressure:coordinates = "time lon lat altz" ;
+-----
+
+Thus we will add or overwrite the present values:
+
+-----
+ncatted -O -a coordinates,Prz,c,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Tmp,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Cod,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Xms,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,V0,c,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Flc,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,V1,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Oxy,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,V2,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Obs,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,V4,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,PAR,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,V5,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Alt,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Sal,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Sig,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Ptp,o,c,'time lon lat Dep' test.nc
+ncatted -O -a coordinates,Des,o,c,'time lon lat Dep' test.nc
+-----
+
+A couple of warnings can be nuked via:
+
+-----
+ncatted -O -a ancillary_variables,,d,c,'time lon lat Dep' test.nc
+ncatted -O -a grid_mapping,,d,c,'time lon lat Dep' test.nc
+-----
+
+Now we are left with the warnings:
+
+-----
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/_pyke_rules/compiled_krb/fc_rules_cf_fc.py:1195: UserWarning: Ignoring netCDF variable 'time' invalid units 'Minutes since 1-Jan-4713 BC 12:00 noon GMT'
+  warnings.warn(msg.format(msg_name, msg_units))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/_pyke_rules/compiled_krb/fc_rules_cf_fc.py:1195: UserWarning: Ignoring netCDF variable 'Sal' invalid units 'PSU'
+  warnings.warn(msg.format(msg_name, msg_units))
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/_pyke_rules/compiled_krb/fc_rules_cf_fc.py:1195: UserWarning: Ignoring netCDF variable 'Xms' invalid units 'percentage'
+  warnings.warn(msg.format(msg_name, msg_units))
+-----
+
+And if we look at a specific cube now:
+
+-----
+>>> descent = cubes[0]
+>>> print descent
+descent_rate / (m s^-1)             (-- : 2030)
+     Auxiliary coordinates:
+          depth                         x
+     Scalar coordinates:
+          latitude: 27.6833324432 degrees
+          longitude: -90.5999984741 degrees
+          time: 2456260.22797
+     Attributes:
+          Conventions: CF-1.6
+          Fillvalue: -9999.0
+          ...
+          title: Gulf Integrated Spill Research
+          uuid:  
+>>> 
+-----
+
+Python Script for Modifying Files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-----
+#!/opt/anaconda/bin/python
+
+import os
+
+fname = "/home/baum/CTD/TMP/test2.nc"
+
+#os.system("ncatted -O -a coordinates,Prz,c,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Tmp,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Cod,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Xms,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,V0,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Flc,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,V1,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Oxy,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,V2,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Obs,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,V4,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,PAR,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,V5,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Alt,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Sal,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Sig,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Ptp,o,c,'time lon lat Dep' " + fname)
+os.system("ncatted -O -a coordinates,Des,o,c,'time lon lat Dep' " + fname)
+-----
+
+
+Loading Two CTD Files
+~~~~~~~~~~~~~~~~~~~~~
+
+Two files have been modified and renamed +test1.nc+ and +test2.nc+.  They are
+loaded into IRIS via:
+
+-----
+>>> import iris
+>>> files = iris.sample_data_path('/home/baum/CTD/TMP/test*.nc')
+>>> cubes = iris.load(files)
+...
+/opt/anaconda/lib/python2.7/site-packages/Iris-1.8.0_dev-py2.7.egg/iris/fileformats/cf.py:603:
+UserWarning: Missing CF-netCDF grid mapping variable u'crs', referenced by
+netCDF variable u'Des'
+  warnings.warn(message % (name, nc_var_name))
+>>> print cubes
+0: descent_rate / (m s^-1)             (-- : 2030)
+1: voltage_0_transmissometer / (unknown) (-- : 2030)
+2: voltage_1_fluorometer / (unknown)   (-- : 2030)
+3: voltage_2_oxygen / (unknown)        (-- : 2030)
+4: voltage_5_par / (unknown)           (-- : 2030)
+5: voltage_4_optical_backscatterance / (unknown) (-- : 2030)
+6: fluorescence / (mg m^-3)            (-- : 2030)
+7: OBS, Seatech LS6000 / (unknown)     (-- : 2030)
+8: beam_transmission / (unknown)       (-- : 2030)
+9: descent_rate / (m s^-1)             (-- : 3068)
+10: voltage_0_transmissometer / (unknown) (-- : 3068)
+11: voltage_1_fluorometer / (unknown)   (-- : 3068)
+12: voltage_2_oxygen / (unknown)        (-- : 3068)
+13: voltage_5_par / (unknown)           (-- : 3068)
+14: voltage_4_optical_backscatterance / (unknown) (-- : 3068)
+15: fluorescence / (mg m^-3)            (-- : 3068)
+16: OBS, Seatech LS6000 / (unknown)     (-- : 3068)
+17: beam_transmission / (unknown)       (-- : 3068)
+18: altimeter_range / (m)               (-- : 2030)
+19: altimeter_range / (m)               (-- : 3068)
+20: omnidirectional_photosynthetic_spherical_irradiance_in_sea_water / (W m^-2) (-- : 2030)
+21: omnidirectional_photosynthetic_spherical_irradiance_in_sea_water / (W m^-2) (-- : 3068)
+22: sea_water_density / (kg m^-3)       (-- : 2030)
+23: sea_water_density / (kg m^-3)       (-- : 3068)
+24: sea_water_electrical_conductivity / (S m^-1) (-- : 2030)
+25: sea_water_electrical_conductivity / (S m^-1) (-- : 3068)
+26: sea_water_potential_temperature / (degree_Celsius) (-- : 2030)
+27: sea_water_potential_temperature / (degree_Celsius) (-- : 3068)
+28: sea_water_pressure / (db)           (-- : 2030)
+29: sea_water_pressure / (db)           (-- : 3068)
+30: sea_water_salinity / (unknown)      (-- : 2030)
+31: sea_water_salinity / (unknown)      (-- : 3068)
+32: sea_water_temperature / (degree_Celsius) (-- : 2030)
+33: sea_water_temperature / (degree_Celsius) (-- : 3068)
+34: volume_fraction_of_oxygen_in_sea_water / (ml/l) (-- : 2030)
+35: volume_fraction_of_oxygen_in_sea_water / (ml/l) (-- : 3068)
+>>> 
+-----
+
+Instead of creating another dimension for the similar data structures, IRIS
+created a cube for each field in each file.  The depth range for
++test1.nc+ is:
+
+-----
+z[0] Dep[0]=76.5 m
+z[1] Dep[1]=77 m
+...
+z[2028] Dep[2028]=1085.5 m
+z[2029] Dep[2029]=1085 m
+-----
+
+and for +test2.nc+ is:
+
+-----
+z[0] Dep[0]=5 m
+z[1] Dep[1]=5.5 m
+...
+z[3066] Dep[3066]=1538 m
+z[3067] Dep[3067]=1538.5 m
+-----
+
+
+Plotting a Cube
+~~~~~~~~~~~~~~~
+
+[source,python]
+-----
+fname = iris.sample_data_path('/home/baum/CTD/TMP/test1.nc')
+descent_rate = iris.load_cube(fname,'descent_rate')
+descent_rate_1d = descent_rate[:]
+qplt.plot(descent_rate_1d)
+[<matplotlib.lines.Line2D object at 0x2b1538be5b90>]
+plt.show()
+-----
+
+Examples Using Vertical Profiles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+WOD Standard Level Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This example uses a NetCDF file that complies with the CF profile feature type
+recommendations.
+
+This is contained within an iPython notebook at:
+
+
+http://nbviewer.ipython.org/github/ocefpaf/python4oceanographers/blob/master/content/downloads/notebooks/2014-07-21-iris_profile_data.ipynb[+http://nbviewer.ipython.org/github/ocefpaf/python4oceanographers/blob/master/content/downloads/notebooks/2014-07-21-iris_profile_data.ipynb+]
+
+The data file can be obtained via:
+
+http://data.nodc.noaa.gov/thredds/fileServer/testdata/netCDFTemplateExamples/profile/wodStandardLevels.nc[+http://data.nodc.noaa.gov/thredds/fileServer/testdata/netCDFTemplateExamples/profile/wodStandardLevels.nc+]
+
+There is also a blog post about this at:
+
+http://ocefpaf.github.io/python4oceanographers/blog/2014/07/21/cf-profile/[+http://ocefpaf.github.io/python4oceanographers/blog/2014/07/21/cf-profile/+]
+
+[source,python]
+----
+import iris
+import iris.plot as iplt
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+# Add the .html in the end to visualize in the browser.
+url = 'http://data.nodc.noaa.gov/thredds/dodsC/testdata/netCDFTemplateExamples/profile/wodStandardLevels.nc'
+sal = iris.load_cube(url, 'sea_water_salinity')
+
+print(sal)
+
+sea_water_salinity / (unknown)      (-- : 169; altitude: 26)
+     Dimension coordinates:
+          altitude                      -              x
+     Auxiliary coordinates:
+          latitude                      x              -
+          longitude                     x              -
+          time                          x              -
+     Attributes:
+          Conventions: CF-1.6
+          DODS.dimName: strnlen
+          DODS.strlen: 170
+          cdm_data_type: Profile
+          featureType: profile
+          standard_name_vocabulary: CF-1.6
+
+lon = iris.Constraint(longitude=lambda l:100 < l < 150)
+lat = iris.Constraint(latitude=lambda l:-40 < l < -20)
+alt = iris.Constraint(altitude=lambda a: a <= 30)
+sal_profile = sal.extract(alt & lon & lat)
+print(sal_profile)
+
+sea_water_salinity / (unknown)      (altitude: 4)
+     Dimension coordinates:
+          altitude                           x
+     Scalar coordinates:
+          latitude: -28.7667 degrees
+          longitude: 114.383 degrees
+          time: 1980-03-10 00:00:00
+     Attributes:
+          Conventions: CF-1.6
+          DODS.dimName: strnlen
+          DODS.strlen: 170
+          cdm_data_type: Profile
+          featureType: profile
+          standard_name_vocabulary: CF-1.6
+
+fig, ax = plt.subplots()
+
+x = sal.coord('longitude').points
+y = sal.coord('latitude').points
+
+xc = sal_profile.coord('longitude').points
+yc = sal_profile.coord('latitude').points
+
+ax.plot(x, y, 'ko')
+ax.plot(xc, yc, 'ro')
+ax.grid()
+[plt.show()]
+
+
+fig, ax = plt.subplots(figsize=(5, 6))
+iplt.plot(sal_profile, sal_profile.coord('altitude'),
+          linewidth=2,  color='k')
+ax.set_xlabel('Salinity')
+ax.set_ylabel('Depth')
+[plt.show()]
+-----
+
+Iris Oceanography Profile Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This example uses a NetCDF file that does not comply with the CF profile
+feature type recommendation, but is useful for the graphing portions.
+
+http://scitools.org.uk/iris/docs/latest/example_code/graphics/atlantic_profiles.py[+http://scitools.org.uk/iris/docs/latest/example_code/graphics/atlantic_profiles.py+]
+
+The data file +atlantic_profiles.nc+ is at:
+
+https://github.com/SciTools/iris-sample-data/blob/master/sample_data/atlantic_profiles.nc[+https://github.com/SciTools/iris-sample-data/blob/master/sample_data/atlantic_profiles.nc+]
+
+This example uses a NetCDF file that does not comply with the CF profile
+feature type recommendation, but is useful for the graphing portions.
+
+[source,python]
+-----
+"""
+Oceanographic profiles and T-S diagrams
+=======================================
+
+This example demonstrates how to plot vertical profiles of different
+variables in the same axes, and how to make a scatter plot of two
+variables. There is an oceanographic theme but the same techniques are
+equally applicable to atmospheric or other kinds of data.
+
+The data used are profiles of potential temperature and salinity in the
+Equatorial and South Atlantic, output from an ocean model.
+
+The y-axis of the first plot produced will be automatically inverted due to
+the
+presence of the attribute positive=down on the depth coordinate. This means
+depth values intuitively increase downward on the y-axis.
+
+"""
+import iris
+import iris.iterate
+import iris.plot as iplt
+import matplotlib.pyplot as plt
+
+
+def main():
+
+    # Load the gridded temperature and salinity data.
+    fname = iris.sample_data_path('atlantic_profiles.nc')
+    cubes = iris.load(fname)
+    theta, = cubes.extract('sea_water_potential_temperature')
+    salinity, = cubes.extract('sea_water_practical_salinity')
+
+    # Extract profiles of temperature and salinity from a particular point in
+    # the southern portion of the domain, and limit the depth of the profile
+    # to 1000m.
+    lon_cons = iris.Constraint(longitude=330.5)
+    lat_cons = iris.Constraint(latitude=lambda l: -10 < l < -9)
+    depth_cons = iris.Constraint(depth=lambda d: d <= 1000)
+    theta_1000m = theta.extract(depth_cons & lon_cons & lat_cons)
+    salinity_1000m = salinity.extract(depth_cons & lon_cons & lat_cons)
+
+    # Plot these profiles on the same set of axes. In each case we call plot
+    # with two arguments, the cube followed by the depth coordinate. Putting
+    # them in this order places the depth coordinate on the y-axis.
+    # The first plot is in the default axes. We'll use the same color for the
+    # curve and its axes/tick labels.
+    fig = plt.figure(figsize=(5, 6))
+    temperature_color = (.3, .4, .5)
+    ax1 = plt.gca()
+    iplt.plot(theta_1000m, theta_1000m.coord('depth'), linewidth=2,
+              color=temperature_color, alpha=.75)
+    ax1.set_xlabel('Potential Temperature / K', color=temperature_color)
+    ax1.set_ylabel('Depth / m')
+    for ticklabel in ax1.get_xticklabels():
+        ticklabel.set_color(temperature_color)
+    # To plot salinity in the same axes we use twiny(). We'll use a different
+    # color to identify salinity.
+    salinity_color = (.6, .1, .15)
+    ax2 = plt.gca().twiny()
+    iplt.plot(salinity_1000m, salinity_1000m.coord('depth'), linewidth=2,
+              color=salinity_color, alpha=.75)
+    ax2.set_xlabel('Salinity / PSU', color=salinity_color)
+    for ticklabel in ax2.get_xticklabels():
+        ticklabel.set_color(salinity_color)
+    plt.tight_layout()
+    plt.show()
+
+    # Now plot a T-S diagram using scatter. We'll use all the profiles here,
+    # and each point will be coloured according to its depth.
+    plt.figure(figsize=(6, 6))
+    depth_values = theta.coord('depth').points
+    for s, t in iris.iterate.izip(salinity, theta, coords='depth'):
+        iplt.scatter(s, t, c=depth_values, marker='+', cmap='RdYlBu_r')
+    ax = plt.gca()
+    ax.set_xlabel('Salinity / PSU')
+    ax.set_ylabel('Potential Temperature / K')
+    cb = plt.colorbar(orientation='horizontal')
+    cb.set_label('Depth / m')
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == '__main__':
+    main()
+-----
+
+
+Plotting Our Test Dataset with IRIS/Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example at:
+
+
+http://nbviewer.ipython.org/github/ocefpaf/python4oceanographers/blob/master/content/downloads/notebooks/2014-07-21-iris_profile_data.ipynb[+http://nbviewer.ipython.org/github/ocefpaf/python4oceanographers/blob/master/content/downloads/notebooks/2014-07-21-iris_profile_data.ipynb+]
+
+shows us how to plot our CTD profiles.
+
+Plotting Lon/Lat Points
+^^^^^^^^^^^^^^^^^^^^^^^
+
+[source,python]
+-----
+import iris
+import iris.plot as iplt
+import matplotlib.pyplot as plt
+
+filename = iris.sample_data_path('/home/baum/CTD/TMP/profile.nc')
+pres = iris.load_cube(filename, 'sea_water_pressure')
+print(pres)
+sea_water_pressure / (db)           (-- : 4; depth: 4001)
+     Dimension coordinates:
+          depth                         -         x
+     Auxiliary coordinates:
+          latitude                      x         -
+          longitude                     x         -
+          time                          x         -
+     Attributes:
+          featureType: profile
+lon = iris.Constraint(longitude=lambda l:-100 < l < -90)
+lat = iris.Constraint(latitude=lambda l:27 < l < 28)
+dep = iris.Constraint(depth=lambda a: 200 < a < 300)
+prof = pres.extract(dep & lon & lat)
+print(prof)
+sea_water_pressure / (db)           (-- : 4; depth: 199)
+     Dimension coordinates:
+          depth                         -         x
+     Auxiliary coordinates:
+          latitude                      x         -
+          longitude                     x         -
+          time                          x         -
+     Attributes:
+          featureType: profile
+>>> fig, ax = plt.subplots()
+>>> x = pres.coord('longitude').points
+>>> y = pres.coord('latitude').points
+>>> xc = prof.coord('longitude').points
+>>> yc = prof.coord('latitude').points
+>>> ax.plot(x, y, 'ko')
+>>> ax.plot(xc, yc, 'ro')
+>>> ax.grid()
+>>> plt.show()
+-----
+
+Plotting Vertical Profiles
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note that this particular version of +profile.nc+ contains only one profile.
+We've not yet figured out how to elegantly do multiple profiles.
+
+After the info at:
+
+http://nbviewer.ipython.org/github/ocefpaf/python4oceanographers/blob/master/content/downloads/notebooks/2014-07-21-iris_profile_data.ipynb[+http://nbviewer.ipython.org/github/ocefpaf/python4oceanographers/blob/master/content/downloads/notebooks/2014-07-21-iris_profile_data.ipynb+]
+
+[source,python]
+-----
+filename = iris.sample_data_path('/home/baum/CTD/TMP/profile.nc')
+
+pres = iris.load_cube(filename, 'sea_water_pressure')
+lon = iris.Constraint(longitude=lambda l:-100 < l < -90)
+lat = iris.Constraint(latitude=lambda l:27 < l < 28)
+dep = iris.Constraint(depth=lambda a: 200 < a < 300)
+prof = pres.extract(dep & lon & lat)
+
+fig, ax = plt.subplots(figsize=(5, 6))
+iplt.plot(prof, prof.coord('depth'),linewidth=2, color='k')
+ax.set_xlabel('Pressure')
+ax.set_ylabel('Depth')
+plt.show()
+
+pres = iris.load_cube(filename, 'sea_water_temperature')
+lon = iris.Constraint(longitude=lambda l:-100 < l < -90)
+lat = iris.Constraint(latitude=lambda l:27 < l < 28)
+dep = iris.Constraint(depth=lambda a: 200 < a < 300)
+temp = pres.extract(dep & lon & lat)
+
+fig, ax = plt.subplots(figsize=(5, 6))
+iplt.plot(temp, temp.coord('depth'),linewidth=2, color='k')
+ax.set_xlabel('Temperature')
+ax.set_ylabel('Depth')
+plt.show()
+-----
+
+

@@ -1,0 +1,206 @@
+Audio/Visual Tools
+==================
+Steven K. Baum
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+== ALAC
+
+https://github.com/TimothyGu/alac[`https://github.com/TimothyGu/alac`]
+
+https://github.com/macosforge/alac[`https://github.com/macosforge/alac`]
+
+https://en.wikipedia.org/wiki/Apple_Lossless[`https://en.wikipedia.org/wiki/Apple_Lossless`]
+
+https://vox.rocks/resources/flac-vs-alac[`https://vox.rocks/resources/flac-vs-alac`]
+
+https://unix.stackexchange.com/questions/415477/lossless-audio-conversion-from-flac-to-alac-using-ffmpeg[`https://unix.stackexchange.com/questions/415477/lossless-audio-conversion-from-flac-to-alac-using-ffmpeg`]
+
+=====
+The Apple Lossless Audio Codec (ALAC) with autools to enable compilation
+on Linux.
+This will produce:
+
+* `libalac` - a library for ALAC encoding and decoding
+* `alacconvert` - a command line program to convert WAV files to ALAC files
+=====
+
+== APE
+
+https://github.com/fernandotcl/monkeys-audio[`https://github.com/fernandotcl/monkeys-audio`]
+
+https://en.wikipedia.org/wiki/Monkey%27s_Audio[`https://en.wikipedia.org/wiki/Monkey%27s_Audio`]
+
+=====
+Monkey's Audio is an algorithm and file format for lossless audio data compression.
+Compared to FLAC, ALAC, or WavPack, Monkey's Audio is relatively slow to encode or decode files.
+While Monkey's Audio can achieve high compression ratios, the cost is a dramatic increase in requirements on the decoding end.
+=====
+
+== dvdauthor
+
+https://github.com/ldo/dvdauthor[`https://github.com/ldo/dvdauthor`]
+
+http://dvdauthor.sourceforge.net/[`http://dvdauthor.sourceforge.net/`]
+
+=====
+A program that will generate a DVD-Video movie from a valid
+MPEG-2 stream that should play when you put it in a DVD player.
+To start you need MPEG-2 files that contain the necessary DVD-Video VOB
+packets. These can be generated with FFmpeg, or by by passing `-f 8` to `mplex`.
+=====
+
+== FLAC
+
+https://xiph.org/flac/[`https://xiph.org/flac/`]
+
+https://xiph.org/flac/[`https://xiph.org/flac/`]
+
+=====
+FLAC stands for Free Lossless Audio Codec, an audio format similar to MP3, but lossless, meaning that audio is compressed in FLAC without any loss in quality. This is similar to how Zip works, except with FLAC you will get much better compression because it is designed specifically for audio, and you can play back compressed FLAC files in your favorite player.
+
+FLAC stands out as the fastest and most widely supported lossless audio codec, and the only one that at once is non-proprietary, is unencumbered by patents, has an open-source reference implementation, has a well documented format and API, and has several other independent implementations.
+=====
+
+=== metaflac
+
+https://xiph.org/flac/documentation_tools_metaflac.html[`https://xiph.org/flac/documentation_tools_metaflac.html`]
+
+=====
+A command-line .flac file metadata editor. You can use it to list the contents of metadata blocks, edit, delete or insert blocks, and manage padding.
+=====
+
+== mjpegtools
+
+https://mjpeg.sourceforge.io/[`https://mjpeg.sourceforge.io/`]
+
+=====
+The mjpeg programs are a set of tools that can do recording of videos and playback, simple cut-and-paste editing and the MPEG compression of audio and video under Linux. 
+The command-line utilities in the package are:
+=====
+
+-----
+ganytovcd.sh
+gjpeg2yuv
+glav2avi.sh
+glav2mpeg
+glav2wav
+glav2yuv
+glavaddwav
+glavinfo
+glavpipe
+glavtc.sh
+glavtrans
+gmatteblend.flt
+gmjpeg_simd_helper
+gmp2enc
+gmpeg2enc
+gmplex
+gmultiblend.flt
+gpgmtoy4m
+gpng2yuv
+gpnmtoy4m
+gppmtoy4m
+gqttoy4m
+gtransist.flt
+gy4mblack
+gy4mcolorbars
+gy4mdenoise
+gy4minterlace
+gy4mivtc
+gy4mscaler
+gy4mshift
+gy4mspatialfilter
+gy4mstabilizer
+gy4mtopnm
+gy4mtoppm
+gy4mtoqt
+gy4mtoyuv
+gy4munsharp
+gypipe
+gyuv2lav
+gyuv4mpeg
+gyuvcorrect
+gyuvcorrect_tune
+gyuvdeinterlace
+gyuvdenoise
+gyuvfps
+gyuvinactive
+gyuvkineco
+gyuvmedianfilter
+gyuvscaler
+gyuvycsnoise
+gyuyvtoy4m
+-----
+
+== mp4als
+
+https://www.nue.tu-berlin.de/menue/forschung/forschungsgebiete/datenkompression_und_uebertragung/mpeg_4_audio_lossless_coding_als/parameter/en/[`https://www.nue.tu-berlin.de/menue/forschung/forschungsgebiete/datenkompression_und_uebertragung/mpeg_4_audio_lossless_coding_als/parameter/en/`]
+
+https://en.wikipedia.org/wiki/Audio_Lossless_Coding[`https://en.wikipedia.org/wiki/Audio_Lossless_Coding`]
+
+=====
+The MPEG-4 Audio Lossless Coding (ALS) standard belongs to the family MPEG-4 audio coding standards pubished by ISO.
+In contrast to lossy codecs such as MP3 and AAC, which merely strive to preserve the subjective audio quality, lossless coding preserves every single bit of the original audio data.
+
+MPEG-4 ALS defines efficient and fast lossless audio compression techniques for both professional and consumer applications. It offers many features not included in other lossless compression schemes.
+
+* General support for virtually any uncompressed digital audio format (including wav, aiff, au, bwf, raw).
+* Support for PCM resolutions of up to 32-bit at arbitrary sampling rate (including 16/44.1, 16/48, 24/48, 24/96, 24/192).
+* Multi-channel / multi-track support for up to 65536 channels (including 5.1 surround).
+* Support for 32-bit IEEE floating point audio data.
+* Fast random access to any part of the encoded data.
+* Optional storage in MP4 file format (allows multiplex with video).
+* High flexibility of codec parameters for various applications. 
+=====
+
+== SHN
+
+http://shnutils.freeshell.org/shorten/[`http://shnutils.freeshell.org/shorten/`]
+
+=====
+A fast, low complexity waveform coder (i.e. audio compressor than can operate in both lossy and lossless modes.
+=====
+
+== shntools
+
+http://shnutils.freeshell.org/shntool/[`http://shnutils.freeshell.org/shntool/`]
+
+=====
+A multi-purpose WAVE data processing and reporting utility. File formats are abstracted from its core, so it can process any file that contains WAVE data, compressed or not - provided there exists a format module to handle that particular file type. 
+shntool has native support for .wav files. If you want it to work with other lossless audio formats, you must have the appropriate helper program installed.
+=====
+
+== SoX
+
+http://sox.sourceforge.net/[`http://sox.sourceforge.net/`]
+
+https://en.wikipedia.org/wiki/SoX[`https://en.wikipedia.org/wiki/SoX`]
+
+https://opensource.com/article/20/2/linux-sox[`https://opensource.com/article/20/2/linux-sox`]
+
+https://www.thegeekstuff.com/2009/05/sound-exchange-sox-15-examples-to-manipulate-audio-files/[`https://www.thegeekstuff.com/2009/05/sound-exchange-sox-15-examples-to-manipulate-audio-files/`]
+
+https://madskjeldgaard.dk/posts/sox-tutorial-cli-tape-music/[`https://madskjeldgaard.dk/posts/sox-tutorial-cli-tape-music/`]
+
+=====
+SoX is a cross-platform (Windows, Linux, MacOS X, etc.) command line utility that can convert various formats of computer audio files in to other formats. It can also apply various effects to these sound files, and, as an added bonus, SoX can play and record audio files on most platforms. 
+=====
+
+== WavPack
+
+https://www.wavpack.com/[`https://www.wavpack.com/`]
+
+=====
+WavPack is a completely open audio compression format providing lossless, high-quality lossy, and a unique hybrid compression mode. For version 5.0.0, several new file formats and lossless DSD audio compression were added, making WavPack a universal audio archiving solution.
+
+The hybrid mode provides all the advantages of lossless compression with an additional bonus. Instead of creating a single file, this mode creates both a relatively small, high-quality lossy file that can be used all by itself, and a "correction" file that (when combined with the lossy file) provides full lossless restoration. For some users this means never having to choose between lossless and lossy compression.
+=====
+
+
+
+
+

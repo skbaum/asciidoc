@@ -1,0 +1,5394 @@
+Machine Maintenance and Details
+===============================
+Steven K. Baum
+v0.5, 2012-05-21
+:doctype: book
+:toc:
+:icons:
+:threddshome: http://www.unidata.ucar.edu/projects/THREDDS/
+:cdm: http://www.unidata.ucar.edu/software/netcdf-java/CDM/index.html
+:ncml: http://www.unidata.ucar.edu/software/netcdf/ncml/
+:netcdf: http://www.unidata.ucar.edu/software/netcdf/
+:hdf: http://www.hdfgroup.org/
+:grib: http://www.grib.us/
+:nexrad: http://en.wikipedia.org/wiki/NEXRAD
+:wms: http://en.wikipedia.org/wiki/Web_Map_Service
+:wcs: http://en.wikipedia.org/wiki/Web_Coverage_Service
+:http: http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
+:java: http://www.java.com/en/
+:tomcat: http://tomcat.apache.org/
+
+:numbered!:
+
+[preface]
+Preface
+-------
+
+How to maintain the various machines of our group.
+
+:numbered:
+
+Summary
+-------
+
+
+|=========================================
+| *Name* | *IP* | *OS* | Kernel | *Parallel OS* | *CPU* | *Cores* | *RAM Size* | *RAM Type* | *Mobo* | *RAID* | *Hard Drives*
+| xref:copano[copano] | 128.194.27.93 | CentOS 7.2.1511 | 3.10.0-327.22.2.el7.x86_64 | none | 2 x Xeon E5-2630 v3 2.40GHz | 8 | 64 | 8 x 2133MHz unknown | Supermicro X10DRH-iT | Intel C610/X99 sSATA | NA
+| xref:hafen[hafen] | 165.91.85.34 | CentOS 5.7 | 2.6.18-274.7.1.el5 | none | Xeon X5690 | NA | 96 | 12 x Kingston 9965516-001.B00LF | Supermicro X8DTH-i/6/iF/6F | MegaRAID SAS 9265-8i | NA
+| xref:barataria[barataria] | 165.91.85.30 | CentOS 5.7 | 2.6.18-274.7.1.el5 | none | Xeon E5620 | 4 | 24 | 6 x Kingston 9965426-049.A00LF | Supermicro X8DTH-i/6/iF/6F | MegaRAID SAS 9265-8i | NA
+| xref:redfish[redfish] | 128.194.27.129 | CentOS 7.3.1611 | 3.10.0-514.16.1.el7.x86_64 | none | Xeon E5-2420 1.90GHz | 6 | 64 | 4 x Kingston E70D186E | Supermicro X9DBU | none | NA
+| xref:rho[rho] | 165.91.85.151 | CentOS 5.8 | 2.6.18-308.el5 | none | 2 x Xeon E5620 2.40GHz | 4 | 24 | 6 x Kingston 9965426-087.A00LF | Supermicro X8DTH-i/6/iF/6F | MegaRAID SAS 9265-8i | NA
+| xref:terrebonne[terrebonne] | 165.91.85.132 | CentOS 7.0.1406 | 2.6.18-194.el5 | none | 2 x Opteron  | 8 | 32 | 8 x Kingston 9965447-056.A00LF | Supermicro H8DG6/H8DGi | MegaRAID SAS 9280-4i4e | 36 x Hitachi 7K2000 HDS722020ALA330 2TB
+| xref:zeta[zeta] | 165.91.54.228 | OS X | NA | none | NA | NA | NA | NA | NA | NA | NA
+| xref:rocks[rocks] | 128.194.106.198 | CentOS 6.0 | 2.6.32-71.7.1.el6 | none | i5-2500K | 1 | 32 | 4 x Kingston 99U5471-056.A00LF | ASUSTeK P8P67 PRO REV 3.1 | NA | NA
+| xref:megara[megara] | 165.91.85.39 | CentOS 5.3 | 2.6.18-128.el5xen | none | Opteron 8222 SE | 4 | 32 | 16 x AD HYMP525P72CP4-Y5 | Dell 0FR933 vA00 | Dell PERC 5/i | NA
+| xref:gcoos1[gcoos1] | 128.194.26.145 | CentOS 7.2.1511 | 3.10.0-327.el7.x86_64 | none | 2 x Xeon E5620 2.40GHz | 4 | 96 | 8 x Micron 72KSZS2G72PZ-1G1D1 | Supermicro X8DTL | MegaRAID SAS 2008 | NA
+| xref:gcoos2[gcoos2] | 128.194.26.146 | CentOS 7.2.1511 | 3.10.0-327.22.2.el7.x86_64 | none | 2 x Xeon E5620 2.40GHz | 4 | 96 | 8 x Micron 72KSZS2G72PZ-1G1D1 | Supermicro X8DTL | MegaRAID SAS 2008 | NA
+| xref:gcoos3[gcoos3] | 128.194.27.48 | CentOS 7.2.1511 | 3.10.0-327.22.2.el7.x86_64 | none | 2 x Xeon E5620 2.40GHz | 4 | 64 | 8 x Micron 72KSZS2G72PZ-1G1D1 | Supermicro X8DTL | MegaRAID SAS-3 3108 | NA
+| xref:gcoos4[gcoos4] | 128.194.27.108 | CentOS 7.2.1511 | 3.10.0-327.22.2.el7.x86_64 | none | 2 x Xeon E5620 2.40GHz | 4 | 64 | 8 x Micron 72KSZS2G72PZ-1G1D1 | Supermicro X8DTL | MegaRAID SAS-3 3108 | NA
+| xref:gcoos5[gcoos5] | 128.194.27.210 | CentOS 7.6.1810 | 3.10.0-957.el7.x86_64 | none | 2 x Xeon E5-2640 v4 2.40GHz | 20 | 128 | 8 x SK Hynix HMA82GR7AFR8N-VK  | Supermicro X10DRW-iT | MegaRAID SAS-3 3008 | NA
+| xref:chenier[chenier] | 165.91.85.62 | CentOS 5.6 | 2.6.18-238.19.1.el5 | Rocks 5.4.3 | 2 x AMD 2427 | 6 | 16 | NA | Supermicro H8DM8-2 | 3ware Inc 9650SE | 8 x Seagate ST3000DM001 3TB
+| xref:atchafalaya[atchafalaya] | 165.91.85.122 | CentOS 6.5 | 2.6.18-194.el5 | Rocks 6.1.1 | 2 x AMD 6128 | 8 | 32 | 8 x DDR3 1333MHz Kingston 9965447-056 | Supermicro H8DG6/H8DGi | MegaRAID SAS 2108 | 36 x Hitachi 7K2000 HDS722020ALA330 2 TB
+| xref:merrimack[merrimack] | 165.91.85.150 | CentOS 5.6 | 2.6.18-238.19.1.el5 | Rocks 5.4.3 | 2 x AMD 2378 | 4 | 8 | 8 x DDR2 333MHz | Supermicro H8DM3-2 | MegaRAID SAS 8208ELP | 8 x Seagate ES.2 ST31000340NS 1TB
+|=========================================
+
+RAID Info
+~~~~~~~~~
+
+|=========================================
+| *Name* | *RAID* | *Hard Drives* | *Virtual Drive 1* | *Virtual Drive 2*
+| xref:copano[copano] | Intel C610/X99 sSATA | 24 x TrueNAS 8TB Enterprise Nearline SAS 6Gb/s 7200RPM 64MB | 95 TB | 95 TB
+| xref:hafen[hafen] | MegaRAID SAS 9265-8i | 16 x Seagate ST91000640SS 1TB | 11.819 TB | NA
+| xref:barataria[barataria] | MegaRAID SAS 9265-8i | 36 x Seagate ES.2 ST33000650SS 3TB SAS | 43.656 TB | 43.656 TB
+| xref:rho[rho] | MegaRAID SAS 9265-8i | 52 x Seagate ST33000650SS 3TB SAS | 76.398 TB (28 drives) | 49.113 TB (24 drives)
+| xref:terrebonne[terrebonne] | MegaRAID SAS 9280-4i4e | 36 x Hitachi 7K2000 HDS722020ALA330 2TB | 18.188 TB (12 drives) | 38.195 TB (24 drives)
+| xref:megara[megara] | Dell PERC 5/i | NA | NA | NA
+| xref:gcoos1[gcoos1] | MegaRAID SAS 2008 | NA | NA | NA
+| xref:gcoos2[gcoos2] | MegaRAID SAS 2008 | NA | NA | NA
+| xref:gcoos3[gcoos3] | MegaRAID SAS-3 3108 | NA | NA | NA
+| xref:gcoos4[gcoos4] | MegaRAID SAS-3 3108 | NA | NA | NA
+| xref:chenier[chenier] | 3ware Inc 9650SE | 8 x Seagate ST3000DM001 3TB | 16.763 TB (8 drives) | NA
+| xref:atchafalaya[atchafalaya] | MegaRAID SAS 2108 | 36 x Hitachi 7K2000 HDS722020ALA330 2 TBa | 38.195 TB (24 drives) | 18.118 TB (12 drives)
+| xref:merrimack[merrimack] | MegaRAID SAS 8208ELP | 8 x Seagate ES.2 ST31000340NS 1TB | NA (8 drives) | NA
+|=========================================
+
+Notes:
+
+*  The name of the machine can be found via +hostname+.
+
+*  The IP number can be found via +ip addr show+.
+
+* The kernel version can be found via +uname -a+.
+
+* The distro and version can be found via +cat /etc/*-release+.
+
+* The CPU type can be found via +less /proc/cpuinfo+.
+
+[[copano]]
+copano
+------
+
+BIOS
+~~~~
+
+American Megatrends v1.1, 05/15/2015, Rev. 5.6
+
+System
+~~~~~~
+
+Name: Supermicro SSG-6048R-E1CR36L
+SN: S17496625B25923
+UUID: 00000000-0000-0000-0000-0CC47A6E9816
+SKU: 085915D9
+Chassis SN: C8470FE41N61499
+
+https://www.supermicro.com/products/system/4u/6048/ssg-6048r-e1cr36l.cfm[+https://www.supermicro.com/products/system/4u/6048/ssg-6048r-e1cr36l.cfm+]
+
+Mobo (Integrated with Case)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Name: Supermicro X10DRH-iT v1.01
+SN: NM15AS016180a
+
+https://www.supermicro.com/products/motherboard/Xeon/C600/X10DRH-iT.cfm[+https://www.supermicro.com/products/motherboard/Xeon/C600/X10DRH-iT.cfm+]
+
+RAM
+~~~
+
+64 GB - 8x8GB DIMM at 2133 MHz
+
+Power Supply
+~~~~~~~~~~~~
+
+Name:  2 x Supermicro PWS-1K28P-SQ 
+SN1:  P1K28CF35MN1528
+SN2:  P1K28CF35MN1527
+
+CPU
+~~~
+
+Name:  2 x Intel Xeon E5-2630 at 2.40 GHz
+Socket:  LGA2011-3
+
+Hard Drives
+~~~~~~~~~~~
+
+58 x HGST HUH728080AL5204 8 GB, 7200 RPM, SAS 12 Gb/s 
+
+https://www.hgst.com/sites/default/files/resources//Ultrastar-He8-DS.pdf[+https://www.hgst.com/sites/default/files/resources//Ultrastar-He8-DS.pdf+]
+
+https://www.newegg.com/Product/Product.aspx?Item=N82E16822145998[+https://www.newegg.com/Product/Product.aspx?Item=N82E16822145998+]
+
+https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=5&ved=0ahUKEwjVmej95M7bAhXM6J8KHVNFCQEQFghvMAQ&url=https%3A%2F%2Fwww.hgst.com%2Fsites%2Fdefault%2Ffiles%2Fresources%2FUltrastar-He8-DS.pdf&usg=AOvVaw1wfZW_bNmHm3oGaYDiVKZa
+
+RAID Controller
+~~~~~~~~~~~~~~~
+
+Intel Corporation C610/X99 series chipset sSATA Controller
+
+https://www.intel.com/content/www/us/en/chipsets/x99-chipset-pch-spec-update.html[+https://www.intel.com/content/www/us/en/chipsets/x99-chipset-pch-spec-update.html+]
+
+SAS Controller
+~~~~~~~~~~~~~~
+
+LSI Logic / Symbios Logic SAS3008 PCI-Express Fusion-MPT SAS-3 (rev 02)
+LSI Logic / Symbios Logic SAS2308 PCI-Express Fusion-MPT SAS-2 (rev 05)
+
+https://hwraid.le-vert.net/wiki/LSIFusionMPTSAS2[+https://hwraid.le-vert.net/wiki/LSIFusionMPTSAS2+]
+
+PCI-2 storage - SAS2308 PCI-Express Fusion-MPT SAS-2
+
+Found via lshw.
+
+-----
+d0 - sda
+d1 - sdb
+d2 - sdk
+d3 - sdl
+d4 - sdm
+d5 - sdn
+d6 - sdo
+d7 - sdp
+d8 - sdq
+d9 - sdr
+d10 - sds
+d11 - sdt
+d12 - sdc
+d13 - sdu
+d14 - sdv
+d15 - sd2
+d16 - sdx
+d17 - sdy
+d18 - sdz
+d19 - sdaa
+d20 - sdab
+d21 - sdac
+d22 - sdd
+d23 - sde
+d24 - sdf
+d25 - sdg
+d26 - sdh
+d27 - sdi
+d28 - sdj
+-----
+
+PCI-3 - SAS2308 PCI-Express Fusion-MPT SAS-2
+
+PCI-4 - SAS2308 PCI-Express Fusion-MPT SAS-2
+
+-----
+d0 - sdaf
+d1 - sdag
+d2 - sdah
+d3 - sdai
+d4 - sdaj
+d5 - sdak
+d6 - sdal
+d7 - sdam
+d8 - sdan
+d9 - sdao
+d10 - sdap
+d11 - sdaq
+d12 - sdar
+d13 - sdas
+d14 - sdat
+d15 - sdau
+d16 - sdav
+d17 - sdaw
+d18 - sdax
+d19 - sday
+d20 - sdaz
+d21 - sdba
+d22 - sdbb
+d23 - sdbc
+d24 - sdbd
+d25 - sdb3
+d26 - sdbf
+d27 - sdbg
+d28 - sdbh
+-----
+
+PCI-2 - SAS3008 PCI-Express Fusion-MPT SAS-3
+
+PCI-3 - SAS2308 PCI-Express Fusion-MPT SAS-2
+
+
+
+Kernel Command Line
+~~~~~~~~~~~~~~~~~~~
+
+BOOT_IMAGE=/vmlinuz-3.10.0-327.22.2.el7.x86_64 root=UUID=fc5a6dbc-eec5-4e7d-8551-a87cd897a72a ro crashker
+nel=auto rd.md.uuid=03117eee:30533b14:de066af2:6973ebaa rd.md.uuid=ef68e8b6:349c935e:8e253215:c5759add rhgb quiet LANG=en_US.UTF-8
+
+Software RAID
+~~~~~~~~~~~~~
+
+Overview
+^^^^^^^^
+
+https://raid.wiki.kernel.org/index.php/A_guide_to_mdadm[+https://raid.wiki.kernel.org/index.php/A_guide_to_mdadm+]
+
+https://unix.stackexchange.com/questions/4561/how-do-i-find-out-what-hard-disks-are-in-the-system[+https://unix.stackexchange.com/questions/4561/how-do-i-find-out-what-hard-disks-are-in-the-system+]
+
+-----
+cat /proc/mdstat
+
+Personalities : [raid1] [raid6] [raid5] [raid4] 
+md124 : active raid5 sdbe[8] sdal[12] sdbf[0] sdaj[5] sdah[11] sdak[7] sdaw[1] sdav[15] sdac[9] sdbg[3] sdi[4] sdm[14] sdk[6] sdl[2]
+      101580637184 blocks super 1.2 level 5, 512k chunk, algorithm 2 [14/14] [UUUUUUUUUUUUUU]
+      bitmap: 0/59 pages [0KB], 65536KB chunk
+
+md125 : active raid5 sdh[8] sdp[15] sdai[9] sdw[5] sdbd[2] sdbc[11] sdba[7] sdu[1] sdj[10] sds[6] sdo[14](S) sdt[4] sda[12] sdn[3] sdb[0]
+      101580637184 blocks super 1.2 level 5, 512k chunk, algorithm 2 [14/14] [UUUUUUUUUUUUUU]
+      bitmap: 4/59 pages [16KB], 65536KB chunk
+
+md126 : active raid1 sdad2[0] sdae2[1]
+      111327232 blocks super 1.2 [2/2] [UU]
+      bitmap: 1/1 pages [4KB], 65536KB chunk
+
+md127 : active raid1 sdad1[0] sdae1[1]
+      488384 blocks super 1.0 [2/2] [UU]
+      bitmap: 0/1 pages [0KB], 65536KB chunk
+-----
+
+md124
+^^^^^
+
+-----
+mdadm --detail /dev/md124
+
+/dev/md124:
+        Version : 1.2
+  Creation Time : Mon Mar 21 11:29:01 2016
+     Raid Level : raid5
+     Array Size : 101580637184 (96874.85 GiB 104018.57 GB)
+  Used Dev Size : 7813895168 (7451.91 GiB 8001.43 GB)
+   Raid Devices : 14
+  Total Devices : 14
+    Persistence : Superblock is persistent
+  Intent Bitmap : Internal
+    Update Time : Tue Jun 12 13:59:22 2018
+          State : clean 
+ Active Devices : 14
+Working Devices : 14
+ Failed Devices : 0
+  Spare Devices : 0
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+           Name : copano.tamu.edu:1  (local to host copano.tamu.edu)
+           UUID : 8ad97205:4608e487:7d32dcac:f8c05e43
+         Events : 128685
+
+    Number   Major   Minor   RaidDevice State
+       0      67      144        0      active sync   /dev/sdbf
+       1      67        0        1      active sync   /dev/sdaw
+       2       8      176        2      active sync   /dev/sdl
+       3      67      160        3      active sync   /dev/sdbg
+       4       8      128        4      active sync   /dev/sdi
+       5      66       48        5      active sync   /dev/sdaj
+       6       8      160        6      active sync   /dev/sdk
+       7      66       64        7      active sync   /dev/sdak
+       8      67      128        8      active sync   /dev/sdbe
+       9      65      192        9      active sync   /dev/sdac
+      14       8      192       10      active sync   /dev/sdm
+      11      66       16       11      active sync   /dev/sdah
+      12      66       80       12      active sync   /dev/sdal
+      15      66      240       13      active sync   /dev/sdav
+-----
+
+md125
+^^^^^
+
+-----
+mdadm --detail /dev/md125
+
+/dev/md125:                                                                                                                                  
+        Version : 1.2
+  Creation Time : Mon Mar 21 11:32:58 2016
+     Raid Level : raid5
+     Array Size : 101580637184 (96874.85 GiB 104018.57 GB)
+  Used Dev Size : 7813895168 (7451.91 GiB 8001.43 GB)
+   Raid Devices : 14 
+  Total Devices : 15
+    Persistence : Superblock is persistent
+  Intent Bitmap : Internal 
+    Update Time : Tue Jun 12 14:01:12 2018 
+          State : clean
+ Active Devices : 14
+Working Devices : 15
+ Failed Devices : 0
+  Spare Devices : 1
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+           Name : copano.tamu.edu:2  (local to host copano.tamu.edu)
+           UUID : 68a23f69:ddc89b29:913936cf:e146d0ee
+         Events : 121294
+
+    Number   Major   Minor   RaidDevice State
+       0       8       16        0      active sync   /dev/sdb
+       1      65       64        1      active sync   /dev/sdu
+       2      67      112        2      active sync   /dev/sdbd
+       3       8      208        3      active sync   /dev/sdn
+       4      65       48        4      active sync   /dev/sdt
+       5      65       96        5      active sync   /dev/sdw
+       6      65       32        6      active sync   /dev/sds
+       7      67       64        7      active sync   /dev/sdba
+       8       8      112        8      active sync   /dev/sdh
+       9      66       32        9      active sync   /dev/sdai
+      10       8      144       10      active sync   /dev/sdj
+      11      67       96       11      active sync   /dev/sdbc
+      12       8        0       12      active sync   /dev/sda
+      15       8      240       13      active sync   /dev/sdp
+
+      14       8      224        -      spare   /dev/sdo
+-----
+
+md126
+^^^^^
+
+-----
+mdadm --detail /dev/md126
+
+/dev/md126:
+        Version : 1.2
+  Creation Time : Wed Mar 16 11:36:11 2016
+     Raid Level : raid1
+     Array Size : 111327232 (106.17 GiB 114.00 GB)
+  Used Dev Size : 111327232 (106.17 GiB 114.00 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+  Intent Bitmap : Internal
+    Update Time : Tue Jun 12 14:04:44 2018
+          State : clean 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+           Name : localhost.localdomain:root
+           UUID : 03117eee:30533b14:de066af2:6973ebaa
+         Events : 8720
+
+    Number   Major   Minor   RaidDevice State
+       0      65      210        0      active sync   /dev/sdad2
+       1      65      226        1      active sync   /dev/sdae2
+-----
+
+md127
+^^^^^
+
+-----
+mdadm --detail /dev/md127
+
+/dev/md127:
+        Version : 1.0
+  Creation Time : Wed Mar 16 11:36:08 2016
+     Raid Level : raid1
+     Array Size : 488384 (477.02 MiB 500.11 MB)
+  Used Dev Size : 488384 (477.02 MiB 500.11 MB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+  Intent Bitmap : Internal
+    Update Time : Sun Jun 10 01:10:10 2018
+          State : clean 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+           Name : localhost.localdomain:boot
+           UUID : ef68e8b6:349c935e:8e253215:c5759add
+         Events : 378
+
+    Number   Major   Minor   RaidDevice State
+       0      65      209        0      active sync   /dev/sdad1
+       1      65      225        1      active sync   /dev/sdae1
+-----
+
+/proc/partitions
+^^^^^^^^^^^^^^^^
+
+-----
+major minor  #blocks  name
+
+  65      224  125034840 sdae
+  65      225     488448 sdae1
+  65      226  111392768 sdae2
+  65      208  125034840 sdad
+  65      209     488448 sdad1
+  65      210  111392768 sdad2
+  65      211    7812096 sdad3
+  65      176 7814026584 sdab
+  65      144 7814026584 sdz
+   8       16 7814026584 sdb
+  65      128 7814026584 sdy
+  65      160 7814026584 sdaa
+   8       96 7814026584 sdg
+   8      112 7814026584 sdh
+   8      240 7814026584 sdp
+  65      192 7814026584 sdac
+  65       16 7814026584 sdr
+  65        0 7814026584 sdq
+  65       48 7814026584 sdt
+  65       80 7814026584 sdv
+   8       80 7814026584 sdf
+  65       64 7814026584 sdu
+  65      112 7814026584 sdx
+   8      224 7814026584 sdo
+   8      176 7814026584 sdl
+   8       64 7814026584 sde
+   8       48 7814026584 sdd
+   8       32 7814026584 sdc
+   8      192 7814026584 sdm
+   8        0 7814026584 sda
+  65       32 7814026584 sds
+   8      128 7814026584 sdi
+  65       96 7814026584 sdw
+   8      144 7814026584 sdj
+   8      160 7814026584 sdk
+   8      208 7814026584 sdn
+   9      127     488384 md127
+   9      126  111327232 md126
+  65      240 7814026584 sdaf
+  66        0 7814026584 sdag
+  66       16 7814026584 sdah
+  66       32 7814026584 sdai
+  66       48 7814026584 sdaj
+  66       64 7814026584 sdak
+  66       80 7814026584 sdal
+  66       96 7814026584 sdam
+  66      112 7814026584 sdan
+  66      128 7814026584 sdao
+  66      144 7814026584 sdap
+  66      160 7814026584 sdaq
+  66      192 7814026584 sdas
+  66      176 7814026584 sdar
+  66      208 7814026584 sdat
+  66      224 7814026584 sdau
+  66      240 7814026584 sdav
+  67        0 7814026584 sdaw
+  67       16 7814026584 sdax
+  67       32 7814026584 sday
+  67       48 7814026584 sdaz
+  67       64 7814026584 sdba
+  67       80 7814026584 sdbb
+  67       96 7814026584 sdbc
+  67      112 7814026584 sdbd
+  67      128 7814026584 sdbe
+  67      144 7814026584 sdbf
+  67      160 7814026584 sdbg
+  67      176 7814026584 sdbh
+   9      125 101580637184 md125
+   9      124 101580637184 md124
+   7        0  104857600 loop0
+   7        1    2097152 loop1
+ 253        0  104857600 dm-0
+-----
+
+udisksctl status
+~~~~~~~~~~~~~~~~
+
+-----
+MODEL                     REVISION  SERIAL               DEVICE
+--------------------------------------------------------------------------
+HGST HUH728080AL5204      C515      2EGMV1AV             sda sdaf
+HGST HUH728080AL5204      C515      2EGMULEV             sdag sdb
+HGST HUH728080AL5204      C515      2EGLPUSV             sdah sdc
+HGST HUH728080AL5204      C515      2EGNH6JV             sdai sdd
+HGST HUH728080AL5204      C515      2EGMY87V             sdaj sde
+HGST HUH728080AL5204      C515      2EGMTT2V             sdak sdf
+HGST HUH728080AL5204      C515      2EGMWW5V             sdal sdg
+HGST HUH728080AL5204      C515      2EGMY9GV             sdam sdh
+HGST HUH728080AL5204      C515      2EGKB31V             sdan sdi
+HGST HUH728080AL5204      C515      2EGNNELV             sdao sdj
+HGST HUH728080AL5204      C515      2EGNEK0V             sdap sdk
+HGST HUH728080AL5204      C515      2EGMT72V             sdaq sdl
+HGST HUH728080AL5204      C515      2EGLNDEV             sdar sdm
+HGST HUH728080AL5204      C515      2EGNEERV             sdas sdn
+HGST HUH728080AL5204      C515      2EGNHKTV             sdat sdo
+HGST HUH728080AL5204      C515      2EGNKU9V             sdau sdp
+HGST HUH728080AL5204      C515      2EGND2BV             sdav sdq
+HGST HUH728080AL5204      C515      2EGNND8V             sdaw sdr
+HGST HUH728080AL5204      C515      2EGKXV4V             sdax sds
+HGST HUH728080AL5204      C515      2EGNENGV             sday sdt
+HGST HUH728080AL5204      C515      2EGNWT2V             sdaz sdu
+HGST HUH728080AL5204      C515      2EGNLL8V             sdba sdv
+HGST HUH728080AL5204      C515      2EGLN2TV             sdbb sdw
+HGST HUH728080AL5204      C515      2EGN8K3V             sdbc sdx
+HGST HUH728080AL5204      C515      2EGNERKV             sdbd sdy
+HGST HUH728080AL5204      C515      2EGNU8RV             sdbe sdz
+HGST HUH728080AL5204      C515      2EGNHE5V             sdaa sdbf
+HGST HUH728080AL5204      C515      2EGNN7RV             sdab sdbg
+HGST HUH728080AL5204      C515      2EGNVX4V             sdac sdbh
+Micron_M600_MTFDDAK128MBF MU03      15270FF2F083         sdad    
+Micron_M600_MTFDDAK128MBF MU03      15270FF3150F         sdae
+-----
+
+mtab
+~~~~
+
+-----
+rootfs / rootfs rw 0 0
+sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+devtmpfs /dev devtmpfs rw,nosuid,size=32835400k,nr_inodes=8208850,mode=755 0 0
+securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev/shm tmpfs rw,nosuid,nodev 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+tmpfs /run tmpfs rw,nosuid,nodev,mode=755 0 0
+tmpfs /sys/fs/cgroup tmpfs ro,nosuid,nodev,noexec,mode=755 0 0
+cgroup /sys/fs/cgroup/systemd cgroup rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/usr/lib/systemd/systemd-cgroups-agent,name=systemd 0 0
+pstore /sys/fs/pstore pstore rw,nosuid,nodev,noexec,relatime 0 0
+cgroup /sys/fs/cgroup/cpu,cpuacct cgroup rw,nosuid,nodev,noexec,relatime,cpuacct,cpu 0 0
+cgroup /sys/fs/cgroup/blkio cgroup rw,nosuid,nodev,noexec,relatime,blkio 0 0
+cgroup /sys/fs/cgroup/perf_event cgroup rw,nosuid,nodev,noexec,relatime,perf_event 0 0
+cgroup /sys/fs/cgroup/net_cls cgroup rw,nosuid,nodev,noexec,relatime,net_cls 0 0
+cgroup /sys/fs/cgroup/memory cgroup rw,nosuid,nodev,noexec,relatime,memory 0 0
+cgroup /sys/fs/cgroup/cpuset cgroup rw,nosuid,nodev,noexec,relatime,cpuset 0 0
+cgroup /sys/fs/cgroup/hugetlb cgroup rw,nosuid,nodev,noexec,relatime,hugetlb 0 0
+cgroup /sys/fs/cgroup/devices cgroup rw,nosuid,nodev,noexec,relatime,devices 0 0
+cgroup /sys/fs/cgroup/freezer cgroup rw,nosuid,nodev,noexec,relatime,freezer 0 0
+configfs /sys/kernel/config configfs rw,relatime 0 0
+/dev/md126 / ext4 rw,relatime,data=ordered 0 0
+systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=32,pgrp=1,timeout=300,minproto=5,maxproto=5,direct 0 0
+hugetlbfs /dev/hugepages hugetlbfs rw,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+mqueue /dev/mqueue mqueue rw,relatime 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw,relatime 0 0
+nfsd /proc/fs/nfsd nfsd rw,relatime 0 0
+/dev/md127 /boot ext4 rw,relatime,stripe=4,data=ordered 0 0
+fusectl /sys/fs/fuse/connections fusectl rw,relatime 0 0
+/dev/md124 /d1 xfs rw,relatime,attr2,inode64,sunit=1024,swidth=13312,noquota 0 0
+/dev/md125 /d2 xfs rw,relatime,attr2,inode64,sunit=1024,swidth=13312,noquota 0 0
+tmpfs /run/user/1000 tmpfs rw,nosuid,nodev,relatime,size=6570044k,mode=700,uid=1000,gid=1000 0 0
+tmpfs /run/user/42 tmpfs rw,nosuid,nodev,relatime,size=6570044k,mode=700,uid=42,gid=42 0 0
+gvfsd-fuse /run/user/42/gvfs fuse.gvfsd-fuse rw,nosuid,nodev,relatime,user_id=42,group_id=42 0 0
+tmpfs /run/user/890 tmpfs rw,nosuid,nodev,relatime,size=6570044k,mode=700,uid=890,gid=1001 0 0
+/dev/md126 /var/lib/docker/devicemapper ext4 rw,relatime,data=ordered 0 0
+-----
+
+[[megara]]
+megara
+------
+
+Network Info
+~~~~~~~~~~~~
+
+*IP*:  +165.91.85.39+ +
+*NM*:  +255.255.255.0+ +
+*GW*:  +165.91.85.1+ +
+*DNS*: +128.194.254.1+, +128.194.254.2+
+       +128.194.254.2+
+
+fstab
+~~~~~
+
+------
+LABEL=/                 /                       ext3    defaults        1 1
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+LABEL=SWAP-sda2         swap                    swap    defaults        0 0
+/dev/sdb1               /d4                     xfs     defaults        1 1
+/dev/sdd1               /d2                     xfs     defaults        1 1
+------
+
+mtab
+~~~~
+
+------
+/dev/sda1 / ext3 rw 0 0
+proc /proc proc rw 0 0
+sysfs /sys sysfs rw 0 0
+devpts /dev/pts devpts rw,gid=5,mode=620 0 0
+tmpfs /dev/shm tmpfs rw 0 0
+/dev/sdb1 /d4 xfs rw 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw 0 0
+nfsd /proc/fs/nfsd nfsd rw 0 0
+/dev/sdc1 /d2 xfs rw 0 0
+------
+
+/proc/partitions
+~~~~~~~~~~~~~~~~
+
+------
+major minor  #blocks  name
+
+   8     0  292421632 sda
+   8     1  284382630 sda1
+   8     2    8032468 sda2
+   8    16 1952972800 sdb
+   8    17 1952965791 sdb1
+   8    32 1953481728 sdc
+   8    33 1953479871 sdc1
+------
+
+
+Hardware
+~~~~~~~~
+
+*BIOS*: Dell 1.2.12 Rev. 2.12
+*Mobo*: 0FR933 ver. A00, SN: CN708217AH005U
+*Name*: Dell PowerEdge 6950
+*SN*:  30DY1F1
+*UUID*: 44454C4C-3000-1044-8059-B3C04F314631
+*CPU*:  4 x Dual Core AMD Opteron 8222 SE
+*RAM*: 32 GB (16 x 2 GB), DDR2, 667 MHz, Hynix Part #HYMP525P72CP4-Y5
+
+* HL-DT-ST GCR-8240N, ATAPI CD/DVD-ROM drive 
+
+* Dell PowerEdge Expandable RAID controller 5
+
+User Guide:
+http://support.dell.com/support/edocs/storage/RAID/PERC5/en/index.htm[+http://support.dell.com/support/edocs/storage/RAID/PERC5/en/index.htm+]
+
+
+Configuring the PowerEdge RAID Controller Without RAID
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Press Ctrl-R to run configuration utility.
+
+* On initial screen with *PERC 5/i Integrated BIOS Configuration Utility*
+across top, hit F2 to bring up menu.
+
+* Select *Create New VD* on this menu.
+
+* The *RAID Level* should be on +RAID-0+.  If not change it to +RAID-0+.
+
+* Choose the disk from the *Physical Disks* menu below the *RAID Level*
+menu.
+
+* Select the *OK* button to the right of the window.
+
+* Select the *OK* on the *It is recommended...* menu that pops up.
+
+* Initialization is not required with a new disk.
+
+
+To find out the model of the RAID controller:
+
++/sbin/lspci | grep -i raid+ +
++02:0e.0 RAID bus controller: Dell PowerEdge Expandable RAID controller 5+
+
+Or use the command +dmidecode+ to discover:
+
+-----
+Handle 0x0100, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Dell Inc.
+	Product Name: PowerEdge 6950
+	Version: Not Specified
+	Serial Number: 30DY1F1
+	UUID: 44454C4C-3000-1044-8059-B3C04F314631
+	Wake-up Type: Power Switch
+	SKU Number: Not Specified
+	Family: Not Specified
+-----
+
+http://en.community.dell.com/support-forums/servers/f/906/p/18816086/18939072.aspx[+http://en.community.dell.com/support-forums/servers/f/906/p/18816086/18939072.aspx+]
+
+"If you want no RAID, just configure each drive attached to the PERC as a
+single drive R0. This will look and behave like there is no RAID and you get
+the benefit of the cache on the controller. If you truly want to have nothing
+to do with configuring, managing RAID, you have to get a SAS 5/i."
+
+http://en.community.dell.com/support-forums/servers/f/906/t/18327220.aspx[+http://en.community.dell.com/support-forums/servers/f/906/t/18327220.aspx+]
+
+"It's simple really, just make several RAID 0 arrays, each one is a single
+physical drive, problem solved."
+
+http://forums.2cpu.com/showthread.php?t=93698#post762508[+http://forums.2cpu.com/showthread.php?t=93698#post762508+]
+
+"As others have stated, it has no jbod mode and the drives won't show in
+solaris unless the drives are part of a raid set. You can set each drive to
+raid0 but then you loose some of the benefits of zfs, and it gets a bit wierd
+when you go to replace a failed drive...as sometimes the drives will get
+renamed. ie logical disk 3 will become logical disk2 when disk 2 is removed to
+be replaced...."
+
+[[chenier]]
+chenier
+-------
+
+Hardware
+~~~~~~~~
+
+RAID Controller
+^^^^^^^^^^^^^^^
+
++/usr/local/sbin/lspci -vv | grep -i raid
+
+=====
+06:00.0 RAID bus controller: 3ware Inc 9650SE SATA-II RAID PCIe (rev 01)
+        Subsystem: 3ware Inc 9650SE SATA-II RAID PCIe
+=====
+
+The PDF guide can be downloaded from:
+
+http://docs.avagotech.com/docs/12353273[+http://docs.avagotech.com/docs/12353273+]
+
+RAID Controller Software
+^^^^^^^^^^^^^^^^^^^^^^^^
+
++/opt/3ware/CLI/tw_cli+
+
+=====
+//chenier> help
+
+Copyright (c) 2012 LSI
+LSI/3ware CLI (version 2.00.11.022)
+
+
+Commands  Description
+-------------------------------------------------------------------
+focus     Changes from one object to another.  For Interactive Mode Only!
+show      Displays information about controller(s), unit(s) and port(s).
+flush     Flush write cache data to units in the system.
+rescan    Rescan all empty ports for new unit(s) and disk(s).
+update    Update controller firmware from an image file.
+commit    Commit dirty DCB to storage on controller(s).     (Windows only)
+/cx       Controller specific commands.
+/cx/ux    Unit specific commands.
+/cx/px    Port specific commands.
+/cx/phyx  Phy specific commands.
+/cx/bbu   BBU specific commands.                             (9000 series)
+/cx/ex    Enclosure specific commands.                      (9690SA, 9750)
+/ex       Enclosure specific commands.                    (9550SX, 9650SE)
+
+Certain commands are qualified with constraints of controller type/model
+support.  Please consult the tw_cli documentation for explanation of the
+controller-qualifiers.
+
+Type help <command> to get more details about a particular command.
+For more detail information see tw_cli's documentation.
+
+//chenier> show ver
+CLI Version = 2.00.11.022
+API Version = 2.08.00.027
+
+//chenier> /c6 show bios
+/c6 Bios Version = BE9X 4.08.00.004
+
+//chenier> /c6 show driver
+/c6 Driver Version = 2.26.08.007-2.6.18RH
+
+//chenier> /c6 show firmware
+/c6 Firmware Version = FE9X 4.10.00.027
+
+//chenier> /c6 show unitstatus
+
+Unit  UnitType  Status         %RCmpl  %V/I/M  Stripe  Size(GB)  Cache  AVrfy
+------------------------------------------------------------------------------
+u0    RAID-6    OK             -       -       64K     16763.7   RiW    ON
+
+//chenier> /c6 show serial
+/c6 Serial Number = L326027A9491734
+
+
+
+//chenier> /c6 show drivestatus
+
+VPort Status         Unit Size      Type  Phy Encl-Slot    Model
+------------------------------------------------------------------------------
+p0    OK             u0   2.73 TB   SATA  0   -            ST3000DM001-1CH166  
+p1    OK             u0   2.73 TB   SATA  1   -            ST3000DM001-1CH166  
+p2    OK             u0   2.73 TB   SATA  2   -            ST3000DM001-1CH166  
+p3    OK             u0   2.73 TB   SATA  3   -            ST3000DM001-1CH166  
+p4    OK             u0   2.73 TB   SATA  4   -            ST3000DM001-1CH166  
+p5    OK             u0   2.73 TB   SATA  5   -            ST3000DM001-1CH166  
+p6    OK             u0   2.73 TB   SATA  6   -            ST3000DM001-1CH166  
+p7    OK             u0   2.73 TB   SATA  7   -            ST3000DM001-1CH166
+
+=====
+
+RAID Hard Drives
+^^^^^^^^^^^^^^^^
+
+=====
+ST3000DM001-1CH166
+
+is a:
+
+Seagate Desktop HDD ST3000DM001 3TB 64MB Cache SATA 6.0Gb/s 3.5" Internal Hard Drive
+=====
+
+
+CURRENT STATUS:  Head and 10 nodes up.
+
+URL:  http://chenier.tamu.edu/wordpress/[+http://chenier.tamu.edu/wordpress/+]
+
+Ganglia URL:
+http://chenier.tamu.edu/ganglia/[+http://chenier.tamu.edu/ganglia/+]
+
+To restart the Ganglia and queueing services, run:
+
+-----
+/etc/init.d/gmetad restart
+/etc/init.d/gmond restart
+/etc/init.d/pbs_server restart
+-----
+
+Adding RAID Array to ROCKS Cluster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is explained at:
+
+http://www.danielwong.org/mounting-and-sharing-an-external-volume-using-nfs-on-a-rocks-cluster-autofs/[+http://www.danielwong.org/mounting-and-sharing-an-external-volume-using-nfs-on-a-rocks-cluster-autofs/+]
+
+although there are a few updates that need to be made, i.e. basically
+changing +cluster-fork+ to +rocks run host+ as shown below.
+
+Steps for Adding RAID Array
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*  Mount the volume
+
+-----
+# mount -t xfs /dev/sdc1 /raid1
+-----
+
+* Add an entry to +/etc/fstab+
+
+-----
+/dev/sdc1               /raid1                  xfs     defaults        1 2
+-----
+
+* Add an entry to +/etc/exports+ to allow NFS sharing of the volume
+
+-----
+/raid1  10.1.20.1(rw,async,no_root_squash) 10.1.20.0/255.255.255.0(rw,async)
+-----
+
+* Re-read the new NFS configuration
+
+-----
+# /usr/sbin/exportfs -r
+-----
+
+* Add +/etc/auto.share+ entry:
+
+-----
+/raid1  chenier.local:/raid1
+-----
+
+* Add +auto.share+ entry to +/etc/auto.master+
+
+-----
+/share  /etc/auto.share  --timeout=1200
+-----
+
+* Update 411 and push changes
+
+-----
+# cd /var/411
+# make clean
+rm -f 411.mk
+rm -f 411-Group.mk
+# make
+touch Makefile Files.mk
+Regenerating 411.mk...
+/opt/rocks/sbin/411put --comment="#" /etc/auto.share
+411 Wrote: /etc/411.d/etc.auto..share
+Size: 555/234 bytes (encrypted/plain)
+# rocks run host command="411get --all"
+-----
+
+* Restart the services
+
+-----
+# /sbin/service autofs reload
+# rocks run host command="service autofs restart"
+-----
+
+
+The 411 Service
+~~~~~~~~~~~~~~~
+
+To force the 411 system to flush all changes, run:
+
+-----
+make -C /var/411
+-----
+
+on the frontend.  To force all compute nodes to retrieve the
+latest files from the frontend, execute:
+
+-----
+rocks run host command="411get --all"
+-----
+
+LSI 9650SE-8LMPL Raid Controller
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Driver Version
+^^^^^^^^^^^^^^
+
+This is found via:
+
+-----
+root@chenier baum]# /opt/3ware/CLI/tw_cli
+//chenier> /c6 show driver
+/c6 Driver Version = 2.26.08.007-2.6.18RH
+-----
+
+CLI Version
+^^^^^^^^^^^
+
+The version of the command line interface (CLI) is found via:
+
+-----
+root@chenier baum]# /opt/3ware/CLI/tw_cli                  
+//chenier> help
+
+Copyright (c) 2012 LSI
+LSI/3ware CLI (version 2.00.11.022)
+-----
+
+Controller Model Number
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Find it via:
+
+-----
+[root@chenier baum]# /opt/3ware/CLI/tw_cli show
+
+Ctl   Model        (V)Ports  Drives   Units   NotOpt  RRate   VRate  BBU
+
+c6    9650SE-8LPML 8         7        2       2       1       1      OK
+-----
+
+Firmware Version
+^^^^^^^^^^^^^^^^
+
+Find it via:
+
+-----
+[root@chenier baum]# /opt/3ware/CLI/tw_cli /c6 show firmware
+/c6 Firmware Version = FE9X 4.08.00.006
+-----
+
+This is a pre-2009 firmware version, with no findable information as to hard
+drive size support.  The latest firmware version is 4.10.00.027 as of Dec. 3,
+2012, with the documentation claiming support for drives up to 4 TB.
+The support page is at:
+
+http://www.lsi.com/support/Pages/download-results.aspx?keyword=9650SE[+http://www.lsi.com/support/Pages/download-results.aspx?keyword=9650SE+]
+
+Controller Status
+^^^^^^^^^^^^^^^^^
+
+This is found via the command (on 3/18/14):
+
+-----
+[root@chenier baum]# /opt/3ware/CLI/tw_cli /c6 show
+
+Unit  UnitType  Status         %RCmpl  %V/I/M  Stripe  Size(GB)  Cache  AVrfy
+
+u0    RAID-5    INOPERABLE     -       -       256K    5587.88   Ri     ON
+u1    UNKNOWN   INOPERABLE     -       -       -       0         Ri     OFF
+
+VPort Status         Unit Size      Type  Phy Encl-Slot    Model
+
+p0    CFG-OP-FAIL    -    3.85 GB   SATA  0   -            ST_M13FQBL
+p1    OK             u0   931.51 GB SATA  1   -            ST31000340NS
+p2    OK             u0   931.51 GB SATA  2   -            ST31000340NS
+p3    OK             u0   931.51 GB SATA  3   -            ST31000340NS
+p5    OK             u0   931.51 GB SATA  5   -            SAMSUNG HD103SJ
+p6    OK             u0   931.51 GB SATA  6   -            ST31000340NS
+p7    DEGRADED       u0   931.51 GB SATA  7   -            ST31000340NS
+
+Name  OnlineState  BBUReady  Status    Volt     Temp     Hours  LastCapTest
+
+bbu   On           Yes       OK        OK       OK       0      xx-xxx-xxxx
+-----
+
+Upgrading the Firmware
+^^^^^^^^^^^^^^^^^^^^^^
+
+This is explained at:
+
+https://safe.nrao.edu/wiki/bin/view/Ccs/Lsi3WareGuide[+https://safe.nrao.edu/wiki/bin/view/Ccs/Lsi3WareGuide+]
+
+Basically, you download the firmware from:
+
+http://www.lsi.com/support/Pages/download-results.aspx?keyword=9650SE[+http://www.lsi.com/support/Pages/download-results.aspx?keyword=9650SE+]
+
+Unzip the package in a directory, and from within that directory:
+
+-----
+/opt/3ware/CLI/tw_cli /c6 update fw=prom0006.img
+-----
+
+The latest firmware is on rocks in /home/baum/Downloads/LSI_9650SE.
+
+Upgrade Warning
++++++++++++++++
+
+-----
+Important: Older Drivers & Software Tools Are Not Compatible With This Release
+Drivers and software released prior to version 9.5.5.1 are not fully
+compatible with the
+firmware in this release. You must upgrade to a 3ware driver and a software
+level before
+you update the firmware on your 9690SA or 9650SE controllers.
+-----
+
+Upgraded on 3/19/14
++++++++++++++++++++
+
+The following was the update procedure:
+
+-----
+//chenier> /c6 update fw=prom0006.img
+
+Warning: Updating the firmware can render the device driver and/or
+management tools incompatible. Before you update the firmware,
+it is recommended that you:
+
+1) Back up your data.
+
+2) Make sure you have a copy of the current firmware image so that
+you can roll back, if necessary.
+
+3) Close all applications.
+
+Examining compatibility data from firmware image and /c6 ... Done.
+
+New-Firmware        Current-Firmware    Current-Driver      Current-API 
+
+FE9X 4.10.00.027    FE9X 4.08.00.006    2.26.08.007-2.6.18RH2.08.00.027       
+
+Both API and Driver are compatible with the new firmware.
+Recommendation: proceed to update.
+
+Given the above recommendation...
+Do you want to continue ? Y|N [N]: Y
+Downloading the firmware from file prom0006.img ... Done. 
+The new image will take effect after reboot.
+-----
+
+Added New Unit on 3/19/14
++++++++++++++++++++++++++
+
+The command was:
+
+-----
+//chenier> /c6 add type=raid6 disk=0-7 stripe=64
+Creating new unit on controller /c6 ... Done. The new unit is /c6/u0.
+Setting AutoVerify=ON for the new unit ... Done.
+Setting default Storsave policy to [balance] for the new unit ... Done.
+Setting default Command Queuing policy for unit /c6/u0 to [on] ... Done.
+Setting write cache = ON for the new unit ... Done.
+-----
+
+Created Filesystem on 3/19/14
++++++++++++++++++++++++++++++
+
+-----
+[root@chenier LSI_9650SE]# /sbin/mkfs.xfs /dev/sdc1
+warning: unable to probe device toplology for device /dev/sdc1
+meta-data=/dev/sdc1              isize=256    agcount=17, agsize=268435455
+blks
+         =                       sectsz=512   attr=2, projid32bit=0
+data     =                       bsize=4096   blocks=4394513920, imaxpct=5
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0
+log      =internal log           bsize=4096   blocks=521728, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+-----
+
+Mounted Raid Array on 3/19/14
++++++++++++++++++++++++++++++
+
+-----
+mount -t xfs /dev/sdc1 /raid1
+-----
+
+Added +fstab+ Entry
++++++++++++++++++++
+
+-----
+/dev/sdc1               /raid1                  xfs     defaults        1 2
+-----
+
+Fixing the Nodes
+~~~~~~~~~~~~~~~~
+
+The Problem!!!!
+^^^^^^^^^^^^^^^
+
+Upon PXE booting, we get the following:
+
+-----
+...
+Trying to load: pxelinux.cfg/0A0114F8
+Loading vmlinuz-5.4.3-x86_64
+Loading initrd.img-5.4.3-x86_64
+Ready
+
+Kernel alive
+Kernel direct mapping tables up to 420000000 @ 10000-22000
+-----
+
+at which point the boot stalls.  This happens whether we boot via the
+network or via a boot CD.   Both methods stall at the same place, so we
+need not search for a solution to a network booting problem but rather a
+general solution to a booting problem.
+
+Booting into rescue mode via the CD leads to the same stall point.
+
+Solution Attempt Procedures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Starting insert-ethers on the Frontend
+++++++++++++++++++++++++++++++++++++++
+
+As documented at:
+
+http://www.rocksclusters.org/rocks-documentation/4.2/install-compute-nodes.html[+http://www.rocksclusters.org/rocks-documentation/4.2/install-compute-nodes.html+],
+the installation of nodes must be preceded by running +insert-ethers+
+on the frontend node.  Enter
+
+-----
+insert-ethers
+-----
+
+and then choose the +Compute+ option, at which point a box entitled
++Inserted Appliances+ will appear with a blank interior.
+It is waiting for new compute nodes.  When the frontend receives
+a DHCP request from a compute node, a message similar to:
+
+-----
+Discovered a new appliance with MAC (00:13:72:ba:c8:df)
+-----
+
+will appear.  After a few seconds, this message will be replaced by
+one similar to:
+
+-----
+00:13:72:ba:c8:df         compute-0-0     ( )
+-----
+
+An asterisk will appear in the parentheses when the node requests a
+kickstart file.
+
+
+
+Setting the Nodes to Install Mode
++++++++++++++++++++++++++++++++++
+
+Entering the command:
+
+-----
+rocks list host boot
+-----
+
+gives us:
+
+-----
+HOST          ACTION 
+chenier:      -------
+compute-0-0:  install
+compute-0-1:  install
+compute-0-2:  os     
+compute-0-3:  install
+compute-0-4:  install
+compute-0-5:  install
+compute-0-6:  install
+compute-0-7:  os     
+compute-0-8:  os     
+compute-0-9:  install
+compute-0-10: os     
+compute-0-11: install
+compute-0-12: install
+compute-0-13: os     
+compute-0-14: os     
+compute-0-15: os
+-----
+
+We can change the +ACTION+ via, e.g.
+
+-----
+rocks set host boot compute-0-0 action=install
+-----
+
+If a dead node is set to +os+, it will skip the PXE
+boot and die at the attempted disc boot.  If it is set
+to +install+, it will continue to the stall point described
+in the following section.
+
+
+
+Adding noapic to the GRUB Boot Options
+++++++++++++++++++++++++++++++++++++++
+
+Various proposed solutions:
+
+http://h30499.www3.hp.com/t5/ProLiant-Servers-ML-DL-SL/Kernel-Direct-Mapping-Hang-on-Install/td-p/3733271#.VLAl7fhZWhc[+http://h30499.www3.hp.com/t5/ProLiant-Servers-ML-DL-SL/Kernel-Direct-Mapping-Hang-on-Install/td-p/3733271#.VLAl7fhZWhc+]
+
+Fixed by booting with +linux noapic+.  Doesn't work here.
+
+Adding verbose and debug to the GRUB Boot Options
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+We find at:
+
+http://www.askapache.com/linux/linux-debugging.html[+http://www.askapache.com/linux/linux-debugging.html+]
+
+that appending +verbose+ and/or +debug+ to the GRUB boot options will
+supposedly give us more information.  Adding both of these to:
+
+-----
+/tftpboot/pxelinux/pxelinux.cfg/default
+-----
+
+supply no additional information.  It stalls at the same place with the
+same information.
+
+Using rocks remove|list host partition to Remove Existing Partitions When Installing a New Disk
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+At:
+
+http://marc.info/?l=npaci-rocks-discussion&m=136796615626526&w=2[+http://marc.info/?l=npaci-rocks-discussion&m=136796615626526&w=2+]
+
+we find: "In order to re-install successfully any node,I must remove the
+partitioning first."  This is done via:
+
+-----
+rocks remove host partition compute-0-6
+-----
+
+The partitions that are removed look like:
+
+-----
+rocks list host partition compute-0-6
+
+DEVICE MOUNTPOINT        START  SIZE   ID TYPE       FLAGS FORMATFLAGS
+sda1   /                 32.3kB 16.8GB -- ext3       boot  -----------
+sda2   /var              16.8GB 4195MB -- ext3       ----- -----------
+sda3   swap              21.0GB 1045MB -- linux-swap ----- -----------
+sda4   ----------------- 22.0GB 228GB  -- ---------- ----- -----------
+sda5   /state/partition1 22.0GB 228GB  -- ext3       ----- -----------
+-----
+
+The Location of the PXE Boot Files on the Head Node
++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+All the PXE boot files are located on the main node in:
+
+-----
+/tftpboot/pxelinux
+-----
+
+and are:
+
+-----
+-rwxr-xr-x 1 root root   18536630 Aug 24  2011 initrd.img-5.4.3-x86_64
+-rwxr-xr-x 1 root root      20020 Aug  9  2011 memdisk
+-rw-r--r-- 1 root root      94600 Aug 24  2011 memtest
+-rwxr-xr-x 1 root root    2949120 Aug  9  2011 pxeflash.img
+-rw-r--r-- 1 root root      13148 Aug 24  2011 pxelinux.0
+drwxrwxr-x 2 root apache     4096 Jan  8 16:36 pxelinux.cfg
+-rwxr-xr-x 1 root root    2097180 Aug 24  2011 vmlinuz-5.4.3-x86_64
+-----
+
+The +pxelinux.cfg+ directory contains:
+
+-----
+-rw-rw-r-- 1 root apache 200 Jan  8 16:36 default
+-rw-rw-r-- 1 root apache 302 Jan  8 16:36 0A0114F8
+-rw-rw-r-- 1 root apache 295 Jan  8 15:34 0A0114FE
+-rw-rw-r-- 1 root apache 295 Jan  8 15:34 0A0114FD
+-rw-rw-r-- 1 root apache 295 Jan  8 15:34 0A0114FB
+-rw-rw-r-- 1 root apache 295 Jan  8 15:33 0A0114FA
+-rw-rw-r-- 1 root apache 295 Jan  8 15:33 0A0114F9
+-rw-rw-r-- 1 root apache 295 Jan  8 15:33 0A0114F5
+-rw-rw-r-- 1 root apache 295 Jan  8 15:33 0A0114F3
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114F4
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114FC
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114F0
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114F7
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114F6
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114EF
+-rw-rw-r-- 1 root apache  48 Mar  3  2012 0A0114F1
+-rw-rw-r-- 1 root apache 295 Aug 24  2011 0A0114F2
+-----
+
+As per the advice to add +noapic+ to the GRUB boot string, we first edit the
+default string in the file +/tftpboot/pxelinux/pxelinux.cfg/default+, i.e.
+
+-----
+vi /tftpboot/pxelinux/pxelinux.cfg/default
+-----
+
+and change:
+
+-----
+append ks ramdisk_size=150000 lang= devfs=nomount pxe kssendmac selinux=0 noipv6 ksdevice=bootif initrd=initrd.img-5.4.3-x86_64
+-----
+
+to 
+
+-----
+append ks ramdisk_size=150000 lang= devfs=nomount pxe kssendmac selinux=0 noipv6 ksdevice=bootif initrd=initrd.img-5.4.3-x86_64 noapic
+-----
+
+It does not fix the problem to add +noapic+ to either the file +default+ or
+the file +0A0114F8+ (the latter of which it tells us it's trying to load).
+So we still can't get past the stall after +kernel direct mapping...+.
+
+[[terrebonne]]
+terrebonne
+----------
+
+Hardware Details
+~~~~~~~~~~~~~~~~
+
+*Motherboard:*  Supermicro H8DG6/H8DGi
+
+*Motherboard URL:* http://www.supermicro.com/Aplus/motherboard/Opteron6000/SR56x0/H8DG6.cfm[+http://www.supermicro.com/Aplus/motherboard/Opteron6000/SR56x0/H8DG6.cfm+] 
+
+*CPU:*  AMD Opteron
+
+RAM
+^^^
+
+*Memory slots:*  16 x DIMM slots
+
+*Memory support:*
+
+* Up to 512GB Registered ECC or 128GB Unbuffered ECC/non-ECC DDR3 1600/1333/1066 SDRAM in 16 DIMMs
+
+*Memory configuration guide (PDF):* http://www.supermicro.com/support/resources/memory/X8_DP_DIMM_population.pdf[+http://www.supermicro.com/support/resources/memory/X8_DP_DIMM_population.pdf+]
+
+*Memory installed originally:* 8 x Kingston 4GB DIMM DDR3 1333MHz 240-pin 9965447-056.A00LF
+
+*Upgrade Candidates*
+
+* Kingston 8GB 240-Pin DDR3 SDRAM ECC Registered DDR3 1333 Server Memory Model KVR13LR9S4/8 - $60 +
+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239540[+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239540+]
+
+* Kingston 16GB 240-Pin DDR3 SDRAM ECC Registered DDR3 1333 (PC3 10600) Server Memory Model KVR13LR9D4/16 - $110 +
+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239620[+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239620+]
+
+RAID Controller
+^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -aALL+
+
+=====
+                    Versions
+                ================
+Product Name    : LSI MegaRAID SAS 9280-4i4e
+Serial No       : SV00202963
+FW Package Build: 12.11.0-0016
+
+                    Mfg. Data
+                ================
+Mfg. Date       : 01/06/10
+Rework Date     : 00/00/00
+Revision No     : 
+Battery FRU     : N/A
+
+                Image Versions in Flash:
+                ================
+FW Version         : 2.110.03-0967
+BIOS Version       : 3.18.00_4.09.05.00_0x0416A000
+Preboot CLI Version: 04.04-011:#%00008
+WebBIOS Version    : 6.0-24-e_19-Rel
+NVDATA Version     : 2.08.03-0004
+Boot Block Version : 2.02.00.00-0000
+BOOT Version       : 01.250.04.219
+=====
+
+RAID Enclosure
+^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -EncInfo -aALL+
+
+=====
+    Enclosure 0:
+    Device ID                     : 45
+    Number of Slots               : 12
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 12
+    Status                        : Normal
+    Position                      : 2
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X28
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X28         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 1:
+    Device ID                     : 93
+    Number of Slots               : 24
+    Number of Power Supplies      : 2
+    Number of Fans                : 5
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 24
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X36
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 2:
+    Device ID                     : 252
+    Number of Slots               : 8
+    Number of Power Supplies      : 0
+    Number of Fans                : 0
+    Number of Temperature Sensors : 0
+    Number of Alarms              : 0
+    Number of SIM Modules         : 1
+    Number of Physical Drives     : 0
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Unavailable
+    Enclosure type                : SGPIO
+Failed in first Inquiry commnad
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : Unavailable
+
+    Inquiry data                  :
+        Vendor Identification     : LSI     
+        Product Identification    : SGPIO           
+        Product Revision Level    : N/A 
+        Vendor Specific           : 
+=====
+
+RAID Hard Drives
+^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep Inquiry+
+
+=====
+Inquiry Data:       JK1101B9JPTXNFHitachi HDS722020ALA330                 JKAOA3MA
+
+which means that the hard drives are:
+
+Hitachi GST Deskstar 7K2000 HDS722020ALA330 (0F10311) 2TB 7200 RPM 32MB Cache SATA 3.0Gb/s 3.5" Internal Hard Drive
+=====
+
+Virtual Drive Info
+^^^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL+
+
+=====
+Adapter 0 -- Virtual Drive Information:
+Virtual Drive: 0 (Target Id: 0)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 38.195 TB
+Parity Size         : 3.637 TB
+State               : Optimal
+Strip Size          : 64 KB
+Number Of Drives    : 23
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Is VD Cached: No
+
+
+Virtual Drive: 1 (Target Id: 1)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 18.188 TB
+Parity Size         : 3.637 TB
+State               : Partially Degraded
+Strip Size          : 64 KB
+Number Of Drives    : 12
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Is VD Cached: No
+=====
+
+
+CURRENT STATUS:  Dead like a doornail.  Needs a head node system reinstall.
+
+Network Info
+~~~~~~~~~~~~
+
+-----
+*IP*:  +165.91.85.132+ +
+*NM*:  +255.255.255.0+ +
+*GW*:  +165.91.85.1+ +
+*DNS*: +128.194.254.1+, +128.194.254.2+
+       +128.194.254.2+
+-----
+
+mtab
+~~~~
+
+-----
+rootfs / rootfs rw 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+sysfs /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
+devtmpfs /dev devtmpfs rw,nosuid,size=16348560k,nr_inodes=4087140,mode=755 0 0
+securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev/shm tmpfs rw,nosuid,nodev 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+tmpfs /run tmpfs rw,nosuid,nodev,mode=755 0 0
+tmpfs /sys/fs/cgroup tmpfs rw,nosuid,nodev,noexec,mode=755 0 0
+cgroup /sys/fs/cgroup/systemd cgroup rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/usr/lib/systemd/systemd-cgroups-agent,name=systemd 0 0
+pstore /sys/fs/pstore pstore rw,nosuid,nodev,noexec,relatime 0 0
+cgroup /sys/fs/cgroup/cpuset cgroup rw,nosuid,nodev,noexec,relatime,cpuset 0 0
+cgroup /sys/fs/cgroup/cpu,cpuacct cgroup rw,nosuid,nodev,noexec,relatime,cpuacct,cpu 0 0
+cgroup /sys/fs/cgroup/memory cgroup rw,nosuid,nodev,noexec,relatime,memory 0 0
+cgroup /sys/fs/cgroup/devices cgroup rw,nosuid,nodev,noexec,relatime,devices 0 0
+cgroup /sys/fs/cgroup/freezer cgroup rw,nosuid,nodev,noexec,relatime,freezer 0 0
+cgroup /sys/fs/cgroup/net_cls cgroup rw,nosuid,nodev,noexec,relatime,net_cls 0 0
+cgroup /sys/fs/cgroup/blkio cgroup rw,nosuid,nodev,noexec,relatime,blkio 0 0
+cgroup /sys/fs/cgroup/perf_event cgroup rw,nosuid,nodev,noexec,relatime,perf_event 0 0
+cgroup /sys/fs/cgroup/hugetlb cgroup rw,nosuid,nodev,noexec,relatime,hugetlb 0 0
+configfs /sys/kernel/config configfs rw,relatime 0 0
+/dev/sdd2 / xfs rw,relatime,attr2,inode64,noquota 0 0
+systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=35,pgrp=1,timeout=300,minproto=5,maxproto=5,direct 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+mqueue /dev/mqueue mqueue rw,relatime 0 0
+hugetlbfs /dev/hugepages hugetlbfs rw,relatime 0 0
+binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc rw,relatime 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw,relatime 0 0
+sunrpc /proc/fs/nfsd nfsd rw,relatime 0 0
+/dev/sdc1 /boot xfs rw,relatime,attr2,inode64,noquota 0 0
+/dev/md127 /home xfs rw,relatime,attr2,inode64,noquota 0 0
+/dev/sda1 /raid xfs rw,relatime,attr2,inode64,noquota 0 0
+rho.tamu.edu:/raid /rho/raid nfs rw,relatime,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,mountaddr=165.91.85.151,mountvers=3,mountport=738,mountproto=udp,local_lock=none,addr=165.91.85.151 0 0
+atchafalaya.tamu.edu:/raid1 /atch/raid1 nfs4 rw,relatime,vers=4.0,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,port=0,timeo=600,retrans=2,sec=sys,clientaddr=165.91.85.132,local_lock=none,addr=165.91.85.122 0 0
+-----
+
+fstab
+~~~~~
+
+-----
+#
+# /etc/fstab
+# Created by anaconda on Mon Sep 15 19:32:40 2014
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+UUID=a7a29bdf-4013-459e-a1b0-fa88059f94b8 /                       xfs     defaults        1 1
+UUID=ecfd1d96-dcbf-4d77-81ba-a9aa8512bda5 /boot                   xfs     defaults        1 2
+UUID=fb24ec80-5875-41ab-b177-54e0cb331f68 /home                   xfs     defaults        1 2
+UUID=06c4785b-f5f6-4eee-88cb-9400a4dba162 swap                    swap    defaults        0 0
+-----
+
+/proc/partitions
+~~~~~~~~~~~~~~~~
+
+-----
+major minor  #blocks  name
+
+   8        0 41012428800 sda
+   8        1 41012427759 sda1
+   8       32  244198584 sdc
+   8       33     512000 sdc1
+   8       34  174734336 sdc2
+   8       35   24713216 sdc3
+   8       16 19529728000 sdb
+   8       48  244198584 sdd
+   8       49  174734336 sdd1
+   8       50   69463040 sdd2
+   9      127  174603136 md127
+-----
+
+Backups
+~~~~~~~
+
+The entire +/usr+ and +/home+ directory structures are presently backed up on:
+
++pong.tamu.edu:/raid/terrebonne+
+
+Problems
+~~~~~~~~
+
+6/18/06:
+
+*Problem*: Discs won't mount because of a corrupted +mount+ command.
+
+*Solution*:  Burn a rescue disk of CentoS XXX and reinstall the +util-linux+
+package.
+
+First, though, we need to go to the basement and find out which OS version
+the machine is running.
+
+Attempted Solution #1
+^^^^^^^^^^^^^^^^^^^^^
+
+General Procedure
++++++++++++++++++
+
+Boot into rescue mode using the CentOS 5.5 OS that is installed on terrebonne,
+and then when it finds the Linux filesystem and mounts it under
++/mnt/sysimage/+ use the command:
+
++chroot /mnt/sysimage+
+
+to mount the root partition as +/+.  Then we can use +rpm+ to reinstall
+the +util-linux+ package.
+
+The full rescue mode instructions can be found at:
+
+http://www.centos.org/docs/5/html/Installation_Guide-en-US/s1-rescuemode-boot.html[+http://www.centos.org/docs/5/html/Installation_Guide-en-US/s1-rescuemode-boot.html+]
+
+Reinstalling RPMs from the CD or DVD
+++++++++++++++++++++++++++++++++++++
+
+http://linuxgazette.net/159/prestia.html[+http://linuxgazette.net/159/prestia.html+]
+
+* Boot from the RHEL boot CD and at the boot prompt type: linux rescue.
+* Select your language and keyboard layout.
+* Choose whether or not to start networking interfaces.
+* Mount your partitions read/write.
+* Mount the CD or DVD by typing mount /dev/cdrom /mnt/source.
+* Select the RPM and reinstall it with rpm --replacepkgs -ivh /mnt/source/Server/rpmfile.rpm --root /mnt/sysimage
+* Reboot.
+
+
+What Happens
+++++++++++++
+
+Reboot the machine and enter:
+
++linux rescue+
+
+The linux filesystem - on the +md*+ software RAID partitions - 
+is not found and nothing is mounted under +/mnt/sysimage+.
+
+How the Linux Software RAID Thing Works for the Root Disk
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The method for creating the bootable linux software RAID-1 array is detailed
+at:
+
+http://somedec.com/downloads/howto-bootable-linux-raid1.html[+http://somedec.com/downloads/howto-bootable-linux-raid1.html+]
+
+
+Basically, to create a RAID-1 array of two drives, you use:
+
++mdadm -C -ap4 -l1 /dev/md_d0 /dev/hda /dev/hdb+
+
+to create four (+-ap4+) partitions of RAID-1 (+-l1+) as
+devices +md_d0+, +md_d1+, +md_d2+ and +md_d3+ from hard drives
++hda+ and +hdb+.
+
+Installing Linux on Software RAID in 10 Steps
++++++++++++++++++++++++++++++++++++++++++++++
+
+http://jeremysands.com/?p=52[+http://jeremysands.com/?p=52+]
+
+. Partition the first disk on whatever machine using whatever tool.
+
+. Copy that partition scheme to all disks via:
+
++sfdisk -d /dev/sda | sfdisk /dev/sdb+
+
+. Create the RAID array.
+
+Blah blah blah.
+
+How to Set Up a Software RAID on CentOS 5
++++++++++++++++++++++++++++++++++++++++++
+
+. Begin graphical installation of CentOS.
+
+. Customize partitions and remove all partitions for a fresh start.
+
+. Create a 100 MB software RAID partition on sda and sdb for +/boot+.
+
+. 
+
+
+
+The MegaRAID Hardware RAID Sets
++++++++++++++++++++++++++++++++
+
+The first RAID set can be mounted via:
+
++mkdir /raid1+ +
++mount /dev/sda /raid1+
+
+When attempting to mount the second RAID set via:
+
++mkdir /raid2+ +
++mount /dev/sdb /raid2+
+
+we get an error, the machine freezes up completely, and we have to reboot.
+
+
+Attempted Solution #2
+^^^^^^^^^^^^^^^^^^^^^
+
+Reinstall the whole fucking thing since we have all the +home+
+directories backed up.  The only problem is the LSI MegaRAID software.
+How will we recover the /sdb disc?  I guess using the command line interface.
+
+[[gcoos1]]
+gcoos1
+------
+
+Hardware
+~~~~~~~~
+
+Mobo
+^^^^
+
+Supermicro X8DTL
+
+UUID: 49434D53-0200-9062-2500-6290250059BE
+
+CPU
+^^^
+
+2 x Intel Xeon E5620 @ 2.40GHz
+
+
+fstab
+~~~~~
+
+-----
+/dev/VolGroup01/LogVol00 /                       ext3    defaults        1 1
+LABEL=/boot             /boot                   ext3    defaults        1 2
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+/dev/VolGroup01/LogVol01 swap                    swap    defaults        0 0
+/dev/sdb1               /data                   ext3    defaults        1 1
+-----
+
+mtab
+~~~~
+
+-----
+/dev/mapper/VolGroup01-LogVol00 / ext3 rw 0 0
+proc /proc proc rw 0 0
+sysfs /sys sysfs rw 0 0
+devpts /dev/pts devpts rw,gid=5,mode=620 0 0
+/dev/sda1 /boot ext3 rw 0 0
+tmpfs /dev/shm tmpfs rw 0 0
+/dev/sdb1 /data ext3 rw 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw 0 0
+-----
+
+/proc/partitions
+~~~~~~~~~~~~~~~~
+
+-----
+major minor  #blocks  name
+
+   8     0  438475776 sda
+   8     1     104391 sda1
+   8     2  438365655 sda2
+   8    16 1952147456 sdb
+   8    17 1952146476 sdb1
+ 253     0  411631616 dm-0
+ 253     1   26705920 dm-1
+-----
+
+[[gcoos2]]
+gcoos2
+------
+
+fstab
+~~~~~
+
+-----
+#
+# /etc/fstab
+# Created by anaconda on Wed May 13 13:27:37 2015
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+UUID=e792ead2-96d4-4eb2-9332-03cb2c014ac0 /                       xfs     defaults        0 0
+UUID=2090a461-f078-4c5d-bdc9-c56b081d0bbc /boot                   xfs     defaults        0 0
+UUID=0dfa725a-12ae-421b-ae3f-ffb9761661db swap                    swap    defaults        0 0
+-----
+
+mtab
+~~~~
+
+-----
+rootfs / rootfs rw 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+sysfs /sys sysfs rw,seclabel,nosuid,nodev,noexec,relatime 0 0
+devtmpfs /dev devtmpfs rw,seclabel,nosuid,size=49388724k,nr_inodes=12347181,mode=755 0 0
+securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev/shm tmpfs rw,seclabel,nosuid,nodev 0 0
+devpts /dev/pts devpts rw,seclabel,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000 0 0
+tmpfs /run tmpfs rw,seclabel,nosuid,nodev,mode=755 0 0
+tmpfs /sys/fs/cgroup tmpfs ro,seclabel,nosuid,nodev,noexec,mode=755 0 0
+cgroup /sys/fs/cgroup/systemd cgroup rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/usr/lib/systemd/systemd-cgroups-agent,name=systemd 0 0
+pstore /sys/fs/pstore pstore rw,nosuid,nodev,noexec,relatime 0 0
+cgroup /sys/fs/cgroup/cpuset cgroup rw,nosuid,nodev,noexec,relatime,cpuset 0 0
+cgroup /sys/fs/cgroup/cpu,cpuacct cgroup rw,nosuid,nodev,noexec,relatime,cpuacct,cpu 0 0
+cgroup /sys/fs/cgroup/memory cgroup rw,nosuid,nodev,noexec,relatime,memory 0 0
+cgroup /sys/fs/cgroup/devices cgroup rw,nosuid,nodev,noexec,relatime,devices 0 0
+cgroup /sys/fs/cgroup/freezer cgroup rw,nosuid,nodev,noexec,relatime,freezer 0 0
+cgroup /sys/fs/cgroup/net_cls cgroup rw,nosuid,nodev,noexec,relatime,net_cls 0 0
+cgroup /sys/fs/cgroup/blkio cgroup rw,nosuid,nodev,noexec,relatime,blkio 0 0
+cgroup /sys/fs/cgroup/perf_event cgroup rw,nosuid,nodev,noexec,relatime,perf_event 0 0
+cgroup /sys/fs/cgroup/hugetlb cgroup rw,nosuid,nodev,noexec,relatime,hugetlb 0 0
+configfs /sys/kernel/config configfs rw,relatime 0 0
+/dev/sda3 / xfs rw,seclabel,relatime,attr2,inode64,noquota 0 0
+selinuxfs /sys/fs/selinux selinuxfs rw,relatime 0 0
+systemd-1 /proc/sys/fs/binfmt_misc autofs rw,relatime,fd=33,pgrp=1,timeout=300,minproto=5,maxproto=5,direct 0 0
+mqueue /dev/mqueue mqueue rw,seclabel,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,relatime 0 0
+hugetlbfs /dev/hugepages hugetlbfs rw,seclabel,relatime 0 0
+/dev/sda1 /boot xfs rw,seclabel,relatime,attr2,inode64,noquota 0 0
+binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc rw,relatime 0 0
+/dev/sdb1 /data ext3 rw,seclabel,relatime,data=ordered 0 0
+tmpfs /run/user/1004 tmpfs rw,seclabel,nosuid,nodev,relatime,size=9879532k,mode=700,uid=1004,gid=1005 0 0
+tmpfs /run/user/42 tmpfs rw,seclabel,nosuid,nodev,relatime,size=9879532k,mode=700,uid=42,gid=42 0 0
+tmpfs /run/user/1000 tmpfs rw,seclabel,nosuid,nodev,relatime,size=9879532k,mode=700,uid=1000,gid=1000 0 0
+-----
+
+/proc/partitions
+~~~~~~~~~~~~~~~~
+
+-----
+major minor  #blocks  name
+
+   8       16 1952147456 sdb
+   8       17 1952146476 sdb1
+   8        0  438475776 sda
+   8        1     340992 sda1
+   8        2   24413184 sda2
+   8        3  413720576 sda3
+-----
+
+[[gcoos3]]
+gcoos3
+------
+
+Hardware
+~~~~~~~~
+
+Server
+^^^^^^
+
+PowerEdge R710
+
+http://www.dell.com/us/business/p/poweredge-r710/pd[+http://www.dell.com/us/business/p/poweredge-r710/pd+]
+
+PDF Manual:  http://downloads.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r710_owner%27s%20manual_en-us.pdf[+http://downloads.dell.com/manuals/all-products/esuprt_ser_stor_net/esuprt_poweredge/poweredge-r710_owner%27s%20manual_en-us.pdf+]
+
+18 DIMM slots
+
+PERC 6/i SAS backplane
+
+Memory
+^^^^^^
+
+18 Kingston PC3-10600 DDR3-1333MHz ECC Registered CL9 240-Pin DIMMs 	
+Part #: KTD-PE313K3/24G
+
+The BIOS says that is has disabled DIMMS A3, A6 and A9.
+
+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1442334847&partno=KTD-PE313K3/24G&rid=88&gclid=Cj0KEQiAxrW2BRCFidKbqKyq1YEBEiQAnMDWxh3qEldr3GbbFWRrvbnjLvRSpC_9OKFYkrakGDol7zQaAoPn8P8HAQ[+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1442334847&partno=KTD-PE313K3/24G&rid=88&gclid=Cj0KEQiAxrW2BRCFidKbqKyq1YEBEiQAnMDWxh3qEldr3GbbFWRrvbnjLvRSpC_9OKFYkrakGDol7zQaAoPn8P8HAQ+]
+
+[[gcoos4]]
+gcoos4
+------
+
+Not much yet.
+
+[[merrimack]]
+merrimack
+---------
+
+Hardware
+~~~~~~~~
+
+RAID Controller
+^^^^^^^^^^^^^^^
+
++/usr/local/sbin/lspci -vv | grep -i raid+
+
+=====
+02:00.0 SCSI storage controller: LSI Logic / Symbios Logic MegaRAID SAS 8208ELP/8208ELP (rev 04)
+0b:0e.0 RAID bus controller: Areca Technology Corp. ARC-1120 8-Port PCI-X to SATA RAID Controller
+        Subsystem: Areca Technology Corp. ARC-1120 8-Port PCI-X to SATA RAID Controller
+=====
+
+The manual for the ARC-1120 can be found at:
+
+http://www.areca.us/support/download/RaidCards/Documents/Manual_Spec/SATA-RAIDCard_4.1.zip[+http://www.areca.us/support/download/RaidCards/Documents/Manual_Spec/SATA-RAIDCard_4.1.zip+]
+
+The manual for the CLI can be found at:
+
+http://www.areca.us/support/download/RaidCards/Documents/Manual_Spec/CLIManual.zip[+http://www.areca.us/support/download/RaidCards/Documents/Manual_Spec/CLIManual.zip+]
+
+The CLI utility can be found at:
+
+http://www.areca.us/support/s_linux/cli/linuxcli_V1.14.7_150519.zip[+http://www.areca.us/support/s_linux/cli/linuxcli_V1.14.7_150519.zip+]
+
+After downloading the CLI, you unpack it with:
+
+=====
+unzip linuxcli_V1.14.7_150519.zip
+
+Archive:  linuxcli_V1.14.7_150519.zip
+   creating: linuxcli_V1.14.7_150519/
+   creating: linuxcli_V1.14.7_150519/i386/
+  inflating: linuxcli_V1.14.7_150519/i386/cli32  
+   creating: linuxcli_V1.14.7_150519/x86_64/
+  inflating: linuxcli_V1.14.7_150519/x86_64/cli64 
+=====
+
+Run it as root:
+
+=====
+./cli64
+
+Copyright (c) 2004-2015 Areca, Inc. All Rights Reserved.
+Areca CLI, Version: 1.14.7, Arclib: 350, Date: May 19 2015( Linux )
+
+ S  #   Name       Type             Interface
+
+[*] 1   ARC-1120   Raid Controller  PCI
+
+
+CMD     Description
+
+main    Show Command Categories.
+set     General Settings.
+rsf     RaidSet Functions.
+vsf     VolumeSet Functions.
+disk    Physical Drive Functions.
+sys     System Functions.
+adsys   Advanced System Functions.
+hddpwr  Hdd Power Management.
+net     Ethernet Functions.
+event   Event Functions.
+hw      Hardware Monitor Functions.
+mail    Mail Notification Functions.
+snmp    SNMP Functions.
+ntp     NTP Functions.
+exit    Exit CLI.
+
+Command Format: <CMD> [Sub-Command] [Parameters].
+Note: Use <CMD> -h or -help to get details.
+CLI> disk info
+  # Ch# ModelName                       Capacity  Usage
+
+  1  1  ST31000340NS                    1000.2GB  Failed    
+  2  2  ST31000340NS                    1000.2GB  Raid Set # 00   
+  3  3  ST31000340NS                    1000.2GB  Raid Set # 00   
+  4  4  ST31000340NS                    1000.2GB  Raid Set # 00   
+  5  5  ST31000340NS                    1000.2GB  Raid Set # 00   
+  6  6  ST31000340NS                    1000.2GB  Raid Set # 00   
+  7  7  ST31000340NS                    1000.2GB  Raid Set # 00   
+  8  8  ST31000340NS                    1000.2GB  HotSpare[Global]
+
+CLI> vsf info
+  # Name             Raid Name       Level   Capacity Ch/Id/Lun  State         
+
+  1 ARC-1120-VOL#00  Raid Set # 00   Raid5   5000.0GB 00/00/00   Normal
+
+CLI> sys showcfg p=0
+GuiErrMsg<0x08>: Password Required.
+
+CLI> sys info
+The System Information
+
+Main Processor     : 500MHz
+CPU ICache Size    : 32KB
+CPU DCache Size    : 32KB
+CPU SCache Size    : 0KB
+System Memory      : 256MB/333MHz/ECC
+Firmware Version   : V1.46 2008-08-06
+BOOT ROM Version   : V1.45 2008-3-14 
+Serial Number      : Y847CAABAR201412
+Controller Name    : ARC-1120
+
+CLI> event info
+Date-Time            Device           Event Type            Elapsed Time Errors
+
+2016-07-16 14:43:44  IDE Channel #01  Dev Fail (SMART)                         
+2016-07-16 14:43:44  H/W MONITOR      Raid Powered On                          
+2016-06-22 02:21:08  IDE Channel #07  Reading Error                            
+2016-05-05 04:39:42  IDE Channel #06  Reading Error                            
+2016-04-29 12:45:02  IDE Channel #07  Reading Error                            
+2016-04-27 21:15:11  IDE Channel #07  Reading Error                            
+2016-04-26 20:37:35  IDE Channel #01  Dev Fail (SMART)                         
+2016-04-26 20:37:34  H/W MONITOR      Raid Powered On                          
+2016-04-26 20:03:44  IDE Channel #01  Dev Fail (SMART)                         
+2016-04-26 20:03:44  H/W MONITOR      Raid Powered On                          
+2016-03-22 10:24:30  ARC-1120-VOL#00  Complete Rebuild      005:07:31          
+2016-03-22 08:19:52  IDE Channel #06  Reading Error                            
+2016-03-22 08:19:44  IDE Channel #06  Reading Error                            
+2016-03-22 08:19:34  IDE Channel #06  Reading Error                            
+2016-03-22 05:16:58  ARC-1120-VOL#00  Start Rebuilding                         
+2016-03-22 05:16:56  IDE Channel #01  Device Failed                            
+2016-03-22 05:16:56  Raid Set # 00    Rebuild RaidSet                          
+2016-03-22 05:16:55  Raid Set # 00    RaidSet Degraded                         
+2016-03-22 05:16:55  ARC-1120-VOL#00  Volume Degraded                          
+2016-03-18 23:45:36  IDE Channel #01  Reading Error                            
+2016-03-10 12:48:16  H/W MONITOR      Raid Powered On                          
+2016-03-06 19:34:17  IDE Channel #07  Reading Error                            
+2016-02-20 22:25:51  IDE Channel #01  Reading Error                            
+2016-02-19 22:02:49  IDE Channel #01  Reading Error                            
+2016-02-17 17:26:08  H/W MONITOR      Raid Powered On                          
+2016-02-09 17:07:34  H/W MONITOR      Raid Powered On                          
+2016-02-09 04:20:21  IDE Channel #01  Reading Error                            
+2016-02-08 22:15:52  IDE Channel #01  Reading Error                            
+2016-01-29 00:48:43  IDE Channel #01  Reading Error                            
+2016-01-01 20:15:38  H/W MONITOR      Raid Powered On                          
+2015-01-28 15:46:09  ARC-1120-VOL#00  Complete Rebuild      005:02:09          
+2015-01-28 13:30:33  IDE Channel #06  Reading Error                            
+2015-01-28 13:30:25  IDE Channel #06  Reading Error                            
+2015-01-28 13:30:18  IDE Channel #06  Reading Error                            
+2015-01-28 10:44:10  IDE Channel #05  Device Inserted                          
+2015-01-28 10:44:00  ARC-1120-VOL#00  Start Rebuilding                         
+2015-01-28 10:43:58  IDE Channel #05  Device Removed                           
+2015-01-28 10:43:58  Raid Set # 00    Rebuild RaidSet
+2015-01-28 10:43:57  Raid Set # 00    RaidSet Degraded                         
+2015-01-28 10:43:57  ARC-1120-VOL#00  Volume Degraded                          
+2014-03-18 23:28:28  H/W MONITOR      Raid Powered On                          
+2014-01-10 17:16:58  H/W MONITOR      Raid Powered On                          
+2013-11-30 16:31:03  H/W MONITOR      Raid Powered On                          
+2013-07-23 12:12:50  H/W MONITOR      Raid Powered On                          
+2013-02-16 01:55:59  IDE Channel #06  Reading Error                            
+2012-07-13 14:54:32  H/W MONITOR      Raid Powered On                          
+2012-06-02 16:11:17  H/W MONITOR      Raid Powered On                          
+2012-03-06 17:12:15  H/W MONITOR      Raid Powered On                          
+2012-03-03 19:07:33  H/W MONITOR      Raid Powered On                          
+2011-11-07 20:27:31  H/W MONITOR      Raid Powered On                          
+2011-11-07 19:45:26  H/W MONITOR      Raid Powered On                          
+2011-11-07 19:40:17  H/W MONITOR      Raid Powered On                          
+2011-11-07 18:59:45  H/W MONITOR      Raid Powered On                          
+2011-11-03 16:40:24  H/W MONITOR      Raid Powered On                          
+2011-10-28 23:20:59  H/W MONITOR      Raid Powered On                          
+2011-10-19 22:18:58  H/W MONITOR      Raid Powered On                          
+2011-10-19 22:00:42  H/W MONITOR      Raid Powered On                          
+2011-10-19 21:59:51  H/W MONITOR      Raid Powered On                          
+2011-10-14 23:44:28  H/W MONITOR      Raid Powered On                          
+2011-10-14 23:34:13  H/W MONITOR      Raid Powered On                          
+2011-10-14 20:34:14  H/W MONITOR      Raid Powered On                          
+2011-10-14 19:22:29  H/W MONITOR      Raid Powered On                          
+2011-10-14 17:07:37  H/W MONITOR      Raid Powered On                          
+2011-10-14 16:02:37  H/W MONITOR      Raid Powered On                          
+=====
+
+SWITCH
+^^^^^^
+
+Flextronics F-X430046
+
+Presently (2/16) only available used/refurbed, e.g.
+
+http://www.impactcomputers.com/f-x430046.html - $350
+
+
+
+
+
+
+CURRENT STATUS:  Head and 18 nodes up.  Switch down.
+
+URL: http://merrimack.tamu.edu/wordpress/[+http://merrimack.tamu.edu/wordpress/+]
+
+Ganglia URL:
+http://merrimack.tamu.edu/ganglia/[+http://merrimack.tamu.edu/ganglia/+]
+
+fstab
+~~~~~
+
+------
+/dev/md126              /                       ext3    defaults        1 1
+/dev/md127              /export                 ext3    defaults        1 2
+/dev/md124              /boot                   ext3    defaults        1 2
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+/dev/md125              swap                    swap    defaults        0 0
+/dev/sdc1               /raid                   ext3    defaults        0 0
+
+# The ram-backed filesystem for ganglia RRD graph databases.
+tmpfs /var/lib/ganglia/rrds tmpfs
+size=2044056000,gid=nobody,uid=nobody,defaults 1 0
+------
+
+mtab
+~~~~
+
+------
+/dev/md126 / ext3 rw 0 0
+proc /proc proc rw 0 0
+sysfs /sys sysfs rw 0 0
+devpts /dev/pts devpts rw,gid=5,mode=620 0 0
+/dev/md127 /export ext3 rw 0 0
+/dev/md124 /boot ext3 rw 0 0
+tmpfs /dev/shm tmpfs rw 0 0
+/dev/sdc1 /raid ext3 rw 0 0
+tmpfs /var/lib/ganglia/rrds tmpfs rw,size=2044056000,gid=99,uid=99 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw 0 0
+none /ipathfs ipathfs rw 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw 0 0
+nfsd /proc/fs/nfsd nfsd rw 0 0
+/export/home/baum /home/baum none rw,bind 0 0
+------
+
+/proc/partitions
+~~~~~~~~~~~~~~~~
+
+------
+major minor  #blocks  name
+
+   8     0  244198584 sda
+   8     1     104391 sda1
+   8     2    8289540 sda2
+   8     3   20482875 sda3
+   8     4          1 sda4
+   8     5  215319163 sda5
+   8    16  244198584 sdb
+   8    17     104391 sdb1
+   8    18    8289540 sdb2
+   8    19   20482875 sdb3
+   8    20          1 sdb4
+   8    21  215319163 sdb5
+   8    32 4882812160 sdc
+   8    33 4882804115 sdc1
+   9   126   20482752 md126
+   9   127  215319040 md127
+   9   125    8289472 md125
+   9   124     104320 md124
+------
+
+
+
+Torque Info
+~~~~~~~~~~~
+
+*Admin Manual* - http://www.clusterresources.com/torquedocs21/[+http://www.clusterresources.com/torquedocs21/+]
+
+*Troubleshooting* -
+http://www.clusterresources.com/torquedocs21/11.1troubleshooting.shtml[+http://www.clusterresources.com/torquedocs21/11.1troubleshooting.shtml+]
+
+*Commands Overview* -
+http://www.clusterresources.com/torquedocs21/a.acommands.shtml[+http://www.clusterresources.com/torquedocs21/a.acommands.shtml+]
+
+*Troubleshooting Torque and Maui* -
+http://debianclusters.org/index.php/Troubleshooting_Torque_and_Maui[+http://debianclusters.org/index.php/Troubleshooting_Torque_and_Maui+]
+
+To stop Torque/PBS:
+
++/etc/init.d/pbs_server stop+
+
+To start Torque/PBS:
+
++/etc/init.d/pbs_server start+
+
+qmgr
+^^^^
+
+To set a node to 'free' do this:
+
++qmgr -a -c 'set node compute-0-0 state=free'+
+
+Infiniband Info
+~~~~~~~~~~~~~~~
+
+Troubleshooting Infiniband Connection Issues Using OFED Tools:
+http://software.intel.com/en-us/articles/troubleshooting-infiniband-connection-issues-using-ofed-tools/[+http://software.intel.com/en-us/articles/troubleshooting-infiniband-connection-issues-using-ofed-tools/+]
+
++ibdiagnet+ man page:
+http://linux.die.net/man/1/ibdiagnet[+http://linux.die.net/man/1/ibdiagnet+]
+
+Hosts File Problem With Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If +qnodes+ says the nodes are down and all the other diagnostic indicators
+say they are up, then it might be the +/etc/hosts+ file on the nodes, which
+should look like this:
+
+------
+# Added by rocks report host #
+#        DO NOT MODIFY       #
+#  Add any modifications to  #
+#    /etc/hosts.local file   #
+
+127.0.0.1       localhost.localdomain   localhost
+
+10.1.10.254     compute-0-0.local       compute-0-0
+10.1.10.253     compute-0-1.local       compute-0-1
+10.1.10.244     compute-0-10.local      compute-0-10
+10.1.10.243     compute-0-11.local      compute-0-11
+10.1.10.242     compute-0-12.local      compute-0-12
+10.1.10.241     compute-0-13.local      compute-0-13
+10.1.10.240     compute-0-14.local      compute-0-14
+10.1.10.239     compute-0-15.local      compute-0-15
+10.1.10.238     compute-0-16.local      compute-0-16
+10.1.10.252     compute-0-2.local       compute-0-2
+10.1.10.251     compute-0-3.local       compute-0-3
+10.1.10.250     compute-0-4.local       compute-0-4
+10.1.10.249     compute-0-5.local       compute-0-5
+10.1.10.248     compute-0-6.local       compute-0-6
+10.1.10.247     compute-0-7.local       compute-0-7
+10.1.10.246     compute-0-8.local       compute-0-8
+10.1.10.245     compute-0-9.local       compute-0-9
+10.1.10.1       merrimack.tamu.edu      merrimack
+------
+
+If that last line shows the world IP number instead of
+the local IP number - 165.91.85.150 vs. 10.1.10.1 - then
+things are bollixed and it must be changed to the local
+IP number.
+
+The hosts file on the head node should look like this:
+
+------
+# Added by rocks report host #
+#        DO NOT MODIFY       #
+#  Add any modifications to  #
+#    /etc/hosts.local file   #
+
+127.0.0.1       localhost.localdomain   localhost
+
+10.1.10.254     compute-0-0.local       compute-0-0
+10.1.10.253     compute-0-1.local       compute-0-1
+10.1.10.244     compute-0-10.local      compute-0-10
+10.1.10.243     compute-0-11.local      compute-0-11
+10.1.10.242     compute-0-12.local      compute-0-12
+10.1.10.241     compute-0-13.local      compute-0-13
+10.1.10.240     compute-0-14.local      compute-0-14
+10.1.10.239     compute-0-15.local      compute-0-15
+10.1.10.238     compute-0-16.local      compute-0-16
+10.1.10.252     compute-0-2.local       compute-0-2
+10.1.10.251     compute-0-3.local       compute-0-3
+10.1.10.250     compute-0-4.local       compute-0-4
+10.1.10.249     compute-0-5.local       compute-0-5
+10.1.10.248     compute-0-6.local       compute-0-6
+10.1.10.247     compute-0-7.local       compute-0-7
+10.1.10.246     compute-0-8.local       compute-0-8
+10.1.10.245     compute-0-9.local       compute-0-9
+10.1.10.1       merrimack.local merrimack
+165.91.85.150   merrimack.tamu.edu
+------
+
+[[atchafalaya]]
+atchafalaya
+-----------
+
+Hardware Information
+~~~~~~~~~~~~~~~~~~~~
+
+RAID Controller
+^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -aALL+
+
+=====
+                    Versions
+                ================
+Product Name    : LSI MegaRAID SAS 9280-4i4e
+Serial No       : SV00202433
+FW Package Build: 12.11.0-0016
+
+                    Mfg. Data
+                ================
+Mfg. Date       : 01/06/10
+Rework Date     : 00/00/00
+Revision No     : 
+Battery FRU     : N/A
+
+                Image Versions in Flash:
+                ================
+FW Version         : 2.110.03-0967
+BIOS Version       : 3.18.00_4.09.05.00_0x0416A000
+Preboot CLI Version: 04.04-011:#%00008
+WebBIOS Version    : 6.0-24-e_19-Rel
+NVDATA Version     : 2.08.03-0004
+Boot Block Version : 2.02.00.00-0000
+BOOT Version       : 01.250.04.219
+=====
+
+RAID Hard Drives
+^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep Inquiry+
+
+=====
+Inquiry Data:       JK1101B9JPUZRFHitachi HDS722020ALA330                 JKAOA3MA
+
+which is a:
+
+Hitachi GST Deskstar 7K2000 HDS722020ALA330 (0F10311) 2TB 7200 RPM 32MB Cache SATA 3.0Gb/s 3.5" Internal Hard Drive
+=====
+
+RAID Virtual Drive
+^^^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL+
+
+=====
+Adapter 0 -- Virtual Drive Information:
+Virtual Drive: 0 (Target Id: 0)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 38.195 TB
+Parity Size         : 3.637 TB
+State               : Optimal
+Strip Size          : 64 KB
+Number Of Drives    : 23
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteThrough, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Is VD Cached: No
+
+
+Virtual Drive: 1 (Target Id: 1)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 18.188 TB
+Parity Size         : 3.637 TB
+State               : Partially Degraded
+Strip Size          : 64 KB
+Number Of Drives    : 12
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteThrough, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Is VD Cached: No
+=====
+
+RAID Enclosure
+^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -EncInfo -aALL+
+
+=====
+    Enclosure 0:
+    Device ID                     : 11
+    Number of Slots               : 12
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 12
+    Status                        : Normal
+    Position                      : 2
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X28
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X28         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0 
+
+    Enclosure 1:
+    Device ID                     : 72
+    Number of Slots               : 24
+    Number of Power Supplies      : 2
+    Number of Fans                : 5
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 24
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X36
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 2:
+    Device ID                     : 252
+    Number of Slots               : 8
+    Number of Power Supplies      : 0
+    Number of Fans                : 0
+    Number of Temperature Sensors : 0
+    Number of Alarms              : 0
+    Number of SIM Modules         : 1
+    Number of Physical Drives     : 0
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Unavailable
+    Enclosure type                : SGPIO
+Failed in first Inquiry commnad
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : Unavailable
+
+    Inquiry data                  :
+        Vendor Identification     : LSI     
+        Product Identification    : SGPIO           
+        Product Revision Level    : N/A 
+        Vendor Specific           :  
+=====
+
+
+Partition Information
+~~~~~~~~~~~~~~~~~~~~~
+
+fstab
+^^^^^
+
+-----
+/dev/md2                       /                              ext3       defaults,noatime,nodiratime              0 1
+/dev/md0                       /boot                          ext2       defaults,noatime,nodiratime              0 2
+/dev/md1                       swap                           swap       defaults                                 0 0
+proc            /proc   proc    defaults,nosuid 0 0
+sysfs           /sys    sysfs   noauto  0 0
+devpts          /dev/pts        devpts  mode=0620,gid=5 0 0
+tmpfs           /dev/shm        tmpfs   defaults        0 0
+/mnt/swapfile  swap swap defaults 0 0
+/mnt/swapfile2 swap swap defaults 0 0
+###sshfs#mma@pong.tamu.edu:/home/mma/public_html/oof/plots  /raid1/mma/oof/oof/oof/outputs/plots  fuse user,noauto 0 0
+
+# This section of this file was automatically generated by cmd. Do not edit manually!
+# BEGIN AUTOGENERATED SECTION -- DO NOT REMOVE
+/dev/sdc                         /raid1               xfs          defaults         0 0
+/dev/sdd                         /raid2               xfs          defaults         0 0
+# END AUTOGENERATED SECTION   -- DO NOT REMOVE
+-----
+
+CURRENT STATUS (Sep. 15, 2014:  Switch dead.  Head and five nodes up.
+
+GUI command:  +/cm/shared/apps/cmgui/cmgui+
+
+Switch
+~~~~~~
+
+Installed Type
+^^^^^^^^^^^^^^
+Mellanox IS5030 Managed Switch - 36-port -
+(http://www.mellanox.com/page/products_dyn?product_family=60[+http://www.mellanox.com/page/products_dyn?product_family=60+])
+
+Manual:
+http://www.mellanox.com/related-docs/user_manuals/IS50XX_user_manual.pdf[+http://www.mellanox.com/related-docs/user_manuals/IS50XX_user_manual.pdf+]
+
+Infiniband Software
+^^^^^^^^^^^^^^^^^^^
+
+The infiniband software installed is Open Fabrics Enterprise Distribution Version 1.4 (Dec. 2008).
+The documentation can be found at:
+
+-----
+/cm/images/default-image/usr/share/doc/ofed-docs-1.4.1
+-----
+
+The RPMs created for this - found in +README.txt+ - are:
+
+-----
+The OFED Distribution package generates RPMs for installing the following:
+
+  o   OpenFabrics core and ULPs
+        - HCA drivers (mthca, mlx4, ipath, ehca)
+        - iWARP driver (cxgb3, nes)
+        - core
+        - Upper Layer Protocols: IPoIB, SDP, SRP Initiator and target, iSER
+          Initiator and target, RDS, uDAPL, qlgc_vnic and NFS-RDMA.
+  o   OpenFabrics utilities
+        - OpenSM: InfiniBand Subnet Manager
+        - Diagnostic tools
+        - Performance tests
+  o   MPI
+        - OSU MVAPICH stack supporting the InfiniBand and iWARP interface
+        - Open MPI stack supporting the InfiniBand and iWARP interface
+        - OSU MVAPICH2 stack supporting the InfiniBand and iWARP interface
+        - MPI benchmark tests (OSU BW/LAT, Intel MPI Benchmark, Presta)
+  o   Extra packages
+        - open-iscsi: open-iscsi initiator with iSER support
+        - ib-bonding: Bonding driver for IPoIB interface
+  o   Sources of all software modules (under conditions mentioned in the
+      modules' LICENSE files)
+  o   Documentation
+-----
+
+The diagnostic +/etc/init.d/openibd status+ obtains:
+
+-----
+Low level hardware support loaded:
+	mlx4_ib 
+
+Upper layer protocol modules:
+	ib_iser ib_srp rds ib_sdp ib_ipoib 
+
+User space access modules:
+	rdma_ucm ib_ucm ib_uverbs ib_umad 
+
+Connection management modules:
+	rdma_cm ib_cm iw_cm 
+
+Configured IPoIB interfaces: ib0 
+Currently active IPoIB interfaces: ib0 
+-----
+
+Managed vs. Unmanaged Switch
+++++++++++++++++++++++++++++
+
+http://itknowledgeexchange.techtarget.com/itanswers/unmanaged-vs-managed-switch/[+http://itknowledgeexchange.techtarget.com/itanswers/unmanaged-vs-managed-switch/+]
+
+_____
+An unmanaged switch is a glorified hub. It means that the switch does
+its thing with no user interaction. For most people, that’s quite all
+right. The switch’s benefits over a hub are full bandwidth to each
+port, rather than smushing all the data over all the ports like a hub,
+and dealing with collisions.
+
+A Managed switch has its own IP address, and has a telnet and maybe a
+web-based interface to monitor and secure access to each port on the
+switch. A managed port can have VLANs, which effectively break up
+different ports on a switch into different switches. This can be
+useful when you have a lot of ports but you’d like to, forinstance,
+separate direct connection to the Internet for a few computers, from
+the rest of your local area network.
+
+A managed switch can tell you about excessive usage on certain ports.
+It can be used to limit the number of IP addresses that one port can
+service. This is important if you want one computer for one port,
+forinstance. It makes sure nobody plugs a hub into a wall and shares
+off more connections without talking to the administrator first. A
+managed switch can also be used to enable or disable specific ports
+without unplugging a cable.
+_____
+
+
+SWITCH PROBLEM (Sep. 15, 2014)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The skinny as of Oct. 29:
+
+* the Bright software says the switch is down
+* the IB diagnostic software says everything is fine
+
+Bright Software Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Bright Cluster Manager Switches page for +switch01+ has six
+tabs:  Overview, Health, Tasks, Settings, Members and Notes.
+
+The Overview page says the state of the machine is +Down+.
+
+The Health page says:
+
+* +Health check+ - +DeviceIsUp+
+* +Severity+ - +10+
+* +Value+ - +Fail+
+
+Infiniband Daemons
+^^^^^^^^^^^^^^^^^^
+
+Check the status of both of the IB daemons, i.e. +openibd+ and
++opensmd+.
+
+-----
+/etc/init.d/openibd status
+/etc/init.d/opensmd status
+-----
+
+Then check the log file +/var/log/opensm.log+.
+
+-----
+less /var/log/opensm.log
+
+Oct 29 13:10:56 058452 [AB2E6A90] 0x03 -> OpenSM 3.3.3
+-------------------------------------------------
+OpenSM 3.3.3
+ Reading Cached Option File: /etc/ofed/opensm.conf
+ Loading Cached Option:sm_priority = 15
+ Loading Cached Option:max_wire_smps = 32
+ Loading Cached Option:daemon = TRUE
+Command Line Arguments:
+ Daemon mode
+ Log File: /var/log/opensm.log
+-------------------------------------------------
+OpenSM 3.3.3
+
+Oct 29 13:10:56 058528 [AB2E6A90] 0x80 -> OpenSM 3.3.3
+Entering DISCOVERING state
+
+Oct 29 13:10:56 060208 [AB2E6A90] 0x02 -> osm_vendor_init: 1000 pending umads specified
+Oct 29 13:10:56 088283 [AB2E6A90] 0x80 -> Entering DISCOVERING state
+Using default GUID 0x2c903000fa727
+Entering STANDBY state
+
+Oct 29 13:10:56 094536 [AB2E6A90] 0x02 -> osm_vendor_bind: Binding to port 0x2c903000fa727
+Oct 29 13:10:56 110943 [AB2E6A90] 0x02 -> osm_vendor_bind: Binding to port 0x2c903000fa727
+Oct 29 13:10:56 110990 [AB2E6A90] 0x02 -> osm_opensm_bind: Setting IS_SM on port 0x0002c903000fa727
+Oct 29 13:10:56 117384 [46632940] 0x80 -> Entering STANDBY state
+-----
+
+Infiniband Software Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Infiniband diagostics detailed at:
+
+http://pkg-ofed.alioth.debian.org/howto/infiniband-howto-4.html[+http://pkg-ofed.alioth.debian.org/howto/infiniband-howto-4.html+]
+
+ibhosts
++++++++
+
+shows us the following checks.
+
+-----
+ibhosts
+Ca	: 0x0002c903000fa5ce ports 1 "node04 HCA-1"
+Ca	: 0x0002c903000fa726 ports 1 "node01 HCA-1"
+Ca	: 0x0002c903000fa71e ports 1 "node02 HCA-1"
+Ca	: 0x0002c903000fa786 ports 1 "node03 HCA-1"
+Ca	: 0x0002c903000fa692 ports 1 "atchafalaya HCA-1"
+-----
+
+ibswitches
+++++++++++
+
+-----
+ibswitches
+Switch	: 0x0002c9020042e848 ports 36 "MF0;switch-119f16:IS5030/U1" enhanced port 0 lid 2 lmc 0
+-----
+
+iblinkinfo
+++++++++++
+
+-----
+iblinkinfo
+Switch 0x0002c9020042e848 MF0;switch-119f16:IS5030/U1:
+           2    1[  ] ==( 4X 10.0 Gbps Active/  LinkUp)==>       5    1[  ] "node03 HCA-1" ( )
+           2    2[  ] ==( 4X 10.0 Gbps Active/  LinkUp)==>       4    1[  ] "node02 HCA-1" ( )
+           2    3[  ] ==( 4X 10.0 Gbps Active/  LinkUp)==>       3    1[  ] "node01 HCA-1" ( )
+           2    4[  ] ==( 4X 10.0 Gbps Active/  LinkUp)==>       6    1[  ] "node04 HCA-1" ( )
+           2    5[  ] ==( 4X undefined (7)   Down/ Polling)==>             [  ] "" ( )
+-----
+
+ibping
+++++++
+
+If we start an IB ping server on the first node:
+
+-----
+ssh node01
+ibping -S
+-----
+
+we can test the connectivity via running (on the head node):
+
+-----
+ibping -G 0x0002c903000fa727
+Pong from node01.(none) (Lid 3): time 0.138 ms
+Pong from node01.(none) (Lid 3): time 0.093 ms
+...
+-----
+
+which shows that there is indeed connectivity between node 01 and the server
+machine.
+
+ibnetdiscover
++++++++++++++
+
+-----
+ibnetdiscover
+#
+# Topology file: generated on Wed Oct 29 13:08:39 2014
+#
+# Initiated from node 0002c903000fa726 port 0002c903000fa727
+
+vendid=0x2c9
+devid=0xbd36
+sysimgguid=0x2c9020042e84b
+switchguid=0x2c9020042e848(2c9020042e848)
+Switch	36 "S-0002c9020042e848"		# "MF0;switch-119f16:IS5030/U1" enhanced port 0 lid 2 lmc 0
+[1]	"H-0002c903000fa786"[1](2c903000fa787) 		# "node03 HCA-1" lid 5 4xQDR
+[2]	"H-0002c903000fa71e"[1](2c903000fa71f) 		# "node02 HCA-1" lid 4 4xQDR
+[3]	"H-0002c903000fa726"[1](2c903000fa727) 		# "node01 HCA-1" lid 3 4xQDR
+[4]	"H-0002c903000fa5ce"[1](2c903000fa5cf) 		# "node04 HCA-1" lid 6 4xQDR
+[36]	"H-0002c903000fa692"[1](2c903000fa693) 		# "atchafalaya HCA-1" lid 1 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000fa695
+caguid=0x2c903000fa692
+Ca	1 "H-0002c903000fa692"		# "atchafalaya HCA-1"
+[1](2c903000fa693) 	"S-0002c9020042e848"[36]		# lid 1 lmc 0 "MF0;switch-119f16:IS5030/U1" lid 2 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000fa5d1
+caguid=0x2c903000fa5ce
+Ca	1 "H-0002c903000fa5ce"		# "node04 HCA-1"
+[1](2c903000fa5cf) 	"S-0002c9020042e848"[4]		# lid 6 lmc 0 "MF0;switch-119f16:IS5030/U1" lid 2 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000fa721
+caguid=0x2c903000fa71e
+Ca	1 "H-0002c903000fa71e"		# "node02 HCA-1"
+[1](2c903000fa71f) 	"S-0002c9020042e848"[2]		# lid 4 lmc 0 "MF0;switch-119f16:IS5030/U1" lid 2 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000fa789
+caguid=0x2c903000fa786
+Ca	1 "H-0002c903000fa786"		# "node03 HCA-1"
+[1](2c903000fa787) 	"S-0002c9020042e848"[1]		# lid 5 lmc 0 "MF0;switch-119f16:IS5030/U1" lid 2 4xQDR
+
+vendid=0x2c9
+devid=0x673c
+sysimgguid=0x2c903000fa729
+caguid=0x2c903000fa726
+Ca	1 "H-0002c903000fa726"		# "node01 HCA-1"
+[1](2c903000fa727) 	"S-0002c9020042e848"[3]		# lid 3 lmc 0 "MF0;switch-119f16:IS5030/U1" lid 2 4xQDR
+-----
+
+Hardware Status LEDs
+^^^^^^^^^^^^^^^^^^^^
+
+The STATUS, PSU 1, PSU 2 and FAN LEDs should all be green.  If not, see page
+15 of the user manual for remedial action.
+
+The STATUS, PSU 1 and FAN LEDs are all green.  There is only one PSU installed
+so PSU 2 is off.
+
+Remediation Attempts
+^^^^^^^^^^^^^^^^^^^^
+
+Users Manual Troubleshooting Section
+++++++++++++++++++++++++++++++++++++
+
+This is a load of rubbish about checking the warning lights, cycling
+the power, and using the FabricIT management CLI or Web GUI to determine
+the cause of the problem.
+
+The FabricIT management software is described at:
+
+http://www.mellanox.com/page/ib_fabricit_efm_management[+http://www.mellanox.com/page/ib_fabricit_efm_management+]
+
+On that page you can click on a link for "IS50XX Edge Switch Software and
+Documentation Download", which leads to:
+
+http://support.mellanox.com/SupportWeb/Switches/infiniband_switches/IS50XX[+http://support.mellanox.com/SupportWeb/Switches/infiniband_switches/IS50XX+]
+
+wherein you are requested to login.  I do not have a username or password.
+To request them, one must know the serial number of the switch, which will
+have to be physically removed from the rack to find.
+
+Cycling Power
++++++++++++++
+
+No change.
+
+Moving Cables on Switch Box
++++++++++++++++++++++++++++
+
+No change.
+
+Beating on Switch With Baseball Bat
++++++++++++++++++++++++++++++++++++
+
+Feel much better, but no change.
+
+Replacing Switch
+^^^^^^^^^^^^^^^^
+
+The Mellanox IS5022 seems to be the same thing as the
+IS5030, with the difference being 8 ports instead of
+36.  Hopefully, the installed IB software will see
+the switches as identical.
+
+Alternative Switch
+^^^^^^^^^^^^^^^^^^
+
+Mellanox 5022 - 8-port -
+http://www.mellanox.com/page/products_dyn?product_family=89&mtag=is5022[+http://www.mellanox.com/page/products_dyn?product_family=89&mtag=is5022+]
+
+* Newegg - $1666 -
+http://www.newegg.com/Product/Product.aspx?Item=12K-00NZ-00004&cm_re=mellanox-_-12K-00NZ-00004-_-Product[+http://www.newegg.com/Product/Product.aspx?Item=12K-00NZ-00004&cm_re=mellanox-_-12K-00NZ-00004-_-Product+]
+
+* Ebay - $1100 -
+http://www.ebay.com/itm/Mellanox-MIS5022Q-1BFR-INFINIBAND-8-port-QDR-SWITCH-1U-half-width-IS5022-IS5022Q-/221552696512?pt=US_Network_Switches&hash=item339591dcc0[+http://www.ebay.com/itm/Mellanox-MIS5022Q-1BFR-INFINIBAND-8-port-QDR-SWITCH-1U-half-width-IS5022-IS5022Q-/221552696512?pt=US_Network_Switches&hash=item339591dcc0+]
+
+
+NODE PROBLEM (2013-2014) - Fixed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Present Revival Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+One can +ssh+ to the dead nodes, so they are alive enough for that.  Thus,
+the latest strategy is to +scp+ the entirety of the installation/provisioning
+software from a working node to a dead node, since the netboot
+provisioning process crashes and burns before finishing.
+
+Dead Nodes Status
+^^^^^^^^^^^^^^^^^
+
+During the provisioning of the child node from the head node, +rsync+ fails at
+some point and the provisioning stops, leaving the child node bereft of many
+programs it needs to boot.  The key bits in the provisioning log that
+lead to the uninformative "previous errors" message at the end are:
+
+.....
+...
+WARNING:  boot/initrd-2.6.18-194.26.1.el5.img failed verification -- update
+discarded
+(will try again).
+boot/initrd-2.6.18-194.26.1.el5.img
+rsync: read errors mapping
+"/cm/images/default-image/boot/initrd-2.6.18-194.26.1.el5.img: Input/output
+error (5)
+WARNING:  boot/grub/stage2 failed verification -- update discarded (will try
+again).
+boot/grub/stage2
+rsync: read errors mapping "/cm/images/default-image/boot/grub/stage2":
+Input/output
+error (5)
+...
+rsync: read errors mapping
+"/cm/images/default-image/boot/initrd-2.6.18-194.26.1.el5.img": Input/output
+error (5)
+...
+rsync: read errors mapping "/cm/images/default-image/boot/grub/stage2":
+Input/output
+error (5)
+...WARNING:  boot/initrd-2.6.18-194.26.1.el5.img failed verification -- update
+discarded
+(will try again).
+boot/initrd-2.6.18-194.26.1.el5.img
+rsync: read errors mapping
+"/cm/images/default-image/boot/initrd-2.6.18-194.26.1.el5.img: Input/output
+error (5)
+WARNING:  boot/grub/stage2 failed verification -- update discarded (will try
+again).
+boot/grub/stage2
+rsync: read errors mapping "/cm/images/default-image/boot/grub/stage2":
+Input/output
+error (5)
+...
+ERROR: boot/initrd-2.6.18-194.26.1.el5.img failed verification - update
+discarded.
+ERROR: boot/grub/stage2 failed verification - update discarded. 
+...
+.....
+
+
+/var/log/cmdaemon Log Error Message
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.....
+Sep  6 08:34:07 atchafalaya CMDaemon: Info: DHCP performing update
+Sep  6 08:34:07 atchafalaya CMDaemon: Info: Postfix performing update
+Sep  6 08:34:07 atchafalaya CMDaemon: Info: Named performing update
+Sep  6 08:34:12 atchafalaya CMDaemon: Info: Updating Torque configuration
+Sep  6 08:34:12 atchafalaya CMDaemon: Info: Updating PBS configuration
+Sep  6 08:36:45 atchafalaya CMDaemon: Info: Provisioning node atchafalaya will
+provision node04.
+Sep  6 08:37:00 atchafalaya CMDaemon: Info: Provisioning node atchafalaya will
+provision node03.
+Sep  6 08:37:58 atchafalaya CMDaemon: Info: CMDaemon::doMaintenance is running
+slow: 11s
+Sep  6 08:40:14 atchafalaya CMDaemon: Info: PBS: 'qstat ' (exit: 0, signal: 9)
+Sep  6 08:57:46 atchafalaya CMDaemon: Fatal: ProvisionerRsyncDaemon: Rsync for
+10.141.0.3 failed. (Exit code: 23 Signal: 0).
+Sep  6 08:57:46 atchafalaya CMDaemon: Info: Provisioner: Finished
+provisioning, sending notification to master cmdaemon.
+Sep  6 08:57:46 atchafalaya CMDaemon: Fatal: ProvisionerRsyncDaemon: Rsync for
+10.141.0.4 failed. (Exit code: 23 Signal: 0).
+Sep  6 08:57:46 atchafalaya CMDaemon: Info: Provisioner: Finished
+provisioning, sending notification to master cmdaemon.
+Sep  6 08:57:46 atchafalaya CMDaemon: Info: Provisioning node atchafalaya
+finished provisioning node03.
+Sep  6 08:57:46 atchafalaya CMDaemon: Info: Provisioning node atchafalaya
+finished provisioning node04.
+Sep  6 08:57:57 atchafalaya CMDaemon: Info: DHCP performing update
+Sep  6 08:57:57 atchafalaya CMDaemon: Info: Postfix performing update
+Sep  6 08:57:57 atchafalaya CMDaemon: Info: Named performing update
+Sep  6 08:58:02 atchafalaya CMDaemon: Info: Updating Torque configuration
+Sep  6 08:58:02 atchafalaya CMDaemon: Info: Updating PBS configuration
+Sep  6 09:46:59 atchafalaya CMDaemon: Info: Named performing update
+Sep  6 09:46:59 atchafalaya CMDaemon: Info: DHCP performing update
+Sep  6 09:46:59 atchafalaya CMDaemon: Info: Postfix performing update
+Sep  6 09:47:04 atchafalaya CMDaemon: Info: Updating Torque configuration
+Sep  6 09:47:04 atchafalaya CMDaemon: Info: Updating PBS configuration
+Sep  6 09:49:36 atchafalaya CMDaemon: Info: Provisioning node atchafalaya will
+provision node01.
+Sep  6 09:51:09 atchafalaya CMDaemon: Info: Grabbing image from node03 to
+/cm/images/default-image.
+Sep  6 09:51:09 atchafalaya CMDaemon: Fatal: ProvisionerGrab: remotecm not
+initialized for node: node03
+Sep  6 09:51:36 atchafalaya CMDaemon: Info: Grabbing image from node03 to
+/cm/images/default-image.
+Sep  6 09:51:36 atchafalaya CMDaemon: Fatal: ProvisionerGrab: remotecm not
+initialized for node: node03
+Sep  6 09:54:48 atchafalaya CMDaemon: Fatal: ProvisionerRsyncSsh: remotecm not
+initialized for node: 10.141.0.3
+Sep  6 09:54:48 atchafalaya CMDaemon: Info: Provisioner: Finished
+provisioning, sending notification to master cmdaemon.
+Sep  6 09:54:48 atchafalaya CMDaemon: Info: Provisioning node atchafalaya will
+provision node03.
+Sep  6 09:55:02 atchafalaya CMDaemon: Info: Provisioning node atchafalaya
+finished provisioning node03.
+Sep  6 09:55:43 atchafalaya CMDaemon: Fatal: ProvisionerRsyncSsh: remotecm not
+initialized for node: 10.141.0.3
+Sep  6 09:55:53 atchafalaya CMDaemon: Info: Provisioner: Finished
+provisioning, sending notification to master cmdaemon.
+Sep  6 09:55:53 atchafalaya CMDaemon: Info: Provisioning node atchafalaya will
+provision node03.
+Sep  6 09:55:58 atchafalaya CMDaemon: Info: Provisioning node atchafalaya
+finished provisioning node03.
+Sep  6 09:58:15 atchafalaya CMDaemon: Info: PBS: 'qstat ' (exit: 0, signal: 9)
+Sep  6 09:59:18 atchafalaya CMDaemon: Fatal: ProvisionerRsyncDaemon: Rsync for
+10.141.0.1 failed. (Exit code: 23 Signal: 0).
+Sep  6 09:59:18 atchafalaya CMDaemon: Info: Provisioner: Finished
+provisioning, sending notification to master cmdaemon.
+Sep  6 09:59:18 atchafalaya CMDaemon: Info: Provisioning node atchafalaya
+finished provisioning node01.
+Sep  6 09:59:28 atchafalaya CMDaemon: Info: DHCP performing update
+Sep  6 09:59:28 atchafalaya CMDaemon: Info: Postfix performing update
+Sep  6 09:59:28 atchafalaya CMDaemon: Info: Named performing update
+Sep  6 09:59:33 atchafalaya CMDaemon: Info: Updating Torque configuration
+Sep  6 09:59:33 atchafalaya CMDaemon: Info: Updating PBS configuration
+.....
+
+/var/log/node-installer Log Error Message
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Not helpful.
+
+.....
+Sep  6 09:47:25 10.141.0.1 node-installer: Creating journal (32768 blocks): done
+Sep  6 09:49:30 10.141.0.1 node-installer: Writing superblocks and filesystem accounting information: done
+Sep  6 09:49:30 10.141.0.1 node-installer:
+Sep  6 09:49:30 10.141.0.1 node-installer: This filesystem will be automatically checked every 36 mounts or
+Sep  6 09:49:30 10.141.0.1 node-installer: 180 days, whichever comes first. Use tune2fs -c or -i to override.
+Sep  6 09:49:35 10.141.0.1 node-installer: Mounting disks.
+Sep  6 09:49:35 10.141.0.1 node-installer: Detecting device '/dev/sda': found
+Sep  6 09:49:35 10.141.0.1 node-installer: swapon /dev/sda1
+Sep  6 09:49:35 10.141.0.1 node-installer: mkdir -p /localdisk/
+Sep  6 09:49:35 10.141.0.1 node-installer: Mounting /dev/sda2 on /localdisk/
+Sep  6 09:49:35 10.141.0.1 node-installer: mount -t ext3 -o defaults,noatime,nodiratime /dev/sda2 /localdisk/
+Sep  6 09:49:35 10.141.0.1 node-installer: Disks are mounted.
+Sep  6 09:49:35 10.141.0.1 node-installer: Root device is /dev/sda2, type ext3.
+Sep  6 09:49:35 10.141.0.1 node-installer: Preparing for provisioning.
+Sep  6 09:49:35 10.141.0.1 node-installer: Rsyncd PID: 4826
+Sep  6 09:49:36 10.141.0.1 node-installer: Rsync daemon is ready.
+Sep  6 09:49:36 10.141.0.1 node-installer: Sending FULL provisioning request.
+Sep  6 09:49:36 10.141.0.1 node-installer: Waiting for provisioning to start.
+Sep  6 09:49:36 10.141.0.1 node-installer: Provisioning started, waiting for completion.
+Sep  6 09:59:18 10.141.0.1 node-installer: Error: provisioning failed, see daemon log.
+Sep  6 09:59:18 10.141.0.1 node-installer: There was a fatal problem. This node can not be installed until the problem is corrected.
+.....
+
+
+fstab
+^^^^^
+
+.....
+/dev/md2 defaults,noatime,nodiratime              0 1
+/dev/md0 defaults,noatime,nodiratime              0 2
+/dev/md1                       swap                           swap defaults                                 0 0
+proc            /proc   proc    defaults,nosuid 0 0
+sysfs           /sys    sysfs   noauto  0 0
+devpts          /dev/pts        devpts  mode=0620,gid=5 0 0
+tmpfs           /dev/shm        tmpfs   defaults        0 0
+/mnt/swapfile none swap defaults 0 0
+###sshfs#mma@pong.tamu.edu:/home/mma/public_html/oof/plots /raid1/mma/oof/oof/oof/outputs/plots  fuse user,noauto 0 0
+
+# This section of this file was automatically generated by cmd. Do not edit
+# manually!
+# BEGIN AUTOGENERATED SECTION -- DO NOT REMOVE
+/dev/sdc                         /raid1               xfs          defaults 0 0
+/dev/sdd                         /raid2               xfs          defaults 0 0
+# END AUTOGENERATED SECTION   -- DO NOT REMOVE
+.....
+
+mtab
+^^^^
+
+.....
+/dev/md2 / ext3 rw,noatime,nodiratime 0 0
+proc /proc proc rw,nosuid 0 0
+sysfs /sys sysfs rw 0 0
+devpts /dev/pts devpts rw,mode=0620,gid=5 0 0
+/dev/md0 /boot ext2 rw,noatime,nodiratime 0 0
+tmpfs /dev/shm tmpfs rw 0 0
+/dev/sdc /raid1 xfs rw 0 0
+/dev/sdd /raid2 xfs rw 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw 0 0
+nfsd /proc/fs/nfsd nfsd rw 0 0
+sshfs#pong.tamu.edu:/home/mma/public_html/oof/plots /raid1/mma/oof/oof/oof/outputs/plots fuse rw,nosuid,nodev,max_read=65536,user=mma 0 0
+.....
+
+Fix
+^^^
+
+The following was diagnosed.
+
+-----
+cmsh
+[atchafalaya]% device
+[atchafalaya->device]% synclog node02 | grep "read errors"
+rsync: read errors mapping "/cm/images/default-image/boot/initrd-2.6.18-194.26.1.el5.img": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/boot/grub/stage2": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/boot/initrd-2.6.18-194.26.1.el5.img": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/boot/grub/stage2": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/lib64/iptables/libipt_ttl.so": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/lib64/security/pam_ldap.so": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/lib64/security/pam_userdb.so": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/lib64/iptables/libipt_ttl.so": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/lib64/security/pam_ldap.so": Input/output error (5)
+rsync: read errors mapping "/cm/images/default-image/lib64/security/pam_userdb.so": Input/output error (5)
+-----
+
+This can also be found on the GUI via *Slave Nodes -> node01 -> Tasks -> Provisioning Log*.
+
+Upon further inspection, all the files giving read errors had become somehow corrupt, as
+could be see by +diff+ing them against their counterparts elsewhere, e.g.
+
+-----
+/boot/initrd-2.6.18-194.26.1.el5.img
+/cm/images/default-image/boot/initrd-2.6.18-194.26.1.el5.img
+
+/lib64/security/pam_ldap.so
+/cm/images/default-image/lib64/security/pam_ldap.so
+-----
+
+and so on.
+
+This was ameliorated by copying the former, system versions to the +cm+ hierarchy and rebooting
+the machines, after which they all came back up.  Woo hoo!
+
+[[barataria]]
+barataria
+---------
+
+Hardware Details
+~~~~~~~~~~~~~~~~
+
+*Motherboard:*  Supermicro X8DTH-i/6/iF/6F
+
+*Motherboard URL:*  http://www.supermicro.com/products/motherboard/QPI/5500/X8DTH-iF.cfm[+http://www.supermicro.com/products/motherboard/QPI/5500/X8DTH-iF.cfm+]
+
+*CPU:*  Intel Xeon E5620 @ 2.40GHz
+
+*RAID Card:*  Symbios Logic MegaRAID SAS 9265-8i
+
+*Hard Drives:*
+
+The command
+
++/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep Inquiry+ 
+
+shows
+22 Seagate ST330000650SS drives.  These drives are:
+
+-----
+Seagate Constellation ES.2 ST33000650SS 3TB 7200 RPM 64MB Cache SAS 6Gb/s 3.5"
+-----
+
+*Adapter Info*:
+
+The command
+
++/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -aALL+
+
+gives:
+
+=====
+                    Versions                                                                                            
+                ================                                                                                        
+Product Name    : LSI MegaRAID SAS 9265-8i                                                                              
+Serial No       : SV13205142                                                                                            
+FW Package Build: 23.1.1-0004                                                                                           
+                                                                                                                        
+                    Mfg. Data                                                                                           
+                ================                                                                                        
+Mfg. Date       : 08/03/11                                                                                              
+Rework Date     : 00/00/00                                                                                              
+Revision No     : 01A                                                                                                   
+Battery FRU     : N/A                                                                                                   
+                                                                                                                        
+                Image Versions in Flash:                                                                                
+                ================
+BIOS Version       : 5.25.00_4.11.05.00_0x05040000
+WebBIOS Version    : 6.1-20-e_20-Rel
+Preboot CLI Version: 05.01-04:#%00001
+FW Version         : 3.140.15-1320
+NVDATA Version     : 2.1106.03-0051
+Boot Block Version : 2.04.00.00-0001
+BOOT Version       : 06.253.57.219
+=====
+
+*Virtual Drive*:
+
+The command:
+
++/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL+ 
+
+gives:
+
+=====
+Virtual Drive: 0 (Target Id: 0)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 43.656 TB
+Parity Size         : 5.457 TB
+State               : Optimal
+Strip Size          : 64 KB
+Number Of Drives    : 18
+Span Depth          : 1
+
+Virtual Drive: 1 (Target Id: 1)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 43.656 TB
+Parity Size         : 5.457 TB
+State               : Optimal
+Strip Size          : 64 KB
+Number Of Drives    : 18
+Span Depth          : 1
+=====
+
+*RAID Enclosure*:
+
+The command:
+
++/opt/MegaRAID/MegaCli/MegaCli64 -EncInfo -aALL+
+
+gives:
+
+=====
+   Enclosure 0:
+    Device ID                     : 8
+    Number of Slots               : 24
+    Number of Power Supplies      : 2
+    Number of Fans                : 5
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 24
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X36
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 1:
+    Device ID                     : 9
+    Number of Slots               : 12
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 12
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 4 - 7
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X28
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X28         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 2:
+    Device ID                     : 252
+    Number of Slots               : 8
+    Number of Power Supplies      : 0
+    Number of Fans                : 0
+    Number of Temperature Sensors : 0
+    Number of Alarms              : 0
+    Number of SIM Modules         : 1
+    Number of Physical Drives     : 0
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Unavailable
+    Enclosure type                : SGPIO
+Failed in first Inquiry commnad
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : Unavailable
+
+    Inquiry data                  :
+        Vendor Identification     : LSI     
+        Product Identification    : SGPIO           
+        Product Revision Level    : N/A 
+        Vendor Specific           :
+=====
+
+RAM
+^^^
+
+*Memory slots:*  12 x 240pin DIMM slots
+
+*Memory support:* 
+
+* Up to 192GB 1333/1066/800MHz DDR3 ECC Registered memory
+* Up to 48GB 1333/1066/800MHz DDR3 ECC/Non-ECC Unbuffered memory
+
+*Memory configuration guide (PDF):* http://www.supermicro.com/support/resources/memory/X8_DP_DIMM_population.pdf[+http://www.supermicro.com/support/resources/memory/X8_DP_DIMM_population.pdf+]
+
+*Memory installed originally:* 6 x Kingston 4GB DIMM DDR3 1066MHz 240-pin 9965426
+
+*Upgrade Candidates*
+
+* Kingston 8GB 240-Pin DDR3 SDRAM ECC Registered DDR3 1333 Server Memory Model KVR13LR9S4/8 - $60 +
+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239540[+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239540+]
+
+* Kingston 16GB 240-Pin DDR3 SDRAM ECC Registered DDR3 1333 (PC3 10600) Server Memory Model KVR13LR9D4/16 - $110 +
+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239620[+http://www.newegg.com/Product/Product.aspx?Item=N82E16820239620+]
+
+Replacing Failed Disk in Software RAID1 Array
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Useful Information
+^^^^^^^^^^^^^^^^^^
+
+*Cloning the Remaining Disk* -
+https://wiki.archlinux.org/index.php/disk_cloning[+https://wiki.archlinux.org/index.php/disk_cloning+}
+
++dd if=/dev/sda of=/dev/sdb bs=4096 conv=notrunc,noerror,sync+
+
+*Replacing a Failed Hard Drive in a Software RAID1 Array* -
+http://www.howtoforge.com/replacing_hard_disks_in_a_raid1_array[+http://www.howtoforge.com/replacing_hard_disks_in_a_raid1_array+]
+
+A disk has failed, but the system is still up.  This details how to remove the
+failed disk from the RAID 1 array, and then how to add a new disk.
+
+*Converting a Running System to RAID 1* -
+http://linuxconfig.org/linux-software-raid-1-setup[+http://linuxconfig.org/linux-software-raid-1-setup+]
+
+The system partitions are on /dev/sda.  A /dev/md RAID 1 disk is created using a second
+disk /dev/sdb.
+
+*A Linux Software RAID Tutorial* (PDF) -
+http://www-01.ibm.com/support/knowledgecenter/linuxonibm/liaav/Linux-Software-RAID-Tutorial.pdf[+http://www-01.ibm.com/support/knowledgecenter/linuxonibm/liaav/Linux-Software-RAID-Tutorial.pdf+]
+
+Creating software raid using the Fedora and OpenSUSE graphical processes as
+well as via the command line.  Recovering and restoring a software RAID array.
+
+*Installing GRUB on Both Drives of Software RAID 1* -
+https://www.jms1.net/grub-raid-1.shtml[+https://www.jms1.net/grub-raid-1.shtml+]
+
+*mdadm.conf and initrd* -
+http://ubuntuforums.org/showthread.php?t=1524483[+http://ubuntuforums.org/showthread.php?t=1524483+]
+
+
+
+
+*How to View, Modify and Recreate initrd.img* -
+http://www.thegeekstuff.com/2009/07/how-to-view-modify-and-recreate-initrd-img/[+http://www.thegeekstuff.com/2009/07/how-to-view-modify-and-recreate-initrd-img/+]
+
+Diagnostics
++++++++++++
+
+Booting error messages:
+
+-----
+megasas:  INIT adapter done
+mount:  error mounting /dev/root on /sysroot as ext3: Invalid argument
+EXT3-fs: unable to read superblock
+setuproot: moving /dev failed: No such file or directory
+setuproot: error mounting /proc:  No such file or directory
+setuproot: error mounting /sys:  No such file or directory
+switchroot: mount failed:  No such file or directory
+Kernel panic - not syncing: Attempted to kill init!
+-----
+
+Googling this entire error message yields a single hit:
+
+https://www.centos.org/forums/viewtopic.php?t=24314[+https://www.centos.org/forums/viewtopic.php?t=24314+]
+
+Googling the second and third lines yields:
+
+https://www.centos.org/forums/viewtopic.php?t=16335[+https://www.centos.org/forums/viewtopic.php?t=16335+]
+
+
+
+Running:
+
+-----
+mdadm --auto-detect
+-----
+
+creates:
+
+-----
+md2:  active raid1 sdd3[1] sdc3[0]
+      69754112 blocks [2/2] [UU]
+md1:  active raid1 sdd2[0] sdc2[1]
+      8289472 blocks [2/2] [UU]
+md0:  active raid1 sdd1[1] sdc2[0]
+      104320 blocks [2/2] [UU]
+md3:  active raid0 sdb1[1] sdb2[0]
+      93751082752 blocks 64k chunks
+-----
+
+
+The +/proc/partitions+ file shows:
+
+-----
+8   0  sda
+8   1  sda1
+8  16  sdb
+8  17  sdb1
+8  32  sdc
+8  33  sdc1
+8  34  sdc2
+8  35  sdc3
+8  48  sdd
+8  49  sdd1
+8  50  sdd2
+8  51  sdd3
+9   0  md0
+9   1  md1
+9   2  md2
+-----
+
+
+Motherboard
+~~~~~~~~~~~
+
+Model Number: Supermicro X8DTH-iF
+
+Home Page: http://www.supermicro.com/products/motherboard/QPI/5500/X8DTH-iF.cfm[+http://www.supermicro.com/products/motherboard/QPI/5500/X8DTH-iF.cfm+]
+
+Newegg:
+http://www.newegg.com/Product/Product.aspx?Item=N82E16813182175[+http://www.newegg.com/Product/Product.aspx?Item=N82E16813182175+]
+
+System Drive
+~~~~~~~~~~~~
+
+Intel 320 Series SSDSA1NW080G301 1.8" 80GB SATA II MLC Internal Solid State
+Drive (SSD) -
+http://www.newegg.com/Product/Product.aspx?Item=N82E16820167074[+http://www.newegg.com/Product/Product.aspx?Item=N82E16820167074+]
+
+Boot Info
+~~~~~~~~~
+
+Contents of +/boot/grub/grub.conf+:
+
+-----
+# grub.conf generated by anaconda
+#
+# Note that you do not have to rerun grub after making changes to this file
+# NOTICE:  You have a /boot partition.  This means that
+#          all kernel and initrd paths are relative to /boot/, eg.
+#          root (hd0,0)
+#          kernel /vmlinuz-version ro root=/dev/md2
+#          initrd /initrd-version.img
+#boot=/dev/md0
+default=0
+timeout=5
+splashimage=(hd0,0)/grub/splash.xpm.gz
+hiddenmenu
+title CentOS (2.6.18-274.7.1.el5)
+        root (hd0,0)
+        kernel /vmlinuz-2.6.18-274.7.1.el5 ro root=/dev/md2 rhgb quiet
+        initrd /initrd-2.6.18-274.7.1.el5.img
+title CentOS (2.6.18-238.el5)
+        root (hd0,0)
+        kernel /vmlinuz-2.6.18-238.el5 ro root=/dev/md2 rhgb quiet
+        initrd /initrd-2.6.18-238.el5.img
+-----
+
+Contents of +/boot/grub/device.map+:
+
+-----
+# this device map was generated by anaconda
+(hd0)     /dev/sda
+(hd1)     /dev/sdb
+-----
+
+Drive Layout
+~~~~~~~~~~~~
+
+fstab
+^^^^^
+
+.....
+/dev/md2                /                       ext3    defaults        1 1
+/dev/md0                /boot                   ext3    defaults        1 2
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+/dev/md1                swap                    swap    defaults        0 0
+/dev/md3                /raid                   xfs     defaults        0 0
+.....
+
+
+mtab
+^^^^
+
+.....
+/dev/md2 / ext3 rw 0 0
+proc /proc proc rw 0 0
+sysfs /sys sysfs rw 0 0
+devpts /dev/pts devpts rw,gid=5,mode=620 0 0
+/dev/md0 /boot ext3 rw 0 0
+tmpfs /dev/shm tmpfs rw 0 0
+/dev/md3 /raid xfs rw 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw 0 0
+.....
+
+[[hafen]]
+hafen
+-----
+
+Hardware
+~~~~~~~~
+
+Raid Controller
+^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -AdpAllInfo -aALL+
+
+=====
+                    Versions
+                ================
+Product Name    : LSI MegaRAID SAS 9265-8i
+Serial No       : SV13203418
+FW Package Build: 23.1.1-0004
+
+                    Mfg. Data
+                ================
+Mfg. Date       : 08/02/11
+Rework Date     : 00/00/00
+Revision No     : 01A
+Battery FRU     : N/A
+
+                Image Versions in Flash:
+                ================
+BIOS Version       : 5.25.00_4.11.05.00_0x05040000
+WebBIOS Version    : 6.1-20-e_20-Rel
+Preboot CLI Version: 05.01-04:#%00001
+FW Version         : 3.140.15-1320
+NVDATA Version     : 2.1106.03-0051
+Boot Block Version : 2.04.00.00-0001
+BOOT Version       : 06.253.57.219
+=====
+
+RAID Virtual Drive
+^^^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL+
+
+=====
+Adapter 0 -- Virtual Drive Information:
+Virtual Drive: 0 (Target Id: 0)
+Name                :Storage
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 11.819 TB
+Parity Size         : 1.818 TB
+State               : Optimal
+Strip Size          : 256 KB
+Number Of Drives    : 15
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Enabled
+Encryption Type     : None
+Default Power Savings Policy: Controller Defined
+Current Power Savings Policy: None
+Can spin up in 1 minute: Yes
+LD has drives that support T10 power conditions: Yes
+LD's IO profile supports MAX power savings with cached writes: No
+Is VD Cached: No
+=====
+
+RAID Physical Drives
+^^^^^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep Inquiry+
+
+=====
+Inquiry Data: SEAGATE ST91000640SS    00019XG07KA2            
+Inquiry Data: SEAGATE ST91000640SS    00019XG06P0K            
+Inquiry Data: SEAGATE ST91000640SS    00019XG088Q3            
+Inquiry Data: SEAGATE ST91000640SS    00019XG07K7Z            
+Inquiry Data: SEAGATE ST91000640SS    00019XG08N1S            
+Inquiry Data: SEAGATE ST91000640SS    00019XG08ZLV            
+Inquiry Data: SEAGATE ST91000640SS    00019XG07KHX            
+Inquiry Data: SEAGATE ST91000640SS    00019XG085LZ            
+Inquiry Data: SEAGATE ST91000640SS    00019XG08MMA            
+Inquiry Data: SEAGATE ST91000640SS    00019XG08MH2            
+Inquiry Data: SEAGATE ST91000640SS    00019XG07YJJ            
+Inquiry Data: SEAGATE ST91000640SS    00019XG08QP6            
+Inquiry Data: SEAGATE ST91000640SS    00019XG07JY4            
+Inquiry Data: SEAGATE ST91000640SS    00019XG077WJ            
+Inquiry Data: SEAGATE ST91000640SS    00019XG08N1N            
+Inquiry Data: SEAGATE ST91000640SS    00019XG07K2L
+
+means that the drives are:
+
+Seagate 1TB Constellation SAS 6Gb/s 64MB Cache 2.5-Inch Internal Bare Drive (ST91000640SS)
+=====
+
+RAID Enclosure:
+
++/opt/MegaRAID/MegaCli/MegaCli64 -EncInfo -aALL+
+
+=====
+    Enclosure 0:
+    Device ID                     : 24
+    Number of Slots               : 24
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 16
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    VendorId is LSI CORP and Product Id is SAS2X36
+VendorID and Product ID didnt match
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 1:
+    Device ID                     : 252
+    Number of Slots               : 8
+    Number of Power Supplies      : 0
+    Number of Fans                : 0
+    Number of Temperature Sensors : 0
+    Number of Alarms              : 0
+    Number of SIM Modules         : 1
+    Number of Physical Drives     : 0
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Unavailable
+    Enclosure type                : SGPIO
+Failed in first Inquiry commnad
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : Unavailable
+
+    Inquiry data                  :
+        Vendor Identification     : LSI     
+        Product Identification    : SGPIO           
+        Product Revision Level    : N/A 
+        Vendor Specific           : 
+=====
+
+fstab
+~~~~~
+
+.....
+/dev/md2                /                       ext3    defaults        1 1
+/dev/md0                /boot                   ext3    defaults        1 2
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+/dev/md1                swap                    swap    defaults        0 0
+.....
+
+mtab
+~~~~
+
+.....
+/dev/md2 / ext3 rw 0 0
+proc /proc proc rw 0 0
+sysfs /sys sysfs rw 0 0
+devpts /dev/pts devpts rw,gid=5,mode=620 0 0
+/dev/md0 /boot ext3 rw 0 0
+tmpfs /dev/shm tmpfs rw 0 0
+none /proc/sys/fs/binfmt_misc binfmt_misc rw 0 0
+sunrpc /var/lib/nfs/rpc_pipefs rpc_pipefs rw 0 0
+/dev/sdc /raid xfs rw 0 0
+.....
+
+[[rho]]
+rho
+---
+
+Hardware
+~~~~~~~~
+
+RAID Controller
+^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64  -AdpAllInfo -aALL+
+
+=====
+                    Versions
+                ================
+Product Name    : LSI MegaRAID SAS 9265-8i
+Serial No       : SV22711409
+FW Package Build: 21.0.1-0100
+
+                    Mfg. Data
+                ================
+Mfg. Date       : 07/06/12
+Rework Date     : 00/00/00
+Revision No     : 01D
+Battery FRU     : N/A
+
+                Image Versions in Flash:
+                ================
+BIOS Version       : 5.14.00_4.11.05.00_0x04360000
+WebBIOS Version    : 6.1-10-e_10-Rel
+Preboot CLI Version: 05.00-02:#%00008
+FW Version         : 3.130.05-1169
+NVDATA Version     : 2.1012.03-0022
+Boot Block Version : 2.03.00.00-0003
+BOOT Version       : 06.253.57.219
+=====
+
+RAID Virtual Drive
+^^^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL+
+
+=====
+Adapter 0 -- Virtual Drive Information:
+Virtual Drive: 0 (Target Id: 0)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 76.398 TB
+Parity Size         : 5.457 TB
+State               : Optimal
+Strip Size          : 256 KB
+Number Of Drives    : 30
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Default Power Savings Policy: Controller Defined
+Current Power Savings Policy: Maximum
+Can spin up in 1 minute: Yes
+LD has drives that support T10 power conditions: Yes
+LD's IO profile supports MAX power savings with cached writes: Yes
+Is VD Cached: No
+
+Virtual Drive: 1 (Target Id: 1)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 49.113 TB
+Parity Size         : 5.457 TB
+State               : Optimal
+Strip Size          : 256 KB
+Number Of Drives    : 20
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Default Power Savings Policy: Controller Defined
+Current Power Savings Policy: Maximum
+Can spin up in 1 minute: Yes
+LD has drives that support T10 power conditions: Yes
+LD's IO profile supports MAX power savings with cached writes: Yes
+Is VD Cached: No
+=====
+
+RAID Physical Drives
+^^^^^^^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep Inquiry+
+
+=====
+Inquiry Data: SEAGATE ST33000650SS    0004Z292X84S                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292T035                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZPT9                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZQ7G                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZT6Z                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV6A                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZK5Z                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZTE9                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZQ7J                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV44                                                                                   
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZTQ4            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZSWH            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZQ2A            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV97            
+Inquiry Data: SEAGATE ST33000650SS    0004Z29333BF            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2935EGR            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZT29            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937RR7            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937VFY            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292YYRC            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV57            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZPSP            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV4D            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZSR7            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZQ2N            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV2Q            
+Inquiry Data: SEAGATE ST33000650SS    0004Z293505J            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV1Z            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZTGR            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937RA1            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292YWSB            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZTEA            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2935B5B            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV37            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292YWJT            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZSY9            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZQ47            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292YWHJ            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937QXW            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937RYM            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZTEP            
+Inquiry Data: SEAGATE ST33000650SS    0004Z29308XA            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZPWA            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZG0K            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZTZX            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZV38            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZSWM            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937RPC            
+Inquiry Data: SEAGATE ST33000650SS    0004Z292ZQ3X            
+Inquiry Data: SEAGATE ST33000650SS    0004Z2937TWS
+=====
+
+Thus the drives are all:
+
+=====
+Seagate ST33000650SS Constellation ES.2 SAS 6Gb/s 3-TB Hard Drive
+=====
+
+RAID Enclosure
+^^^^^^^^^^^^^^
+
++/opt/MegaRAID/MegaCli/MegaCli64 -EncInfo -aALL+
+
+=====
+    Enclosure 0:
+    Device ID                     : 23
+    Number of Slots               : 28
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 14
+    Status                        : Normal
+    Position                      : 3
+    Connector Name                : Port 4 - 7
+    Enclosure type                : SES
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 65535
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0718
+        Vendor Specific           : x36-55.7.24.1
+
+    Enclosure 1:
+    Device ID                     : 32
+    Number of Slots               : 24
+    Number of Power Supplies      : 2
+    Number of Fans                : 5
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 24
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 87
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 2:
+    Device ID                     : 61
+    Number of Slots               : 12
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 12
+    Status                        : Normal
+    Position                      : 2
+    Connector Name                : Port 4 - 7
+    Enclosure type                : SES
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 62
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X28         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 3:
+    Device ID                     : 62
+    Number of Slots               : 12
+    Number of Power Supplies      : 2
+    Number of Fans                : 3
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 12
+    Status                        : Normal
+    Position                      : 2
+    Connector Name                : Port 0 - 3
+    Enclosure type                : SES
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 61
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X28         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 4:
+    Device ID                     : 87
+    Number of Slots               : 24
+    Number of Power Supplies      : 2
+    Number of Fans                : 5
+    Number of Temperature Sensors : 1
+    Number of Alarms              : 1
+    Number of SIM Modules         : 0
+    Number of Physical Drives     : 24
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Port 4 - 7
+    Enclosure type                : SES
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : 32
+
+    Inquiry data                  :
+        Vendor Identification     : LSI CORP
+        Product Identification    : SAS2X36         
+        Product Revision Level    : 0717
+        Vendor Specific           : x36-55.7.23.0
+
+    Enclosure 5:
+    Device ID                     : 252
+    Number of Slots               : 8
+    Number of Power Supplies      : 0
+    Number of Fans                : 0
+    Number of Temperature Sensors : 0
+    Number of Alarms              : 0
+    Number of SIM Modules         : 1
+    Number of Physical Drives     : 0
+    Status                        : Normal
+    Position                      : 1
+    Connector Name                : Unavailable
+    Enclosure type                : SGPIO
+    FRU Part Number               : N/A
+    Enclosure Serial Number       : N/A 
+    ESM Serial Number             : N/A 
+    Enclosure Zoning Mode         : N/A 
+    Partner Device Id             : Unavailable
+
+    Inquiry data                  :
+        Vendor Identification     : LSI     
+        Product Identification    : SGPIO           
+        Product Revision Level    : N/A 
+        Vendor Specific 
+=====
+
+Diagnostics on Discs, Partitions and Filesystems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The +/proc/partitions+ command shows:
+
+-----
+major minor  #blocks  name
+
+   8     0   58615704 sda
+   8     1     200781 sda1
+   8     2    8289540 sda2
+   8     3   50122800 sda3
+   8    16 82032197632 sdb
+   8    17 82032197598 sdb1
+   8    32 52734984192 sdc
+-----
+
+Using +fdisk for Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The command +/sbin/fdisk -l+ shows:
+
+-----
+Disk /dev/sda: 60.0 GB, 60022480896 bytes
+255 heads, 63 sectors/track, 7297 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1          25      200781   83  Linux
+/dev/sda2              26        1057     8289540   82  Linux swap / Solaris
+/dev/sda3            1058        7297    50122800   83  Linux
+
+WARNING: GPT (GUID Partition Table) detected on '/dev/sdb'! The util fdisk
+doesn't support GPT. Use GNU Parted.
+
+
+WARNING: The size of this disk is 84.0 TB (84000970375168 bytes).
+DOS partition table format can not be used on drives for volumes
+larger than 2.2 TB (2199023255040 bytes). Use parted(1) and GUID 
+partition table format (GPT).
+
+
+Disk /dev/sdb: 84000.9 GB, 84000970375168 bytes
+255 heads, 63 sectors/track, 10212536 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdb1               1      267350  2147483647+  ee  EFI GPT
+
+WARNING: GPT (GUID Partition Table) detected on '/dev/sdc'! The util fdisk
+doesn't support GPT. Use GNU Parted.
+
+
+WARNING: The size of this disk is 54.0 TB (54000623812608 bytes).
+DOS partition table format can not be used on drives for volumes
+larger than 2.2 TB (2199023255040 bytes). Use parted(1) and GUID 
+partition table format (GPT).
+
+
+Disk /dev/sdc: 54000.6 GB, 54000623812608 bytes
+255 heads, 63 sectors/track, 6565201 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdc1               1      267350  2147483647+  ee  EFI GPT
+-----
+
+Using +file+ for Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-----
+[root@rho baum]# file -sL /dev/sdb
+/dev/sdb: x86 boot sector; partition 1: ID=0xee, starthead 0, startsector 1, 4294967295 sectors, extended partition table (last)\011
+[root@rho baum]# file -sL /dev/sdb1
+/dev/sdb1: SGI XFS filesystem data (blksz 4096, inosz 256, v2 dirs)
+[root@rho baum]# file -sL /dev/sdc
+/dev/sdc: x86 boot sector; partition 1: ID=0xee, starthead 0, startsector 1, 4294967295 sectors, extended partition table (last)\011
+-----
+
+Using +parted+ for Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The +parted+ command gives:
+
+-----
+[root@rho baum]# /sbin/parted /dev/sdb -l
+
+Model: ATA INTEL SSDSC2CW06 (scsi)
+Disk /dev/sda: 60.0GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      32.3kB  206MB   206MB   primary  ext3         boot 
+ 2      206MB   8694MB  8488MB  primary  linux-swap        
+ 3      8694MB  60.0GB  51.3GB  primary  ext3              
+
+Model: LSI MR9265-8i (scsi)
+Disk /dev/sdb: 84.0TB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  84.0TB  84.0TB               sdb   raid 
+
+Model: LSI MR9265-8i (scsi)
+Disk /dev/sdc: 54.0TB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  54.0TB  54.0TB               sdc   raid 
+
+Error: Unable to open /dev/md0 - unrecognised disk label.
+-----
+
+and
+
+-----
+[root@rho baum]# /sbin/parted /dev/sdc -l
+
+Disk /dev/sda: 60.0GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      32.3kB  206MB   206MB   primary  ext3         boot 
+ 2      206MB   8694MB  8488MB  primary  linux-swap        
+ 3      8694MB  60.0GB  51.3GB  primary  ext3              
+
+Model: LSI MR9265-8i (scsi)
+Disk /dev/sdb: 84.0TB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  84.0TB  84.0TB               sdb   raid 
+
+Model: LSI MR9265-8i (scsi)
+Disk /dev/sdc: 54.0TB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  54.0TB  54.0TB               sdc   raid 
+
+Error: Unable to open /dev/md0 - unrecognised disk label.
+-----
+
+Using +fstab+ for Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The +/etc/fstab+ file is:
+
+-----
+LABEL=/                 /                       ext3    defaults        1 1
+LABEL=/boot             /boot                   ext3    defaults        1 2
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+LABEL=SWAP-sdc2         swap                    swap    defaults        0 0
+/dev/md0                /raid                   xfs     defaults        0 0
+-----
+
+Using +blkid+ for Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The +blkid+ command can be used to find the filesystem type of an
+unmounted disk as per:
+
+http://unix.stackexchange.com/questions/53542/how-to-determine-the-filesystem-of-an-unmounted-device[+http://unix.stackexchange.com/questions/53542/how-to-determine-the-filesystem-of-an-unmounted-device+]
+
+Here we obtain:
+
+-----
+[root@rho baum]# /sbin/blkid
+/dev/sda1: LABEL="/boot" UUID="d49d9c44-16bb-4cf3-b091-4bc4849ffeb6"
+SEC_TYPE="ext2" TYPE="ext3" 
+/dev/sda2: TYPE="swap" LABEL="SWAP-sdc2" 
+/dev/sda3: LABEL="/" UUID="14450cd8-7f8f-4ac7-b6c8-27c03eb226d7"
+SEC_TYPE="ext2" TYPE="ext3" 
+/dev/sdb1: UUID="870add6a-f599-4a2e-9d64-1228b760237a" TYPE="xfs"
+-----
+
+Using +mdadm+ for Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The contents of +/proc/mdstat+ are:
+
+-----
+Personalities : [raid0] 
+unused devices: <none>
+-----
+
+The command +mdadm --examine+ provides:
+
+-----
+[root@rho baum]# /sbin/mdadm --examine /dev/sdb
+/dev/sdb:
+          Magic : a92b4efc
+        Version : 0.90.00
+           UUID : 7e6f9059:be3e2bab:29b2cdc9:0ef92520
+  Creation Time : Fri Sep 14 22:10:18 2012
+     Raid Level : raid0
+  Used Dev Size : 0
+   Raid Devices : 2
+  Total Devices : 2
+Preferred Minor : 0
+
+    Update Time : Fri Sep 14 22:10:18 2012
+          State : active
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+       Checksum : bf2de1ee - correct
+         Events : 1
+
+     Chunk Size : 64K
+
+      Number   Major   Minor   RaidDevice State
+this     0       8       16        0      active sync   /dev/sdb
+
+   0     0       8       16        0      active sync   /dev/sdb
+   1     1       8       32        1      active sync   /dev/sdc
+-----
+
+and
+
+-----
+[root@rho baum]# /sbin/mdadm --examine /dev/sdc
+/dev/sdc:
+          Magic : a92b4efc
+        Version : 0.90.00
+           UUID : 7e6f9059:be3e2bab:29b2cdc9:0ef92520
+  Creation Time : Fri Sep 14 22:10:18 2012
+     Raid Level : raid0
+  Used Dev Size : 0
+   Raid Devices : 2
+  Total Devices : 2
+Preferred Minor : 0
+
+    Update Time : Fri Sep 14 22:10:18 2012
+          State : active
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+       Checksum : bf2de200 - correct
+         Events : 1
+
+     Chunk Size : 64K
+
+      Number   Major   Minor   RaidDevice State
+this     1       8       32        1      active sync   /dev/sdc
+
+   0     0       8       16        0      active sync   /dev/sdb
+   1     1       8       32        1      active sync   /dev/sdc
+-----
+
+Power Supply Failure on 3/17/14
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On 3/17/04 the raid array became inaccessible.  A check of the machine
+revealed that one of the two apparently redundant power supplies had failed or
+was at least acting up.  A replacement was obtained for:
+
+-----
+Supermicro PWS-1K62P-1R
+-----
+
+and the RAID array was run through a rebuild cycle.
+
+
+The MegaCli Command Line Interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A useful page with a subset of the seemingly infinite number of commands
+available for MegaCli is at:
+
+http://erikimh.com/megacli-cheatsheet/[+http://erikimh.com/megacli-cheatsheet/+]
+
+Controller information (lots of it) can be obtained via:
+
+-----
+MegaCli -AdpAllInfo -aALL
+MegaCli -CfgDsply -aALL
+MegaCli -AdpEventLog -GetEvents -f events.log -aALL && cat events.log
+-----
+
+The command:
+
+-----
+/opt/MegaRAID/MegaCli/MegaCli64 -CfgDsply -aALL
+-----
+
+obtains:
+
+-----
+==============================================================================
+Adapter: 0
+Product Name: LSI MegaRAID SAS 9265-8i
+Memory: 1024MB
+BBU: Present
+Serial No: SV22711409
+==============================================================================
+Number of DISK GROUPS: 2
+
+DISK GROUP: 0
+Number of Spans: 1
+SPAN: 0
+Span Reference: 0x00
+Number of PDs: 30
+Number of VDs: 1
+Number of dedicated Hotspares: 0
+Virtual Drive Information:
+Virtual Drive: 0 (Target Id: 0)
+Name                :
+RAID Level          : Primary-6, Secondary-0, RAID Level Qualifier-3
+Size                : 76.398 TB
+Parity Size         : 5.457 TB
+State               : Optimal
+Strip Size          : 256 KB
+Number Of Drives    : 30
+Span Depth          : 1
+Default Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Current Cache Policy: WriteBack, ReadAhead, Direct, No Write Cache if Bad BBU
+Default Access Policy: Read/Write
+Current Access Policy: Read/Write
+Disk Cache Policy   : Disk's Default
+Encryption Type     : None
+Default Power Savings Policy: Controller Defined
+Current Power Savings Policy: Maximum
+Can spin up in 1 minute: Yes
+LD has drives that support T10 power conditions: Yes
+LD's IO profile supports MAX power savings with cached writes: Yes
+Is VD Cached: No
+
+Physical Disk: 0
+Enclosure Device ID: 32
+Slot Number: 1
+Drive's postion: DiskGroup: 0, Span: 0, Arm: 0
+Enclosure position: 1
+Device Id: 64
+WWN: 5000C50041EC85F0
+Sequence Number: 2
+Media Error Count: 0
+Other Error Count: 0
+Predictive Failure Count: 0
+Last Predictive Failure Event Seq Number: 0
+PD Type: SAS
+
+Raw Size: 2.728 TB [0x15d50a3b0 Sectors]
+Non Coerced Size: 2.728 TB [0x15d40a3b0 Sectors]
+Coerced Size: 2.728 TB [0x15d400000 Sectors]
+Firmware state: Online, Spun down
+Device Firmware Level: 0004
+Shield Counter: 0
+Successful diagnostics completion on :  N/A
+SAS Address(0): 0x5000c50041ec85f1
+SAS Address(1): 0x5000c50041ec85f2
+Connected Port Number: 0(path0) 1(path1) 
+Inquiry Data: SEAGATE ST33000650SS    0004Z2935EGR            
+FDE Capable: Not Capable
+FDE Enable: Disable
+Secured: Unsecured
+Locked: Unlocked
+Needs EKM Attention: No
+Foreign State: None 
+Device Speed: 6.0Gb/s 
+Link Speed: 6.0Gb/s 
+Media Type: Hard Disk Device
+Drive Temperature : N/A
+PI Eligibility:  No 
+Drive is formatted for PI information:  No
+PI: No PI
+Port-0 :
+Port status: Active
+Port's Linkspeed: 6.0Gb/s 
+Port-1 :
+Port status: Active
+Port's Linkspeed: Unknown 
+Drive has flagged a S.M.A.R.T alert : No
+
+...
+
+Physical Disk: 19
+...
+Exit Code: 0x00
+-----
+
+
+
+Memory Upgrade Choices
+~~~~~~~~~~~~~~~~~~~~~~
+
+Recommended DDR3 1.35V-1066 Memory for Upgrade
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The page for DDR3 1.35V-1066 16GB RAM recommendations is at:
+
+http://www.supermicro.com/support/resources/memory/display.cfm?sz=16.0&mspd=1.066&mtyp=36&id=E06D84A181649C1BB8F92DCCFC8EDABA&prid=81342&type=DDR3%201.35V&ecc=1&reg=1&fbd=0[+http://www.supermicro.com/support/resources/memory/display.cfm?sz=16.0&mspd=1.066&mtyp=36&id=E06D84A181649C1BB8F92DCCFC8EDABA&prid=81342&type=DDR3%201.35V&ecc=1&reg=1&fbd=0+]
+
+and the recommended chip is:
+
+*Micron MT72KSZS2G72PZ-1G1M1* 
+
+Memory America -
+http://www.memoryamerica.com/mt72kszs2g72pz-1g1m1.html[+http://www.memoryamerica.com/mt72kszs2g72pz-1g1m1.html+]
+- 149.00
+
+Memory4Less -
+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1465006570[+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1465006570+]
+- 251.71
+
+MemoryTen -
+http://www.memoryten.com/pc/030357/DDR3-240p-PC3-8500ER-16GB/[+http://www.memoryten.com/pc/030357/DDR3-240p-PC3-8500ER-16GB/+]
+- 159.98
+
+Recommended DDR3 1066 Memory for Upgrade
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Recommended 16GB DDR3-1066 memory chips at the Supermicro page for X8DTL-i
+(with the same recommendations for X8DTL-3, X8DTL-3F and X8DTL-iF):
+
+http://www.supermicro.com/support/resources/memory/display.cfm?sz=16.0&mspd=1.066&mtyp=32&id=1EBA54600ECB890F82D479187488D4DF&prid=81341&type=DDR3&ecc=1&reg=1&fbd=0[+http://www.supermicro.com/support/resources/memory/display.cfm?sz=16.0&mspd=1.066&mtyp=32&id=1EBA54600ECB890F82D479187488D4DF&prid=81341&type=DDR3&ecc=1&reg=1&fbd=0+]
+
+are:
+
+*Micron MT72JSZS2G72PZ-1G1D1*
+
+Memory America - http://www.memoryamerica.com/mt72jszs2g72pz-1g1d1.html[+http://www.memoryamerica.com/mt72jszs2g72pz-1g1d1.html+] - 221.25
+
+Memory4Less -
+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1443545452[+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1443545452+]
+- 251.71
+
+Digi-Key -
+http://www.digikey.com/product-detail/en/MT72JSZS2G72PZ-1G1D1/MT72JSZS2G72PZ-1G1D1-ND/2663798[+http://www.digikey.com/product-detail/en/MT72JSZS2G72PZ-1G1D1/MT72JSZS2G72PZ-1G1D1-ND/2663798+]
+- Call
+
+*Samsung M393B2K70CM0-CF8*
+
+ServerSupply -
+http://www.serversupply.com/products/part_search/pid_lookup.asp?pid=166656&gclid=CMeXk8Dz9L0CFUYV7Aodty0Akg[+http://www.serversupply.com/products/part_search/pid_lookup.asp?pid=166656&gclid=CMeXk8Dz9L0CFUYV7Aodty0Akg+]
+- 185.00
+
+Memory America -
+http://www.memoryamerica.com/m393b2k70cm0-cf8.html?utm_source=m393b2k70cm0-cf8&utm_medium=shopping%2Bengine&utm_campaign=googleproducts&gclid=CNXRwdDz9L0CFVFp7AodulIAQw[+http://www.memoryamerica.com/m393b2k70cm0-cf8.html?utm_source=m393b2k70cm0-cf8&utm_medium=shopping%2Bengine&utm_campaign=googleproducts&gclid=CNXRwdDz9L0CFVFp7AodulIAQw+]
+- 167.99
+
+MemoryTen -
+http://www.memoryten.com/pc/023816/DDR3-240p-PC3-8500ER-16GB/[+http://www.memoryten.com/pc/023816/DDR3-240p-PC3-8500ER-16GB/+]
+
+SuperBiiz -
+http://www.superbiiz.com/detail.php?name=D3-10R16GS[+http://www.superbiiz.com/detail.php?name=D3-10R16GS+]
+- 199.99
+
+*Hynix HMT42GR7BMR4C-G7*
+
+Memory America -
+http://www.memoryamerica.com/hmt42gr7bmr4c-g7.html?utm_source=hmt42gr7bmr4c-g7&utm_medium=shopping%2Bengine&utm_campaign=googleproducts&gclid=CJmYqL_09L0CFc1j7Aodz3YAAA[+http://www.memoryamerica.com/hmt42gr7bmr4c-g7.html?utm_source=hmt42gr7bmr4c-g7&utm_medium=shopping%2Bengine&utm_campaign=googleproducts&gclid=CJmYqL_09L0CFc1j7Aodz3YAAA+]
+- 187.50
+
+MemoryTen -
+https://www.memoryten.com/pc/024123/DDR3-240p-PC3-8500ER-16GB/[+https://www.memoryten.com/pc/024123/DDR3-240p-PC3-8500ER-16GB/+]
+- 169.98
+
+Memory4Less -
+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1449028247[+http://www.memory4less.com/m4l_itemdetail.aspx?itemid=1449028247+]
+- 251.71
+
++dmicode+ Dump
+~~~~~~~~~~~~~~
+
+Running +dmidecode+ obtains:
+
+-----
+# dmidecode 2.11
+SMBIOS 2.6 present.
+70 structures occupying 2851 bytes.
+Table at 0x00099C00.
+
+Handle 0x0000, DMI type 0, 24 bytes
+BIOS Information
+	Vendor: American Megatrends Inc.
+	Version: 2.1       
+	Release Date: 08/27/11  
+	Address: 0xF0000
+	Runtime Size: 64 kB
+	ROM Size: 4096 kB
+	Characteristics:
+		ISA is supported
+		PCI is supported
+		PNP is supported
+		BIOS is upgradeable
+		BIOS shadowing is allowed
+		ESCD support is available
+		Boot from CD is supported
+		Selectable boot is supported
+		BIOS ROM is socketed
+		EDD is supported
+		5.25"/1.2 MB floppy services are supported (int 13h)
+		3.5"/720 kB floppy services are supported (int 13h)
+		3.5"/2.88 MB floppy services are supported (int 13h)
+		Print screen service is supported (int 5h)
+		8042 keyboard services are supported (int 9h)
+		Serial services are supported (int 14h)
+		Printer services are supported (int 17h)
+		CGA/mono video services are supported (int 10h)
+		ACPI is supported
+		USB legacy is supported
+		LS-120 boot is supported
+		ATAPI Zip drive boot is supported
+		BIOS boot specification is supported
+		Targeted content distribution is supported
+	BIOS Revision: 8.16
+
+Handle 0x0001, DMI type 1, 27 bytes
+System Information
+	Manufacturer: Supermicro
+	Product Name: X8DTL
+	Version: 1234567890
+	Serial Number: 1234567890
+	UUID: 49434D53-0200-9062-2500-6290250059BE
+	Wake-up Type: Power Switch
+	SKU Number: To Be Filled By O.E.M.
+	Family: Server
+
+Handle 0x0002, DMI type 2, 15 bytes
+Base Board Information
+	Manufacturer: Supermicro
+	Product Name: X8DTL
+	Version: 1234567890
+	Serial Number: VM19S84405
+	Asset Tag: To Be Filled By O.E.M.
+	Features:
+		Board is a hosting board
+		Board is replaceable
+	Location In Chassis: To Be Filled By O.E.M.
+	Chassis Handle: 0x0003
+	Type: Motherboard
+	Contained Object Handles: 0
+
+Handle 0x0003, DMI type 3, 21 bytes
+Chassis Information
+	Manufacturer: Supermicro
+	Type: Main Server Chassis
+	Lock: Not Present
+	Version: 1234567890
+	Serial Number: 1234567890
+	Asset Tag: To Be Filled By O.E.M.
+	Boot-up State: Safe
+	Power Supply State: Safe
+	Thermal State: Safe
+	Security Status: None
+	OEM Information: 0x00000000
+	Height: Unspecified
+	Number Of Power Cords: 1
+	Contained Elements: 0
+
+Handle 0x0004, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU 1
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel            
+	ID: C2 06 02 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 44, Stepping 2
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU           E5620  @ 2.40GHz     
+	Voltage: Unknown
+	External Clock: 133 MHz
+	Max Speed: 2400 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Other
+	L1 Cache Handle: 0x0005
+	L2 Cache Handle: 0x0006
+	L3 Cache Handle: 0x0007
+	Serial Number: To Be Filled By O.E.M.
+	Asset Tag: To Be Filled By O.E.M.
+	Part Number: To Be Filled By O.E.M.
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 8
+	Characteristics:
+		64-bit capable
+
+Handle 0x0005, DMI type 7, 19 bytes
+Cache Information
+	Socket Designation: L1-Cache
+	Configuration: Enabled, Not Socketed, Level 1
+	Operational Mode: Write Through
+	Location: Internal
+	Installed Size: 256 kB
+	Maximum Size: 256 kB
+	Supported SRAM Types:
+		Other
+	Installed SRAM Type: Other
+	Speed: Unknown
+	Error Correction Type: Parity
+	System Type: Instruction
+	Associativity: 4-way Set-associative
+
+Handle 0x0006, DMI type 7, 19 bytes
+Cache Information
+	Socket Designation: L2-Cache
+	Configuration: Enabled, Not Socketed, Level 2
+	Operational Mode: Write Through
+	Location: Internal
+	Installed Size: 1024 kB
+	Maximum Size: 1024 kB
+	Supported SRAM Types:
+		Other
+	Installed SRAM Type: Other
+	Speed: Unknown
+	Error Correction Type: Single-bit ECC
+	System Type: Unified
+	Associativity: 8-way Set-associative
+
+Handle 0x0007, DMI type 7, 19 bytes
+Cache Information
+	Socket Designation: L3-Cache
+	Configuration: Enabled, Not Socketed, Level 3
+	Operational Mode: Write Back
+	Location: Internal
+	Installed Size: 12288 kB
+	Maximum Size: 12288 kB
+	Supported SRAM Types:
+		Other
+	Installed SRAM Type: Other
+	Speed: Unknown
+	Error Correction Type: Single-bit ECC
+	System Type: Unified
+	Associativity: 16-way Set-associative
+
+Handle 0x0008, DMI type 4, 42 bytes
+Processor Information
+	Socket Designation: CPU 2
+	Type: Central Processor
+	Family: Xeon
+	Manufacturer: Intel            
+	ID: C2 06 02 00 FF FB EB BF
+	Signature: Type 0, Family 6, Model 44, Stepping 2
+	Flags:
+		FPU (Floating-point unit on-chip)
+		VME (Virtual mode extension)
+		DE (Debugging extension)
+		PSE (Page size extension)
+		TSC (Time stamp counter)
+		MSR (Model specific registers)
+		PAE (Physical address extension)
+		MCE (Machine check exception)
+		CX8 (CMPXCHG8 instruction supported)
+		APIC (On-chip APIC hardware supported)
+		SEP (Fast system call)
+		MTRR (Memory type range registers)
+		PGE (Page global enable)
+		MCA (Machine check architecture)
+		CMOV (Conditional move instruction supported)
+		PAT (Page attribute table)
+		PSE-36 (36-bit page size extension)
+		CLFSH (CLFLUSH instruction supported)
+		DS (Debug store)
+		ACPI (ACPI supported)
+		MMX (MMX technology supported)
+		FXSR (FXSAVE and FXSTOR instructions supported)
+		SSE (Streaming SIMD extensions)
+		SSE2 (Streaming SIMD extensions 2)
+		SS (Self-snoop)
+		HTT (Multi-threading)
+		TM (Thermal monitor supported)
+		PBE (Pending break enabled)
+	Version: Intel(R) Xeon(R) CPU           E5620  @ 2.40GHz     
+	Voltage: Unknown
+	External Clock: 133 MHz
+	Max Speed: 2400 MHz
+	Current Speed: 2400 MHz
+	Status: Populated, Enabled
+	Upgrade: Other
+	L1 Cache Handle: 0x0009
+	L2 Cache Handle: 0x000A
+	L3 Cache Handle: 0x000B
+	Serial Number: To Be Filled By O.E.M.
+	Asset Tag: To Be Filled By O.E.M.
+	Part Number: To Be Filled By O.E.M.
+	Core Count: 4
+	Core Enabled: 4
+	Thread Count: 8
+	Characteristics:
+		64-bit capable
+
+Handle 0x0009, DMI type 7, 19 bytes
+Cache Information
+	Socket Designation: L1-Cache
+	Configuration: Enabled, Not Socketed, Level 1
+	Operational Mode: Write Through
+	Location: Internal
+	Installed Size: 256 kB
+	Maximum Size: 256 kB
+	Supported SRAM Types:
+		Other
+	Installed SRAM Type: Other
+	Speed: Unknown
+	Error Correction Type: Parity
+	System Type: Instruction
+	Associativity: 4-way Set-associative
+
+Handle 0x000A, DMI type 7, 19 bytes
+Cache Information
+	Socket Designation: L2-Cache
+	Configuration: Enabled, Not Socketed, Level 2
+	Operational Mode: Write Through
+	Location: Internal
+	Installed Size: 1024 kB
+	Maximum Size: 1024 kB
+	Supported SRAM Types:
+		Other
+	Installed SRAM Type: Other
+	Speed: Unknown
+	Error Correction Type: Single-bit ECC
+	System Type: Unified
+	Associativity: 8-way Set-associative
+
+Handle 0x000B, DMI type 7, 19 bytes
+Cache Information
+	Socket Designation: L3-Cache
+	Configuration: Enabled, Not Socketed, Level 3
+	Operational Mode: Write Back
+	Location: Internal
+	Installed Size: 12288 kB
+	Maximum Size: 12288 kB
+	Supported SRAM Types:
+		Other
+	Installed SRAM Type: Other
+	Speed: Unknown
+	Error Correction Type: Single-bit ECC
+	System Type: Unified
+	Associativity: 16-way Set-associative
+
+Handle 0x000C, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J1A1
+	Internal Connector Type: None
+	External Reference Designator: PS2Mouse
+	External Connector Type: PS/2
+	Port Type: Mouse Port
+
+Handle 0x000D, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J1A1
+	Internal Connector Type: None
+	External Reference Designator: Keyboard
+	External Connector Type: PS/2
+	Port Type: Keyboard Port
+
+Handle 0x000E, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J2A2
+	Internal Connector Type: None
+	External Reference Designator: USB1
+	External Connector Type: Access Bus (USB)
+	Port Type: USB
+
+Handle 0x000F, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J2A2
+	Internal Connector Type: None
+	External Reference Designator: USB2
+	External Connector Type: Access Bus (USB)
+	Port Type: USB
+
+Handle 0x0010, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J4A1
+	Internal Connector Type: None
+	External Reference Designator: LPT 1
+	External Connector Type: DB-25 male
+	Port Type: Parallel Port ECP/EPP
+
+Handle 0x0011, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J2A1
+	Internal Connector Type: None
+	External Reference Designator: COM A
+	External Connector Type: DB-9 male
+	Port Type: Serial Port 16550A Compatible
+
+Handle 0x0012, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6A1
+	Internal Connector Type: None
+	External Reference Designator: Audio Mic In
+	External Connector Type: Mini Jack (headphones)
+	Port Type: Audio Port
+
+Handle 0x0013, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6A1
+	Internal Connector Type: None
+	External Reference Designator: Audio Line In
+	External Connector Type: Mini Jack (headphones)
+	Port Type: Audio Port
+
+Handle 0x0014, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6B1 - AUX IN
+	Internal Connector Type: On Board Sound Input From CD-ROM
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Audio Port
+
+Handle 0x0015, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6B2 - CDIN
+	Internal Connector Type: On Board Sound Input From CD-ROM
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Audio Port
+
+Handle 0x0016, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6J2 - PRI IDE
+	Internal Connector Type: On Board IDE
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0017, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6J1 - SEC IDE
+	Internal Connector Type: On Board IDE
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0018, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J4J1 - FLOPPY
+	Internal Connector Type: On Board Floppy
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0019, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J9H1 - FRONT PNL
+	Internal Connector Type: 9 Pin Dual Inline (pin 10 cut)
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x001A, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J1B1 - CHASSIS REAR FAN
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x001B, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J2F1 - CPU FAN
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x001C, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J8B4 - FRONT FAN
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x001D, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J9G2 - FNT USB
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x001E, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J6C3 - FP AUD
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x001F, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J9G1 - CONFIG
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0020, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J8C1 - SCSI LED
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0021, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J9J2 - INTRUDER
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0022, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J9G4 - ITP
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0023, DMI type 8, 9 bytes
+Port Connector Information
+	Internal Reference Designator: J2H1 - MAIN POWER
+	Internal Connector Type: Other
+	External Reference Designator: Not Specified
+	External Connector Type: None
+	Port Type: Other
+
+Handle 0x0024, DMI type 9, 17 bytes
+System Slot Information
+	Designation: PCI1
+	Type: 32-bit PCI
+	Current Usage: Available
+	Length: Short
+	ID: 1
+	Characteristics:
+		3.3 V is provided
+		Opening is shared
+		PME signal is supported
+
+Handle 0x0025, DMI type 9, 17 bytes
+System Slot Information
+	Designation: PCI2
+	Type: 32-bit PCI
+	Current Usage: Available
+	Length: Short
+	ID: 2
+	Characteristics:
+		3.3 V is provided
+		Opening is shared
+		PME signal is supported
+
+Handle 0x0026, DMI type 9, 17 bytes
+System Slot Information
+	Designation: PCIE3
+	Type: x4 PCI Express x8
+	Current Usage: Available
+	Length: Long
+	ID: 3
+	Characteristics:
+		3.3 V is provided
+		Opening is shared
+		PME signal is supported
+
+Handle 0x0027, DMI type 9, 17 bytes
+System Slot Information
+	Designation: PCIE4
+	Type: x8 PCI Express x8
+	Current Usage: Available
+	Length: Short
+	ID: 4
+	Characteristics:
+		3.3 V is provided
+		Opening is shared
+		PME signal is supported
+
+Handle 0x0028, DMI type 9, 17 bytes
+System Slot Information
+	Designation: PCIE5
+	Type: x4 PCI Express x8
+	Current Usage: Available
+	Length: Long
+	ID: 5
+	Characteristics:
+		3.3 V is provided
+		Opening is shared
+		PME signal is supported
+
+Handle 0x0029, DMI type 9, 17 bytes
+System Slot Information
+	Designation: PCIE6
+	Type: x8 PCI Express x16
+	Current Usage: In Use
+	Length: Long
+	ID: 6
+	Characteristics:
+		3.3 V is provided
+		Opening is shared
+		PME signal is supported
+
+Handle 0x002A, DMI type 11, 5 bytes
+OEM Strings
+	String 1: Intel Nehalem/Tylersburg/ICH10  
+	String 2: Supermicro motherboard-X8 Series
+
+Handle 0x002B, DMI type 13, 22 bytes
+BIOS Language Information
+	Language Description Format: Long
+	Installable Languages: 1
+		en|US|iso8859-1
+	Currently Installed Language: en|US|iso8859-1
+
+Handle 0x002C, DMI type 15, 55 bytes
+System Event Log
+	Area Length: 1008 bytes
+	Header Start Offset: 0x0810
+	Data Start Offset: 0x0810
+	Access Method: General-purpose non-volatile data functions
+	Access Address: 0x0001
+	Status: Valid, Not Full
+	Change Token: 0x00000000
+	Header Format: No Header
+	Supported Log Type Descriptors: 16
+	Descriptor 1: OEM-specific
+	Data Format 1: Multiple-event handle
+	Descriptor 2: OEM-specific
+	Data Format 2: Multiple-event handle
+	Descriptor 3: Single-bit ECC memory error
+	Data Format 3: Multiple-event handle
+	Descriptor 4: Multi-bit ECC memory error
+	Data Format 4: Multiple-event handle
+	Descriptor 5: Parity memory error
+	Data Format 5: Multiple-event
+	Descriptor 6: I/O channel block
+	Data Format 6: Multiple-event
+	Descriptor 7: POST error
+	Data Format 7: POST results bitmap
+	Descriptor 8: PCI parity error
+	Data Format 8: Multiple-event handle
+	Descriptor 9: PCI system error
+	Data Format 9: Multiple-event handle
+	Descriptor 10: CPU failure
+	Data Format 10: Multiple-event handle
+	Descriptor 11: System limit exceeded
+	Data Format 11: Multiple-event system management
+	Descriptor 12: OEM-specific
+	Data Format 12: POST results bitmap
+	Descriptor 13: OEM-specific
+	Data Format 13: Multiple-event handle
+	Descriptor 14: OEM-specific
+	Data Format 14: Multiple-event handle
+	Descriptor 15: OEM-specific
+	Data Format 15: Multiple-event handle
+	Descriptor 16: OEM-specific
+	Data Format 16: Multiple-event handle
+
+Handle 0x002D, DMI type 16, 15 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 96 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 3
+
+Handle 0x002E, DMI type 19, 15 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x002FFFFFFFF
+	Range Size: 12 GB
+	Physical Array Handle: 0x002D
+	Partition Width: 3
+
+Handle 0x002F, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x002D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 4096 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMM1A
+	Bank Locator: BANK
+	Type: Other
+	Type Detail: Other
+	Speed: 1066 MHz
+	Manufacturer: Samsung       
+	Serial Number: 55178683
+	Asset Tag: AssetTagNum0
+	Part Number: M393B5170FH0-CH9  
+	Rank: Unknown
+
+Handle 0x0030, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x000FFFFFFFF
+	Range Size: 4 GB
+	Physical Device Handle: 0x002F
+	Memory Array Mapped Address Handle: 0x002E
+	Partition Row Position: 1
+	Interleave Position: Unknown
+	Interleaved Data Depth: 2
+
+Handle 0x0031, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x002D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 4096 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMM2A
+	Bank Locator: BANK
+	Type: Other
+	Type Detail: Other
+	Speed: 1066 MHz
+	Manufacturer: Samsung       
+	Serial Number: 59178683
+	Asset Tag: AssetTagNum1
+	Part Number: M393B5170FH0-CH9  
+	Rank: Unknown
+
+Handle 0x0032, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00100000000
+	Ending Address: 0x001FFFFFFFF
+	Range Size: 4 GB
+	Physical Device Handle: 0x0031
+	Memory Array Mapped Address Handle: 0x002E
+	Partition Row Position: 1
+	Interleave Position: Unknown
+	Interleaved Data Depth: 2
+
+Handle 0x0033, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x002D
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 4096 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P2_DIMM3A
+	Bank Locator: BANK
+	Type: Other
+	Type Detail: Other
+	Speed: 1066 MHz
+	Manufacturer: Samsung       
+	Serial Number: 9D188683
+	Asset Tag: AssetTagNum2
+	Part Number: M393B5170FH0-CH9  
+	Rank: Unknown
+
+Handle 0x0034, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00200000000
+	Ending Address: 0x002FFFFFFFF
+	Range Size: 4 GB
+	Physical Device Handle: 0x0033
+	Memory Array Mapped Address Handle: 0x002E
+	Partition Row Position: 1
+	Interleave Position: Unknown
+	Interleaved Data Depth: 2
+
+Handle 0x0035, DMI type 16, 15 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Use: System Memory
+	Error Correction Type: Multi-bit ECC
+	Maximum Capacity: 96 GB
+	Error Information Handle: Not Provided
+	Number Of Devices: 3
+
+Handle 0x0036, DMI type 19, 15 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00300000000
+	Ending Address: 0x005FFFFFFFF
+	Range Size: 12 GB
+	Physical Array Handle: 0x0035
+	Partition Width: 3
+
+Handle 0x0037, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x0035
+	Error Information Handle: Not Provided
+	Total Width: 72 bits
+	Data Width: 64 bits
+	Size: 4096 MB
+	Form Factor: DIMM
+	Set: None
+	Locator: P1_DIMM1A
+	Bank Locator: BANK
+	Type: Other
+	Type Detail: Other
+	Speed: 1066 MHz
+	Manufacturer: Samsung       
+	Serial Number: 48178683
+	Asset Tag: AssetTagNum3
+	Part Number: M393B5170FH0-CH9  
+	Rank: Unknown
+
+Handle 0x0038, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00300000000
+	Ending Address: 0x003FFFFFFFF
+	Range Size: 4 GB
+	Physical Device Handle: 0x0037
+	Memory Array Mapped Address Handle: 0x0036
+	Partition Row Position: 1
+	Interleave Position: Unknown
+	Interleaved Data Depth: 2
+	Bank Locator: BANK
+	Type: Other
+	Type Detail: Other
+	Speed: 1066 MHz
+	Manufacturer: Samsung       
+	Serial Number: 4A178683
+	Asset Tag: AssetTagNum5
+	Part Number: M393B5170FH0-CH9  
+	Rank: Unknown
+
+Handle 0x003C, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x00500000000
+	Ending Address: 0x005FFFFFFFF
+	Range Size: 4 GB
+	Physical Device Handle: 0x003B
+	Memory Array Mapped Address Handle: 0x0036
+	Partition Row Position: 1
+	Interleave Position: Unknown
+	Interleaved Data Depth: 2
+
+Handle 0x003D, DMI type 16, 15 bytes
+Physical Memory Array
+	Location: System Board Or Motherboard
+	Use: Flash Memory
+	Error Correction Type: None
+	Maximum Capacity: 4 MB
+	Error Information Handle: Not Provided
+	Number Of Devices: 1
+
+Handle 0x003E, DMI type 19, 15 bytes
+Memory Array Mapped Address
+	Starting Address: 0x00000000000
+	Ending Address: 0x000003FFFFF
+	Range Size: 4 MB
+	Physical Array Handle: 0x003D
+	Partition Width: 1
+
+Handle 0x003F, DMI type 17, 28 bytes
+Memory Device
+	Array Handle: 0x003D
+	Error Information Handle: Not Provided
+	Total Width: 8 bits
+	Data Width: 8 bits
+	Size: 4096 kB
+	Form Factor: Other
+	Set: None
+	Locator: BIOS
+	Bank Locator: ROM0
+	Type: Flash
+	Type Detail: Non-Volatile
+	Speed: 33 MHz
+	Manufacturer: MXIC        
+	Serial Number:  
+	Asset Tag:  
+	Part Number: 25L3205             
+	Rank: Unknown
+
+Handle 0x0040, DMI type 20, 19 bytes
+Memory Device Mapped Address
+	Starting Address: 0x000FFC00000
+	Ending Address: 0x000FFFFFFFF
+	Range Size: 4 MB
+	Physical Device Handle: 0x003F
+	Memory Array Mapped Address Handle: 0x003E
+	Partition Row Position: <OUT OF SPEC>
+
+Handle 0x0041, DMI type 32, 20 bytes
+System Boot Information
+	Status: No errors detected
+
+Handle 0x0042, DMI type 38, 18 bytes
+IPMI Device Information
+	Interface Type: KCS (Keyboard Control Style)
+	Specification Version: 2.0
+	I2C Slave Address: 0x00
+	NV Storage Device: Not Present
+	Base Address: 0x0000000000000CA2 (I/O)
+	Register Spacing: Successive Byte Boundaries
+
+Handle 0x0043, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:   To Be Filled By O.E.M.
+	Type: Video
+	Status: Enabled
+	Type Instance: 0
+
+Handle 0x0044, DMI type 41, 11 bytes
+Onboard Device
+	Reference Designation:  To Be Filled By O.E.M.
+	Type: SCSI Controller
+	Status: Disabled
+	Type Instance: 0
+
+Handle 0x0045, DMI type 127, 4 bytes
+End Of Table
+-----
+
+

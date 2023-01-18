@@ -1,0 +1,124 @@
+Android Notes
+=============
+Steven K. Baum
+0.1, Aug. 12, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+== Meta
+
+*Wikipedia* - https://en.wikipedia.org/wiki/Android_(operating_system)[`https://en.wikipedia.org/wiki/Android_(operating_system)`]
+
+*AOSP* - https://source.android.com/[`https://source.android.com/`]
+
+*Using ADB and fastboot* - https://wiki.oddsolutions.us/adb_fastboot_guide.html[`https://wiki.oddsolutions.us/adb_fastboot_guide.html`]
+
+*Backing Up Android Using Linux* - https://www.iskysoft.com/phone-transfer/how-to-backup-android-using-linux-tool.html[`https://www.iskysoft.com/phone-transfer/how-to-backup-android-using-linux-tool.html`]
+
+*Connect Fedora to Android with GSConnect* - https://fedoramagazine.org/connect-fedora-to-your-android-phone-with-gsconnect/[`https://fedoramagazine.org/connect-fedora-to-your-android-phone-with-gsconnect/`]
+
+== /e/
+
+https://en.wikipedia.org/wiki//e/_(operating_system)[`https://en.wikipedia.org/wiki//e/_(operating_system)`]
+
+=====
+A free and open-source Android-based mobile operating system and associated online services. The operating system is a fork of LineageOS and Android. The custom firmware is developed by the /e/ Foundation, which was founded by French entrepreneur Gaël Duval. /e/ is presented as privacy software that does not contain proprietary Google apps or services,
+=====
+
+== LineageOS
+
+https://lineageos.org/[`https://lineageos.org/`]
+
+https://wiki.oddsolutions.us/[`https://wiki.oddsolutions.us/`]
+
+https://en.wikipedia.org/wiki/LineageOS[`https://en.wikipedia.org/wiki/LineageOS`]
+
+*LineageOS for Essential PH-1* - https://wiki.oddsolutions.us/devices/mata/[`https://wiki.oddsolutions.us/devices/mata/`]
+
+=====
+LineageOS is an operating system for smartphones, tablet computers, and set-top boxes, based on Android with mostly free and open-source software. 
+
+LineageOS includes many essential and useful apps, but t is free from unnecessary software often pre-installed by a phone's manufacturer or carrier that is considered to be bloatware.
+
+LineageOS offers several features that Android Open Source Project (AOSP) does not include. 
+=====
+
+=== LineageOS for microG
+
+https://lineage.microg.org/[`https://lineage.microg.org/`]
+
+=====
+As a response to the refusal for several reasons of support for signature spoofing in official builds, a LineageOS fork with microG services included, known as "LineageOS for microG", was created. The project ships custom builds of LineageOS with the required patch and native F-Droid support, bundled with the MicroG project's free re-implementation of proprietary Gapps. In other respects it follows upstream, shipping OTA updates every seven days.
+=====
+
+
+== Procedures
+
+=== Backing Up to Google Cloud
+
+https://www.digitaltrends.com/mobile/how-to-backup-your-android-smartphone-to-pc/[`https://www.digitaltrends.com/mobile/how-to-backup-your-android-smartphone-to-pc/`]
+
+=====
+Like Apple’s iOS and iPadOS, Google provides means to automatically back up your Android device to the cloud. This setting is typically toggled on, but you can verify by following these steps in stock Android 11 and Samsung phones:
+
+*Step 1*: Swipe down from the top to expand the notification shade and tap the cog icon. This opens the Settings panel.
+
+*Step 2*: Tap Google or System (stock Android only).
+
+*Step 3*: Tap Backup.
+
+*Step 4*: Tap the toggle next to Back Up to Google Drive if this feature isn’t enabled already.
+=====
+
+=== Connecting to Android with GSConnect
+
+
+==== Install GNOME Shell extension.
+
+https://fedoramagazine.org/install-gnome-shell-extension/[`https://fedoramagazine.org/install-gnome-shell-extension/`]
+
+https://fedoramagazine.org/connect-fedora-to-your-android-phone-with-gsconnect/[`https://fedoramagazine.org/connect-fedora-to-your-android-phone-with-gsconnect/`]
+
+-----
+dnf search gnome-shell-extension
+...
+gnome-shell-extension-pomodoro.x86_64 : A time management utility for GNOME
+gnome-shell-extension-apps-menu.noarch : Application menu for GNOME Shell
+gnome-shell-extension-gsconnect.x86_64 : KDE Connect implementation for GNOME Shell
+gnome-shell-extension-apps-menu.noarch : Application menu for GNOME Shell
+gnome-shell-extension-ibus-font.noarch : A GNOME Shell extension for ibus-setup custom font settings
+...
+
+dnf install gnome-shell-extension
+-----
+
+==== Install KDE Connection on Phone
+
+Find KDE Connect on Google Play Store or F-Droid, install it, and run it.
+
+
+==== Establish Connection
+
+Once GSConnect is installed and KDE Connect is installed and running you will find
+your Android device - on Fedora - under the down arrow at the top right of your screen.
+There will be a menu item *Mobile Devices* to select.
+This will pop up a window listing your devices.
+Click on the device name to which you wish to pair to bring up another screen.
+Click on pair on this screen and you will be asked to accept pairing on the Android
+device.
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,245 @@
+IPython
+=======
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+About Ipython.
+
+Links
+-----
+
+Home Page - http://ipython.org/[+http://ipython.org/+]
+IPython Notebook -
+http://ipython.org/notebook.html[+http://ipython.org/notebook.html+]
+Jupyter, the Next Generation of IPython Notebook-
+https://github.com/jupyter[+https://github.com/jupyter+]
+
+Installation
+------------
+
+IPython
+~~~~~~~
+
+Get the development version from:
+
+https://github.com/ipython/ipython[+https://github.com/ipython/ipython+]
+
+Download, compile and install using:
+
+-----
+git clone https://github.com/ipython/ipython.git
+cd ipython
+python2.7 setup.py build
+su
+python2.7 setup.py install
+-----
+
+IPython Notebook
+~~~~~~~~~~~~~~~~
+
+
+
+Pandoc
+^^^^^^
+
+First, install the Haskell platform via:
+
+http://www.haskell.org/platform/[+http://www.haskell.org/platform/+]
+
+Then install +pandoc+ using +cabal+:
+
+-----
+cabal update
+cabal install pandoc
+-----
+
+
+
+Using Notebook
+--------------
+
+Basic Commands
+~~~~~~~~~~~~~~
+
+Starting Notebook
+^^^^^^^^^^^^^^^^^
+
+After entering:
+
+-----
+ipython notebook
+-----
+
+on the command line, you will get a new window or tab
+opening that looks like:
+
+image::ipython/ipython-initial.png[link="ipython/ipython-initial.png"]
+
+Creating a New Notebook
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Click on the +New Notebook+ tab to obtain another tab/window that looks like:
+
+image::ipython/ipython-notebook-1.png[link="ipython/ipython-notebook-1.png"]
+
+Entering and Running Python Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now enter some code into this in what is called *edit mode*:
+
+image::ipython/ex-01.png[link="ipython/ex-01.png"]
+
+and then click on the +Run Cell+ button:
+
+image::ipython/run_icon.png[link="ipython/run_icon.png"]
+
+to obtain:
+
+image::ipython/ex-02.png[link="ipython/ex-02.png"]
+
+Running System Commands
+^^^^^^^^^^^^^^^^^^^^^^^
+
+System commands can be run.  The first two are system aliases, and
+the third demonstrates how any command line program can be run
+using +!+ with string interpolation from Python variables.
+
+image::ipython/ex-system-commands.png[link="ipython/ex-system-commands.png"]
+
+Rich Display System
+~~~~~~~~~~~~~~~~~~~
+
+The +display+ function is a general purpose tool for displaying different
+representations of objects, i.e. sort of a print command for objects.
+A notebook with the following examples is at:
+
+http://nbviewer.ipython.org/github/ipython/ipython/blob/master/examples/Notebook/Display%20System.ipynb[+http://nbviewer.ipython.org/github/ipython/ipython/blob/master/examples/Notebook/Display%20System.ipynb+]
+
+
+Links to Local Files
+^^^^^^^^^^^^^^^^^^^^
+
+Links to local files can be created via the +FileLink+ object, e.g.
+
+-----
+from IPython.display import FileLink, FileLinks
+-----
+
+If there
+is a file named +README.rst+ in the directory from which +ipython notebook+
+was invoked, it can be accessed in the following way.
+
+image::ipython/filelink.png[link="ipython/filelink.png"]
+
+
+Links to External Sites
+^^^^^^^^^^^^^^^^^^^^^^^
+
+An entire page from another wite can be embedded into an iframe using
+
+-----
+from IPython.display import IFrame
+-----
+
+An example that embeds today's Wikipedia page for mobile users is:
+
+image::ipython/ex-wikipedia.png[link="ipython/ex-wikipedia.png"]
+
+HTML Rendering
+^^^^^^^^^^^^^^
+
+HTML can be displayed in the notebook by using the +HTML+ class:
+
+-----
+from IPython.display import HTML
+-----
+
+image::ipython/ex-html-01.png[link="ipython/ex-html-01.png"]
+
+If you are using Pandas, this can be used to allow
++DataFrames+ to be represented as HTML classes.
+
+image::ipython/ex-html-02.png[link="ipython/ex-html-02.png"]
+
+LaTeX Rendering
+^^^^^^^^^^^^^^^
+
+Mathematical expressions typeset with LaTeX can be displayed using
+the MathJax +Math+ class:
+
+-----
+from IPython.display import Math
+-----
+
+An example is:
+
+image::ipython/ex-latex-01.png[link="ipython/ex-latex-01.png"]
+
+They can also be displayed using the +Latex+ class:
+
+-----
+from IPython.display import Latex
+-----
+
+although you have to include the delimiters yourself, which allows
+you to use other LaTeX modes such as +eqnarray+.
+
+image::ipython/ex-latex-02.png[link="ipython/ex-latex-02.png"]
+
+
+LaTeX can also be entered directly using +%%latex+ cell magic.
+
+image::ipython/ex-latex-03.png[link="ipython/ex-latex-03.png"]
+
+
+Using a Notebook Server on a Remote Machine on a Local Machine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://coderwall.com/p/ohk6cg[+https://coderwall.com/p/ohk6cg+]
+
+Enter the following on the remote machine +barataria+:
+
+-----
+/opt/anaconda/bin/ipython notebook --no-browser --port=8889
+-----
+
+Create an SSH tunnel on your local machine:
+
+-----
+ssh -N -f -L localhost:8888:localhost:8889 baum@barataria.tamu.edu
+-----
+
+Open a browser on your machine and type the following into the address bar:
+
+-----
+localhost:8888
+-----
+
+and a tab or window will open to the remote notebook server.
+
+To kill the SSH tunnel, search for it via:
+
+-----
+ps aux | grep localhost:8889
+-----
+
+and kill the process in the usual way.
+
+The server on +barataria can be killed with +ctrl-c ctrl-c+.
+
+
+
+
+
+
+

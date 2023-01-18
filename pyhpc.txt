@@ -1,0 +1,539 @@
+
+= Python HPC
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Charm4Py
+
+https://github.com/UIUC-PPL/charm4py[`https://github.com/UIUC-PPL/charm4py`]
+
+"Charm4py (Charm++ for Python -formerly CharmPy-) is a distributed computing and parallel programming framework for Python, for the productive development of fast, parallel and scalable applications. It is built on top of Charm++, a C++ adaptive runtime system that has seen extensive use in the scientific and high-performance computing (HPC) communities across many disciplines, and has been used to develop applications that run on a wide range of devices: from small multi-core devices up to the largest supercomputers."
+
+=== Charm++
+
+https://github.com/UIUC-PPL/charm[`https://github.com/UIUC-PPL/charm`]
+
+"Charm++ is a message-passing parallel language and runtime system. It is implemented as a set of libraries for C++, is efficient, and is portable to a wide variety of parallel machines. Source code is provided, and non-commercial use is free."
+
+== CuPy
+
+https://cupy.dev/[`https://cupy.dev/`]
+
+"CuPy is an open-source array library accelerated with NVIDIA CUDA. CuPy provides GPU accelerated computing with Python. CuPy uses CUDA-related libraries including cuBLAS, cuDNN, cuRand, cuSolver, cuSPARSE, cuFFT and NCCL to make full use of the GPU architecture."
+
+== Cython
+
+https://cython.readthedocs.io/en/latest/[`https://cython.readthedocs.io/en/latest/`]
+
+https://cython.org/[`https://cython.org/`]
+
+"Cython is a programming language that makes writing C extensions for the Python language as easy as Python itself. It aims to become a superset of the [Python] language which gives it high-level, object-oriented, functional, and dynamic programming. Its main feature on top of these is support for optional static type declarations as part of the language. The source code gets translated into optimized C/C++ code and compiled as Python extension modules. This allows for both very fast program execution and tight integration with external C libraries, while keeping up the high programmer productivity for which the Python language is well known."
+
+== dask
+
+https://dask.org/[`https://dask.org/`]
+
+https://twitter.com/dask_dev[`https://twitter.com/dask_dev`]
+
+https://docs.dask.org/en/latest/[`https://docs.dask.org/en/latest/`]
+
+https://github.com/dask/dask[`https://github.com/dask/dask`]
+
+https://github.com/dask/dask-examples[`https://github.com/dask/dask-examples`]
+
+*SciPy 2020 Tutorial* - https://www.youtube.com/watch?v=EybGGLbLipI[`https://www.youtube.com/watch?v=EybGGLbLipI`]
+
+* *Tutorial Source Code* - https://github.com/dask/dask-tutorial[`https://github.com/dask/dask-tutorial`]
+
+*High Throughput Computing With Dask* - https://www.cecam.org/workshop-details/1022[`https://www.cecam.org/workshop-details/1022`]
+
+"Dask is a flexible library for parallel computing in Python.
+
+Dask is composed of two parts:
+
+* Dynamic task scheduling optimized for computation. This is similar to Airflow, Luigi, Celery, or Make, but optimized for interactive computational workloads.
+* “Big Data” collections like parallel arrays, dataframes, and lists that extend common interfaces like NumPy, Pandas, or Python iterators to larger-than-memory or distributed environments. These parallel collections run on top of dynamic task schedulers."
+
+The capabilities include:
+
+* Provides parallelized NumPy array and Pandas DataFrame objects
+* Provides a task scheduling interface for more custom workloads and integration with other projects.
+* Enables distributed computing in pure Python with access to the PyData stack.
+* Operates with low overhead, low latency, and minimal serialization necessary for fast numerical algorithms
+* Runs resiliently on clusters with 1000s of cores
+* Trivial to set up and run on a laptop in a single process
+* Designed with interactive computing in mind, it provides rapid feedback and diagnostics to aid humans
+
+=== Dask.distributed
+
+https://github.com/aamirshafi/distributed[`https://github.com/aamirshafi/distributed`]
+
+https://distributed.dask.org/en/latest/[`https://distributed.dask.org/en/latest/`]
+
+"Dask.distributed is a lightweight library for distributed computing in Python. It extends both the concurrent.futures and dask APIs to moderate sized clusters.
+
+Dask.distributed is a centrally managed, distributed, dynamic task scheduler. The central dask-scheduler process coordinates the actions of several dask-worker processes spread across multiple machines and the concurrent requests of several clients.
+
+Users interact by connecting a local Python session to the scheduler and submitting work, either by individual calls to the simple interface client.submit(function, *args, **kwargs) or by using the large data collections and parallel algorithms of the parent dask library. The collections in the dask library like dask.array and dask.dataframe provide easy access to sophisticated algorithms and familiar APIs like NumPy and Pandas, while the simple client.submit interface provides users with custom control when they want to break out of canned “big data” abstractions and submit fully custom workloads."
+
+=== Dask Jupyterlab Extension
+
+https://github.com/dask/dask-labextension[`https://github.com/dask/dask-labextension`]
+
+"This package provides a JupyterLab extension to manage Dask clusters, as well as embed Dask's dashboard plots directly into JupyterLab panes."
+
+=== Dask with xarray
+
+http://xarray.pydata.org/en/stable/dask.html[`http://xarray.pydata.org/en/stable/dask.html`]
+
+"xarray integrates with Dask to support parallel computations and streaming computation on datasets that don’t fit into memory. Currently, Dask is an entirely optional feature for xarray. However, the benefits of using Dask are sufficiently strong that Dask may become a required dependency in a future version of xarray."
+
+=== MPI4Dask
+
+https://arxiv.org/abs/2101.08878[`https://arxiv.org/abs/2101.08878`]
+
+"MPI4Dask exploits mpi4py over MVAPICH2-GDR, which is a GPU-aware implementation of the Message Passing Interface (MPI) standard. MPI4Dask provides point-to-point asynchronous I/O communication coroutines, which are non-blocking concurrent operations defined using the async/await keywords from the Python's asyncio framework."
+
+==== MPAPICH2-GDR
+
+https://mvapich.cse.ohio-state.edu/features/#mv2gdr[`https://mvapich.cse.ohio-state.edu/features/#mv2gdr`]
+
+"MVAPICH2-GDR 2.3.5 derives from MVAPICH2 2.3.5, which is an MPI-3 implementation based on MPICH ADI3 layer.
+All the features available with the OFA-IB-CH3 channel of MVAPICH2 2.3.5 are available with this release and incorporates designs that take advantage of the GPUDirect RDMA (GDR) technology for inter-node data movement on NVIDIA GPUs clusters with Mellanox InfiniBand interconnect. MVAPICH2-GDR 2.3.5 also adds support for AMD GPUs via Radeon Open Compute (ROCm) software stack and exploits ROCmRDMA technology for direct communication between AMD GPUs and Mellanox InfiniBand adapters. It also provides support for OpenPower and NVLink, efficient intra-node CUDA-Aware unified memory communication and support for RDMA_CM, RoCE-V1, and RoCE-V2."
+
+===== MVAPICH2
+
+https://mvapich.cse.ohio-state.edu/[`https://mvapich.cse.ohio-state.edu/`]
+
+"The MVAPICH2 software, based on MPI 3.1 standard, delivers the best performance, scalability and fault tolerance for high-end computing systems and servers using InfiniBand, Omni-Path, Ethernet/iWARP, and RoCE networking technologies."
+
+== Disco
+
+https://github.com/discoproject/disco/[`https://github.com/discoproject/disco/`]
+
+http://discoproject.org/[`http://discoproject.org/`]
+
+"Disco is a distributed map-reduce and big-data framework. Like the original framework, which was publicized by Google, Disco supports parallel computations over large data sets on an unreliable cluster of computers. This makes it a perfect tool for analyzing and processing large datasets without having to bother about difficult technical questions related to distributed computing, such as communication protocols, load balancing, locking, job scheduling or fault tolerance, all of which are taken care by Disco."
+
+== mpi4py
+
+https://mpi4py.readthedocs.io/en/stable/[`https://mpi4py.readthedocs.io/en/stable/`]
+
+https://bitbucket.org/mpi4py/mpi4py[`https://bitbucket.org/mpi4py/mpi4py`]
+
+*Parallel Programming with MPI for Python* - https://rabernat.github.io/research_computing/parallel-programming-with-mpi-for-python.html[`https://rabernat.github.io/research_computing/parallel-programming-with-mpi-for-python.html`]
+
+*Parallel Python with mpi4py* - https://info.gwdg.de/wiki/doku.php?id=wiki:hpc:mpi4py[`https://info.gwdg.de/wiki/doku.php?id=wiki:hpc:mpi4py`]
+
+"MPI for Python provides bindings of the Message Passing Interface (MPI) standard for the Python programming language, allowing any Python program to exploit multiple processors.
+
+This package is constructed on top of the MPI-1/2/3 specifications and provides an object oriented interface which resembles the MPI-2 C++ bindings. It supports point-to-point (sends, receives) and collective (broadcasts, scatters, gathers) communications of any picklable Python object, as well as optimized communications of Python object exposing the single-segment buffer interface (NumPy arrays, builtin bytes/string/array objects)."
+
+=== BigMPI4py
+
+https://www.biorxiv.org/content/10.1101/517441v2.full[`https://www.biorxiv.org/content/10.1101/517441v2.full`]
+
+https://gitlab.com/alexmascension/bigmpi4py[`https://gitlab.com/alexmascension/bigmpi4py`]
+
+"Big Data analysis is a discipline with a growing number of areas where huge amounts of data is extracted and analyzed. Parallelization in Python integrates Message Passing Interface via mpi4py module. Since mpi4py does not support parallelization of objects greater than 231 bytes, we developed BigMPI4py, a Python module that wraps mpi4py, supporting object sizes beyond this boundary. BigMPI4py automatically determines the optimal object distribution strategy, and also uses vectorized methods, achieving higher parallelization efficiency."
+
+=== Software Using mpi4py
+
+==== abICS
+
+https://issp-center-dev.github.io/abICS/docs/sphinx/en/build/html/index.html[`https://issp-center-dev.github.io/abICS/docs/sphinx/en/build/html/index.html`]
+
+"abICS is a software framework for performing configurational sampling in disordered systems, with a specific emphasis on multi-component solid state systems such as metal and oxide alloys. It couples parallel sampling methods with external codes that perform structural relaxation and energy calculations. We provide interfaces for Quantum Espresso, VASP, and aenet, with planned support for OpenMX in the near future."
+
+==== ASE
+
+https://wiki.fysik.dtu.dk/ase/about.html[`https://wiki.fysik.dtu.dk/ase/about.html`]
+
+"ASE is an Atomic Simulation Environment written in the Python programming language with the aim of setting up, steering, and analyzing atomistic simulations."
+
+==== DistArray
+
+http://docs.enthought.com/distarray/[`http://docs.enthought.com/distarray/`]
+
+https://distributed-array-protocol.readthedocs.io/en/rel-0.10.0/[`https://distributed-array-protocol.readthedocs.io/en/rel-0.10.0/`]
+
+"DistArray provides general multidimensional NumPy-like distributed arrays to Python. It intends to bring the strengths of NumPy to data-parallel high-performance computing. DistArray has a similar API to NumPy."
+
+==== ESMPy
+
+https://earthsystemmodeling.org/esmpy/[`https://earthsystemmodeling.org/esmpy/`]
+
+https://github.com/nawendt/esmpy-tutorial[`https://github.com/nawendt/esmpy-tutorial`]
+
+"ESMPy is a Python interface to the Earth System Modeling Framework (ESMF) regridding utility.
+It provides a Grid to represent single-tile logically rectangular coordinate data, a Mesh for unstructured coordinates, and a LocStream for collections of unconnected points like observational data streams. ESMPy supports bilinear, nearest neighbor, higher order patch recovery, first-order conservative and second-order conservative regridding. There is also an option to ignore unmapped destination points and mask out points on either the source or destination. Regridding on the sphere takes place in 3D Cartesian space, so the pole problem is not an issue as it commonly is with some Earth system grid remapping software. Grid and Mesh objects can be created in 2D or 3D space, and 3D conservative regridding is fully supported."
+
+===== ESMF
+
+https://earthsystemmodeling.org/regrid/[`https://earthsystemmodeling.org/regrid/`]
+
+https://earthsystemmodeling.org/[`https://earthsystemmodeling.org/`]
+
+"The Earth System Modeling Framework (ESMF) is a suite of software tools for developing high-performance, multi-component Earth science modeling applications. Such applications may include a few or dozens of components representing atmospheric, oceanic, terrestrial, or other physical domains, and their constituent processes (dynamical, chemical, biological, etc.). Often these components are developed by different groups independently, and must be “coupled” together using software that transfers and transforms data among the components in order to form functional simulations."
+
+==== FEniCS
+
+https://fenicsproject.org/[`https://fenicsproject.org/`]
+
+"FEniCS is a popular open-source (LGPLv3) computing platform for solving partial differential equations (PDEs). FEniCS enables users to quickly translate scientific models into efficient finite element code. With the high-level Python and C++ interfaces to FEniCS, it is easy to get started, but FEniCS offers also powerful capabilities for more experienced programmers. FEniCS runs on a multitude of platforms ranging from laptops to high-performance clusters."
+
+==== FiPy
+
+https://www.ctcms.nist.gov/fipy/[`https://www.ctcms.nist.gov/fipy/`]
+
+https://github.com/usnistgov/fipy[`https://github.com/usnistgov/fipy`]
+
+"FiPy is an object oriented, partial differential equation (PDE) solver, written in Python, based on a standard finite volume (FV) approach.
+The FiPy framework includes terms for transient diffusion, convection and standard sources, enabling the solution of arbitrary combinations of coupled elliptic, hyperbolic and parabolic PDEs."
+
+==== GeoBIPy
+
+https://usgs.github.io/geobipy/index.html[`https://usgs.github.io/geobipy/index.html`]
+
+"This package uses a Bayesian formulation and Markov chain Monte Carlo sampling methods to derive posterior distributions of subsurface and measured data properties. The current implementation is applied to time and frequency domain electromagnetic data. Application outside of these data types is in development."
+
+==== GROMACS
+
+https://www.gromacs.org/[`https://www.gromacs.org/`]
+
+https://manual.gromacs.org/[`https://manual.gromacs.org/`]
+
+"GROMACS is a versatile package to perform molecular dynamics, i.e. simulate the Newtonian equations of motion for systems with hundreds to millions of particles.
+
+It is primarily designed for biochemical molecules like proteins, lipids and nucleic acids that have a lot of complicated bonded interactions, but since GROMACS is extremely fast at calculating the nonbonded interactions (that usually dominate simulations) many groups are also using it for research on non-biological systems, e.g. polymers."
+
+==== ILAMB
+
+https://www.ilamb.org/doc/index.html[`https://www.ilamb.org/doc/index.html`]
+
+"The International Land Model Benchmarking (ILAMB) project is a model-data intercomparison and integration project designed to improve the performance of land models and, in parallel, improve the design of new measurement campaigns to reduce uncertainties associated with key land surface processes."
+
+==== Korali
+
+https://www.cse-lab.ethz.ch/korali/[`https://www.cse-lab.ethz.ch/korali/`]
+
+https://www.cse-lab.ethz.ch/korali/docs/index.html[`https://www.cse-lab.ethz.ch/korali/docs/index.html`]
+
+"Korali is a high-performance framework for uncertainty quantification, optimization, and deep reinforcement learning. Its engine provides support for large-scale HPC systems and a multi-language interface compatible with distributed computational models."
+
+==== Mantid
+
+https://www.mantidproject.org/Main_Page[`https://www.mantidproject.org/Main_Page`]
+
+"The Mantid project provides a framework that supports high-performance computing and visualisation of materials science data.
+Mantid has been created to manipulate and analyse neutron scattering and muon spectroscopy data, but could be applied to many other techniques."
+
+==== mpi4py-fft
+
+https://mpi4py-fft.readthedocs.io/en/latest/[`https://mpi4py-fft.readthedocs.io/en/latest/`]
+
+"mpi4py-fft is a Python package for computing Fast Fourier Transforms (FFTs). Large arrays are distributed and communications are handled under the hood by MPI for Python (mpi4py). To distribute large arrays we are using a new and completely generic algorithm that allows for any index set of a multidimensional array to be distributed. We can distribute just one index (a slab decomposition), two index sets (pencil decomposition) or even more for higher-dimensional arrays.
+
+In mpi4py-fft there is also included a Python interface to the FFTW library. This interface can be used without MPI, much like pyfftw, and even for real-to-real transforms, like discrete cosine or sine transforms."
+
+==== NRP
+
+https://neurorobotics.net/[`https://neurorobotics.net/`]
+
+"The NRP is an integrative simulation framework that offers fully customizable setups for closed-loop embodied simulation of virtual agents. It offers several template environments, as well as a ready-to-use model library that comprises rigid-body robots, compliant tendon-driven robots and musculoskeletal models. With the NRP you will be able to use multiple neural simulators and AI frameworks (e.g. NEST, TensorFlow, Nengo) to implement a wide range of brain simulations (e.g. spiking neural networks) and controllers."
+
+==== OCGIS
+
+https://github.com/NCPP/ocgis[`https://github.com/NCPP/ocgis`]
+
+"OpenClimateGIS (OCGIS) is a Python package designed for geospatial manipulation, subsetting, computation, and translation of spatiotemporal datasets stored in local NetCDF files or files served through THREDDS data servers. OpenClimateGIS has a straightforward, request-based API that is simple to use yet complex enough to perform a variety of computational tasks. The software is built entirely from open source packages."
+
+==== OpenMC
+
+https://openmc.org/[`https://openmc.org/`]
+
+https://docs.openmc.org/en/stable/index.html[`https://docs.openmc.org/en/stable/index.html`]
+
+"OpenMC is a community-developed Monte Carlo neutron and photon transport simulation code. It is capable of performing fixed source, k-eigenvalue, and subcritical multiplication calculations on models built using either a constructive solid geometry or CAD representation. OpenMC supports both continuous-energy and multigroup transport. The continuous-energy particle interaction data is based on a native HDF5 format that can be generated from ACE files produced by NJOY. Parallelism is enabled via a hybrid MPI and OpenMP programming model.
+
+One of the unique features of OpenMC is its rich, extensible Python and C/C++ programming interfaces that enable programming pre- and post-processing, multigroup cross section generation, workflow automation, depletion calculations, multiphysics coupling, and the visualization of geometry and tally results."
+
+==== PyFR
+
+http://www.pyfr.org/index.php[`http://www.pyfr.org/index.php`]
+
+"PyFR is an open-source Python based framework for solving advection-diffusion type problems on streaming architectures using the Flux Reconstruction approach of Huynh. The framework is designed to solve a range of governing systems on mixed unstructured grids containing various element types. It is also designed to target a range of hardware platforms via use of an in-built domain specific language derived from the Mako templating engine."
+
+==== PyLAMMPS
+
+https://lammps.sandia.gov/doc/Howto_pylammps.html[`https://lammps.sandia.gov/doc/Howto_pylammps.html`]
+
+"PyLammps is a Python wrapper class for LAMMPS which can be created on its own or use an existing lammps Python object. It creates a simpler, more “pythonic” interface to common LAMMPS functionality."
+
+===== LAMMPS
+
+https://lammps.sandia.gov/[`https://lammps.sandia.gov/`]
+
+"LAMMPS is a classical molecular dynamics code with a focus on materials modeling. It's an acronym for Large-scale Atomic/Molecular Massively Parallel Simulator.
+
+LAMMPS has potentials for solid-state materials (metals, semiconductors) and soft matter (biomolecules, polymers) and coarse-grained or mesoscopic systems. It can be used to model atoms or, more generically, as a parallel particle simulator at the atomic, meso, or continuum scale.
+
+LAMMPS runs on single processors or in parallel using message-passing techniques and a spatial-decomposition of the simulation domain. Many of its models have versions that provide accelerated performance on CPUs, GPUs, and Intel Xeon Phis. The code is designed to be easy to modify or extend with new functionality."
+
+==== MACH-Aero
+
+https://github.com/mdolab/MACH-Aero[`https://github.com/mdolab/MACH-Aero`]
+
+https://mdolab-mach-aero.readthedocs-hosted.com/en/latest/index.html[`https://mdolab-mach-aero.readthedocs-hosted.com/en/latest/index.html`]
+
+"MACH-Aero is a framework for performing aerodynamic shape optimization."
+
+==== OpenMDAO
+
+http://openmdao.org/twodocs/versions/latest/index.html[`http://openmdao.org/twodocs/versions/latest/index.html`]
+
+"OpenMDAO is an open-source high-performance computing platform for systems analysis and multidisciplinary optimization, written in Python. It enables you to decompose your models, making them easier to build and maintain, while still solving them in a tightly coupled manner with efficient parallel numerical methods.
+
+The OpenMDAO project is primarily focused on supporting gradient based optimization with analytic derivatives to allow you to explore large design spaces with hundreds or thousands of design variables, but the framework also has a number of parallel computing features that can work with gradient-free optimization, mixed-integer nonlinear programming, and traditional design space exploration."
+
+==== Paraview
+
+https://www.paraview.org/[`https://www.paraview.org/`]
+
+"ParaView is an open-source, multi-platform data analysis and visualization application. ParaView users can quickly build visualizations to analyze their data using qualitative and quantitative techniques. The data exploration can be done interactively in 3D or programmatically using ParaView’s batch processing capabilities.
+
+ParaView was developed to analyze extremely large datasets using distributed memory computing resources. It can be run on supercomputers to analyze datasets of petascale size as well as on laptops for smaller data."
+
+==== petsc4py
+
+https://gitlab.com/petsc/petsc4py[`https://gitlab.com/petsc/petsc4py`]
+
+"Python bindings for PETSc."
+
+===== PETSc
+
+https://www.mcs.anl.gov/petsc/[`https://www.mcs.anl.gov/petsc/`]
+
+https://gitlab.com/petsc/petsc[`https://gitlab.com/petsc/petsc`]
+
+"PETSc, pronounced PET-see (the S is silent), is a suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It supports MPI, and GPUs through CUDA or OpenCL, as well as hybrid MPI-GPU parallelism."
+
+==== pyOpt
+
+http://www.pyopt.org/index.html[`http://www.pyopt.org/index.html`]
+
+"An object-oriented framework for formulating and solving optimization problems in an efficient, reusable and portable manner. The goal is to provide an easy-to-use optimization framework with access to a variety of integrated optimization algorithms which are accessible through a common interface."
+
+==== PyOPUS
+
+http://fides.fe.uni-lj.si/pyopus/[`http://fides.fe.uni-lj.si/pyopus/`]
+
+http://fides.fe.uni-lj.si/pyopus/download/0.9/docsrc/_build/html/index.html[`http://fides.fe.uni-lj.si/pyopus/download/0.9/docsrc/_build/html/index.html`]
+
+"PyOPUS is a library for simulation-based optimization of arbitrary systems. It was developed with circuit optimization in mind. The library is the basis for the PyOPUS GUI that makes it possible to setup design automation tasks with ease. In the GUI you can also view the the results and plot the waveforms generated by the simulator.
+
+PyOPUS provides several optimization algorithms (Coordinate Search, Hooke-Jeeves, Nelder-Mead Simplex, Successive Approximation Simplex, PSADE (global), MADS, ...). Optimization algorithms can be fitted with plugins that are triggered at every function evaluation and have full access to the internals of the optimization algorithm."
+
+==== SfePy
+
+https://sfepy.org/doc-devel/index.html[`https://sfepy.org/doc-devel/index.html`]
+
+"SfePy is a software for solving systems of coupled partial differential equations (PDEs) by the finite element method in 1D, 2D and 3D. It can be viewed both as black-box PDE solver, and as a Python package which can be used for building custom applications. The word “simple” means that complex FEM problems can be coded very easily and rapidly."
+
+==== Spinal Cord Toolbox
+
+https://spinalcordtoolbox.com/en/stable/overview/introduction.html[`https://spinalcordtoolbox.com/en/stable/overview/introduction.html`]
+
+"SCT is a comprehensive, free and open-source software dedicated to the processing and analysis of spinal cord MRI data. SCT builds on previously-validated methods and includes state-of-the-art MRI templates and atlases of the spinal cord, algorithms to segment and register new data to the templates, and motion correction methods for diffusion and functional time series. SCT is tailored towards standardization and automation of the processing pipeline, versatility, modularity, and it follows guidelines of software development and distribution."
+
+==== Underworld
+
+https://www.underworldcode.org/[`https://www.underworldcode.org/`]
+
+https://github.com/underworldcode/underworld2[`https://github.com/underworldcode/underworld2`]
+
+"Underworld 2 is a Python API (Application Programming Interface) which provides functionality for the modelling of geodynamics processes, and is designed to work (almost) seamlessly across PC, cloud and HPC infrastructure. Primarily the API consists of a set of Python classes from which numerical geodynamics models may be constructed. The API also provides the tools required for inline analysis and data management. For scalability across multiprocessor platforms, MPI (Message Passing Interface) is leveraged, and for performant operation all heavy computations are executed within a statically typed layer."
+
+==== VeloxChem
+
+https://docs.veloxchem.org/index.html[`https://docs.veloxchem.org/index.html`]
+
+"VeloxChem is a python-based open source quantum chemistry software developed for computing molecular properties and a variety of spectroscopies from response theory."
+
+==== WESTPA
+
+https://westpa.github.io/westpa/[`https://westpa.github.io/westpa/`]
+
+"WESTPA (The Weighted Ensemble Simulation Toolkit with Parallelization and Analysis) is a high-performance Python framework for carrying out extended-timescale simulations of rare events with rigorous kinetics."
+
+==== Yade
+
+https://yade-dem.org/doc/index.html[`https://yade-dem.org/doc/index.html`]
+
+"Yade is an extensible open-source framework for discrete numerical models, focused on Discrete Element Method. The computation parts are written in c++ using flexible object model, allowing independent implementation of new algorithms and interfaces. Python is used for rapid and concise scene construction, simulation control, postprocessing and debugging."
+
+== Numba
+
+https://numba.pydata.org/[`https://numba.pydata.org/`]
+
+"Numba is an open source JIT compiler that translates a subset of Python and NumPy code into fast machine code.
+
+Numba translates Python functions to optimized machine code at runtime using the industry-standard LLVM compiler library. Numba-compiled numerical algorithms in Python can approach the speeds of C or FORTRAN.
+
+You don't need to replace the Python interpreter, run a separate compilation step, or even have a C/C++ compiler installed. Just apply one of the Numba decorators to your Python function, and Numba does the rest."
+
+== Parallel Python
+
+https://www.parallelpython.com/[`https://www.parallelpython.com/`]
+
+"Parallel Python is a python module which provides mechanism for parallel execution of python code on SMP (systems with multiple processors or cores) and clusters (computers connected via network)."
+
+== Phylanx
+
+https://stellar-group.github.io/phylanx/docs/sphinx/branches/master/html/index.html[`https://stellar-group.github.io/phylanx/docs/sphinx/branches/master/html/index.html`]
+
+https://drive.google.com/file/d/1DmVOr94vju1-amHn2cn981LCstpE4GCy/view[`https://drive.google.com/file/d/1DmVOr94vju1-amHn2cn981LCstpE4GCy/view`]
+
+"Phylanx is a distributed Machine Learning platform that aims to provide users a high level, Python interface which delivers HPC performance. At its core Phylanx is a general purpose system for computing large distributed arrays often used on applied statistics problems. Phylanx builds upon other solutions such as Spartan, Theano, and Tensorflow in an effort to generalize array operations specifically to support distributed computing. The system will decompose array computations into a predefined set of parallel operations and employ algorithms which optimize execution and data layout from of a user provided expression graph. Using hints from the user as well as application logic an expression graph is created which is then passed to HPX, a distributed C++ runtime system used to schedule and execute the work on commodity systems."
+
+== Pyccel
+
+https://github.com/pyccel/pyccel[`https://github.com/pyccel/pyccel`]
+
+https://pypi.org/project/pyccel/[`https://pypi.org/project/pyccel/`]
+
+"Pyccel stands for Python extension language using accelerators.
+
+The aim of Pyccel is to provide a simple way to generate automatically, parallel low level code. The main uses would be:
+
+* Convert a Python code (or project) into a Fortran or C code.
+* Accelerate Python functions by converting them to Fortran or C functions.
+
+Pyccel can be viewed as:
+
+* Python-to-Fortran/C converter
+* a compiler for a Domain Specific Language with Python syntax
+
+Pyccel comes with a selection of extensions allowing you to convert calls to some specific python packages to Fortran/C. The following packages will be covered (partially):
+
+* numpy
+* scipy
+* mpi4py"
+
+== PyCompSs
+
+https://pypi.org/project/pycompss/[`https://pypi.org/project/pycompss/`]
+
+"PyCOMPSs is the Python binding of COMPSs, a programming model and runtime which aims to ease the development of parallel applications for distributed infrastructures, such as Clusters and Clouds."
+
+=== COMPSs
+
+https://www.bsc.es/research-and-development/software-and-apps/software-list/comp-superscalar/[`https://www.bsc.es/research-and-development/software-and-apps/software-list/comp-superscalar/`]]
+
+https://github.com/bsc-wdc/compss[`https://github.com/bsc-wdc/compss`]
+
+"The COMP Superscalar (COMPSs) framework is mainly composed of a task-based programming model which aims to ease the development of parallel applications for distributed infrastructures, such as Clusters, Clouds and containerized platforms, and a runtime system that exploits the inherent parallelism of applications at execution time. The framework is complemented by a set of tools for facilitating the development, execution monitoring and post-mortem performance analysis."
+
+=== PyCOMPSs AutoParallel
+
+https://github.com/cristianrcv/pycompss-autoparallel[`https://github.com/cristianrcv/pycompss-autoparallel`]
+
+https://journals.sagepub.com/doi/full/10.1177/1094342020937050[`https://journals.sagepub.com/doi/full/10.1177/1094342020937050`]
+
+"A Python module to automatically find an appropriate task-based parallelisation of affine loop nests and execute them in parallel in a distributed computing infrastructure. It is based on sequential programming and contains one single annotation (in the form of a Python decorator) so that anyone with intermediate-level programming skills can scale up an application to hundreds of cores.
+
+AutoParallel is capable of automatically generating task-based workflows from sequential Python code while achieving the same performances than manually taskified versions of established state-of-the-art algorithms (i.e., Cholesky, LU, and QR decompositions). It is also  capable of automatically building data blocks to increase the tasks’ granularity; freeing the user from creating the data chunks, and re-designing the algorithm."
+
+== pycos
+
+https://pycos.org/[`https://pycos.org/`]
+
+"pycos is a Python framework for concurrent, asynchronous, network / distributed programming and distributed / cloud computing, using very light weight computational units called tasks. pycos tasks are created with generator functions similar to the way threads are created with functions using Python’s threading module."
+
+=== dispy
+
+http://dispy.sourceforge.net/[`http://dispy.sourceforge.net/`]
+
+"dispy is a comprehensive, yet easy to use framework for creating and using compute clusters to execute computations in parallel across multiple processors in a single machine (SMP), among many machines in a cluster, grid or cloud. dispy is well suited for data parallel (SIMD) paradigm where a computation is evaluated with different (large) datasets independently with no communication among computation tasks (except for computation tasks sending intermediate results to the client)."
+
+== PyPy
+
+https://www.pypy.org/[`https://www.pypy.org/`]
+
+"PyPy is a replacement for CPython. It is built using the RPython language that was co-developed with it. The main reason to use it instead of CPython is speed: it runs generally faster.
+
+PyPy implements Python 2.7.13 and 3.6.9. It supports all of the core language, passing the Python 2.7 test suite and most of the 3.6 test suite (with minor modifications) It supports most of the commonly used Python standard library modules."
+
+== PySpark
+
+https://spark.apache.org/docs/0.9.0/python-programming-guide.html[`https://spark.apache.org/docs/0.9.0/python-programming-guide.html`]
+
+"The Spark Python API (PySpark) exposes the Spark programming model to Python. To learn the basics of Spark, we recommend reading through the Scala programming guide first; it should be easy to follow even if you don’t know Scala."
+
+=== Spark
+
+https://spark.apache.org/docs/0.9.0/index.html[`https://spark.apache.org/docs/0.9.0/index.html`]
+
+"Apache Spark is a fast and general-purpose cluster computing system. It provides high-level APIs in Scala, Java, and Python that make parallel jobs easy to write, and an optimized engine that supports general computation graphs. It also supports a rich set of higher-level tools including Shark (Hive on Spark), MLlib for machine learning, GraphX for graph processing, and Spark Streaming."
+
+== Pyston
+
+https://www.pyston.org/[`https://www.pyston.org/`]
+
+https://blog.pyston.org/[`https://blog.pyston.org/`]
+
+"Numba translates Python functions to optimized machine code at runtime using the industry-standard LLVM compiler library. Numba-compiled numerical algorithms in Python can approach the speeds of C or FORTRAN.
+
+You don't need to replace the Python interpreter, run a separate compilation step, or even have a C/C++ compiler installed. Just apply one of the Numba decorators to your Python function, and Numba does the rest."
+
+== Pythran
+
+https://pythran.readthedocs.io/en/latest/[`https://pythran.readthedocs.io/en/latest/`]
+
+"Pythran is an ahead of time compiler for a subset of the Python language, with a focus on scientific computing. It takes a Python module annotated with a few interface description and turns it into a native Python module with the same interface, but (hopefully) faster.
+
+It is meant to efficiently compile scientific programs, and takes advantage of multi-cores and SIMD instruction units."
+
+== SCOOP
+
+https://github.com/soravux/scoop[`https://github.com/soravux/scoop`]
+
+https://scoop.readthedocs.io/en/0.7/[`https://scoop.readthedocs.io/en/0.7/`]
+
+"SCOOP (Scalable COncurrent Operations in Python) is a distributed task module allowing concurrent parallel programming on various environments, from heterogeneous grids to supercomputers."
+
+== StarCluster
+
+http://star.mit.edu/cluster/[`http://star.mit.edu/cluster/`]
+
+" StarCluster is an open source cluster-computing toolkit for Amazon’s Elastic Compute Cloud (EC2) released under the LGPL license.
+
+StarCluster has been designed to automate and simplify the process of building, configuring, and managing clusters of virtual machines on Amazon’s EC2 cloud. StarCluster allows anyone to easily create a cluster computing environment in the cloud suited for distributed and parallel computing applications and systems."
+
+== ucx-py
+
+https://github.com/rapidsai/ucx-py[`https://github.com/rapidsai/ucx-py`]
+
+https://ucx-py.readthedocs.io/en/latest/[`https://ucx-py.readthedocs.io/en/latest/`]
+
+"UCX-Py is the Python interface for UCX, a low-level high-performance networking library. UCX and UCX-Py supports several transport methods including InfiniBand and NVLink while still using traditional networking protocols like TCP."
+
+=== UCX
+
+https://github.com/openucx/ucx[`https://github.com/openucx/ucx`]
+
+"Unified Communication X (UCX) provides an optimized communication layer for Message Passing (MPI), PGAS/OpenSHMEM libraries and RPC/data-centric applications.
+
+UCX utilizes high-speed networks for inter-node communication, and shared memory mechanisms for efficient intra-node communication."
+
+
+
+
+
+
+

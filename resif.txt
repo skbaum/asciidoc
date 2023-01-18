@@ -1,0 +1,229 @@
+RESIF Notes
+===========
+Steven K. Baum
+0.1, July 26, 2021:  It begins.
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+
+== Overview
+
+== Installation
+
+This is the entirety of the installation procedure as outlined at:
+
+https://github.com/ULHPC/sw[`https://github.com/ULHPC/sw`]
+
+=== Cloning the Repository
+
+-----
+mkdir -p ~/git/github.com/ULHPC
+cd ~/git/github.com/ULHPC
+git clone https://github.com/ULHPC/sw.git
+
+Cloning into 'sw'...
+remote: Enumerating objects: 265, done.
+remote: Counting objects: 100% (265/265), done.
+remote: Compressing objects: 100% (134/134), done.
+remote: Total 265 (delta 104), reused 249 (delta 89), pack-reused 0
+Receiving objects: 100% (265/265), 3.14 MiB | 8.61 MiB/s, done.
+Resolving deltas: 100% (104/104), done.
+
+cd sw
+ls -l
+
+total 44
+drwxrwxr-x. 1 baum baum    24 Jul 26 09:38 apps
+drwxrwxr-x. 1 baum baum   124 Jul 26 09:38 config
+drwxrwxr-x. 1 baum baum   416 Jul 26 09:38 docs
+drwxrwxr-x. 1 baum baum    44 Jul 26 09:38 easyconfigs
+drwxrwxr-x. 1 baum baum    16 Jul 26 09:38 hooks
+drwxrwxr-x. 1 baum baum    38 Jul 26 09:38 logs
+-rw-rw-r--. 1 baum baum 18305 Jul 26 09:38 Makefile
+-rw-rw-r--. 1 baum baum   936 Jul 26 09:38 mkdocs.yml
+-rw-rw-r--. 1 baum baum 12099 Jul 26 09:38 README.md
+-rw-rw-r--. 1 baum baum   123 Jul 26 09:38 requirements.txt
+drwxrwxr-x. 1 baum baum   554 Jul 26 09:38 scripts
+drwxrwxr-x. 1 baum baum    96 Jul 26 09:38 settings
+drwxrwxr-x. 1 baum baum     8 Jul 26 09:38 slides
+drwxrwxr-x. 1 baum baum    20 Jul 26 09:38 sources
+-rw-rw-r--. 1 baum baum    10 Jul 26 09:38 VERSION
+-----
+
+=== SSH Cluster Key Authorization on Gitlab and Github
+
+=== Install and Configure LMod
+
+=== Create a Python Virtual Environment
+
+https://github.com/pyenv/pyenv/[`https://github.com/pyenv/pyenv/`]
+
+https://varrette.gforge.uni.lu/blog/2019/09/10/using-pyenv-virtualenv-direnv/[`https://varrette.gforge.uni.lu/blog/2019/09/10/using-pyenv-virtualenv-direnv/`]
+
+"You will have to create the resif3 virtual environment with Python 3 to use this repository."
+
+==== Install Pyenv from Github
+
+Check out pyenv where you want it installed.
+
+-----
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+-----
+
+Compile a bash extension to speed up Pyenv.
+
+-----
+cd ~/.pyenv && src/configure && make -C src
+-----
+
+==== Configure the Shell Environment
+
+Configure your shell environment for Pyenv. First,
+adjust the session-wide environment for your account.  For bash this entails:
+
+-----
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+echo 'eval "$(pyenv init --path)"' >> ~/.profile
+-----
+
+Next, add `pyenv` into your shell by running the output of `pyenv init -` to enable autocompletion
+and all subcommands.  For this this entails:
+
+-----
+echo 'source ~/.profile' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+-----
+
+Note:  I found that 'source ~/.profile' also needed to be add into `.bashrc`.
+
+==== Restart Login Sessions
+
+Restart your login session for the changes to take effect.
+
+==== Install Python Build Dependencies
+
+https://github.com/pyenv/pyenv/wiki#suggested-build-environment[`https://github.com/pyenv/pyenv/wiki#suggested-build-environment`]
+
+==== Install Python Versions
+
+Now you install Python version(s) into `$(pyenv root)/versions`.
+For example, to download and install Python 3.9.5 you would enter:
+
+-----
+pyenv install 3.9.5
+-----
+
+The `pyenv uninstall` command is used to remove a Python version.
+
+=== Install `pyenv-virtualenv` Plugin
+
+https://github.com/pyenv/pyenv-virtualenv[`https://github.com/pyenv/pyenv-virtualenv`]
+
+Check out `pyenv-virtualenv` into the `pyenv` plugin directory.
+
+Optionally add `pyenv virtualenv` to your shell to enable auto-activation of virtual environments.
+
+-----
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+-----
+
+Restart our shell to enable `pyenv-virtualenv`.
+
+-----
+exec "$SHELL"
+-----
+
+An example of usage is to create a `virtualenv` for the Python version used with `pyenv`
+by running `pyenv virtualenv` and specifying the Python version and the name of the
+`virtualenv` directory, e.g. for version `2.7.10`:
+
+-----
+pyenv virtualenv 2.7.10 my-virtual-env-2.7.10
+-----
+
+This creates a Python 2.7.10 `virtualenv` under `$(pyenv root)/versions` in the
+subdirectory `virtual-env-2.7.10`.
+
+-----
+make setup
+
+git fetch origin
+git branch --track production origin/production
+Branch 'production' set up to track remote branch 'production' from 'origin'.
+git config gitflow.branch.master     production
+git config gitflow.branch.develop    devel
+git config gitflow.prefix.feature    feature/
+git config gitflow.prefix.release    release/
+git config gitflow.prefix.hotfix     hotfix/
+git config gitflow.prefix.support    support/
+git config gitflow.prefix.versiontag "v"
+make update
+make[1]: Entering directory '/home/baum/git/github.com/ULHPC/sw'
+
+=> Pulling and updating the local branch 'devel'
+
+Already on 'devel'
+Your branch is up to date with 'origin/devel'.
+From https://github.com/ULHPC/sw
+ * branch            devel      -> FETCH_HEAD
+Already up to date.
+
+=> Pulling and updating the local branch 'production'
+
+Switched to branch 'production'
+Your branch is up to date with 'origin/production'.
+From https://github.com/ULHPC/sw
+ * branch            production -> FETCH_HEAD
+Already up to date.
+git checkout devel
+Switched to branch 'devel'
+Your branch is up to date with 'origin/devel'.
+=> updating (NOT upgrading) git submodule
+git submodule init
+Submodule '.submodules/Makefiles' (https://github.com/Falkor/Makefiles.git) registered for path '.submodules/Makefiles'
+git submodule update
+Cloning into '/home/baum/git/github.com/ULHPC/sw/.submodules/Makefiles'...
+Submodule path '.submodules/Makefiles': checked out '42333c7f1e58e8205c94a40ce4aa1074eb91e89f'
+make[1]: Leaving directory '/home/baum/git/github.com/ULHPC/sw'
+=> setup git-lfs
+make[1]: Entering directory '/home/baum/git/github.com/ULHPC/sw'
+git-lfs pull
+make[1]: Leaving directory '/home/baum/git/github.com/ULHPC/sw'
+make[1]: Entering directory '/home/baum/git/github.com/ULHPC/sw'
+=> setup XDG Base Directories
+mkdir -p /home/baum/.config
+mkdir -p /home/baum/.local/share
+mkdir -p /home/baum/.cache
+=> setup direnv -- see https://varrette.gforge.uni.lu/tutorials/pyenv.html
+mkdir -p /home/baum/.config/direnv
+ - creating /home/baum/.config/direnv/init.sh
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   559  100   559    0     0   3493      0 --:--:-- --:--:-- --:--:--  3515
+ - sample override of direnv-stdlib in /home/baum/.config/direnv/direnvrc
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  3842  100  3842    0     0  21829      0 --:--:-- --:--:-- --:--:-- 21829
+ - sample '.envrc' for your projects in  /home/baum/.config/direnv/envrc
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   891  100   891    0     0   4432      0 --:--:-- --:--:-- --:--:--  4455
+make[2]: Entering directory '/home/baum/git/github.com/ULHPC/sw'
+
+# Add the following to your favorite shell config (~/.bashrc or ~/.zshrc etc.)
+if [ -f "/home/baum/.config/direnv/init.sh" ]; then
+        . /home/baum/.config/direnv/init.sh
+fi
+
+make[2]: Nothing to be done for 'setup-shell-direnv'.
+make[2]: Leaving directory '/home/baum/git/github.com/ULHPC/sw'
+make[1]: Leaving directory '/home/baum/git/github.com/ULHPC/sw'
+-----
+
+
+
+

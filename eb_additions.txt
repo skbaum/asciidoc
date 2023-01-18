@@ -1,0 +1,339 @@
+
+= EasyBuild Extensions
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Introduction
+
+A list of locally developed easyconfig files not in the official EasyBuild GitHub repository.
+
+== New Modules
+
+=== Aesara
+
+https://github.com/aesara-devs/aesara[`https://github.com/aesara-devs/aesara`]
+
+https://aesara.readthedocs.io/en/latest/[`https://aesara.readthedocs.io/en/latest/`]
+
+=====
+Aesara is a Python library that allows one to define, optimize, and efficiently evaluate mathematical expressions involving multi-dimensional arrays.
+The features include:
+
+* A hackable, pure-Python codebase
+* Extensible graph framework suitable for rapid development of custom operators and symbolic optimizations
+* Implements an extensible graph transpilation framework that currently provides compilation via C, JAX, and Numba
+* Based on one of the most widely-used Python tensor libraries: Theano
+=====
+
+=== BAli-Phy
+
+https://github.com/bredelings/BAli-Phy[`https://github.com/bredelings/BAli-Phy`]
+
+=====
+Software that estimates multiple sequence alignments and evolutionary trees from DNA, amino acid, or codon sequences. It uses likelihood-based evolutionary models of substitutions and insertions and deletions to place gaps. 
+
+*Note*:  There are existing easyconfigs for this in the GitHub archive, but they download a binary and install it.
+There were `libc` issues with those that prompted the creation of an easyconfig that would instead build this
+from source.  Use the source, Luke.
+=====
+
+=== Bohrium
+
+https://bohrium.readthedocs.io/[`https://bohrium.readthedocs.io/`]
+
+https://github.com/bh107/bohrium[`https://github.com/bh107/bohrium`]
+
+=====
+Bohrium provides automatic acceleration of array operations in Python/NumPy, C, and C++ targeting multi-core CPUs and GP-GPUs. Forget handcrafting CUDA/OpenCL to utilize your GPU and forget threading, mutexes and locks to utilize your multi-core CPU.
+
+The features include:
+
+* Lazy Evaluation, Bohrium will lazy evaluate all Python/NumPy operations until it encounters a “Python Read” such a printing an array or having a if-statement testing the value of an array.
+* Views Bohrium supports NumPy views fully thus operating on array slices does not involve data copying.
+* Loop Fusion, Bohrium uses a fusion algorithm that fuses (or merges) array operations into the same computation kernel that are then JIT-compiled and executed. However, Bohrium can only fuse operations that have some common sized dimension and no horizontal data conflicts.
+* Lazy CPU/GPU Communication, Bohrium only moves data between the host and the GPU when the data is accessed directly by Python or a Python C-extension.
+* python -m bohrium, automatically makes import numpy use Bohrium.
+* Jupyter Support, you can use the magic command %%bohrium to automatically use Bohrium as NumPy.
+* Zero-copy interoperability with NumPy, Cython, PyOpenCL and PyCUDA.
+=====
+
+=== cobaya
+
+https://pypi.org/project/cobaya/[`https://pypi.org/project/cobaya/`]
+
+https://cobaya.readthedocs.io/en/latest/[`https://cobaya.readthedocs.io/en/latest/`]
+
+=====
+If a Cobaya (code for bayesian analysis, and Spanish for Guinea Pig) is a framework for sampling and statistical modelling: it allows you to explore an arbitrary prior or posterior using a range of Monte Carlo samplers (including the advanced MCMC sampler from CosmoMC, and the advanced nested sampler PolyChord). The results of the sampling can be analysed with GetDist. It supports MPI parallelization (and very soon HPC containerization with Docker/Shifter and Singularity).software package named `Armadillo` is requested, look for already installed versions via:
+
+Cobaya has been conceived from the beginning to be highly and effortlessly extensible: without touching cobaya’s source code, you can define your own priors and likelihoods, create new parameters as functions of other parameters…
+
+Though cobaya is a general purpose statistical framework, it includes interfaces to cosmological theory codes (CAMB and CLASS) and likelihoods of cosmological experiments (Planck, Bicep-Keck, SDSS… and more coming soon). Automatic installers are included for all those external modules. You can also use cobaya simply as a wrapper for cosmological models and likelihoods, and integrate it in your own sampler/pipeline.
+=====
+
+=== cuSZ
+
+https://github.com/szcompressor/cuSZ[`https://github.com/szcompressor/cuSZ`]
+
+=====
+A CUDA implementation of the widely used SZ lossy compressor for scientific data. It is the first error-bounded lossy compressor (circa 2020) on GPU for scientific data, aming to massively improve SZ's throughput on heterogeneous HPC systems.
+=====
+
+=== DaCe
+
+https://github.com/spcl/dace[`https://github.com/spcl/dace`]
+
+=====
+DaCe is a fast parallel programming framework that takes code in Python/NumPy and other programming languages, and maps it to high-performance CPU, GPU, and FPGA programs, which can be optimized to achieve state-of-the-art. Internally, DaCe uses the Stateful DataFlow multiGraph (SDFG) data-centric intermediate representation: A transformable, interactive representation of code based on data movement. Since the input code and the SDFG are separate, it is possible to optimize a program without changing its source, so that it stays readable. On the other hand, transformations are customizable and user-extensible, so they can be written once and reused in many applications. With data-centric parallel programming, we enable direct knowledge transfer of performance optimization, regardless of the application or the target processor.
+
+DaCe generates high-performance programs for:
+
+* Multi-core CPUs (tested on Intel, IBM POWER9, and ARM with SVE)
+* NVIDIA GPUs and AMD GPUs (with HIP)
+* Xilinx and Intel FPGAs
+
+DaCe can be written inline in Python and transformed in the command-line/Jupyter Notebooks.
+=====
+
+=== dm-tree
+
+https://pypi.org/project/dm-tree/[`https://pypi.org/project/dm-tree/`]
+
+https://github.com/deepmind/tree[`https://github.com/deepmind/tree`]
+
+=====
+A library for working with nested data structures. In a way, tree generalizes the builtin map function which only supports flat sequences, and allows to apply a function to each "leaf" preserving the overall structure.
+=====
+
+=== fdasrsf
+
+https://github.com/jdtuck/fdasrsf_python[`https://github.com/jdtuck/fdasrsf_python`]
+
+https://fdasrsf-python.readthedocs.io/en/latest/[`https://fdasrsf-python.readthedocs.io/en/latest/`]
+
+=====
+A python package for functional data analysis using the square root slope framework and curves using the square root velocity framework which performs pair-wise and group-wise alignment as well as modeling using functional component analysis and regression.
+=====
+
+=== GetDist
+
+https://pypi.org/project/GetDist/[`https://pypi.org/project/GetDist/`]
+
+https://getdist.readthedocs.io/en/latest/[`https://getdist.readthedocs.io/en/latest/`]
+
+=====
+GetDist is a Python package for analysing Monte Carlo samples, including correlated samples from Markov Chain Monte Carlo (MCMC).
+=====
+
+=== Gymnasium
+
+https://github.com/Farama-Foundation/Gymnasium[`https://github.com/Farama-Foundation/Gymnasium`]
+
+https://gymnasium.farama.org/[`https://gymnasium.farama.org/`]
+
+=====
+Gymnasium is an open source Python library for developing and comparing reinforcement learning algorithms by providing a standard API to communicate between learning algorithms and environments, as well as a standard set of environments compliant with that API. This is a fork of OpenAI's Gym library by the maintainers (OpenAI handed over maintenance a few years ago to an outside team), and is where future maintenance will occur going forward.
+=====
+
+=== hatchling
+
+https://pypi.org/project/hatchling/[`https://pypi.org/project/hatchling/`]
+
+https://hatch.pypa.io/latest/[`https://hatch.pypa.io/latest/`]
+
+=====
+This is the extensible, standards compliant build backend used by Hatch.
+
+Hatch is a modern, extensible Python project manager.  The features include:
+
+* Standardized build system with reproducible builds by default
+* Robust environment management with support for custom scripts
+* Easy publishing to PyPI or other sources
+* Version management
+* Configurable project generation with sane defaults
+* Responsive CLI, ~2-3x faster than equivalent tools
+=====
+
+=== LHS-MDU
+
+https://pypi.org/project/lhsmdu/[`https://pypi.org/project/lhsmdu/`]
+
+https://github.com/sahilm89/lhsmdu[`https://github.com/sahilm89/lhsmdu`]
+
+https://zenodo.org/record/3929531[`https://zenodo.org/record/3929531`]
+
+=====
+This is an implementation of Latin Hypercube Sampling with Multi-Dimensional Uniformity (LHS-MDU) from Deutsch and Deutsch, "Latin hypercube sampling with multidimensional uniformity".
+=====
+
+=== loopy
+
+https://pypi.org/project/loopy/[`https://pypi.org/project/loopy/`]
+
+https://mathema.tician.de/software/loopy/
+
+https://documen.tician.de/loopy/
+
+https://arxiv.org/abs/1405.7470[`https://arxiv.org/abs/1405.7470`]
+
+=====
+Loopy lets you easily generate the tedious, complicated code that is necessary to get good performance out of GPUs and multi-core CPUs. Loopy’s core idea is that a computation should be described simply and then transformed into a version that gets high performance. This transformation takes place under user control, from within Python.
+=====
+
+=== newick-utils
+
+https://github.com/tjunier/newick_utils[`https://github.com/tjunier/newick_utils`]
+
+=====
+The Newick Utilities are a suite of programs for working with Newick-formatted
+phylogenetic trees.  The tools are:
+
+-----
+nw_clade
+nw_condense
+nw_display
+nw_distance
+nw_duration
+nw_ed
+nw_gen
+nw_indent
+nw_labels
+nw_match
+nw_order
+nw_prune
+nw_rename
+nw_reroot
+nw_stats
+nw_support
+nw_topology
+nw_trim
+-----
+
+=====
+
+=== Nuitka
+
+https://pypi.org/project/Nuitka/[`https://pypi.org/project/Nuitka/`]
+
+https://nuitka.net/[`https://nuitka.net/`]
+
+=====
+Nuitka is the optimizing Python compiler written in Python that creates executables that run without an need for a separate installer. Data files can both be included or put alongside.
+=====
+
+=== nvCOMP
+
+https://github.com/NVIDIA/nvcomp[`https://github.com/NVIDIA/nvcomp`]
+
+https://developer.nvidia.com/nvcomp[`https://developer.nvidia.com/nvcomp`]
+
+=====
+The nvCOMP library provides fast lossless data compression and decompression using a GPU. It features generic compression interfaces to enable developers to use high-performance GPU compressors in their applications.
+
+*Note*:  The version from source code does not contain three proprietary compression algorithms.  A binary version with
+these algorithms included can be obtained from the NVIDIA page shown above.
+=====
+
+=== php
+
+https://www.php.net/[`https://www.php.net/`]
+
+https://www.phoronix-test-suite.com/[`https://www.phoronix-test-suite.com/`]
+
+=====
+A popular general-purpose scripting language that is especially suited to web development.
+
+*Note*: This was created because the Phoronix Test Suite chose - for heaven knows what reason - to use PHP
+as its scripting language.
+=====
+
+=== Pyomo
+
+https://github.com/Pyomo/pyomo[`https://github.com/Pyomo/pyomo`]
+
+http://www.pyomo.org/[`http://www.pyomo.org/`]
+
+=====
+Pyomo is a Python-based open-source software package that supports a diverse set of optimization capabilities for formulating and analyzing optimization models. Pyomo can be used to define symbolic problems, create concrete problem instances, and solve these instances with standard solvers.
+
+Pyomo supports analysis and scripting within a full-featured programming language. Further, Pyomo has also proven an effective framework for developing high-level optimization and analysis tools. For example, the mpi-sppy package provides generic solvers for stochastic programming. mpi-sppy leverages the fact that Pyomo's modeling objects are embedded within a full-featured high-level programming language, which allows for transparent parallelization of subproblems using Python parallel communication libraries.
+=====
+
+=== scikit-fda
+
+https://pypi.org/project/scikit-fda/[`https://pypi.org/project/scikit-fda/`]
+
+https://github.com/GAA-UAM/scikit-fda[`https://github.com/GAA-UAM/scikit-fda`]
+
+https://fda.readthedocs.io/en/latest/[`https://fda.readthedocs.io/en/latest/`]
+
+=====
+This package offers classes, methods and functions to give support to Functional Data Analysis in Python. Includes a wide range of utils to work with functional data, and its representation, exploratory analysis, or preprocessing, among other tasks such as inference, classification, regression or clustering of functional data.
+=====
+
+=== SCNIC
+
+https://github.com/lozuponelab/SCNIC[`https://github.com/lozuponelab/SCNIC`]
+
+=====
+SCNIC is a package for the generation and analysis of cooccurrence
+(positive correlation) networks with compositional data.
+=====
+
+=== SZ
+
+https://github.com/szcompressor/SZ[`https://github.com/szcompressor/SZ`]
+
+=====
+Error-bounded lossy compressor for HPC data.
+=====
+
+=== SZ3
+
+https://github.com/szcompressor/SZ3[`https://github.com/szcompressor/SZ3`]
+
+=====
+A modular error-bounded lossy compression framework for scientific datasets.
+=====
+
+=== Taichi
+
+https://github.com/taichi-dev/taichi[`https://github.com/taichi-dev/taichi`]
+
+https://docs.taichi-lang.org/[`https://docs.taichi-lang.org/`]
+
+=====
+Taichi Lang is an open-source, imperative, parallel programming language for high-performance numerical computation. It is embedded in Python and uses just-in-time (JIT) compiler frameworks, for example LLVM, to offload the compute-intensive Python code to the native GPU or CPU instructions.
+=====
+
+== New Versions of Existing Modules
+
+=== cytoolz
+
+* `cytoolz-0.12.0-foss-2021b-Python-3.9.6.eb`
+
+=== dill
+
+* `dill-0.3.6-GCCcore-11.2.0.eb`
+
+=== einops
+
+* `einops-0.6.0-GCCcore-11.2.0.eb`
+
+=== hipSYCL
+
+* `hipSYCL-0.9.3-GCC-11.2.0.eb`
+
+=== pydantic
+
+* `pydantic-1.6.1-GCCcore-11.2.0-Python-3.9.6.eb`
+
+=== RAxML
+
+* `RAxML-8.2.12-GCC-9.3.0-pthreads-avx2.eb`
+
+
+

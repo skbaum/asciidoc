@@ -1,0 +1,1545 @@
+Unstructured Grids
+==================
+Steven K. Baum
+v0.1, 2013-05-09
+:doctype: book
+:toc:
+:icons:
+:numbered:
+
+
+[preface]
+
+Executive Summary
+-----------------
+
+Information about unstructured grids as obtained from a conference call
+on May 4, 2013 at 3 PM.  Rough outline:
+
+.  Rich Signell with overview about the UGRD proposal, the Google UGRD group, and about the Matlab software +nctoolbox+ for unstructured
+grids.  I was attempting to get the visual part of the webinar working during
+this and didn't catch much.
+
+.  Alex Crosby about the Paegan and Sci-WMS software packages.
+
+.  Various crosstalk about related matters such as OPeNDAP standard extension
+plans, F-TDS, etc.
+
+This will be expanded into a general page about unstructured grids, e.g. the
+standards and the tools used to implement them.
+
+
+Google UGRID Interoperability Group
+-----------------------------------
+
+https://groups.google.com/forum/?fromgroups#!forum/ugrid-interoperability[+https://groups.google.com/forum/?fromgroups#!forum/ugrid-interoperability+]
+
+A group wherein the discussions about the UGRD interoperability proposal are
+archived.
+
+This group rewards careful or even casual reading if you're at all interested
+in unstructured grids.
+
+
+Deltares CF Proposal for Unstructured Grid Data Model
+-----------------------------------------------------
+
+This is a proposal for storing unstructured (or flexible mesh) model data in
+a NetCDF file.  This basically provides a means for defining an unstructured
+grid topology that's presently lacking in the CF-1.6 standard.
+
+The home page for work on the standard is:
+
+http://publicwiki.deltares.nl/display/NETCDF/Deltares+CF+proposal+for+Unstructured+Grid+data+model[+http://publicwiki.deltares.nl/display/NETCDF/Deltares+CF+proposal+for+Unstructured+Grid+data+model+]
+
+and contains the working version of the standard itself as well as links
+to related pages.
+
+nctoolbox
+---------
+
+https://github.com/nctoolbox/nctoolbox[+https://github.com/nctoolbox/nctoolbox+]
+
+A Matlab toolbox that provides read-only access to common data model (CDM)
+datasets.  It uses NetCDF-Java as the data access layer.
+
+
+Sci-WMS
+-------
+
+https://github.com/acrosby/sci-wms[+https://github.com/acrosby/sci-wms+]
+
+Sci-WMS is a Python WMS (web mapping service) implementation for geospatial
+gridded data.  As of this writing, it supports only triangular structured
+meshes and logically rectangular grids.
+
+Prerequisites and Installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sci-WMS is not a trivial package to install, requiring the following
+prerequisites.  If you install them in the order shown, your frustration
+level will be marginally decreased.
+
+Numpy
+^^^^^
+
+http://www.numpy.org/[+http://www.numpy.org/+]
+
+Matplotlib
+^^^^^^^^^^
+
+http://matplotlib.org/[+http://matplotlib.org/+]
+
+Basemap
+^^^^^^^
+
+http://matplotlib.org/basemap/[+http://matplotlib.org/basemap/+]
+
+HDF5
+^^^^
+
+http://www.hdfgroup.org/HDF5/[+http://www.hdfgroup.org/HDF5/+]
+
+NetCDF4
+^^^^^^^
+
+http://www.unidata.ucar.edu/software/netcdf/[+http://www.unidata.ucar.edu/software/netcdf/+]
+
+netcdf4-python
+^^^^^^^^^^^^^^
+
+http://code.google.com/p/netcdf4-python/[+http://code.google.com/p/netcdf4-python/+]
+
+Shapely
+^^^^^^^
+
+A Python package for the manipulation and analysis of planar geometric
+objects.
+
+https://github.com/sgillies/shapely[+https://github.com/sgillies/shapely+]
+
+libspatialindex
+^^^^^^^^^^^^^^^
+
+http://libspatialindex.github.io/[+http://libspatialindex.github.io/+]
+
+That for which +Rtree+ provides a Python wrapper.
+
+Rtree
+^^^^^
+
+A Python wrapper for +libspatialindex+ that provides advanced spatial indexing
+features.
+
+http://toblerity.github.io/rtree/[+http://toblerity.github.io/rtree/+]
+
+Django
+^^^^^^
+
+A Python web framework.
+
+https://www.djangoproject.com/[+https://www.djangoproject.com/+]
+
+Gunicorn
+^^^^^^^^
+
+http://gunicorn.org/[+http://gunicorn.org/+]
+
+A Python WSGI HTTP server.
+
+Greenlet
+^^^^^^^^
+
+A lightweight in-process concurrent programming package for Python.
+
+https://github.com/python-greenlet/greenlet[+https://github.com/python-greenlet/greenlet+]
+
+libevent
+^^^^^^^^
+
+http://libevent.org/[+http://libevent.org/+]
+
+An API providing a mechanism to execute a callback funtion when a specific
+event
+occurs on a file descriptor.
+
+Gevent
+^^^^^^
+
+A coroutine-based Python networking library that provides a synchronous API on
+top of the libevent event loop.
+
+http://www.gevent.org/[+http://www.gevent.org/+]
+
+Using Sci-WMS to Obtain Data Via WMS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The instructions from the creators of Sci-WMS are at:
+
+http://acrosby.github.io/sci-wms/use.html[+http://acrosby.github.io/sci-wms/use.html+]
+
+Although it's got a nice web interface to take a look at the available
+datasets, it's still a WMS server and thus must be accessed via a suitably
+configured and lengthy URL such as:
+
+-----
+http://server:port/wms/your_unique_datasetid/?REQUEST=GetFeatureInfo&CRS=EPSG%3A3857&LAYERS=u-vel&ELEVATION=0&TRANSPARENT=TRUE&FORMAT=image%2Fpng&STYLES=pcolor_average_jet_0_1_node_False&SERVICE=WMS&BBOX=-8469908.967472%2C5509587.080677%2C-8408759.344853%2C5543983.7434&X=385&Y=132&INFO_FORMAT=text%2Fcsv&QUERY_LAYERS=u-vel&FEATURE_COUNT=100&WIDTH=800&HEIGHT=450&TIME=2010-04-01T00:00:00/2010-09-01T00:00:00
+-----
+
+WMS Specification Summary
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A brief discussion about the basics of WMS will be useful at this point.
+The Web Mapping Service (WMS) specification can be obtained at:
+
+http://www.opengeospatial.org/standards/wms[+http://www.opengeospatial.org/standards/wms+]
+
+and is contained within an 85 page PDF document.
+
+A WMS dynamically produces maps of spatially-referenced data from geographic
+information.  A map is a portrayal of geographic data as a digital
+image and not the data itself, with the images generally rendered in
+standard formats such as PNG, GIF, JPEG, SVG, etc.
+THe standard defines three operations to:
+
+. return service-level metadata;
+. return a map with well-defined geographic and dimensional parameters; and
+. return information about particular features shown on a map.
+
+Basically, the first service provides you with information about the
+dataset that enables you to supply various parameter information to the
+second service, and the third service similarly allows you to expand
+the information you acquired via the second service.
+
+These services are invoked by appending various parameter information
+to the URL that indicates the location of the WMS server, the details of
+which will be shown in the separate sections for each service below.
+
+The +getCapabilities+ Operation for the Dataset +mymaracoos+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The operation to return service-level metadata is called the
++GetCapabilities+ operation.  The metadata is a human-readable
+description of the server's information content and acceptable request
+parameter values.  A typical request looks like:
+
+-----
+http://server:port/wms/your_unique_datasetid/?request=getCapabilities
+-----
+
+We can find an example of this by starting at the test demonstration page
+linked to from:
+
+http://acrosby.github.io/sci-wms/use.html[+http://acrosby.github.io/sci-wms/use.html+]
+
+Clicking on +See it in action+ in the left-hand column takes us to:
+
+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/mymaracoos/wmstest[+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/mymaracoos/wmstest+]
+
+If we remove +wmstest+ from this string and
+append +?request=getCapabilities+ we will obtain an official WMS
++getCapabilities+ request, i.e.
+
+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/mymaracoos/?request=getCapabilities[+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/mymaracoos/?request=getCapabilities+]
+
+which will return the following XML file which has been compressed by only
+showing the details of one +Layer+.
+
+-----
+<WMT_MS_Capabilities version="1.1.1">
+  <Service>
+    <Name>OGC:WMS</Name>
+    <Title>SCI-WMS: A Python Based
+        Web Map Service For Met-Ocean Data Accessible Over OpenDAP Or As
+        NetCDF
+    </Title>
+    <Abstract>SCI-WMS: A Python Based Web Map Service For Met-Ocean
+        Data Accessible Over OpenDAP Or As
+        NetCDF
+    </Abstract>
+    <KeywordList>
+      <Keyword>meteorology</Keyword>
+      <Keyword>wms</Keyword>
+      <Keyword>oceanography</Keyword>
+    </KeywordList>
+    <OnlineResource href="http://107.21.136.52:8080/mymaracoos/?" xlink:type="simple"/>
+    <ContactInformation>
+      <ContactPersonPrimary>
+        <ContactPerson/>
+        <ContactOrganization/>
+      </ContactPersonPrimary>
+      <ContactPosition/>
+      <ContactAddress>
+        <AddressType>postal</AddressType>
+        <Address/>
+        <City/>
+        <StateOrProvince/>
+        <PostCode/>
+        <Country/>
+      </ContactAddress>
+      <ContactVoiceTelephone/>
+      <ContactElectronicMailAddress/>
+    </ContactInformation>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>application/vnd.ogc.wms_xml</Format>
+        <Format>text/xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/mymaracoos/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/mymaracoos/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+      <GetFeatureInfo>
+        <Format>image/png</Format>
+        <Format>text/csv</Format>
+        <Format>text/javascript</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/mymaracoos/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetFeatureInfo>
+      <GetLegendGraphic>
+        <Format>image/png</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/mymaracoos/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetLegendGraphic>
+    </Request>
+    <Exception>
+      <Format>text/html</Format>
+    </Exception>
+-----
+
+A +Layer+ with a +Name+ that serves as a group for the various sub-+Layer+
+information it subsumes.
+
+-----
+    <Layer>
+      <Title>mymaracoos</Title>
+      <Abstract>This is a group for the mymacroos portals' wms layers.
+      </Abstract>
+      <SRS>EPSG:3857</SRS>
+      <SRS>MERCATOR</SRS>
+-----
+
+Sample +Layer+ with full information including various +Style+ choices.
+
+-----
+      <Layer opaque="0" queryable="1">
+        <Name>necofs_forecast/x</Name>
+        <Title>nodal x-coordinate</Title>
+        <Abstract>nodal x-coordinate</Abstract>
+        <SRS>EPSG:3857</SRS>
+        <LatLonBoundingBox maxx="-56.8508" maxy="46.146" minx="-75.6843" miny="35.2765"/>
+        <BoundingBox SRS="EPSG:4326" maxx="-56.8508" maxy="46.146" minx="-75.6843" miny="35.2765"/>
+        <Dimension name="time" units="ISO8601"/>
+        <Dimension name="elevation" units="EPSG:5030"/>
+        <Extent name="time">2013-05-11T00:00:00Z/2013-05-17T00:00:00Z</Extent>
+        <Extent default="0" name="elevation" units="0"</Extent>
+        <DepthLayers>0</DepthLayers>
+        <DepthDirection>Down</DepthDirection>
+        <Style>
+          <Name>filledcontours_average_jet_None_None_node_False</Name>
+          <Title>filledcontours_average_jet_None_None_node_False</Title>
+          <Abstract>http://107.21.136.52:8080/doc</Abstract>
+          <LegendURL height="80" width="50">
+            <Format>image/png</Format>
+          </LegendURL>
+        </Style>
+        <Style>
+          <Name>contours_average_jet_None_None_node_False</Name>
+          <Title>contours_average_jet_None_None_node_False</Title>
+          <Abstract>http://107.21.136.52:8080/doc</Abstract>
+          <LegendURL height="80" width="50">
+            <Format>image/png</Format>
+          </LegendURL>
+        </Style>
+        <Style>
+          <Name>pcolor_average_jet_None_None_node_False</Name>
+          <Title>pcolor_average_jet_None_None_node_False</Title>
+          <Abstract>http://107.21.136.52:8080/doc</Abstract>
+          <LegendURL height="80" width="50">
+            <Format>image/png</Format>
+          </LegendURL>
+        </Style>
+        <Style>
+          <Name>facets_average_jet_None_None_node_False</Name>
+          <Title>facets_average_jet_None_None_node_False</Title>
+          <Abstract>http://107.21.136.52:8080/doc</Abstract>
+          <LegendURL height="80" width="50">
+            <Format>image/png</Format>
+          </LegendURL>
+        </Style>
+      </Layer>
+...
+-----
+
+Full layers collapsed to just their +Name+ designation.
+
+-----
+...
+        <Name>necofs_forecast/y</Name>
+        <Name>necofs_forecast/lon</Name>
+        <Name>necofs_forecast/lat</Name>
+        <Name>necofs_forecast/xc</Name>
+        <Name>necofs_forecast/yc</Name>
+        <Name>necofs_forecast/lonc</Name>
+        <Name>necofs_forecast/latc</Name>
+        <Name>necofs_forecast/siglay</Name>
+        <Name>necofs_forecast/siglev</Name>
+        <Name>necofs_forecast/h</Name>
+        <Name>necofs_forecast/nv</Name>
+        <Name>necofs_forecast/time</Name>
+        <Name>necofs_forecast/Times</Name>
+        <Name>necofs_forecast/zeta</Name>
+        <Name>necofs_forecast/nbe</Name>
+        <Name>necofs_forecast/aw0</Name>
+        <Name>necofs_forecast/awx</Name>
+        <Name>necofs_forecast/awy</Name>
+        <Name>necofs_forecast/u</Name>
+        <Name>u,v</Name>
+        <Name>necofs_forecast/v</Name>
+        <Name>necofs_forecast/ww</Name>
+        <Name>necofs_forecast/temp</Name>
+        <Name>necofs_forecast/salinity</Name>
+        <Name>necofs_forecast/icing_0kts</Name>
+        <Name>necofs_forecast/icing_10kts</Name>
+        <Name>NAVY_HYCOM/depth</Name>
+        <Name>NAVY_HYCOM/lat</Name>
+        <Name>NAVY_HYCOM/lon</Name>
+        <Name>NAVY_HYCOM/time</Name>
+        <Name>NAVY_HYCOM/tau</Name>
+        <Name>NAVY_HYCOM/water_temp</Name>
+        <Name>NAVY_HYCOM/salinity</Name>
+        <Name>NAVY_HYCOM/surf_el</Name>
+        <Name>NAVY_HYCOM/water_u</Name>
+        <Name>water_u,water_v</Name>
+        <Name>NAVY_HYCOM/water_v</Name>
+...
+    </Layer>
+  </Capability>
+</WMT_MS_Capabilities>
+-----
+
+If a +Layer+ in the +GetCapabilities+ response document has a +Name+, then it
+can be requested by using that +Name+ in the +LAYERS+ parameter of a
++GetMap+ request.  If multiple layers are to be requested, they must
+be given in a comma-separated list after the +LAYERS+ parameter, with a corresponding comma-separated
+list in the +STYLES+ parameter of desired styles.
+
+The +getMap+ Operation for the Dataset +mymaracoos+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now we'll try a +GetMap+ request along similar lines using the information
+derived from the +getCapabilities+ request:
+
+http://107.21.136.52:8080/mymaracoos/?REQUEST=GetMap&VERSION=1.1.1&LAYERS=u,v&STYLES=vectors_average_jet_None_None_node_False&SRS=EPSG:4326&BBOX=-63.0,38.0,61.0,40.0&WIDTH=800&HEIGHT=600&FORMAT=image/png&TIME=2013-05-11T00:00:00Z&ELEVATION=5[+http://107.21.136.52:8080/mymaracoos/?REQUEST=GetMap&VERSION=1.1.1&LAYERS=u,v&STYLES=vectors_average_jet_None_None_node_False&SRS=EPSG:4326&BBOX=-63.0,38.0,61.0,40.0&WIDTH=800&HEIGHT=600&FORMAT=image/png&TIME=2013-05-11T00:00:00Z&ELEVATION=5+]
+
+This does not work as yet for unknown reasons.
+
+
+Discovering Sci-WMS Server Holdings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A list of the available datasets on a given Sci-WMS server can be found at the
+root level of the server.  For the Sci-WMS test page, this is at:
+
+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/[+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/+]
+
+If we go to this page and click on +maracoos_Masked_SST_Agg+ we will go to the
+page:
+
+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/maracoos_Masked_SST_Agg/?REQUEST=GetCapabilities[+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wms/maracoos_Masked_SST_Agg/?REQUEST=GetCapabilities+]
+
+which displays the results of the +GetCapabilities+ request we just made:
+
+-----
+<WMT_MS_Capabilities version="1.1.1">
+  <Service>
+    <Name>OGC:WMS</Name>
+    <Title>
+      SCI-WMS: A Python Based Web Map Service For Met-Ocean Data Accessible Over OpenDAP Or As NetCDF
+    </Title>
+    <Abstract>SCI-WMS: A Python Based Web Map Service For Met-Ocean
+      Data Accessible Over OpenDAP Or As
+      NetCDF
+    </Abstract>
+    <KeywordList>
+      <Keyword>meteorology</Keyword>
+      <Keyword>wms</Keyword>
+      <Keyword>oceanography</Keyword>
+    </KeywordList>
+    <OnlineResource href="http://107.21.136.52:8080/wms/maracoos_Masked_SST_Agg/?" xlink:type="simple"/>
+    <ContactInformation>
+      <ContactPersonPrimary>
+        <ContactPerson/>
+        <ContactOrganization/>
+      </ContactPersonPrimary>
+      <ContactPosition/>
+      <ContactAddress>
+        <AddressType>postal</AddressType>
+        <Address/>
+        <City/>
+        <StateOrProvince/>
+        <PostCode/>
+        <Country/>
+      </ContactAddress>
+      <ContactVoiceTelephone/>
+      <ContactElectronicMailAddress/>
+    </ContactInformation>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>application/vnd.ogc.wms_xml</Format>
+        <Format>text/xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/wms/maracoos_Masked_SST_Agg/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/wms/maracoos_Masked_SST_Agg/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+      <GetFeatureInfo>
+        <Format>image/png</Format>
+        <Format>text/csv</Format>
+        <Format>text/javascript</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/wms/maracoos_Masked_SST_Agg/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetFeatureInfo>
+      <GetLegendGraphic>
+        <Format>image/png</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://107.21.136.52:8080/wms/maracoos_Masked_SST_Agg/?" xlink:type="simple"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetLegendGraphic>
+    </Request>
+    <Exception>
+      <Format>text/html</Format>
+    </Exception>
+    <Layer>
+      <Title>maracoos_Masked_SST_Agg</Title>
+      <Abstract>maracoos_Masked_SST_Agg</Abstract>
+      <SRS>EPSG:3857</SRS>
+      <SRS>MERCATOR</SRS>
+      <Layer opaque="0" queryable="1">
+        <Name>lon</Name>
+        <Title>longitude</Title>
+        <Abstract>Longitude</Abstract>
+        <SRS>EPSG:3857</SRS>
+        <LatLonBoundingBox/>
+      </Layer>
+      <Layer opaque="0" queryable="1">
+        <Name>lat</Name>
+        <Title>latitude</Title>
+        <Abstract>Latitude</Abstract>
+        <SRS>EPSG:3857</SRS>
+        <LatLonBoundingBox/>
+      </Layer>
+      <Layer opaque="0" queryable="1">
+        <Name>time</Name>
+        <Title>time</Title>
+        <Abstract>Time</Abstract>
+        <SRS>EPSG:3857</SRS>
+        <LatLonBoundingBox/>
+      </Layer>
+      <Layer opaque="0" queryable="1">
+        <Name>mcsst</Name>
+        <Title>sea_surface_temperature</Title>
+        <Abstract>Multichannel Sea Surface Temperature</Abstract>
+        <SRS>EPSG:3857</SRS>
+        <LatLonBoundingBox/>
+      </Layer>
+    </Layer>
+  </Capability>
+</WMT_MS_Capabilities>
+-----
+
+Note that the emboldened names on the server root page are the +Title+ tag
+values for the upper-level +Layer+ tags that do not have +Name+ tags and
+therefore cannot be requested in the +LAYERS+ URL parameter.
+In the case of the +GetCapabilities+ document for +maracoos_Masked_SST_Agg+,
+we find the +Name+ tag values +lon+, +lat+, +time+ and +mcsst+ for layers
+than can be requested via +LAYERS+.
+
+Unfortunately, we do not find all the parameters required for a
++GetMap+ request:
+
+Required Layer Properties for the +getCapabilities+ Request
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Various properties are needed for the +getCapabilities+ request to
+supply sufficient information for a +getMap+ request.
+
++Title+ Element
++++++++++++++++
+
+A +<Title>+ element is mandatory for all layers, and should be
+a human-readable string for presentation in a menu.  It is not
+inherited by child layers.  An example is:
+
+-----
+<Layer>
+  <Title>A title for our layer.</Title>
+</Layer>
+-----
+
++Name+ Element
+++++++++++++++
+
+A layer with a +Title+ but no +Name+ is only a category
+title for the layers nested beneath.
+In the following example, +Many Layers Below+ is a category title.
+
+-----
+<Layer>
+  <Title>Many Layers Below</Title>
+  <Abstract>maracoos_Masked_SST_Agg</Abstract>
+  <SRS>EPSG:3857</SRS>
+  <SRS>MERCATOR</SRS>
+  <Layer opaque="0" queryable="1">
+    <Name>lat</Name>
+    <Title>latitude</Title>
+...
+  </Layer>
+</Layer>
+-----
+
+A +Layer+ with both is a *named layer*
+and can be requested by the +Name+ in the +LAYERS+ parameter of a +GetMap+
+request.  In the previous example the layer with the title +latitude+ also
+has the name +lat+, so it can be requested.
+
++Style+ Element
++++++++++++++++
+
+Any number of +Style+ elements can be advertised for a +Layer+,
+each of which must have +Name+ and +Title+
+subelements.  If only a single, default style is available, it need not
+be advertised.  Optional subelements are +Abstract+ to provide a
+narrative description, and
++LegendURL+ for specifying the location of a map legend image
+appropriate to the style.  The +LegendURL+ element has a subelement
++Format+ used to specify the format of the image.
+An example is:
+
+-----
+<Layer>
+...
+  <Style>
+    <Name>filledcontours_average_jet_None_None_node_False</Name>
+    <Title>filledcontours_average_jet_None_None_node_False</Title>
+    <Abstract>http://107.21.136.52:8080/doc</Abstract>
+    <LegendURL height="80" width="50">
+      <Format>image/png</Format>
+    </LegendURL>
+  </Style>
+  <Style>
+...
+  </Style>
+...
+</Layer>
+-----
+
++EX_GeographicBoundingBox+ Element
+++++++++++++++++++++++++++++++++++
+
+Every named +Layer+ must have
+this element stated explicitly or inherited from a parent layer.
+This states the minimum bounding rectangle in decimal degrees of
+the area covered by the +Layer+ via the attributes +westBoundLongitude+,
++eastBoundLongitude+, +southBoundLatitude+ and +northBoundLatitude+.
+This may be approximate if the data are not natively in geographic
+coordinates, as it is intended to facilitate geographic searches
+without requiring coordinate transformations by the search engine.
+An example is:
+
+-----
+<Layer>
+  <Name>necofs_forecast/x</Name>
+  <Title>nodal x-coordinate</Title>
+  <EX_GeographicBoundingBox eastBoundLongitude="-56.8508" northBoundLatitude="46.146" westBoundLongitude="-75.6843" southBoundLatitude="35.2765"/>
+...
+</Layer>
+-----
+
+In the Sci-WMS implementation of WMS, this element seems to have been replaced by
+the +LatLonBoundingBox+ element with attributes +maxx+, +maxy+, +minx+ and
++miny+.  
+
++CRS+ Element
++++++++++++++
+
+Every +Layer+ is in one or more layer coordinate
+reference systems.  Each named +Layer+ has to have at least one
++<CRS>+ element explicitly state or inherited from a parent
++Layer+.  The root +<Layer>+ element must include a sequence
+of +<CRS>+ elements common to all subsidiary layers.  A layer available in
+more than one coordinate system will list them in a sequence
+of +<CRS>+ elements each containing a single CRS name.
+An example is:
+
+-----
+<Layer>
+...
+  <Name>necofs_forecast/x</Name>
+  <Title>nodal x-coordinate</Title>
+  <SRS>EPSG:3857</SRS>
+...
+</Layer>
+-----
+
++BoundingBox+ Element
++++++++++++++++++++++
+
+One or more bounding boxes must be defined
+for each +Layer+, and may be either stated explicitly or
+inherited.  The +<BoundingBox>+ element includes the attributes
++CRS+ to indicate the layer CRS that applies to the box,
++minx+, +miny+, +maxx+, +maxy+ to indicate the limits of the
+bounding box using the axis units and order of the specified
+CRS, and optionally +resx+ and +resy+ to indicate the spatial
+resolution of the data.
+An example is:
+
+-----
+<Layer opaque="0" queryable="1">
+  <Name>necofs_forecast/x</Name>
+  <Title>nodal x-coordinate</Title>
+  <BoundingBox SRS="EPSG:4326" maxx="-56.8508" maxy="46.146" minx="-75.6843" miny="35.2765"/>
+...
+</Layer>
+-----
+
++Dimension+ Element
++++++++++++++++++++
+
+The +Dimension+ element encloses metadata for multi-dimensional data.  This
+allows the inclusion of information about vertical, temporal and other
+coordinate systems.
+An example is:
+
+-----
+<Layer>
+...
+  <Dimension name="elevation" units="EPSG:5030"/>
+  <Extent default="0" name="elevation">0,1,2,3,4,5,6,7</Extent>
+  <DepthLayers>0,1,2,3,4,5,6,7</DepthLayers>
+  <DepthDirection>Down</DepthDirection>
+...
+  <Dimension name="time" units="ISO8601"/>
+  <Extent name="time">2013-05-13T00:00:00Z/2013-05-19T00:00:00Z</Extent>
+</Layer>
+-----
+
+Looks like the Sci-WMS implementation is going off reservation here, too.
+The examples in the WMS standard appendix C look like:
+
+-----
+<Dimension name="time" units="ISO8601" default="2003-10-17">1996-01-01/2003-10-17/P1D</Dimension>
+<Dimension name="temperature" units="Kelvin" unitSymbol="K" default="300">230,300,400</Dimension>
+<Dimension name="elevation" units="CRS:88" unitSymbol="m" default="0">0/10000/100</Dimension>
+-----
+
+
+.Required +GetMap+ Parameters
+[width="80%",cols="7,7,5,10",options="header"]
+|=========================================================
+| Parameter Name | Parameter Value | Mandatory/Optional | Description 
+| +VERSION+ | +1.1.1+ | M |Request version
+| +REQUEST+ | +GetMap+ | M | Request name
+| +LAYERS+ | +mcsst+ | M | Comma-separated list of one or more map layers
+| +STYLES+ | NA | M | Comma-separated list of one rendering style per
+requested layer
+| +CRS+ | +EPSG:3857+ | M | Coordinate reference system
+| +BBOX+ | NA | M | Bounding box corners (lower left, upper
+right) in CRS units
+| +WIDTH+ | +400+ | M | Width in pixels of map picture
+| +HEIGHT+ | +400+ | M | Height in pixels of map picture
+| +FORMAT+ | NA | M | Output format of map
+| +TIME+ | NA | M* | Time value of layer desired
+| +ELEVATION+ | NA | M* | Elevation of layer desired
+| +TRANSPARENT+ | +TRUE/FALSE+ | O | Background transparency of map
+(default=FALSE)
+| +BGCOLOR+ | +color_value+ | O | Hexadecimal red-green-blue colour value for the
+background color (default=0xFFFFFF)
+| +EXCEPTIONS+ | +exception_format+ | O | The format in which exceptions are to be
+reported by the WMS (default=XML).
+| +Other sample dimension(s) | NA | O | Value of other dimensions as appropriate
+|=========================================================
+
+
+Moving on to attempting a +GetMap+ request, we attempt:
+
+http://107.21.136.52:8080/wms/maracoos_Masked_SST_Agg/?REQUEST=GetMap&VERSION=1.1.1&LAYERS=mcsst&STYLES=pcolor_average_jet_None_None_node_False&CRS=EPSG%3A3857&BBOX=-65.0%2C36.0%2C-60.0%2C42.0&WIDTH=800&HEIGHT=600&FORMAT=image%2Fpng&TIME=2013-05-11T00:00:00&ELEVATION=0
+
+
+http://107.21.136.52:8080/mymaracoos/?REQUEST=GetMap&VERSION=1.1.1&LAYERS=necofs_forecast/temp&STYLES=filledcontours_average_jet_None_None_node_False&CRS=EPSG:3857&BBOX=-65.0,36.0,-60.0,42.0&WIDTH=800&HEIGHT=600&FORMAT=image/png&TIME=2013-05-11T00:00:00&ELEVATION=0
+
+These requests do not work for known and unknown reasons.
+
+A Visual Check of the Sci-WMS Server Holdings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+All these datasets can also be seen as overlays on an Openlayers map page
+built into the server by appending +wmstest+ to the server base URL, e.g.
+
+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wmstest[+http://ec2-107-21-136-52.compute-1.amazonaws.com:8080/wmstest+]
+
+and clicking on the +++ in the upper right part of the page.  It should look
+like this:
+
+.Sample Sci-WMS Page
+image::wmstest_layers.png[height=700]
+
+If you click on the +necofs_forecast+ box you will see something like
+the following appear:
+
+.Sample Sci-WMS Page with NECOFS Forecast Overlay
+image::necofs_forecast.png[height=700]
+
+
+The +GetMap+ Operation
+^^^^^^^^^^^^^^^^^^^^^^
+
+The parameters of a +GetMap+ request are:
+
+[width="80%",cols="7,5,10",options="header"]
+|=========================================================
+| Request Parameter | Mandatory/Optional | Description
+| +VERSION=1.3.0+ | M |Request version
+| +REQUEST=GetMap+ | M | Request name
+| +LAYERS=layer_list+ | M | Comma-separated list of one or more map layers
+| +STYLES=style_list+ | M | Comma-separated list of one rendering style per requested layer
+| +CRS=namespace:identifier+ | M | Coordinate reference system
+| +BBOX=minx,miny,maxx,maxy+ | M | Bounding box corners (lower left, upper right) in CRS units
+| +WIDTH=output_width+ | M | Width in pixels of map picture
+| +HEIGHT=output_height+ | M | Height in pixels of map picture
+| +FORMAT=output_format+ | M | Output format of map
+| +TIME=time+ | M* | Time value of layer desired
+| +ELEVATION=elevation+ | M* | Elevation of layer desired
+| +TRANSPARENT=TRUE/FALSE+ | O | Background transparency of map (default=FALSE)
+| +BGCOLOR=color_value+ | O | Hexadecimal red-green-blue colour value for the background color (default=0xFFFFFF)
+| +EXCEPTIONS=exception_format+ | O | The format in which exceptions are to be reported by the WMS (default=XML).
+| +Other sample dimension(s) | O | Value of other dimensions as appropriate
+|=========================================================
+
+The starred (*) values are optional in the WMS standard but
+mandatory in the Sci-WMS implementation of the standard.
+
+
+A working example of +GetMap+ with the Sci-WMS testbed is:
+
+http://107.21.136.52:8080/mymaracoos/wmstest?REQUEST=GetMap&VERSION=1.1.1&LAYERS=u%2Cv&STYLES=vectors_average_jet_None_None_node_False&CRS=EPSG%3A4326&BBOX=-65.0%2C36.0%2C-60.0%2C42.0&WIDTH=800&HEIGHT=600&FORMAT=image%2Fpng&TIME=2013-05-11T00:00:00&ELEVATION=0[+http://107.21.136.52:8080/mymaracoos/wmstest?REQUEST=GetMap&VERSION=1.1.1&LAYERS=u%2Cv&STYLES=vectors_average_jet_None_None_node_False&CRS=EPSG%3A4326&BBOX=-65.0%2C36.0%2C-60.0%2C42.0&WIDTH=800&HEIGHT=600&FORMAT=image%2Fpng&TIME=2013-05-11T00:00:00&ELEVATION=0+]
+
+The WMS Parameters
+^^^^^^^^^^^^^^^^^^
+
+The WMS parameters shown in the example are:
+
+. +REQUEST=GetFeatureInfo+
+
+. +CRS=EPSG%3A3857+
+
+. +LAYERS=u-vel+
+
+. +ELEVATION=0+
+
+. +TRANSPARENT=TRUE+
+
+. +FORMAT=image%2Fpng+
+
+. +STYLES=pcolor_average_jet_0_1_node_False+
+
+. +SERVICE=WMS+
+
+. +BBOX=-8469908.967472%2C5509587.080677%2C-8408759.344853%2C5543983.7434+
+
+. +INFO_FORMAT=text+
+
+. +QUERY_LAYERS=u-vel+
+
+. +FEATURE_COUNT=100+
+
+. +WIDTH=800+
+
+. +HEIGHT=450+
+
+. +TIME=2010-04-01T00:00:00/2010-09-01T00:00:00+
+
+
+
+The +STYLES+ Parameter
+^^^^^^^^^^^^^^^^^^^^^^
+
+Sci-WMS adds an extra +STYLES+ parameter to the usual WMS parameter list.  
+In the example URL shown, it is:
+
+-----
+STYLES=pcolor_average_jet_0_1_node_False
+-----
+
+The general form for +STYLES+ is an underscore-separated list of seven
+subparameters of the general form:
+
+-----
+STYLES=position1_position2_position3_position4_position5_position6_position7
+-----
+
+with the explanation of each position as follows:
+
+. The style of image to return.  For node variables the options are
++pcolor+, +facets+, +contours+ and +filledcontours+.  If you specify
+two variables such as +LAYERS=u,v+ then the options are +vectors+
+and +barbs+.  For cell variables the options are the same.
+
+. This is a processing choice if a time range is specified rather
+than a single time, with the options being +average+ and
++maximum+.
+
+. This specifies the colormap to be used, and is a case-sensitive
+match to the http://www.scipy.org/Cookbook/Matplotlib/Show_colormaps[Matplotlib default colormaps].
+If you specify a colormap that contains an underscore, substitute a hyphen for
+the underscore in the parameter listing.
+
+. The minimum for color scaling, entered as an integer or decimal number.
+Entering +None+ for either or both this and the next parameter 
+will result in autoscaling.
+
+. The maximum for color scaling, entered as an integer or decimal number.
+Entering +None+ for either or both this and the previous parameter
+will result in autoscaling.
+
+. This specifies whether the variable input in the +LAYERS+ parameter
+is in the middle of or on the node/vertex of an unstructured cell.
+The allowable values are +cell+ or +node+.
+
+. This is a case-sensitive boolean to indicate whether the absolute
+value (magnitude) or actual value should be taken if only one
+variable is specified in the +LAYERS+ parameter.  For example,
++LAYERS=u+ will return positive and negative values of +u+ is
+this is set to +False+, but only the magnitude of +u+ is this
+is set to +True+.  In the case of vectors, +True+ indicates
+autoscaling of vectors, and +False+ indicates no autoscaling.
+A number in this position rather than a boolean will be
+taken as the scale, starting with +2+.
+
+
+Paegan
+------
+
+https://github.com/asascience-open/paegan[+https://github.com/asascience-open/paegan+]
+
+A Python package for the processing and analysis of geophysics and numbers.
+
+Requirements
+~~~~~~~~~~~~
+
+The requirements are listed at:
+
+https://github.com/asascience-open/paegan/blob/master/requirements.txt[+https://github.com/asascience-open/paegan/blob/master/requirements.txt+]
+as:
+
+-----
+numpy==1.6.2
+unittest2==0.5.1
+netCDF4==1.0.2
+Shapely==1.2.17
+GDAL==1.9.1
+pytz==2012h (world timezone definitions for python)
+python-dateutil==2.1
+Fiona (a python interface for GDAL)
+-----
+
+
+gridfields
+----------
+
+http://code.google.com/p/gridfields/[+http://code.google.com/p/gridfields/+]
+
+A package for the algebraic manipulation of unstructured grids in Python.
+
+This is used in such packages as Paegan and Sci-WMS.
+
+The package can be downloaded using SVN via:
+
+-----
+svn checkout http://gridfields.googlecode.com/svn/trunk/ gridfields
+-----
+
+The README file at:
+
+http://code.google.com/p/gridfields/wiki/README[+http://code.google.com/p/gridfields/wiki/README+]
+
+provides various bits of information.
+
+Installing
+~~~~~~~~~~
+
+Download +tag.tgz+ from:
+
+http://code.google.com/p/gridfields/downloads/detail?name=tag.tgz&can=2&q=[+http://code.google.com/p/gridfields/downloads/detail?name=tag.tgz&can=2&q=+]
+
+and then:
+
+-----
+tar xzvf tag.gz
+cd tag
+cd 
+-----
+
+Ferret-THREDDS Data Server (F-TDS)
+----------------------------------
+
+http://ferret.pmel.noaa.gov/LAS/documentation/the-ferret-thredds-data-server-f-tds/[+http://ferret.pmel.noaa.gov/LAS/documentation/the-ferret-thredds-data-server-f-tds/+]
+
+An OPeNDAP server that uses the analysis capabilities of Ferret as a mechanism
+to create and serve virtual variables built from existing NetCDF variables.
+F-TDS expands the capabilities of TDS by allowing users to ask for data
+to be processed, e.g. regridded, averaged, etc., on the server before the
+results are delivered to the user via OPeNDAP.  This also allows data
+from multiple sources to be used as input for calculations on the server.
+
+This was mentioned in the call as another project that can or is attempting
+to provide unstructured grid capabilities such as regridding.
+
+Installing Ferret
+~~~~~~~~~~~~~~~~~
+
+To install the F-TDS package you must first install Ferret and TDS.  The
+installation of TDS is covered here:
+
+http://stommel.tamu.edu/~baum/thredds2.html[+http://stommel.tamu.edu/~baum/thredds2.html+]
+
+and the installation procedure for Ferret follows.
+
+The download page for everything needed is:
+
+http://ferret.pmel.noaa.gov/Ferret/downloads/downloading_ferret[+http://ferret.pmel.noaa.gov/Ferret/downloads/downloading_ferret+]
+
+and we proceeded to the page for 64-bit Linux systems:
+
+http://ferret.pmel.noaa.gov/Ferret/downloads/64-bit-linux-rh5-downloads[+http://ferret.pmel.noaa.gov/Ferret/downloads/64-bit-linux-rh5-downloads+]
+
+and downloaded +fer_executables.tar.gz+, +fer_environment.tar.gz+ and
++fer_dsets.tar.gz+.
+
+Proceed to the installation and update guide at:
+
+http://ferret.pmel.noaa.gov/Ferret/downloads/ferret-installation-and-update-guide[+http://ferret.pmel.noaa.gov/Ferret/downloads/ferret-installation-and-update-guide+]
+
+Create a base directory for the installed files and go there:
+
+-----
+su
+mkdir /opt/ferret
+cd /opt/ferret
+-----
+
+Assuming the files were downloaded to +/home/baum/FERRET+, install the
+environment variables package into +/opt/ferret+ via:
+
+-----
+tar xzf /home/baum/FERRET/fer_environment.tar.gz
+-----
+
+Create a base directory for the data files and install them there:
+
+-----
+su
+mkdir /opt/ferret/dsets
+cd /opt/ferret/dsets
+tar xzf /home/baum/FERRET/fer_dsets.tar.gz
+-----
+
+Now finish the installation and install the executables by running:
+
+-----
+/opt/ferret/bin/Finstall
+-----
+
+and providing the following responses:
+
+-----
+1
+FER_DIR --> /opt/ferret
+'fer_executables.tar.gz' location --> /home/baum/FERRET
+2
+FER_DIR --> /opt/ferret
+FER_DSETS --> /opt/ferret/dsets
+desired 'ferret_paths' location --> /opt/ferret
+3
+-----
+
+Now as a regular user set up the paths for yourself via:
+
+-----
+source /opt/ferret/ferret_paths
+-----
+
+Now if you enter +ferret+ you'll obtain:
+
+--------------------
+ 	NOAA/PMEL TMAP
+ 	FERRET v6.842  
+ 	Linux 2.6.18-308.1.1.el5 64-bit - 01/31/13
+ 	10-May-13 15:10     
+yes?
+--------------------
+
+Installing F-TDS
+~~~~~~~~~~~~~~~~
+
+The instructions for installing F-TDS can be found at:
+
+http://ferret.pmel.noaa.gov/LAS/documentation/the-ferret-thredds-data-server-f-tds/installation-instructions-for-f-tds/[+http://ferret.pmel.noaa.gov/LAS/documentation/the-ferret-thredds-data-server-f-tds/installation-instructions-for-f-tds/+]
+
+First, download the very large LAS distribution from:
+
+http://ferret.pmel.noaa.gov/LAS/downloads/las-downloads[+http://ferret.pmel.noaa.gov/LAS/downloads/las-downloads+]
+
+and unpack it somewhere, e.g.
+
+-----
+tar xzvf las.v8.0.tar.gz
+-----
+
+Then download the Perl script needed to create a partial XML template:
+
+http://ferret.pmel.noaa.gov/LAS/documentation/the-ferret-thredds-data-server-f-tds/ferret_env.pl[+http://ferret.pmel.noaa.gov/LAS/documentation/the-ferret-thredds-data-server-f-tds/ferret_env.pl+]
+
+Run this Perl script, although be sure you've already set up the Ferret paths:
+
+-----
+cd /home/baum/FERRET/las.v8.0
+source /opt/ferret/ferret_paths
+perl ferret_env.pl > env.xml
+-----
+
+Now create an XML file from a template:
+
+-----
+cp env.xml JavaSource/resources/ferret
+cd JavaSource/resources/ferret
+cp FerretBackendConfig.xml.base.in FerretConfig.xml
+vi Ferret_Config.xml
+-----
+
+Now append the +env.xml+ file to +FerretConfig.xml+ below
+the +</messages>+ closing element in the latter.
+
+Edit +FerretConfig.xml+ and change the following within
+the +<invoker>+ element:
+
+. +@FERRET@+ to +/opt/ferret/bin/ferret+
+. +@TDS_TEMP@+ to +/raid/TMP+
+. +@TDS_DYNADATA@+ to +/raid/TMP+
+. +@SERVER_ROOT_URL@+ to +barataria.tamu.edu:8080+
+
+Ignore or remove the other attributes within +<invoker>+.
+
+Go back to the top LAS directory and create an XML file
++build.xml+ from a template:
+
+-----
+cd /home/baum/FERRET/las.v8.0
+cp build.xml.in build.xml
+vi build.xml
+-----
+
+Change +@JAKARTA_HOME@+ in +build.xml+ to +/opt/tomcat6+.
+
+Build the jar file
++ferret_iosp.jar+ and copy it to the appropriate place in
+the Tomcat server directories.
+
+-----
+/opt/ant/bin/ant iosp
+cd /opt/tomcat6/webapps/thredds/WEB-INF/classes
+jar xvf /home/baum/FERRET/las.v8.0/dist/lib/ferret_iosp.jar 
+-----
+
+Copy the +FerretConfig.xml+ file to the appropriate place:
+
+-----
+cp /home/baum/FERRET/las.v8.0/JavaSource/resources/ferret/FerretConfig.xml /opt/tomcat6/webapps/thredds/WEB-INF/classes/resources/iosp/
+-----
+
+Edit the +threddsConfig.xml+ file:
+
+-----
+vi /opt/tomcat6/content/thredds/threddsConfig.xml
+-----
+
+and add:
+
+-----
+<datasetSource>gov.noaa.pmel.tmap.iosp.FerretDataSource</datasetSource>
+
+<nj22Config>
+  <ioServiceProvider
+  <ioServiceProvider class="gov.noaa.pmel.tmap.iosp.FerretIOServiceProvider"/>
+</nj22Config>
+-----
+
+Configuring the THREDDS Catalog for F-TDS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The manual tells us:
+
+______________________________________
+Find the THREDDS catalog that is being used to configure your TDS.  It's
+$TOMCAT_HOME/content/thredds/catalog.xml.  If you have created some virtual
+data sets an easy to way to serve them is to add datasetScan element to the
+catalog.  However, once the two Ferret TDS plug-ins are installed and
+configured you can treat Ferret journal scripts that read netCDF data (and
+optionally create virtual variables) just like any other file to be added to
+the THREDDS catalog of the TDS.
+______________________________________
+
+An example +datasetScan+ element would be:
+
+-----
+<datasetScan name="Data From F-TDS" path="data" location="/home/roland/mydata" serviceName="gridded">
+   <filter>
+      <include wildcard="*.nc"/>
+      <include wildcard="*.fds"/>
+      <include wildcard="*.jnl"/>
+   </filter>
+</datasetScan>
+-----
+
+Modes of F-TDS Usage
+~~~~~~~~~~~~~~~~~~~~
+
+There are a couple of ways the extensive data analysis capabilities of Ferret
+can be employed within F-TDS:
+
+. simple analysis tasks can be performed via embedding the appropriate Ferret
+commands within an extended OPeNDAP URL string; and
+. arbitrarily complex analysis tasks can be performed by creating Ferret
+script files and placing them within the data directory structure of the
+server.
+
+The following two sections explain each of these methods and provide examples.
+
+Using F-TDS Via Commands Within the OPeNDAP URL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A typical OPeNDAP request looks like:
+
+-----
+http://ferret.pmel.noaa.gov:8080/thredds/dodsC/data/coads_climo.jnl.asc?SST[0:2:2][0:2:8][0:2:17]
+-----
+
+where the suffix +.asc+ indicates which of the
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages[OPeNDAP services]
+is desired.  These services are:
+
+. +.das+ - to return the
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages#Dataset_Attribute_Structure[dataset attribute structure] of a dataset;
+. +.dds+ - to return the entire
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages#Dataset_Descriptor_Structure[data descriptor structure] of a dataset;
+. +.dods+ - to
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages#Data_Transmission[return the data] requested by a given URL;
+. +.asc+ or +.ascii+ - to return an
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages#ASCII_Service[ASCII representation] of the data
+requested;
+. +.info+ - to return
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages#Info_Service[human-readable information] about the server and
+dataset; and
+. +.ver+ - to return version information about the server.
+
+F-TDS expands the capabilities of OPeNDAP requests via an extended syntax:
+
+-----
+http://machine:port/thredds/dodsC/dataset_expr_{dataset2,dataset3,...}{expression1;expression2;...}.URLsuffix?constraint 
+-----
+
+where:
+
+. +_expr_+ indicates the start of the extended F-TDS analysis expression;
+
+. +{dataset2,dataset3,...}+ is a comma-separated list of the datasets to be used by the F-TDS
+analysis expression;
+
+. +{expression1;expression2;...}+ is a sequence of semicolon-separated operations
+that are to be performed on the datasets, where the operations can be a Ferret
+commmand, a variable, or a variable definition.  If the operation is a
+variable or variable definition, the variable will be in the output dataset;
+if the operation is a Ferret command, it will be executed by F-TDS.
+
+. +URLsuffix?constraint+ are standard parts of OPeNDAP URLs as described
+elsewhere.
+
+F-TDS also adds another service to the list of OPeNDAP service suffixes described
+above so the server knows to use the capabilities of Ferret, i.e.
+
+. +.jnl+ - to use Ferret to process the dataset and return the requested data.
+
+An example of a F-TDS analysis expression is:
+
+-----
+http://porter.pmel.noaa.gov:8920/thredds/dodsC/las/NOAA_NCEP_EMC_CMB_Ocean_Analysis_ml/data__iridl.ldeo.columbia.edu_SOURCES_.NOAA_.NCEP_.EMC_.CMB_.Pacific_.monthly_dods.jnl_expr_{}{letdeq1A=temp*2}.asc?A
+-----
+
+wherein a new variable +A+ is created that is equal to two times +TEMP+.  In
+this example:
+
+. +porter.pmel.noaa.gov+ is the name of the machine running the server;
+. +8920+ is the port number on which the service is running;
+. +thredds/dodsC+ indicates which TDS service is to be used;
+. +las/NOAA_NCEP_EMC_CMB_Ocean_Analysis_ml+ is the directory holding the data;
+. +data__iridl.ldeo.columbia.edu_SOURCES_.NOAA_.NCEP_.EMC_.CMB_.Pacific_.monthly_dods+ is the filename;
+. the empty first set of brackets +{}+ indicates that no additional datasets
+are to be used;
+. +\{letdeq1A=temp*2\}+ is the
+http://ferret.pmel.noaa.gov/Ferret/documentation/users-guide/variables-xpressions/XPRESSIONS[Ferret analysis expression] that creates
++A+ by doubling +temp+;
+. +asc+ is an http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages[OPeNDAP message] that requests an ASCII representation of the
+requested data; and
+. +?A+ is an
+http://docs.opendap.org/index.php/UserGuideOPeNDAPMessages#Constraint_Expressions[OPeNDAP constraint] request to return only +A+.
+
+Another example is:
+
+-----
+http://porter.pmel.noaa.gov:8920/thredds/dodsC/las/NOAA_NCEP_EMC_CMB_Ocean_Analysis_ml/data__iridl.ldeo.columbia.edu_SOURCES_.NOAA_.NCEP_.EMC_.CMB_.Pacific_.monthly_dods.jnl_expr_{http://porter.pmel.noaa.gov:8920/thredds/dodsC/las/coads_climatology_cdf/data_coads_climatology.jnl}{letdeq1sst_2_regrid=sst[d=2,gxy=temp[d=1]]-temp[d=1]}
+-----
+
+where F-TDS defines a new variable that is the difference between SST from
+the COADS 2x2 degree grid interpolated to the same grid as the +TEMP+ variable from the
+NCEP Pacific Ocean Analysis 1x1 degree grid, and the +TEMP+ variable.
+
+Using F-TDS Via Ferret Scripts in the Data Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An example is provided within the LAS documentation pages at:
+
+http://ferret.pmel.noaa.gov/LAS/documentation/installer-documentation/advanced-dataset-configuration/fixing-the-z-axis-of-the-xml[+http://ferret.pmel.noaa.gov/LAS/documentation/installer-documentation/advanced-dataset-configuration/fixing-the-z-axis-of-the-xml+]
+
+F-TDS can be used to run arbitrarily complex and lengthy Ferret commands.
+These can be used to define and create new variables within a dataset, and
+to virtually present these variables within the dataset.  The following Ferret
+script +sigma_script_example.jnl+ converts between sigma-levels and a depth axis (explaining the
+challenging and terse albeit tremendously useful syntax of Ferret is
+beyond the scope of this document):
+
+-----
+! sigma_script_example.jnl
+! Script to define variables for the conversion to depth in meters.
+
+! Open the dataset
+USE "/home/data/ansley/las_data/uvst.nc"
+
+! Regridding from sigma-z levels to depths.
+
+! These are the depths from the LEvitus Climatology. Any appropriate set of values may be used.
+
+DEFINE AXIS/Z/UNITS=meters/DEPTH zaxmeters = \
+{0,10,20,30,50,75,100,150,200,300,400,600,800,1000,1200,1500,2000,3000,4000,5000}
+
+LET zaxvar = z[gz=zaxmeters]
+LET Zdepth = depth * Z[g=u] 
+
+! regrid in Z.  Defining the variables with /D=1 assigns them to the dataset we opened above.
+
+LET/D=1/UNITS="`u,RETURN=units`"/TITLE="`u,RETURN=title`" u_z = ZAXREPLACE(u,Zdepth, zaxvar)
+LET/D=1/UNITS="`v,RETURN=units`"/TITLE="`v,RETURN=title`" v_z = ZAXREPLACE(v,Zdepth, zaxvar)
+LET/D=1/UNITS="`temp,RETURN=units`"/TITLE="`temp,RETURN=title`" temp_z =ZAXREPLACE(temp, Zdepth, zaxvar)
+LET/D=1/UNITS="`salt,RETURN=units`"/TITLE="`salt,RETURN=title`" salt_z =ZAXREPLACE(salt, Zdepth, zaxvar) 
+-----
+
+Once such a script has been written and debugged from the Ferret command line
+- since such debugging is much, much easier from the Ferret command line then
+from within the signicantly more complex environment of a F-TDS implementation
+- it can be placed into a +scripts+ subdirectory in your server, e.g.
+
+-----
+mkdir $TOMCAT_HOME/content/las/conf/server/data/scripts
+cp sigma_script_example.jnl $TOMCAT_HOME/content/las/conf/server/data/scripts
+-----
+
+Maximum confusion level reached for the day.  Continued tomorrow.
+
+
+Extending OPeNDAP to Offer Remapping Services
+---------------------------------------------
+
+http://opendap.org/node/308[+http://opendap.org/node/308+]
+
+A proposal for extending the OPeNDAP standard into the realm of remapping
+services.
+
+ESMF/ESMP
+---------
+
+http://earthsystemcog.org/projects/esmp/[+http://earthsystemcog.org/projects/esmp/+]
+
+Not mentioned in the webinar but discussed in the Google group is the use of
+UGRID in ESMF, the Earth System Modeling Framework and ESMP, the Python
+interface to ESMF.  Excerpts from:
+
+https://groups.google.com/forum/#!topic/ugrid-interoperability/aAoc7JEkzR8[+https://groups.google.com/forum/#!topic/ugrid-interoperability/aAoc7JEkzR8+]
+
+-----
+In ESMF versions starting with 5.3.0, UGRID can be used two ways.  First, our
+offline interpolation weight generation application (ESMF_RegridWeightGen) can
+read in and produce weights for UGRID files, in addition to other grid file
+conventions.  Second, if a user application uses ESMF, you can create a mesh
+object from a UGRID file, build data fields on it,  and perform operations
+like regridding on those.
+...
+The most recent release of ESMP (ESMF_6_1_0_ESMP_01) also enables you to
+create a mesh from a UGRID file, build data fields on it, and then interpolate
+data between the fields using a Python API.
+...
+Note, we currently only support a subset of the UGrid convention (2D meshes).
+The description of exactly which version of UGrid we based our code on is at
+the end of the RegridWeightGen documentation.
+-----
+
+Installation
+~~~~~~~~~~~~
+
+The package can be downloaded from here:
+
+http://www.earthsystemcog.org/projects/esmp/releases[+http://www.earthsystemcog.org/projects/esmp/releases+]
+
+We choose the CVS method to get ESMPy:
+
+-----
+cvs -d:pserver:anonymous@esmfcontrib.cvs.sourceforge.net:/cvsroot/esmfcontrib login
+cvs -z3 -d:pserver:anonymous@esmfcontrib.cvs.sourceforge.net:/cvsroot/esmfcontrib co -P -d python -rESMPy_620b20_01 python
+-----
+
+and for the corresponding ESMF package:
+
+-----
+git archive --remote=git://esmf.git.sourceforge.net/gitroot/esmf/esmf --format=tar --prefix=esmf/ ESMF_6_2_0_beta_snapshot_20 > esmf.tar
+-----
+
+For the ESMF package, enter the following commands:
+
+-----
+tar xvf esmf.tar
+export ESMF_DIR=/home/baum/PYTHON/esmf
+export ESMF_COMM=mpiuni
+export ESMF_ABI=64
+export ESMF_OS=Linux
+export ESMF_COMPILER=gfortran
+export ESMF_INSTALL_PREFIX=/opt/esmf
+make
+su
+make install
+-----
+
+A new version of the GCC compiler suite had to installed since the Fortran
+compiler already installed wasn't recent enough.
+
+For the ESMP package, enter the following commands:
+
+-----
+export ESMFMKFILE=/opt/esmf/lib/libO/Linux.gfortran.64.mpiuni.default/esmf.mk
+python2.7 setup.py build
+su
+python2.7 setup.py install
+-----
+
+Usage and Examples
+~~~~~~~~~~~~~~~~~~
+
+To use the Python ESMF interface:
+
+-----
+python2.7
+Python 2.7.2 (default, Mar  1 2012, 21:28:11) 
+[GCC 4.1.2 20080704 (Red Hat 4.1.2-51)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import ESMF
+-----
+
+
+cf-python
+---------
+
+http://cfpython.bitbucket.org/[+http://cfpython.bitbucket.org/+]
+
+A Python package implementing the CF data model for reading, writing and
+processing data and metadata in NetCDF and other files.
+
+I'm not sure how this is directly related to unstructured grids, but it's
+pretty cool.
+
+Installation
+~~~~~~~~~~~~
+
+The prerequisites are:
+
+. 2.6 >= Python > 3.0
+. Numpy >= 1.6
+. netcdf4-python >= 0.97
+. udunits-2
+
+Download the package via the button at the site, and use the following
+commands:
+
+-----
+tar xzvf cf-0.9.7.1.tar.gz
+cd cf-0.9.7.1
+python2.7 setup.py build
+su
+python2.7 setup.py install
+-----
+
+Usage
+~~~~~
+
+The documentation page is at:
+
+http://cfpython.bitbucket.org/docs/0.9.7/build/index.html[+http://cfpython.bitbucket.org/docs/0.9.7/build/index.html+]
+
+and offers a goodly number of examples as well as a reference manual.
+

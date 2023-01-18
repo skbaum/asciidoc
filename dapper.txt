@@ -1,0 +1,570 @@
+Dapper
+======
+Steven K. Baum
+v0.1, 2014-07-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+About Dapper.
+
+Links
+~~~~~
+
+
+DChart/Dapper -
+http://www.epic.noaa.gov/epic/dapper_dchart/unsupported.html[+http://www.epic.noaa.gov/epic/dapper_dchart/unsupported.html+]
+
+DChart -
+http://www.epic.noaa.gov/epic/software/dchart/[+http://www.epic.noaa.gov/epic/software/dchart/+]
+
+Downloads -
+http://www.epic.noaa.gov/epic/dapper_dchart/index.html[+http://www.epic.noaa.gov/epic/dapper_dchart/index.html+]
+
+Dapper Administration Guide -
+http://www.epic.noaa.gov/epic/software/dapper/dapperdocs/[+http://www.epic.noaa.gov/epic/software/dapper/dapperdocs/+]
+
+
+
+Installation
+------------
+
+Go to:
+
+http://www.epic.noaa.gov/epic/dapper_dchart/download.html[+http://www.epic.noaa.gov/epic/dapper_dchart/download.html+]
+
+and get the last available version (released 3-10-2009).
+
+http://www.epic.noaa.gov/epic/software/downloads/dapper/dapper-2.2.0.tar.gz[+http://www.epic.noaa.gov/epic/software/downloads/dapper/dapper-2.2.0.tar.gz+]
+
+Create a directory for the distribution, unpack it, and go to the home
+directory.
+
+-----
+mkdir DAPPER
+mv dapper-2.2.0.tar.gz DAPPER
+cd DAPPER
+tar xzvf dapper-2.2.0.tar.gz
+cd dapper-2.2.0
+------
+
+Initial Configuration and Testing
+---------------------------------
+
+The installation and configuration instructions are at:
+
+http://www.epic.noaa.gov/epic/dapper_dchart/install.html[+http://www.epic.noaa.gov/epic/dapper_dchart/install.html+]
+
+Configuring MySQL
+~~~~~~~~~~~~~~~~~
+
+Checking the MySQL Status
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Check the MySQL status:
+
+-----
+/etc/init.d/mysqld status
+-----
+
+If it's up, good.  If not, then start it via:
+
+-----
+/etc/init.d/mysqld start
+Starting mysqld:                                           [  OK  ]
+-----
+
+Creating a Dapper User
+^^^^^^^^^^^^^^^^^^^^^^
+
+Enter MySQL as root user and create a user:
+
+-----
+mysql -u root -p
+Enter password:  [g...]
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 60225
+Server version: 5.1.61 Source distribution
+
+Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>create user 'baum@localhost' identified by 'p*';
+mysql>grant index, create, select, insert, update, delete, alter, lock tables on dapperexample.* to 'baum'@'localhost' identified by 'p*';
+-----
+
+Show MySQL Privileges
+^^^^^^^^^^^^^^^^^^^^^
+
+-----
+mysql> show grants for 'baum'@'localhost';
++----------------------------------------------------------------------------------------------------------------------+
+| Grants for baum@localhost                                                                                            |
++----------------------------------------------------------------------------------------------------------------------+
+| GRANT ALL PRIVILEGES ON *.* TO 'baum'@'localhost' IDENTIFIED BY PASSWORD '*258F04EDB0F2EFAAC5B3F73433305B8AD3F91260' |
+| GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, INDEX, ALTER, LOCK TABLES ON `dapperexample`.* TO 'baum'@'localhost'   |
++----------------------------------------------------------------------------------------------------------------------+
+4 rows in set (0.00 sec)
+-----
+
+
+Loading Data Into Database
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+export JAVA_HOME=/opt/jdk1.7.0_03
+cd examples/argo
+../../dapperload.sh -u baum -p p* create dapperexample argo_sample
+../../dapperload.sh -l example.ptr -u baum -p p* load dapperexample argo_sample
+Converting 1D character variables to attributes
+Only loading datasets modified since last update
+Database contains 0 files
+Processing profile 20 in file
+/home/baum/DAPPER/dapper-2.2.0/examples/argo/data/20050101_prof.nc
+Processing profile 40 in file
+/home/baum/DAPPER/dapper-2.2.0/examples/argo/data/20050101_prof.nc
+Processing profile 60 in file
+/home/baum/DAPPER/dapper-2.2.0/examples/argo/data/20050101_prof.nc
+77 items loaded into database
+-----
+
+Checking Database and Tables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-----
+mysql>use dapperexample;
+
+Database changed
+mysql> show tables;
++-------------------------------+
+| Tables_in_dapperexample       |
++-------------------------------+
+| argo_sample                   |
+| argo_sample_AttCh             |
+| argo_sample_AttChJoin         |
+| argo_sample_AttFloat          |
+| argo_sample_AttFloatJoin      |
+| argo_sample_AttInt            |
+| argo_sample_AttIntJoin        |
+| argo_sample_VarCollection     |
+| argo_sample_VarCollectionJoin |
+| argo_sample_Varinfo           |
+| categoryinfo                  |
+| dapper_schema                 |
+| datasetinfo                   |
+| datasetvarinfo                |
+| datasubtypeinfo               |
+| datatypeinfo                  |
+| directoryinfo                 |
+| hilo                          |
+| keywordinfo                   |
++-------------------------------+
+19 rows in set (0.00 sec)
+
+mysql> describe argo_sample;
++--------------+--------------+------+-----+-------------------+-----------------------------+
+| Field        | Type         | Null | Key | Default           | Extra                       |
++--------------+--------------+------+-----+-------------------+-----------------------------+
+| dataRecordID | int(11)      | NO   | PRI | NULL              | auto_increment              |
+| dirID        | int(11)      | NO   | MUL | NULL              |                             |
+| profileIndex | int(11)      | NO   |     | NULL              |                             |
+| filename     | varchar(255) | NO   |     |                   |                             |
+| minlong      | double       | NO   |     | NULL              |                             |
+| maxlong      | double       | NO   |     | NULL              |                             |
+| minlat       | double       | NO   |     | NULL              |                             |
+| maxlat       | double       | NO   |     | NULL              |                             |
+| mindepth     | double       | NO   |     | NULL              |                             |
+| maxdepth     | double       | NO   |     | NULL              |                             |
+| minjday      | int(11)      | NO   | MUL | NULL              |                             |
+| minms        | int(11)      | NO   |     | NULL              |                             |
+| maxjday      | int(11)      | NO   |     | NULL              |                             |
+| maxms        | int(11)      | NO   |     | NULL              |                             |
+| realtime     | tinyint(1)   | YES  |     | NULL              |                             |
+| varsid       | int(11)      | NO   |     | NULL              |                             |
+| modified     | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++--------------+--------------+------+-----+-------------------+-----------------------------+
+17 rows in set (0.03 sec)
+-----
+
+Modifying the +dapper.properties+ File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Edit the +dapper.properties.sample+ file.
+
+-----
+cd ../..
+cd etc
+cp dapper.properties.sample dapper.properties
+vi dapper.properties
+-----
+
+Add the following to +dapper.properties+:
+
+-----
+dapper.cdp_databases=dapperexample
+dapper.user = baum
+dapper.password = p*
+-----
+
+Starting the Server
+~~~~~~~~~~~~~~~~~~~
+
+Go back to the home directory and start the server:
+
+-----
+cd ..
+./dapper.sh start
+Setting system property opendap.cache.expires to 3600
+Setting system property opendap.cache.capacity to 100000
+Disable caching = false
+Constructed GeneralCacheAdministrator()
+Creating new cache
+Default cache time  = 3600
+Default cache time  = 3600
+Starting Dapper Tomcat server...
+Using CATALINA_BASE:   /home/baum/DAPPER/dapper-2.2.0/jakarta
+Using CATALINA_HOME:   /home/baum/DAPPER/dapper-2.2.0/jakarta
+Using CATALINA_TMPDIR: /home/baum/DAPPER/dapper-2.2.0/jakarta/temp
+Using JRE_HOME:       /opt/jdk1.7.0_03
+-----
+
+Checking the Dapper Servlet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Verify that the Dapper servlet is running by going to:
+
+http://localhost:8080/dods/[+http://localhost:8080/dods/+]
+
+Checking the DChart Web Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now verify that the DChart web interface is running by going to:
+
+http://localhost:8080/dchart/[+http://localhost:8080/dchart/+]
+
+Now do the following to see the gridded data capabilities:
+
+* Drag a region on the map with your mouse.
+* Click on +Plot Selected+.
+* See your NCAR Reanalysis mean daily temperature field
+plotted below the map you used to drag the region.
+
+And to see the in-situ data capabilities:
+
+* Click on *Argo Pacific profiles+.  This will open
+another window or tab.  Just nuke that window or tab and
+go back to your original page.
+* Drag around a set of profile stations as shown on the map.
+* Click on +Plot Selected+.
+* See your profile(s) plotted beneath your dragging map.
+
+For a property/property plot:
+
+* Click on +Property/Property plot+ in the +Plot type+
+window.
+* Choose your properties in the +Y axis variables+ and
++X axis variables+ windows that just magically appeared
+to the immediate right of the +Plot type+ menu.
+* Click on +Plot Selected+ and view your plot.
+* View your property/property plot.
+
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+If something isn't working, first check the messages in the
++jakarta/logs+ directory, e.g.
+
+-----
+cd jakarta/logs
+ls -lt
+total 1476
+-rw-rw-r--. 1 baum baum 441731 Aug 18 12:49 catalina.out
+-rw-rw-r--. 1 baum baum 532461 Aug 18 12:49 dapper_access_log.2014-08.log
+-rw-rw-r--. 1 baum baum 452297 Aug 18 12:49 dapper.log
+-rw-rw-r--. 1 baum baum   7207 Aug 18 12:01 catalina.2014-08-18.log
+-rw-rw-r--. 1 baum baum      0 Aug 18 12:01 admin.2014-08-18.log
+-rw-rw-r--. 1 baum baum      0 Aug 18 12:01 host-manager.2014-08-18.log
+-rw-rw-r--. 1 baum baum      0 Aug 18 12:01 localhost.2014-08-18.log
+-rw-rw-r--. 1 baum baum      0 Aug 18 12:01 manager.2014-08-18.log
+-----
+
+Check the tail ends of the most recent files in that directory.
+
+
+Server Configuration
+--------------------
+
+Dapper consists of two configurable servlets:
+
+* the Dapper servlet that provides OPeNDAP access to data; and
+* the DChart servlet that provides an AJAX user interface to the
+Dapper servlet.
+
+
+
+
+
+
+
+Dapper Aggregations
+~~~~~~~~~~~~~~~~~~~
+
+Multiple NetCDF files can be aggregated into a single logical or virtual
+NetCDF file.  This is done via the aggregation file +aggs.xml+ located
+in the +etc+ subdirectory.
+Two kinds of aggregations are supported:
+
+* variable aggregations that combine the variables from multiple NetCDF
+files into a single logical file; and
+* outer aggregations that concatenate the outer dimension of variables with
+the same name in multiple files into a single logical variable where the
+outer dimension has a size equal to the sum of the sizes of the outer
+dimension in the original NetCDF files.
+
+Other capabilities include:
+
+* nesting outer aggregations within variable aggregations; and
+* aggregating NetCDF files that are available locally or via either
+HTTP or OPeNDAP.
+
+A sample aggregation file is available in the distribution as the
+file +aggs.xml.sample+ in the +etc+ subdirectory.  The HTTP addresses
+in that sample file are no longer valid, though, so use the following 
+instead:
+
+-----
+<scichart>
+    <aggregation cacheTime="86400" id="www.cdc.noaa.gov/Datasets/ncep.reanalysis.dailyavgs/pressure" type="variable">
+        <aggregation type="outer" dim="time">
+            <dataset url="http://www.esrl.noaa.gov/psd/thredds/fileServer/Datasets/NARR/Dailies/monolevel/air.sfc.2006.nc"/>
+            <dataset url="http://www.esrl.noaa.gov/psd/thredds/fileServer/Datasets/NARR/Dailies/monolevel/air.sfc.2007.nc"/>
+        </aggregation>
+        <aggregation type="outer" dim="time">
+            <dataset url="http://www.esrl.noaa.gov/psd/thredds/fileServer/Datasets/NARR/Dailies/monolevel/hgt.tropo.2006.nc"/>
+            <dataset url="http://www.esrl.noaa.gov/psd/thredds/fileServer/Datasets/NARR/Dailies/monolevel/hgt.tropo.2007.nc"/>
+        </aggregation>
+    </aggregation>
+</scichart>
+-----
+
+to test this:
+
+-----
+cd etc
+cp aggs.xml.sample aggs.xml
+-----
+
+Replace the +dataset+ strings in that file with the ones shown above, or
+just delete everything in the file and cut and paste the above into it.
+
+-----
+cd ..
+./dapper.sh stop
+./dapper.sh start
+-----
+
+Now point your browser at:
+
+http://localhost:8080/dods/aggregations/www.cdc.noaa.gov/Datasets/ncep.reanalysis.dailyavgs/[+http://localhost:8080/dods/aggregations/www.cdc.noaa.gov/Datasets/ncep.reanalysis.dailyavgs/+]
+
+The four URIs have been consolidated into a single logical OPeNDAP URL.
+This can be seen via the +dds+ file that is extracted and shown
+below.  The number of times is 730, or two years of days, and
+both the variables +air+ and +hgt+ can be seen.
+
+-----
+Dataset {
+    Float64 time[time = 730];
+    Grid {
+     ARRAY:
+        Float32 lon[y = 277][x = 349];
+     MAPS:
+        Float32 y[y = 277];
+        Float32 x[x = 349];
+    } lon;
+    Float64 time_bnds[time = 730][nbnds = 2];
+    Grid {
+     ARRAY:
+        Int16 air[time = 730][y = 277][x = 349];
+     MAPS:
+        Float64 time[time = 730];
+        Float32 y[y = 277];
+        Float32 x[x = 349];
+    } air;
+    Grid {
+     ARRAY:
+        Int16 hgt[time = 730][y = 277][x = 349];
+     MAPS:
+        Float64 time[time = 730];
+        Float32 y[y = 277];
+        Float32 x[x = 349];
+    } hgt;
+    Float32 y[y = 277];
+    Grid {
+     ARRAY:
+        Float32 lat[y = 277][x = 349];
+     MAPS:
+        Float32 y[y = 277];
+        Float32 x[x = 349];
+    } lat;
+    Float32 x[x = 349];
+} pressure;
+-----
+
+Loading Profile Data
+--------------------
+
+The package includes a database loader script +dapperload.sh+ that updates
+the server with metadata from NetCDF or OPeNDAP profile files.
+The loader only aggregates in-situ data (e.g. profile or time-series data),
+with individual NetCDF files following any convention served via the
+Dapper NetCDF service.
+The last
+incarnation of Dapper (on 3-10-2009) supported the following
+profile conventions:
+
+* ARGO GDAC NetCDF - http://www-argo.ucsd.edu/Prof3files.html[+http://www-argo.ucsd.edu/Prof3files.html+]
+* ARGO NODC mono-profile NetCDF -
+http://www.nodc.noaa.gov/argo/document/datafmt/mono-prof.htm[+http://www.nodc.noaa.gov/argo/document/datafmt/mono-prof.htm+]
+* EPIC NetCDF -
+http://www.epic.noaa.gov/epic/document/convention.htm[+http://www.epic.noaa.gov/epic/document/convention.htm+]
+* OPeNDAP sequence data -
+http://docs.opendap.org/index.php/UserGuideDataModel[+http://docs.opendap.org/index.php/UserGuideDataModel+]
+
+Unfortunately, it does not support the CF convention profile feature type in
+which we are most interested.  This shortcoming can probably be overcome by
+applying the Dapper in-situ data conventions to the CF format.
+Since Dapper converts in-situ and gridded data formats into the OPeNDAP
+protocol for streaming to an OPeNDAP client, then the basic task is to figure
+out how to convert the CF profile feature type into the OPeNDAP protocol.
+
+
+Dapper In-Situ Data Conventions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+http://www.epic.noaa.gov/epic/software/dapper/dapperdocs/conventions/[+http://www.epic.noaa.gov/epic/software/dapper/dapperdocs/conventions/+]
+
+
+
+
+Metadata Conventions for OPeNDAP Sequence Data
+----------------------------------------------
+
+http://www.epic.noaa.gov/epic/dapper_dchart/metadata.html[+http://www.epic.noaa.gov/epic/dapper_dchart/metadata.html+]
+
+Dapper can aggregate OPeNDAP sequence data from other OPeNDAP servers if the
+data supplied by the server conforms to the following conventions.
+
+* The OPeNDAP sequences consists of one outer and one inner sequences, with
+the latter nested in the former.
+* The outer sequence must contain a latitude, longitude, unique ID and either
+a depth/height value or a time variable depending on whether the sequence represents a profile
+or a time series.
+* The inner sequence contains all the data variables (e.g. temperature,
+salinity, etc.) and the time variable (for a time series) or depth variable
+(for a profile).
+* The ID variable must be named +_id+, the value of which must be
+unique since it is used to retrieve the inner sequence.
+* Attributes are used to identify the latitude, longitude, depth and
+time axes.  Dapper determines which variable corresponds to
+which axis based on the units attribute and variable name.
+The best way to guarantee correct identification of axes is to
+use the +units+ and +axis+ attributes, with the +units+
+attribute conforming to the udunits conventions (i.e. +X+ for
+longitude, +Y+ for latitude, +T+ for time, and +Z+ for
+depth or height).
+
+An example DDS for a profile is:
+
+-----
+   Sequence {
+        Float32 longitude;
+        Float64 time;
+        Float32 latitude;
+        Int32 _id;
+        Sequence {
+            Float32 depth;
+            Float32 temperature;
+        }
+   }
+-----
+
+An example DDS for a time series is:
+
+-----
+   Sequence {
+        Float32 longitude;
+        Float64 depth;
+        Float32 latitude;
+        Int32 _id;
+        Sequence {
+            Float32 time;
+            Float32 temperature;
+        }
+   }
+-----
+
+The DDS for one of our NetCDF profile files
+(+PE1315T12302.nc+) is:
+
+-----
+Dataset {
+    Int16 profile;
+    Float64 time;
+    Float64 lat;
+    Float64 lon;
+    Float64 Prz[z = 5385];
+    Float64 Tmp[z = 5385];
+    Float64 Cod[z = 5385];
+    Float64 Xms[z = 5385];
+    Float64 V0[z = 5385];
+    Float64 Flc[z = 5385];
+    Float64 V1[z = 5385];
+    Float64 Oxy[z = 5385];
+    Float64 V2[z = 5385];
+    Float64 Obs[z = 5385];
+    Float64 V4[z = 5385];
+    Float64 PAR[z = 5385];
+    Float64 V5[z = 5385];
+    Float64 Alt[z = 5385];
+    Float64 Sal[z = 5385];
+    Float64 Sig[z = 5385];
+    Float64 Dep[z = 5385];
+    Float64 Ptp[z = 5385];
+    Float64 Des[z = 5385];
+} ctd/PE1315T12302.nc;
+-----
+
+The question is how we restructure our NetCDF file, or change
+the way the DODS server reads it, such that our file's DDS
+looks instead like:
+
+-----
+   Sequence {
+        Float64 time;
+        Float32 longitude;
+        Float32 latitude;
+        Int32 _id;
+        Sequence {
+            Float32 depth;
+            Float32 Prz;
+            Float32 Tmp;
+            Float32 Cod;
+...
+        }
+   }
+-----
+
+Is there a way I can restructure the NetCDF file to force 

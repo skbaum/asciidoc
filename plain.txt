@@ -1,0 +1,217 @@
+INSERT INTO "CAGES_Louisiana_Lengths_CPUE_IOOS_Standard_20130822"
+SELECT
+--modified
+'2013-08-14',
+--verbatimModified
+NULL,
+--datasetID
+'CAGES_Louisiana_Lengths_IOOS_Standard',
+--datasetName
+'CAGES Louisiana Length Data with CPUE',
+--higherInstitutionCode
+'DOC;NOAA;NMFS;SEFSC;Fishery Ecology Branch',
+--institutionCode
+'NMFS',
+--ownerInstitutionCode
+'NMFS',
+--collectionCode
+'CAGES Louisiana',
+--catalogNumber
+NULL,
+--eventDate
+"YYYY" || '-' || lpad("MM",2,'0') || '-' || lpad("DD",2,'0') || 'T' || substr(lpad("Time",4,'0'),1,2) || ':' || substr(lpad("Time",4,'0'),3,2),
+--eventDateTimeZone
+"TimeZone",
+--eventDateRemarks
+NULL,
+--verbatimEventDate
+NULL,
+--time
+replace((("YYYY" || '-' || lpad("MM",2,'0') || '-' || lpad("DD",2,'0') || ' ' || substr(lpad("Time",4,'0'),1,2) || ':' || substr(lpad("Time",4,'0'),3,2))::timestamp + "TimeZone"::interval)::character varying,' ','T') || 'Z',
+--timeUncertainty
+360,
+--latitude
+"Latitude",
+--longitude
+"Longitude",
+--footprintWKT
+NULL,
+--coordinateUncertaintyInMeters
+1250,
+--verbatimCoordinates
+NULL,
+--verbatimCoordinateSystem
+NULL,
+--verbatimSRS
+NULL,
+--geodeticDatum
+'EPSG:4326 WGS84',
+--georeferencedBy
+'LDWF',
+--georeferenceProtocol
+'Coordinate uncertainty is based on starting point plus travel during trawl.',
+--depth
+NULL,
+--basisOfRecord
+'Human Observation',
+--recordedBy
+'LDWF',
+--vernacularName
+initcap(split_part("Common_Name",' ',1)) || ' ' || lower(split_part("Common_Name",' ',2)) || ' ' || lower(split_part("Common_Name",' ',3)),
+--scientificName
+initcap(split_part("Scientific_Name",' ',1)) || ' ' || lower(split_part("Scientific_Name",' ',2)) || ' ' || lower(split_part("Scientific_Name",' ',3)),
+--taxonRank
+CASE
+-- no taxon rank if no sci name
+WHEN "Scientific_Name" IS NULL THEN NULL
+-- no taxon rank for the following list
+WHEN "Species_Code" IN ('999','1120','2000','9999') THEN NULL
+-- taxon rank = Genus for the following list
+WHEN "Species_Code" IN ('993','1115','1116','1210','1213','1409','1506','2057','2127','2142','2184','2185','2186','2188','2190','2191','2197','2199','2200','2201','2202','2211','2221','2222','2227','2230','2233','2240','2252','2258','2313','2322','2366','2385','2392','2429','2434','2446','2454','2459') THEN 'Genus'
+-- taxon rank = Family for the following list
+WHEN "Species_Code" IN ('994','1521','2194','2300','2321','2387','2425','2427','2428','2441','2457','2458','2460') THEN 'Family'
+-- taxon rank = Order for the following list
+WHEN "Species_Code" IN ('992','2380','2383','2384') THEN 'Order'
+-- taxon rank = Subclass for the following list
+WHEN "Species_Code" IN ('2386') THEN 'Subclass'
+-- taxon rank = Class for the following list
+WHEN "Species_Code" IN ('989','990','991','995','996','997') THEN 'Class'
+-- taxon rank = Subphylum for the following list
+WHEN "Species_Code" IN ('998') THEN 'Subphylum' ELSE 'Species'
+END,
+--aphiaID
+NULL,
+--tsn
+NULL,
+--genus
+CASE
+WHEN "Species_Code" IN ('989','990','991','992','994','995','996','997','998','999','1120','1521','2000','2194','2300','2321','2380','2383','2384','2386','2387','2425','2427','2428','2441','2457','2458','2460','9999') THEN NULL
+ELSE initcap(split_part("Scientific_Name",' ',1))
+END,
+--subgenus
+NULL,
+--species
+CASE
+WHEN "Species_Code" IN ('989','990','991','992','993','994','995','996','997','998','999','1115','1116','1120','1210','1213','1409','1506','1521','2000','2057','2127','2142','2184','2185','2186','2188','2190','2191','2194','2197','2199','2200','2201','2202','2211','2221','2222','2227','2230','2233','2240','2252','2258','2300','2313','2321','2322','2366','2380','2383','2384','2385','2386','2387','2392','2425','2427','2428','2429','2434','2441','2446','2454','2457','2458','2459','2460','9999') THEN NULL
+ELSE lower(split_part("Scientific_Name",' ',2))
+END,
+--infraspecificEpithet
+NULL,
+--scientificNameAuthorship
+NULL,
+--identifiedBy
+'LDWF',
+--identificationDate
+"YYYY" || '-' || lpad("MM",2,'0') || '-' || lpad("DD",2,'0'),
+--identificationQualifier
+NULL,
+--identificationRemarks
+NULL,
+--individualCount
+1,
+--sex
+NULL,
+--weightInKg
+NULL,
+--lifeStage
+NULL,
+--dynamicProperties
+NULL,
+--observedIndividualLengthInCm
+to_char("Length"::numeric/10, 'FM999.9')::numeric,
+--observedMeanLengthInCm
+NULL,
+--observedMaxLengthInCm
+NULL,
+--observedMinLengthInCm
+NULL,
+--lengthType
+CASE
+WHEN "Species_Code" IN ('988','2003','2072','2118','2159','2160','2161','2162','2163','2164','2165','2183','2184','2185','2196','2230','2240','2241','2242','2243','2244','2245','2250','2257','2259','2268','2273','2275','2276','2279','2281','2283','2284','2285','2299','2302','2304','2312','2314','2318','2328','2337','2377','2378','2389','2402','2418','2422','2424','2425','2426','2428','2432','2442','2443','2445','2446','2449','2451','2458','2462') THEN 'Carapace Width'
+ELSE 'Total_Length'
+END,
+--occurrenceRemarks
+NULL,
+--surveyEventID
+NULL,
+--sampleID
+"Sample_Code",
+--subsampleID
+"Sample_Code" || '-' || "Species_Code",
+--samplingProtocol
+'Each sample was subsampled by species and individual lengths recorded.',
+--samplingEffort
+'Duration = ' || "Duration" || ' minutes',
+--samplingConditions
+NULL,
+--totalInSample
+'Count = ' || "Total_Number",
+--sampleShape
+NULL,
+--sampleLengthInMeters
+NULL,
+--sampleWidthInMeters
+NULL,
+--sampleHeightInMeters
+NULL,
+--sampleRadiusInMeters
+NULL,
+--sampleAreaInSquareMeters
+NULL,
+--sampleVolumeInCubicMeters
+NULL,
+--visibilityInMeters
+NULL,
+--visibilityType
+NULL,
+--waterTemperatureInCelsius
+NULL,
+--habitat
+NULL,
+--bottomType
+NULL,
+--quantificationType
+'P',
+--quantificationVocabulary
+NULL,
+--quantificationName
+'CPUE',
+--quantificationValue
+"CPUE",
+--quantificationUnit
+'hectare^-1',
+--quantificationUncertainty
+NULL,
+--quantificationDeterminedDate
+NULL,
+--quantificationDeterminedBy
+'SEFSC',
+--quantificationMethod
+'refer to metadata',
+--waterBody
+"Water_Body",
+--islandGroup
+NULL,
+--island
+NULL,
+--locality
+"Site_Name",
+--country
+'USA',
+--stateProvince
+'Louisiana',
+--county
+NULL,
+--municipality
+NULL,
+--kingdom
+NULL,
+--phylum
+NULL,
+--class
+NULL,
+--order
+NULL
+--family
+FROM "CAGES_Louisiana_Lengths_CPUE_Join_20130822"
+;

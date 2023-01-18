@@ -1,0 +1,372 @@
+Docker
+======
+Steven K. Baum
+v0.1, 2016-08-05
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Further Edification
+-------------------
+
+*Container Computing for HPC and Scientific Workflows - SC16 Tutorial*
+
+https://github.com/NERSC/2016-11-14-sc16-Container-Tutorial[+https://github.com/NERSC/2016-11-14-sc16-Container-Tutorial+]
+
+*Install Docker on CentOS 7* - https://docs.mesosphere.com/1.8/administration/installing/custom/system-requirements/install-docker-centos/[+https://docs.mesosphere.com/1.8/administration/installing/custom/system-requirements/install-docker-centos/+]
+
+Docker
+------
+
+https://en.wikipedia.org/wiki/Docker_(software)[`https://en.wikipedia.org/wiki/Docker_(software)`]
+
+*****
+The Docker software as a service offering consists of three components:
+
+* Software: The Docker daemon, called dockerd, is a persistent process that manages Docker containers and handles container objects. The daemon listens for requests sent via the Docker Engine API.[41][42] The Docker client program, called docker, provides a command-line interface that allows users to interact with Docker daemons.[41][43]
+* Objects: Docker objects are various entities used to assemble an application in Docker. The main classes of Docker objects are images, containers, and services.[41]
+** A Docker container is a standardized, encapsulated environment that runs applications.[44] A container is managed using the Docker API or CLI.[41]
+** A Docker image is a read-only template used to build containers. Images are used to store and ship applications.[41]
+** A Docker service allows containers to be scaled across multiple Docker daemons. The result is known as a swarm, a set of cooperating daemons that communicate through the Docker API.[41]
+* Registries: A Docker registry is a repository for Docker images. Docker clients connect to registries to download ("pull") images for use or upload ("push") images that they have built. Registries can be public or private. Two main public registries are Docker Hub and Docker Cloud. Docker Hub is the default registry where Docker looks for images.[41][45] Docker registries also allow the creation of notifications based on events.[4
+*****
+
+Containers
+----------
+
+https://opencontainers.org/about/overview/[`https://opencontainers.org/about/overview/`]
+
+*****
+The OCI currently contains two specifications: the Runtime Specification (runtime-spec) and the Image Specification (image-spec). The Runtime Specification outlines how to run a “filesystem bundle” that is unpacked on disk. At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle. At this point the OCI Runtime Bundle would be run by an OCI Runtime.
+*****
+
+Runtime Specification
+~~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/opencontainers/runtime-spec/blob/master/spec.md[`https://github.com/opencontainers/runtime-spec/blob/master/spec.md`]
+
+*****
+The Open Container Initiative Runtime Specification aims to specify the configuration, execution environment, and lifecycle of a container.
+
+A container's configuration is specified as the config.json for the supported platforms and details the fields that enable the creation of a container. The execution environment is specified to ensure that applications running inside a container have a consistent environment between runtimes along with common actions defined for the container's lifecycle.
+*****
+
+Image Format Specification
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+https://github.com/opencontainers/image-spec/blob/master/spec.md[`https://github.com/opencontainers/image-spec/blob/master/spec.md`]
+
+*****
+This specification defines an OCI Image, consisting of a manifest, an image index (optional), a set of filesystem layers, and a configuration.
+
+The goal of this specification is to enable the creation of interoperable tools for building, transporting, and preparing a container image to run.
+*****
+
+Containers Without Docker
+-------------------------
+
+https://dzone.com/articles/containers-with-out-docker[`https://dzone.com/articles/containers-with-out-docker`]
+
+runc
+~~~~
+
+https://github.com/opencontainers/runc[`https://github.com/opencontainers/runc`]
+
+A CLI tool for spawning and running containers according to the OCI specification.
+
+Extensions
+----------
+
+*shifter* - https://github.com/NERSC/shifter[+https://github.com/NERSC/shifter+]
+
+=====
+Shifter enables container images for HPC. In a nutshell, Shifter allows an HPC system to efficiently and safely allow end-users to run a docker image. Shifter consists of a few moving parts 1) a utility that typically runs on the compute node that creates the run time environment for the application 2) an image gateway service that pulls images from a registry and repacks it in a format suitable for the HPC system (typically squashfs) 3) and example scripts/plugins to integrate Shifter with various batch scheduler systems.
+=====
+
+*Weave Net* - https://www.weave.works/products/weave-net/[+https://www.weave.works/products/weave-net/+]
+
+=====
+Quickly, easily, and securely network and cluster containers across any environment (on premises, in the cloud, or hybrid) with zero code or configuration.  Weave’s decentralized architecture and persistence strategy makes it the best choice for production container networks. When the unexpected happens, a Weave network will keep your container applications running by routing around outages, automatically healing after partitions, and recovering when a host unexpectedly reboots..
+=====
+
+*Weave Scope* - https://www.weave.works/products/weave-scope/[+https://www.weave.works/products/weave-scope/+]
+
+=====
+Zero configuration or integration required — just launch Weave Scope and go! Automatically detects processes, containers, hosts. No kernel modules, no agents, no special libraries, no coding. Seamless integration with Kubernetes and AWS ECS.
+=====
+
+*Weave Flux* - https://github.com/weaveworks/flux[+https://github.com/weaveworks/flux+]
+
+=====
+Weave Flux is a tool that automates the deployment of containers to Kubernetes. It fills the automation void that exists between building and monitoring.
+=====
+
+*Weave Cortex* - https://github.com/weaveworks/cortex[+https://github.com/weaveworks/cortex+]
+
+=====
+Cortex is an API compatible Prometheus implementation, that natively supports multitenancy and horizontal scale-out clustering.  Cortex is a Weaveworks project that forms the monitoring backend of Weave Cloud. 
+=====
+
+
+
+Updating to Latest Version
+--------------------------
+
+-----
+yum install docker-engine
+
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.sesp.northwestern.edu
+ * epel: fedora-epel.mirror.lstn.net
+ * extras: centos.firehosted.com
+ * updates: mirror.stjschools.org
+Resolving Dependencies
+--> Running transaction check
+---> Package docker-engine.x86_64 0:1.11.2-1.el7.centos will be updated
+---> Package docker-engine.x86_64 0:1.12.0-1.el7.centos will be an update
+--> Processing Dependency: docker-engine-selinux >= 1.12.0-1.el7.centos for package: docker-engine-1.12.0-1.el7.centos.x86_64
+--> Running transaction check
+---> Package docker-engine-selinux.noarch 0:1.11.2-1.el7.centos will be updated
+---> Package docker-engine-selinux.noarch 0:1.12.0-1.el7.centos will be an update
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+ Package                        Arch            Version                         Repository           Size
+
+Updating:
+ docker-engine                  x86_64          1.12.0-1.el7.centos             dockerrepo           19 M
+Updating for dependencies:
+ docker-engine-selinux          noarch          1.12.0-1.el7.centos             dockerrepo           28 k
+
+Transaction Summary
+
+Upgrade  1 Package (+1 Dependent package)
+
+Total download size: 19 M
+Is this ok [y/d/N]: y
+Downloading packages:
+No Presto metadata available for dockerrepo
+(1/2): docker-engine-selinux-1.12.0-1.el7.centos.noarch.rpm                        |  28 kB  00:00:00     
+(2/2): docker-engine-1.12.0-1.el7.centos.x86_64.rpm                                |  19 MB  00:00:01     
+----------------------------------------------------------------------------------------------------------
+Total                                                                      14 MB/s |  19 MB  00:00:01     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Updating   : docker-engine-selinux-1.12.0-1.el7.centos.noarch                                       1/4 
+  Updating   : docker-engine-1.12.0-1.el7.centos.x86_64                                               2/4 
+  Cleanup    : docker-engine-1.11.2-1.el7.centos.x86_64                                               3/4 
+  Cleanup    : docker-engine-selinux-1.11.2-1.el7.centos.noarch                                       4/4 
+  Verifying  : docker-engine-selinux-1.12.0-1.el7.centos.noarch                                       1/4 
+  Verifying  : docker-engine-1.12.0-1.el7.centos.x86_64                                               2/4 
+  Verifying  : docker-engine-selinux-1.11.2-1.el7.centos.noarch                                       3/4 
+  Verifying  : docker-engine-1.11.2-1.el7.centos.x86_64                                               4/4 
+
+Updated:
+  docker-engine.x86_64 0:1.12.0-1.el7.centos                                                              
+
+Dependency Updated:
+  docker-engine-selinux.noarch 0:1.12.0-1.el7.centos                                                      
+
+Complete!
+-----
+
+Checking Docker Status
+----------------------
+
+-----
+systemctl status docker
+
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2016-08-05 13:27:47 CDT; 10s ago
+     Docs: https://docs.docker.com
+ Main PID: 17340 (dockerd)
+   Memory: 31.6M
+   CGroup: /system.slice/docker.service
+           ├─17340 /usr/bin/dockerd
+           └─17346 docker-containerd -l unix:///var/run/docker/libcontainerd/docker-containerd.sock --s...
+
+Aug 05 13:27:46 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:46.807123871-05:00" level=inf...ds"
+Aug 05 13:27:46 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:46.807822642-05:00" level=war...nd"
+Aug 05 13:27:46 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:46.808282357-05:00" level=inf...t."
+Aug 05 13:27:46 copano.tamu.edu dockerd[17340]: ....time="2016-08-05T13:27:46.860202862-05:00" level...se"
+Aug 05 13:27:47 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:47.010203828-05:00" level=inf...ss"
+Aug 05 13:27:47 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:47.147178853-05:00" level=inf...e."
+Aug 05 13:27:47 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:47.147412437-05:00" level=inf...on"
+Aug 05 13:27:47 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:47.147450437-05:00" level=inf...2.0
+Aug 05 13:27:47 copano.tamu.edu dockerd[17340]: time="2016-08-05T13:27:47.172122198-05:00" level=inf...ck"
+Aug 05 13:27:47 copano.tamu.edu systemd[1]: Started Docker Application Container Engine.
+Hint: Some lines were ellipsized, use -l to show in full.
+-----
+
+Docker Simple Test
+------------------
+
+docker run hello-world
+
+-----
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker Hub account:
+ https://hub.docker.com
+
+For more examples and ideas, visit:
+ https://docs.docker.com/engine/userguide/
+-----
+
+Docker Slight More Ambitious Test
+---------------------------------
+
+Start Test
+~~~~~~~~~~
+
+-----
+docker run -dit ubuntu bash
+
+Unable to find image 'ubuntu:latest' locally
+latest: Pulling from library/ubuntu
+43db9dbdcb30: Pull complete 
+2dc64e8f8d4f: Pull complete 
+670a583e1b50: Pull complete 
+183b0bfcd10e: Pull complete 
+Digest: sha256:c6674c44c6439673bf56536c1a15916639c47ea04c3d6296c5df938add67b54b
+Status: Downloaded newer image for ubuntu:latest
+-----
+
+Check for Docker Processes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check to see if this is running:
+
+-----
+ps aux | grep docker
+
+root     19341  0.3  0.0 1867728 34004 ?       Ssl  13:46   0:01 /usr/bin/dockerd
+root     19358  0.0  0.0 498860 10396 ?        Ssl  13:46   0:00 docker-containerd -l unix:///var/run/docker/libcontainerd/docker-containerd.sock --shim docker-containerd-shim --metrics-interval=0 --start-timeout 2m --state-dir /var/run/docker/libcontainerd/containerd --runtime docker-runc
+root     20041  0.0  0.0 192376  2612 ?        Sl   13:51   0:00 docker-containerd-shim a411d67b844fb63be14415972b703771a42713cd9544095cb41719fa1ed6f57f /var/run/docker/libcontainerd/a411d67b844fb63be14415972b703771a42713cd9544095cb41719fa1ed6f57f docker-runc
+-----
+
+View the Running Container
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+docker ps -l
+
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+a411d67b844f        ubuntu              "bash"              About a minute ago   Up About a minute                       kickass_dubinsky
+-----
+
+Inspecting the Container's Processes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+docker top kickass_dubinsky
+
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                20055               20041               0                   13:51               pts/1               00:00:00            bash
+-----
+
+Stopping the Container
+~~~~~~~~~~~~~~~~~~~~~~
+
+-----
+docker stop kickass_dubinsky
+
+kickass_dubinsky
+-----
+
+Check to see if it stopped.
+
+-----
+docker ps -l
+
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+a411d67b844f        ubuntu              "bash"              6 minutes ago       Exited (0) 2 seconds ago                       kickass_dubinsky
+-----
+
+Stop/Remove All Docker Containers
+---------------------------------
+
+-----
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+-----
+
+
+Create Docker Group for Security
+--------------------------------
+
+-----
+groupadd docker
+
+usermod -aG docker baum
+-----
+
+Now we can start and stop containers as user baum rather than as root.
+
+Docker Hub
+----------
+
+Where hundreds of images can be found.
+
+https://hub.docker.com/explore/[+https://hub.docker.com/explore/+]
+
+
+Docker for ERDDAP
+-----------------
+
+https://hub.docker.com/r/axiom/docker-erddap/[+https://hub.docker.com/r/axiom/docker-erddap/+]
+
+Obtain the Image
+~~~~~~~~~~~~~~~~
+
+-----
+docker pull axiom/docker-erddap
+-----
+
+Starting
+~~~~~~~~
+
+Quickstart for Testing
+^^^^^^^^^^^^^^^^^^^^^^
+
+-----
+docker run -d -p 80:8080 -p 443:8443 axiom/docker-erddap
+-----
+
+Production
+^^^^^^^^^^
+
+-----
+docker run -d -p 80:8080 -p 443:8443 \
+  -v /path/to/your/ssl.crt:/opt/tomcat/conf/ssl.crt \
+  -v /path/to/your/ssl.key:/opt/tomcat/conf/ssl.key \
+  -v /path/to/your/tomcat-users.xml:/opt/tomcat/conf/tomcat-users.xml \
+  -v /path/to/your/erddap/content:/opt/tomcat/content/erddap \
+  -v /path/to/your/erddap/bigParentDirectory:/erddapData \
+  --name erddap \
+  axiom/docker-erddap
+-----
+
+
+

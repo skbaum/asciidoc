@@ -1,0 +1,44 @@
+Compliance Checkers for NetCDF Files
+====================================
+Steven K. Baum
+v0.2, 2015-09-28
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+Links
+-----
+
+*IOOS Compliance Checker (Github)* - https://github.com/ioos/compliance-checker/[+https://github.com/ioos/compliance-checker/+]
+
+* *Development Wiki* - https://github.com/ioos/compliance-checker/wiki/Development[+https://github.com/ioos/compliance-checker/wiki/Development+]
+
+*IOOS Compliance Checker (Online)* - http://data.ioos.us/compliance/user/login[+http://data.ioos.us/compliance/user/login+]
+
+*IOOS NGDAC Architecture* - https://github.com/ioos/ioosngdac/wiki/NGDAC-Architecture[+https://github.com/ioos/ioosngdac/wiki/NGDAC-Architecture+]
+
+*nc-validate* - https://github.com/kerfoot/nc-validate[+https://github.com/kerfoot/nc-validate+]
+
+*IOOS Glider ERDDAP* - http://data.ioos.us/gliders/erddap/info/index.html?page=1&itemsPerPage=1000[+http://data.ioos.us/gliders/erddap/info/index.html?page=1&itemsPerPage=1000+]
+
+*IOOS Facebook* - https://www.facebook.com/search/top/?q=usioosgov[+https://www.facebook.com/search/top/?q=usioosgov+]
+
+*NetCDF Subset Service (NCSS)* - https://www.unidata.ucar.edu/software/thredds/current/tds/reference/NetcdfSubsetServiceReference.html[+https://www.unidata.ucar.edu/software/thredds/current/tds/reference/NetcdfSubsetServiceReference.html+]
+
+
+IOOS Compliance Checker
+-----------------------
+
+Download the Python script from:
+
+https://github.com/ioos/compliance-checker/[+https://github.com/ioos/compliance-checker/+]
+
+using git, or skip to the chase and do it the easy way:
+
++pip install compliance-checker+
+
+and
+
+

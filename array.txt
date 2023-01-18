@@ -1,0 +1,434 @@
+
+= Array Languages
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Meta
+
+*Array Programing* - https://en.wikipedia.org/wiki/Array_programming[`https://en.wikipedia.org/wiki/Array_programming`]
+
+*SIGPLAN Chapter on Array-Programming Languages* - http://www.sigapl.org/[`http://www.sigapl.org/`]
+
+*Discovering Array Languages* - https://web.archive.org/web/20110227013846/http://www.vector.org.uk/archive/v223/smill222.htm[`https://web.archive.org/web/20110227013846/http://www.vector.org.uk/archive/v223/smill222.htm`]
+
+*Reddit* - https://www.reddit.com/r/apljk/[`https://www.reddit.com/r/apljk/`]
+
+*The Array Cast* - https://www.arraycast.com/[`https://www.arraycast.com/`]
+
+=== Literature
+
+*A Programming Language* - K. E. Iverson (1962) - http://www.jsoftware.com/papers/APL.htm[`http://www.jsoftware.com/papers/APL.htm`]
+
+*APL/360: An Interactive Approach* - L. Gilman and A. J. Rose (1970) - http://www.softwarepreservation.org/projects/apl/Books/GillmanAndRose[`http://www.softwarepreservation.org/projects/apl/Books/GillmanAndRose`]
+
+*APL in Exposition* - K. E. Iverson (1972) - http://www.softwarepreservation.org/projects/apl/Papers/197201_APL%20In%20Exposition_320-3010.pdf[`http://www.softwarepreservation.org/projects/apl/Papers/197201_APL%20In%20Exposition_320-3010.pdf`]
+
+=====
+The following pages illustrate the use of APL for exposition in the teaching of various topics. The first section presents the characteristics of the language, and each of the succeeding sections illustrates its use in the presentation of material in some one discipline. 
+=====
+
+*Introduction to APL for Scientists and Engineers* - K. E. Iverson (1973) - http://www.softwarepreservation.org/projects/apl/Papers/197303_An%20Introduction%20To%20APL%20For%20Scientists%20And%20Engineers.pdf[`http://www.softwarepreservation.org/projects/apl/Papers/197303_An%20Introduction%20To%20APL%20For%20Scientists%20And%20Engineers.pdf`]
+
+=====
+This is an introduction to APL addressed to the scientist or engineer and designed to exploit any previous acquaintance with the very similar notation of vector algebra.
+=====
+
+*Introduction to College Mathematics with APL* - E. J. LeCuyer (1978) - http://www.softwarepreservation.org/projects/apl/Books/CollegeMathematicswithAPL[`http://www.softwarepreservation.org/projects/apl/Books/CollegeMathematicswithAPL`]
+
+*Notation as a Tool of Thought* - K. E. Iverson (1980) - https://www.jsoftware.com/papers/tot.htm[`https://www.jsoftware.com/papers/tot.htm`]
+
+*A Source Book in APL* - A.D. Falkoff and K. E. Iversion (1981) - http://www.softwarepreservation.org/projects/apl/Papers/ASourceBookInAPL[`http://www.softwarepreservation.org/projects/apl/Papers/ASourceBookInAPL`]
+
+*The Principles of APL2* - J. A. Brown - http://www.softwarepreservation.org/projects/apl/Papers/PRINCIPLESOFAPL2[`http://www.softwarepreservation.org/projects/apl/Papers/PRINCIPLESOFAPL2`]
+
+*A Dictionary of APL* - K. E. Iverson (1987) - https://www.jsoftware.com/papers/APLDictionary.htm[`https://www.jsoftware.com/papers/APLDictionary.htm`]
+
+*A Dictionary of APL* - K. E. Iverson (2007) - http://www.sigapl.org/Articles/A%20dictionary%20of%20APL_p32-iverson.pdf[`http://www.sigapl.org/Articles/A%20dictionary%20of%20APL_p32-iverson.pdf`]
+
+*APL Quotations and Anecdotes* (2010) - https://www.jsoftware.com/papers/APLQA.htm[`https://www.jsoftware.com/papers/APLQA.htm`]
+
+*A History of APL in 50 Functions* - R. K. W. Hui (2016) - https://www.jsoftware.com/papers/50/[`https://www.jsoftware.com/papers/50/`]
+
+*A Rosetta Stone for Array Languages* - A. Sinkarovs et al. (2018) - https://dl.acm.org/doi/10.1145/3219753.3219754[`https://dl.acm.org/doi/10.1145/3219753.3219754`]
+
+*APL Since 1978* - R. K. W. Hui and M. J. Kromberg (2020) - https://dl.acm.org/doi/10.1145/3386319[`https://dl.acm.org/doi/10.1145/3386319`]
+
+
+== Software
+
+=== A+
+
+http://www.aplusdev.org/index.html[`http://www.aplusdev.org/index.html`]
+
+https://en.wikipedia.org/wiki/A%2B_(programming_language)[`https://en.wikipedia.org/wiki/A%2B_(programming_language)`]
+
+=====
+A+ is a powerful and efficient programming language. It is freely available under the GNU General Public License. It embodies a rich set of functions and operators, a modern graphical user interface with many widgets and automatic synchronization of widgets and variables, asynchronous execution of functions associated with variables and events, dynamic loading of user compiled subroutines, and many other features. Execution is by a rather efficient interpreter. A+ was created at Morgan Stanley. Primarily used in a computationally-intensive business environment, many critical applications written in A+ have withstood the demands of real world developers over many years. Written in an interpreted language, A+ applications tend to be portable.
+=====
+
+=== APL
+
+https://aplwiki.com/wiki/Main_Page[`https://aplwiki.com/wiki/Main_Page`]
+
+https://en.wikipedia.org/wiki/APL_(programming_language)[`https://en.wikipedia.org/wiki/APL_(programming_language)`]
+
+https://github.com/abrudz/aplcart[`https://github.com/abrudz/aplcart`]
+
+https://github.com/vendethiel/trying.apl[`https://github.com/vendethiel/trying.apl`]
+
+https://tryapl.org/[`https://tryapl.org/`]
+
+*The APL Programming Language Source Code* - https://computerhistory.org/blog/the-apl-programming-language-source-code/[`https://computerhistory.org/blog/the-apl-programming-language-source-code/`]
+
+==== GNU APL
+
+https://www.gnu.org/software/apl/[`https://www.gnu.org/software/apl/`]
+
+https://github.com/exercism/gnu-apl[`https://github.com/exercism/gnu-apl`]
+
+=====
+GNU APL is a free interpreter for the programming language APL.
+The APL interpreter is an (almost) complete implementation of ISO standard 13751 aka. Programming Language APL, Extended.
+=====
+
+=== APLX
+
+https://www.dyalog.com/aplx.htm[`https://www.dyalog.com/aplx.htm`]
+
+=====
+APLX is an implementation of the APL language, a unique, general-purpose array-processing language used in application areas such as financial planning, market research, statistics, management information and for all types of scientific and engineering work. APLX is an advanced, second generation implementation of the APL language, closely based on IBM's APL2, but with a number of important enhancements, including object-oriented language extensions. 
+=====
+
+=== April
+
+https://github.com/phantomics/april[`https://github.com/phantomics/april`]
+
+=====
+April compiles a subset of the APL programming language into Common Lisp. Leveraging Lisp's powerful macros and numeric processing faculties, it brings APL's expressive potential to bear for Lisp developers. Replace hundreds of lines of number-crunching code with a single line of APL.
+
+APL veritably hums with algorithmic power. As a handful of characters run past the lexer, vast fields of data grow, morph and distil to reveal their secrets. However, APL has hitherto dwelt in an ivory tower, secluded inside monolithic runtime environments. If you have a store of data you'd like to process with APL, getting it there can be an ordeal akin to hauling tons of cargo on donkeys' backs through a narrow mountain pass. The original APL interpreters ran on mainframes whose only input was the keyboard and only output was the printer, and the legacy of that implementation approach has persisted to this day, limiting the reach of the language.
+
+But no longer. Lisp is the great connector of the software world, digesting and transforming semantic patterns in much the same way that APL works upon numeric patterns. With APL inside of Lisp, databases, streams, binary files and other media are just a few lines of code away from processing with APL.
+=====
+
+=== BQN
+
+https://github.com/mlochbaum/BQN[`https://github.com/mlochbaum/BQN`]
+
+=====
+BQN is a new programming language in the APL lineage, which aims to remove irregular and burdensome aspects of the APL tradition and put the great ideas on a firmer footing. While its use demands a solid understanding of functions and multidimensional arrays, BQN's focus on providing simple, consistent, and powerful array operations (and documentation!) makes it a good language for learning array programming and building stronger array intuition.
+=====
+
+=== Chapel
+
+https://chapel-lang.org/[`https://chapel-lang.org/`]
+
+https://github.com/chapel-lang/chapel[`https://github.com/chapel-lang/chapel`]
+
+https://en.wikipedia.org/wiki/Chapel_(programming_language)[`https://en.wikipedia.org/wiki/Chapel_(programming_language)`]
+
+=====
+Chapel is a programming language designed for productive parallel computing at scale. 
+It simplifies parallel programming through elegant support for:
+
+* distributed arrays that can leverage thousands of nodes' memories and cores
+* a global namespace supporting direct access to local or remote variables
+* data parallelism to trivially use the cores of a laptop, cluster, or supercomputer
+* task parallelism to create concurrency within a node or across the system 
+=====
+
+=== Co-dfns
+
+https://github.com/Co-dfns/Co-dfns[`https://github.com/Co-dfns/Co-dfns`]
+
+=====
+The Co-dfns project aims to provide a high-performance, high-reliability compiler for a parallel extension of the Dyalog dfns programming language. The dfns language is a functionally oriented, lexically scoped dialect of APL. The Co-dfns language extends the dfns language to include explicit task parallelism with implicit structures for synchronization and determinism. The language is designed to enable rigorous formal analysis of programs to aid in compiler optimization and programmer productivity, as well as in the general reliability of the code itself.
+
+Our mission is to deliver scalable APL programming to information and domain experts across many fields, expanding the scope and capabilities of what you can effectively accomplish with APL.
+=====
+
+=== Dex
+
+https://github.com/google-research/dex-lang[`https://github.com/google-research/dex-lang`]
+
+=====
+Dex (named for "index") is a research language for typed, functional array processing. The goal of the project is to explore:
+
+* Type systems for array programming
+* Mathematical program transformations like differentiation and integration
+* User-directed compilation to parallel hardware
+* Interactive and incremental numerical programming and visualization
+=====
+
+=== Dyalog
+
+https://www.dyalog.com/[`https://www.dyalog.com/`]
+
+https://github.com/Dyalog[`https://github.com/Dyalog`]
+
+https://www.amazon.com/Mastering-Dyalog-APL-Complete-Introduction/dp/0956463800[`https://www.amazon.com/Mastering-Dyalog-APL-Complete-Introduction/dp/0956463800`]
+
+https://github.com/Dyalog/dyalog-jupyter-kernel[`https://github.com/Dyalog/dyalog-jupyter-kernel`]
+
+https://github.com/Dyalog/pynapl[`https://github.com/Dyalog/pynapl`]
+
+=====
+Dyalog delivers an APL-based development environment that allows both subject matter experts and IT specialists to efficiently convert ideas into software solutions.
+=====
+
+=== ELI
+
+https://fastarray.appspot.com/index.html[`https://fastarray.appspot.com/index.html`]
+
+https://en.wikipedia.org/wiki/ELI_(programming_language)[`https://en.wikipedia.org/wiki/ELI_(programming_language)`]
+
+YouTube Channel - https://www.youtube.com/channel/UCpq4XRc7A1YNbEnBRx9-jzw[`https://www.youtube.com/channel/UCpq4XRc7A1YNbEnBRx9-jzw`]
+
+=====
+ELI has most of the functionality of the ISO APL standard, but it also has facilities not described there such as lists for non-homogeneous data, complex numbers, symbols, temporal data, control structures, scripting files, dictionaries, tables and SQL-like statements. It comes with a compiler for flat array programs. ELI is succinct, easy to learn and versatile. Compared with MATLAB or Python, ELI encourages a dataflow style of programming where the output of one operation feeds the input of another, resulting in greater productivity and clarity of code. 
+=====
+
+=== Futhark
+
+https://github.com/diku-dk/futhark[`https://github.com/diku-dk/futhark`]
+
+https://futhark-book.readthedocs.io/en/latest/language.html[`https://futhark-book.readthedocs.io/en/latest/language.html`]
+
+=====
+Futhark is a pure functional data-parallel array language. It is both syntactically and conceptually similar to established functional languages, such as Haskell and Standard ML. In contrast to these languages, Futhark focuses less on expressivity and elaborate type systems, and more on compilation to high-performance parallel code. Futhark programs are written with bulk operations on arrays, called Second-Order Array Combinators (SOACs), that mirror the higher-order functions found in conventional functional languages: map, reduce, filter, and so forth. In Futhark, the parallel SOACs have sequential semantics but permit parallel execution, and will typically be compiled to parallel code.
+
+Futhark provides various combinators for performing bulk transformations of arrays. Judicious use of these combinators is key to getting good performance. There are two overall categories: first-order array combinators, like zip, that always perform the same operation, and second-order array combinators (SOACs), like map, that take a functional argument indicating the operation to perform. SOACs are the basic parallel building blocks of Futhark programming. While they are designed to resemble familiar higher-order functions from other functional languages, they have some restrictions to enable efficient parallel execution.
+=====
+
+=== Heh
+
+https://github.com/ashinkarov/heh[`https://github.com/ashinkarov/heh`]
+
+https://arxiv.org/abs/1710.03832[`https://arxiv.org/abs/1710.03832`]
+
+=====
+Heh is a functional programming language with a built-in support for infinite arrays. The language is strict, but the infinite structures are lazy. The language includes three built-in higher-order constructs: imap, reduce and filter which make it possible to construct complex array operations that can be often seen in APL or SaC.
+
+One of the main distinctive features of the language is that we use ordinals to index arrays as well as to maintain shapes of the arrays. This gives a rise to a number of important static properties that one can observe in Heh.
+=====
+
+=== Ivy
+
+https://github.com/robpike/ivy[`https://github.com/robpike/ivy`]
+
+=====
+Ivy is an interpreter for an APL-like language. It is a plaything and a work in progress.
+=====
+
+=== J
+
+https://en.wikipedia.org/wiki/J_(programming_language)[`https://en.wikipedia.org/wiki/J_(programming_language)`]
+
+*J Dictionary* - https://www.jsoftware.com/help/dictionary/contents.htm[`https://www.jsoftware.com/help/dictionary/contents.htm`]
+
+*J Notation as a Tool of Thought* - https://www.hillelwayne.com/post/j-notation/[`https://www.hillelwayne.com/post/j-notation/`]
+
+==== Jx
+
+https://www.monument.ai/m/parallel[`https://www.monument.ai/m/parallel`]
+
+=====
+The team at Monument has produced composable multi-threaded concurrency, 100% compatible with the J language. We've called it Jx, or the "Monument engine."
+
+It's fast and well-suited for rapid development. You can use all the cores on your computer, simply and elegantly.
+
+With only slight modification of existing code, Jx design enables users to produce parallel rank, interleave concurrent functions, and call several efficient parallel primitives.
+=====
+
+=== K 
+
+https://en.wikipedia.org/wiki/K_(programming_language)[`https://en.wikipedia.org/wiki/K_(programming_language)`]
+
+https://ngn.bitbucket.io/k.html[`https://ngn.bitbucket.io/k.html`]
+
+==== Kona
+
+https://github.com/kevinlawler/kona[`https://github.com/kevinlawler/kona`]
+
+=====
+Kona is the open-source implementation of the k3 programming language. k is a synthesis of APL and LISP. Although many of the capabilities come from APL, the fundamental data construct is quite different. In APL the construct is a multi-dimensional matrix-like array, where the dimension of the array can range from 0 to some maximum (often 9). In k, like LISP, the fundamental data construct is a list. Also, like LISP, the k language is ASCII-based, so you don't need a special keyboard.
+=====
+
+=== KAP
+
+https://github.com/lokedhs/array[`https://github.com/lokedhs/array`]
+
+=====
+An implementation of an APL-like language in Kotlin. The implementation is a Kotlin Multiplatform project, and can be compiled to Java, natively and to Javascript.
+=====
+
+=== Klong
+
+https://t3x.org/klong/[`https://t3x.org/klong/`]
+
+=====
+Klong is an array language, like K, but without the ambiguity. If you know K or APL, you may be disappointed by Klong.
+=====
+
+=== NESL
+
+https://www.cs.cmu.edu/\~scandal/nesl.html[`https://www.cs.cmu.edu/~scandal/nesl.html`]
+
+=====
+NESL is a parallel language developed at Carnegie Mellon by the SCandAL project. It integrates various ideas from the theory community (parallel algorithms), the languages community (functional languages) and the system's community (many of the implementation techniques). The most important new ideas behind NESL are:
+
+* Nested data parallelism: this feature offers the benefits of data parallelism, concise code that is easy to understand and debug, while being well suited for irregular algorithms, such as algorithms on trees, graphs or sparse matrices (see the examples above or in our library of algorithms).
+* A language based performance model: this gives a formal way to calculated the work and depth of a program. These measures can be related to running time on parallel machines. 
+=====
+
+=== ngn/k
+
+https://codeberg.org/ngn/k/[`https://codeberg.org/ngn/k/`]
+
+=====
+A simple fast vector programming language.
+=====
+
+=== Nial
+
+https://en.wikipedia.org/wiki/Nial[`https://en.wikipedia.org/wiki/Nial`]
+
+=== Numpy
+
+https://en.wikipedia.org/wiki/NumPy[`https://en.wikipedia.org/wiki/NumPy`]
+
+*Array Programming with Numpy* - https://www.nature.com/articles/s41586-020-2649-2[`https://www.nature.com/articles/s41586-020-2649-2`]
+
+*The NumPy array: a structure for efficient numerical computation* - https://arxiv.org/abs/1102.1523[`https://arxiv.org/abs/1102.1523`]
+
+=====
+A  library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
+=====
+
+=== Octave
+
+https://www.gnu.org/software/octave/[`https://www.gnu.org/software/octave/`]
+
+https://en.wikipedia.org/wiki/GNU_Octave#Octave,_the_language[`https://en.wikipedia.org/wiki/GNU_Octave#Octave,_the_language`]
+
+=====
+GNU Octave is software featuring a high-level programming language, primarily intended for numerical computations. Octave helps in solving linear and nonlinear problems numerically, and for performing other numerical experiments using a language that is mostly compatible with MATLAB. It may also be used as a batch-oriented language.
+
+The Octave language is an interpreted programming language. It is a structured programming language (similar to C) and supports many common C standard library functions, and also certain UNIX system calls and functions. However, it does not support passing arguments by reference.
+Octave programs consist of a list of function calls or a script. The syntax is matrix-based and provides various functions for matrix operations. It supports various data structures and allows object-oriented programming.
+=====
+
+=== oK
+
+https://github.com/johnearnest/ok[`https://github.com/johnearnest/ok`]
+
+=====
+oK is a toy interpreter for a dialect of the K programming language which aims to be an implementation of K5, the still-evolving bleeding edge version of the language. Expect oK to be buggy, incomplete and occasionally flat-out wrong, but slowly improving over time. 
+=====
+
+=== Pure
+
+https://agraef.github.io/pure-lang/[`https://agraef.github.io/pure-lang/`]
+
+https://github.com/agraef/pure-lang[`https://github.com/agraef/pure-lang`]
+
+=====
+Pure is a modern-style functional programming language based on term rewriting. It offers equational definitions with pattern matching, full symbolic rewriting capabilities, dynamic typing, eager and lazy evaluation, lexical closures, built-in list and matrix support and an easy-to-use C interface. The interpreter uses LLVM as a backend to JIT-compile Pure programs to fast native code.
+
+Pure is the successor of the author's Q language. It offers many new and powerful features and programs run much faster than their Q equivalents. It also integrates nicely with a number of other computing environments, most notably Faust, Pure Data, Octave, Reduce and TeXmacs. A fairly extensive collection of addon modules is available, which makes Pure usable as a compiled scripting language for a variety of purposes.
+=====
+
+=== q
+
+https://code.kx.com/q/[`https://code.kx.com/q/`]
+
+https://en.wikipedia.org/wiki/Q_(programming_language_from_Kx_Systems)[`https://en.wikipedia.org/wiki/Q_(programming_language_from_Kx_Systems)`]
+
+http://www.timestored.com/kdb-guides/[`http://www.timestored.com/kdb-guides/`]
+
+http://kxsystems.github.io/[`http://kxsystems.github.io/`]
+
+https://code.kx.com/q4m3/[`https://code.kx.com/q4m3/`]
+
+=====
+Q is a programming language for array processing, developed by Arthur Whitney. It is proprietary software, commercialized by Kx Systems. Q serves as the query language for kdb+, a disk based and in-memory, column-based database. Kdb+ is based on the language k, a terse variant of the language APL. Q is a thin wrapper around k, providing a more readable, English-like interface.
+=====
+
+==== jq
+
+https://github.com/timestored/jq[`https://github.com/timestored/jq`]
+
+=====
+Jq is an implementation of the q language using the JVM. It aims to be a complete, correct and fast implementation of q, in future it will provide powerful new features.
+=====
+
+=== SAC
+
+https://arxiv.org/pdf/1912.05234.pdf[`https://arxiv.org/pdf/1912.05234.pdf`]
+
+https://en.wikipedia.org/wiki/SAC_programming_language[`https://en.wikipedia.org/wiki/SAC_programming_language`]
+
+https://hgpu.org/?p=19236[`https://hgpu.org/?p=19236`]
+
+=====
+Single-Assignment C is an array programming language predominantly suited for application areas such as numerically intensive applications and signal processing. Its distinctive feature is that it combines high-level program specifications with runtime efficiency similar to that of hand-optimized low-level specifications. Key to the optimization process that facilitates these runtimes is the underlying functional model which also constitutes the basis for implicit parallelisation. This makes SAC ideally suited for harnessing the full potential of a wide variety of modern architectures ranging from a few symmetric cores with shared memory to massively parallel systems that host heterogeneous components including GPUs and FPGAs.
+
+The overall philosophy of the project is to combine high performance, high productivity and high portability under the hood of one compiler: Being able to write a program, or at least the compute intensive part of a program in a high-level style, quickly and leaving a compiler to figure out the details of the underlying architecture and details of the code transformation, leads to performance competitiveness with hand-optimised low-level codes. This vision drives a number of research activities around SaC. 
+=====
+
+=== shakti/k9
+
+https://estradajke.github.io/k9-simples/k9/index.html[`https://estradajke.github.io/k9-simples/k9/index.html`]
+
+https://shakti.com/[`https://shakti.com/`]
+
+=====
+The Shakti programming language is the work of Arthur Whitney and the team at Shakti. The language comes from a lineage of similar languages going back to APL. It’s also known as k9 given the similarities to k, k2, ..., k6, k7 and the fact that Arthur also wrote those. k9 is still under development so expect a bit of syntax change and likely even more improvements. 
+=====
+
+=== ShapeRank
+
+https://github.com/f5devcentral/shapeRank[`https://github.com/f5devcentral/shapeRank`]
+
+=====
+ShapeRank is new programming language under development at F5. ShapeRank is targeted at data analytics, machine learning and reactive programming. ShapeRank is purely functional and statically typed. All ShapeRank values are multi-dimensional streams, and all operations are automatically lifted to process such streams in parallel. This lifting originates in the APL language family, and is known as rank-polymorphism. ShapeRank is unusual in that it extends rank-polymorphism to streams.
+=====
+
+=== Sisal
+
+http://sisal.sourceforge.net/[`http://sisal.sourceforge.net/`]
+
+https://sourceforge.net/projects/sisal/[`https://sourceforge.net/projects/sisal/`]
+
+https://en.wikipedia.org/wiki/SISAL[`https://en.wikipedia.org/wiki/SISAL`]
+
+=====
+SISAL ("Streams and Iteration in a Single Assignment Language") is a general-purpose single assignment functional programming language with strict semantics, implicit parallelism, and efficient array handling. SISAL outputs a dataflow graph in Intermediary Form 1 (IF1). It was derived from VAL (Value-oriented Algorithmic Language, designed by Jack Dennis), and adds recursion and finite streams. It has a Pascal-like syntax and was designed to be a common high-level language for numerical programs on a variety of multiprocessors. 
+=====
+
+=== X10
+
+http://x10-lang.org/[`http://x10-lang.org/`]
+
+https://en.wikipedia.org/wiki/X10_(programming_language)[`https://en.wikipedia.org/wiki/X10_(programming_language)`]
+
+=====
+X10 is a statically-typed object-oriented language, extending a sequential core language with places, activities, clocks, (distributed, multi-dimensional) arrays and struct types. All these changes are motivated by the desire to use the new language for high-end, high-performance, high-productivity computing. 
+=====
+
+=== ZPL
+
+https://research.cs.washington.edu/zpl/home/[`https://research.cs.washington.edu/zpl/home/`]
+
+https://en.wikipedia.org/wiki/ZPL_(programming_language)[`https://en.wikipedia.org/wiki/ZPL_(programming_language)`]
+
+https://ieeexplore.ieee.org/document/714604[`https://ieeexplore.ieee.org/document/714604`]
+
+=====
+ZPL is an array programming language designed from first principles for fast execution on both sequential and parallel computers. It provides a convenient high-level programming medium for supercomputers and large-scale clusters with efficiency comparable to hand-coded message passing. It is the perfect alternative to using a sequential language like C or Fortran and a message passing library like MPI. 
+=====

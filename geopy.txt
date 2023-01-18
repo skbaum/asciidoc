@@ -1,0 +1,1190 @@
+
+= Geoscience Python 
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+Python packages related to the geosciences, more or less.
+
+== Courses
+
+* *Data Visualization and Statistics in the Geosciences* - https://github.com/abbyazari/data_vis_statistics_geosciences[`https://github.com/abbyazari/data_vis_statistics_geosciences`]
+
+* *Python for Geosciences* - https://github.com/koldunovn/python_for_geosciences[`https://github.com/koldunovn/python_for_geosciences`]
+
+* *Unidata 2020 PyAOS Workshop* - https://github.com/Unidata/pyaos-ams-2021[`https://github.com/Unidata/pyaos-ams-2021`]
+
+== 4DVARNN-DinAE
+
+https://github.com/maxbeauchamp/4DVARNN-DinAE[`https://github.com/maxbeauchamp/4DVARNN-DinAE`]
+
+https://arxiv.org/abs/1910.00556[`https://arxiv.org/abs/1910.00556`]
+
+https://arxiv.org/abs/2006.03653[`https://arxiv.org/abs/2006.03653`]
+
+"This software is a computer program whose purpose is to apply deep learning schemes to dynamical systems and ocean remote sensing data."
+
+== AIX360
+
+https://jmlr.org/papers/v21/19-1035.html[`https://jmlr.org/papers/v21/19-1035.html`]
+
+http://aix360.mybluemix.net/[`http://aix360.mybluemix.net/`]
+
+https://github.com/Trusted-AI/AIX360[`https://github.com/Trusted-AI/AIX360`]
+
+"The AI Explainability 360 toolkit is an open-source library that supports interpretability and explainability of datasets and machine learning models. The AI Explainability 360 Python package includes a comprehensive set of algorithms that cover different dimensions of explanations along with proxy explainability metrics.
+
+There is no single approach to explainability that works best. There are many ways to explain: data vs. model, directly interpretable vs. post hoc explanation, local vs. global, etc. It may therefore be confusing to figure out which algorithms are most appropriate for a given use case."
+
+== AnDA
+
+https://github.com/ptandeo/AnDA[`https://github.com/ptandeo/AnDA`]
+
+https://journals.ametsoc.org/view/journals/mwre/145/10/mwr-d-16-0441.1.xml[`https://journals.ametsoc.org/view/journals/mwre/145/10/mwr-d-16-0441.1.xml`]
+
+"A Python library for the Analog Data Assimilation. This fully data-driven approach aims at reconstructing the state of the system without knowing explicitly the dynamical model. Instead, a representative catalog of trajectories of the system is assumed to be available. AnDA combines analog forecasting methods with ensemble data assimilation."
+
+=== PB-MS-AnDA
+
+https://github.com/rfablet/PB_ANDA[`https://github.com/rfablet/PB_ANDA`]
+
+https://github.com/maxbeauchamp/PB_ANDA[`https://github.com/maxbeauchamp/PB_ANDA`]
+
+"PB-MS-AnDA is a Python library for Patch-Based Multi-scale Analog Data Assimilation, applications to ocean remote sensing. We presented a novel data-driven model for the spatio-temporal interpolation of satellite-derived geophysical fields fields, an extension of analog data assimilation framework AnDA  to high-dimensional satellite-derived geophysical fields."
+
+== aospy
+
+https://aospy.readthedocs.io/en/stable/[`https://aospy.readthedocs.io/en/stable/`]
+
+https://github.com/spencerahill/aospy[`https://github.com/spencerahill/aospy`]
+
+"aospy (pronounced A - O - S - py) is an open source Python package for automating your computations that use gridded climate and weather data (namely data stored as netCDF files) and the management of the results of those computations.
+
+aospy enables firing off multiple calculations in parallel using the permutation of an arbitrary number of climate models, simulations, variables to be computed, date ranges, sub-annual-sampling, and many other parameters. In other words, it is possible using aospy to submit and execute all calculations for a particular project (e.g. paper, class project, or thesis chapter) with a single command."
+
+== argopy
+
+https://github.com/euroargodev/argopy[`https://github.com/euroargodev/argopy`]
+
+"argopy is a python library that aims to ease Argo data access, visualisation and manipulation for regular users as well as Argo experts and operators."
+
+== Arrow
+
+https://github.com/arrow-py/arrow[`https://github.com/arrow-py/arrow`]
+
+https://arrow.readthedocs.io/en/latest/[`https://arrow.readthedocs.io/en/latest/`]
+
+"Arrow is a Python library that offers a sensible and human-friendly approach to creating, manipulating, formatting and converting dates, times and timestamps. It implements and updates the datetime type, plugging gaps in functionality and providing an intelligent module API that supports many common creation scenarios. Simply put, it helps you work with dates and times with fewer imports and a lot less code."
+
+== Cartopy
+
+https://scitools.org.uk/cartopy/docs/latest/[`https://scitools.org.uk/cartopy/docs/latest/`]
+
+*Maps With Cartopy* - https://rabernat.github.io/research_computing_2018/maps-with-cartopy.html[`https://rabernat.github.io/research_computing_2018/maps-with-cartopy.html`]
+
+*Geographic Visualizations with Cartopy* - https://makersportal.com/blog/2020/4/24/geographic-visualizations-in-python-with-cartopy[`https://makersportal.com/blog/2020/4/24/geographic-visualizations-in-python-with-cartopy`]
+
+*Basic Cartopy Maps* - https://coderzcolumn.com/tutorials/data-science/cartopy-basic-maps-scatter-map-bubble-map-and-connection-map[`https://coderzcolumn.com/tutorials/data-science/cartopy-basic-maps-scatter-map-bubble-map-and-connection-map`]
+
+*Mapping with Cartopy* - https://semba-blog.netlify.app/07/04/2020/mapping-with-cartopy-in-python/[`https://semba-blog.netlify.app/07/04/2020/mapping-with-cartopy-in-python/`]
+
+*Making Maps with Cartopy* - https://www.vitoshacademy.com/python-making-maps-with-cartopy/[`https://www.vitoshacademy.com/python-making-maps-with-cartopy/`]
+
+"Cartopy is a Python package designed for geospatial data processing in order to produce maps and other geospatial data analyses.
+Cartopy makes use of the powerful PROJ.4, NumPy and Shapely libraries and includes a programmatic interface built on top of Matplotlib for the creation of publication quality maps.
+Key features of cartopy are its object oriented projection definitions, and its ability to transform points, lines, vectors, polygons and images between those projections."
+
+=== cartoee
+
+https://github.com/kmarkert/cartoee[`https://github.com/kmarkert/cartoee`]
+
+https://cartoee.readthedocs.io/en/latest/index.html[`https://cartoee.readthedocs.io/en/latest/index.html`]
+
+"cartoee aims to do only one thing well: getting processing results from Earth Engine into a publication quality mapping interface. cartoee simply gets results from Earth Engine and plots it with the correct geographic projections leaving ee and cartopy to do more of the processing and visualization."
+
+== cf-python
+
+https://ncas-cms.github.io/cf-python/[`https://ncas-cms.github.io/cf-python/`]
+
+"The cf package implements the CF data model 1 for its internal data structures and so is able to process any CF-compliant dataset. It is not strict about CF-compliance, however, so that partially conformant datasets may be ingested from existing datasets and written to new datasets.This is so that datasets that are partially conformant may nonetheless be modified in memory.
+
+The cf package can:
+
+* read field constructs from netCDF, CDL, PP and UM datasets,
+* create new field constructs in memory,
+* inspect field constructs,
+* test whether two field constructs are the same,
+* modify field construct metadata and data,
+* create subspaces of field constructs,
+* write field constructs to netCDF datasets on disk,
+* incorporate, and create, metadata stored in external files (new in version 3.0.0),
+* read, write, and create data that have been compressed by convention (i.e. ragged or gathered arrays), whilst presenting a view of the data in its uncompressed form,
+* read, write, and create coordinates defined by geometry cells (new in version 3.2.0),
+* read netCDF and CDL datasets containing hierarchical groups (new in version 3.6.0),
+* combine field constructs arithmetically,
+* manipulate field construct data by arithmetical and trigonometrical operations,
+* perform statistical collapses on field constructs,
+* perform histogram, percentile and binning operations on field constructs (new in version 3.0.3),
+* regrid field constructs with (multi-)linear, nearest neighbour, first- and second-order conservative and higher order patch recovery methods,
+* apply convolution filters to field constructs,
+* calculate derivatives of field constructs,
+* create field constructs to create derived quantities (such as vorticity).
+
+All of the above use LAMA functionality, which allows multiple fields larger than the available memory to exist and be manipulated."
+
+== cfdm
+
+https://github.com/NCAS-CMS/cfdm[`https://github.com/NCAS-CMS/cfdm`]
+
+https://ncas-cms.github.io/cfdm/[`https://ncas-cms.github.io/cfdm/`]
+
+"The cfdm library implements the data model of the CF (Climate and Forecast) metadata conventions (http://cfconventions.org) and so should be able to represent and manipulate all existing and conceivable CF-compliant datasets."
+
+== cf-plot
+
+ajheaps.github.io/cf-plot/[`ajheaps.github.io/cf-plot/`]
+
+https://github.com/NCAS-CMS/cf-training[`https://github.com/NCAS-CMS/cf-training`]
+
+"cf-plot is a set of Python functions for making common contour, vector and line plots that climate researchers use. cf-plot generally uses cf-python to present the data and CF attributes for plotting. It can also use numpy arrays of data as the input fields making for flexible plotting of data. cf-plot uses the Python numpy, matplotlib and scipy libraries."
+
+== climlab
+
+https://github.com/brian-rose/climlab[`https://github.com/brian-rose/climlab`]
+
+https://climlab.readthedocs.io/en/latest/index.html[`https://climlab.readthedocs.io/en/latest/index.html`]
+
+"climlab is a flexible engine for process-oriented climate modeling. It is based on a very general concept of a model as a collection of individual, interacting processes. climlab defines a base class called Process, which can contain an arbitrarily complex tree of sub-processes (each also some sub-class of Process). Every climate process (radiative, dynamical, physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone process model given appropriate input, or as a sub-process of a more complex model. New classes of model can easily be defined and run interactively by putting together an appropriate collection of sub-processes."
+
+== climpred
+
+https://climpred.readthedocs.io/en/latest/[`https://climpred.readthedocs.io/en/latest/`]
+
+https://github.com/pangeo-data/climpred[`https://github.com/pangeo-data/climpred`]
+
+"There are many packages out there related to computing metrics on initialized geoscience predictions. However, we didn’t find any one package that unified all our needs.
+
+Output from earth system prediction hindcast (also called re-forecast) experiments is difficult to work with. A typical output file could contain the dimensions initialization, lead time, ensemble member, latitude, longitude, depth. climpred leverages the labeled dimensions of xarray to handle the headache of bookkeeping for you. We offer HindcastEnsemble and PerfectModelEnsemble objects that carry products to verify against (e.g., control runs, reconstructions, uninitialized ensembles) along with your decadal prediction output.
+
+When computing lead-dependent skill scores, climpred handles all of the lag-correlating for you, properly aligning the multiple time dimensions between the hindcast and verification datasets. We offer a suite of vectorized deterministic and probabilistic metrics that can be applied to time series and grids."
+
+== CoTeDe
+
+https://github.com/castelao/CoTeDe[`https://github.com/castelao/CoTeDe`]
+
+https://cotede.readthedocs.io/en/latest/[`https://cotede.readthedocs.io/en/latest/`]
+
+https://joss.theoj.org/papers/10.21105/joss.02063[`https://joss.theoj.org/papers/10.21105/joss.02063`]
+
+"CoTeDe is an Open Source Python package to quality control (QC) oceanographic data such as temperature and salinity. It was designed to attend individual scientists as well as real-time operations on large data centers. To achieve that, CoTeDe is highly customizable, giving the user full control to compose the desired set of tests including the specific parameters of each test, or choose from a list of preset QC procedures.
+
+CoTeDe contains several QC procedures that can be easily combined in different ways:
+
+* Pre-set standard tests according to the recommendations by GTSPP, EGOOS, XBT, Argo or QARTOD;
+* Custom set of tests, including user defined thresholds;
+* Two different fuzzy logic approaches: as proposed by Timms et. al 2011 & Morello et. al. 2014, and using usual defuzification by the bisector;
+* A novel approach based on Anomaly Detection, described by Castelao 2015.
+
+Each measuring platform is a different realm with its own procedures, metadata, and meaningful visualization. So CoTeDe focuses on providing a robust framework with the procedures and lets each application, and the user, to decide how to drive the QC."
+
+== D4M
+
+https://github.com/Accla/D4M.py[`https://github.com/Accla/D4M.py`]
+
+https://d4m.mit.edu/[`https://d4m.mit.edu/`]
+
+https://arxiv.org/abs/2209.00602[`https://arxiv.org/abs/2209.00602`]
+
+=====
+D4M.py is a module for Python that allows unstructured data to be represented as triples in sparse matrics (Associative Arrays) and can be manipulated using standard linear algebraic operations. Using D4M it is possible to construct advanced analytics with just a few lines of code.
+=====
+
+== DAAL4PY
+
+https://intelpython.github.io/daal4py/index.html[`https://intelpython.github.io/daal4py/index.html`]
+
+https://www.nextplatform.com/2020/04/15/python-delivers-big-on-complex-unlabeled-data/[`https://www.nextplatform.com/2020/04/15/python-delivers-big-on-complex-unlabeled-data/`]
+
+"Daal4py makes your Machine Learning algorithms in Python lightning fast and easy to use. It provides highly configurable Machine Learning kernels, some of which support streaming input data and/or can be easily and efficiently scaled out to clusters of workstations. Internally it uses Intel(R) oneAPI Data Analytics Library to deliver the best performance.
+
+daal4py was created to give data scientists the easiest way to utilize Intel(R) oneAPI Data Analytics Library powerful machine learning building blocks directly in a high-productivity manner. A simplified API gives high-level abstractions to the user with minimal boilerplate, allowing for quick to write and easy to maintain code when utilizing Jupyter Notebooks. For scaling capabilities, daal4py also provides the ability to do distributed machine learning, giving a quick way to scale out. Its streaming mode provides a flexible mechanism for processing large amounts of data and/or non-contiguous input data.
+
+For framework designers, daal4py has been fashioned to be built under other frameworks from both an API and feature perspective. The machine learning models split the training and inference classes, allowing the model to be exported and serialized if desired. This design also gives the flexibility to work directly with the model and associated primitives, allowing one to customize the behavior of the model itself. The daal4py package can be built with customized algorithm loadouts, allowing for a smaller footprint of dependencies when necessary."
+
+== DAODEN
+
+"The data-driven recovery of the unknown governing equations of dynamical systems has recently received an increasing interest. However, the identification of governing equations remains challenging when dealing with noisy and partial observations. Here, we address this challenge and investigate variational deep learning schemes. Within the proposed framework, we jointly learn an inference model to reconstruct the true states of the system and the governing laws of these states from series of noisy and partial data. In doing so, this framework bridges classical data assimilation and state-of-the-art machine learning techniques. We also demonstrate that it generalises state-of-the-art methods. Importantly, both the inference model and the governing model embed stochastic components to account for stochastic variabilities, model errors, and reconstruction uncertainties."
+
+https://arxiv.org/abs/2009.02296[`https://arxiv.org/abs/2009.02296`]
+
+https://github.com/CIA-Oceanix/DAODEN[`https://github.com/CIA-Oceanix/DAODEN`]
+
+== Dedalus
+
+https://dedalus-project.readthedocs.io/en/latest/[`https://dedalus-project.readthedocs.io/en/latest/`]
+
+https://dedalus-project.org/[`https://dedalus-project.org/`]
+
+"Dedalus is a flexible framework for solving partial differential equations using spectral methods. The code is open-source and developed by a team of researchers studying astrophysical, geophysical, and biological fluid dynamics.
+
+Dedalus is written primarily in Python and features an easy-to-use interface with symbolic equation entry. Our numerical algorithm produces sparse systems for a wide variety of equations and spectrally-discretized domains. These systems are efficiently solved using compiled libraries and are automatically parallelized using MPI."
+
+=== Dedalus-Sphere
+
+https://github.com/DedalusProject/dedalus_sphere[`https://github.com/DedalusProject/dedalus_sphere`]
+
+https://www.sciencedirect.com/science/article/pii/S2590055219300289[`https://www.sciencedirect.com/science/article/pii/S2590055219300289`]
+
+"Running spherical calculations using Dedalus."
+
+== DeepXDE
+
+https://github.com/lululxvi/deepxde[`https://github.com/lululxvi/deepxde`]
+
+https://deepxde.readthedocs.io/en/latest/[`https://deepxde.readthedocs.io/en/latest/`]
+
+https://epubs.siam.org/doi/abs/10.1137/19M1274067[`https://epubs.siam.org/doi/abs/10.1137/19M1274067`]
+
+"DeepXDE is a deep learning library on top of TensorFlow. Use DeepXDE if you need a deep learning library that
+
+* solves forward and inverse partial differential equations (PDEs) via physics-informed neural network (PINN),
+* solves forward and inverse integro-differential equations (IDEs) via PINN,
+* solves forward and inverse fractional partial differential equations (fPDEs) via fractional PINN (fPINN),
+* approximates functions from multi-fidelity data via multi-fidelity NN (MFNN),
+* approximates nonlinear operators via deep operator network (DeepONet),
+* approximates functions from a dataset with/without constraints.
+
+DeepXDE supports complex domain geometries without tyranny mesh generation, coupled PDEs,
+five types of boundary conditions, residual-based adaptive refinement, two types of
+neural networks, etc."
+
+== erddapy
+
+https://github.com/ioos/erddapy[`https://github.com/ioos/erddapy`]
+
+https://ioos.github.io/erddapy/v0.9.0/[`https://ioos.github.io/erddapy/v0.9.0/`]
+
+"erddapy takes advantage of ERDDAP's RESTful web services and creates the ERDDAP URL for any request, like searching for datasets, acquiring metadata, downloading the data, etc.
+
+== ESMPy
+
+https://earthsystemmodeling.org/esmpy/[`https://earthsystemmodeling.org/esmpy/`]
+
+https://earthsystemmodeling.org/esmpy_doc/release/ESMF_8_0_1/html/install.html[`https://earthsystemmodeling.org/esmpy_doc/release/ESMF_8_0_1/html/install.html`]
+
+"ESMPy is a Python interface to the Earth System Modeling Framework (ESMF) regridding utility.
+ESMPy provides a Grid to represent single-tile logically rectangular coordinate data, a Mesh for unstructured coordinates, and a LocStream for collections of unconnected points like observational data streams. ESMPy supports bilinear, nearest neighbor, higher order patch recovery, first-order conservative and second-order conservative regridding. There is also an option to ignore unmapped destination points and mask out points on either the source or destination. Regridding on the sphere takes place in 3D Cartesian space, so the pole problem is not an issue as it commonly is with some Earth system grid remapping software. Grid and Mesh objects can be created in 2D or 3D space, and 3D conservative regridding is fully supported."
+
+== ESM-Tools
+
+https://esm-tools.readthedocs.io/en/latest/index.html[`https://esm-tools.readthedocs.io/en/latest/index.html`]
+
+https://github.com/esm-tools/esm_tools[`https://github.com/esm-tools/esm_tools`]
+
+"The esm-tools are a collection of scripts to download, compile, configure different simulation models for the Earth system, such as atmosphere, ocean, geo-biochemistry, hydrology, sea-ice and ice-sheet models, as well as coupled Earth System Models (ESMs). They include functionality to write unified runscripts to carry out model simulations for different model setups (standalone and ESMs) on different HPC systems."
+
+== ESMValTool
+
+https://gmd.copernicus.org/articles/13/3383/2020/[`https://gmd.copernicus.org/articles/13/3383/2020/`]
+
+https://www.esmvaltool.org/[`https://www.esmvaltool.org/`]
+
+https://docs.esmvaltool.org/en/latest/[`https://docs.esmvaltool.org/en/latest/`]
+
+"The Earth System Model Evaluation Tool (ESMValTool) is a community diagnostics and performance metrics tool for the evaluation of Earth System Models (ESMs) that allows for routine comparison of single or multiple models, either against predecessor versions or against observations.
+It consists of (1) an easy-to-install, well-documented Python package providing the core functionalities (ESMValCore) that performs common preprocessing operations and (2) a diagnostic part that includes tailored diagnostics and performance metrics for specific scientific applications."
+
+=== CVDP
+
+https://www.cesm.ucar.edu/working_groups/CVC/cvdp/[`https://www.cesm.ucar.edu/working_groups/CVC/cvdp/`]
+
+"The Climate Variability Diagnostics Package (CVDP) developed by NCAR's Climate Analysis Section is an analysis tool that documents the major modes of climate variability in models and observations, including ENSO, Pacific Decadal Oscillation, Atlantic Multi-decadal Oscillation, Northern and Southern Annular Modes, North Atlantic Oscillation, Pacific North and South American teleconnection patterns. Time series, spatial patterns and power spectra are displayed graphically via webpages and saved as NetCDF files for later use. The package also computes climatological fields, standard deviation and trend maps; documentation is provided for all calculations."
+
+== EZyRB
+
+https://github.com/mathLab/EZyRB[`https://github.com/mathLab/EZyRB`]
+
+"EZyRB is a python library for the Model Order Reduction based on baricentric triangulation for the selection of the parameter points and on Proper Orthogonal Decomposition for the selection of the modes. It is ideally suited for actual industrial problems, since its structure can interact with several simulation software simply providing the output file of the simulations. Up to now, it handles files in the vtk and mat formats. It has been used for the model order reduction of problems solved with matlab and openFOAM."
+
+== FEniCS
+
+https://fenicsproject.org/[`https://fenicsproject.org/`]
+
+https://en.wikipedia.org/wiki/FEniCS_Project[`https://en.wikipedia.org/wiki/FEniCS_Project`]
+
+https://github.com/FEniCS[`https://github.com/FEniCS`]
+
+"FEniCS is a popular open-source (LGPLv3) computing platform for solving partial differential equations (PDEs). FEniCS enables users to quickly translate scientific models into efficient finite element code. With the high-level Python and C++ interfaces to FEniCS, it is easy to get started, but FEniCS offers also powerful capabilities for more experienced programmers.
+
+=== RBniCS
+
+https://www.rbnicsproject.org/[`https://www.rbnicsproject.org/`]
+
+https://github.com/RBniCS/RBniCS[`https://github.com/RBniCS/RBniCS`]
+
+"The RBniCS Project contains an implementation in FEniCS of several reduced order modelling techniques (and, in particular, certified reduced basis method and Proper Orthogonal Decomposition-Galerkin methods) for parametrized problems. It is ideally suited for an introductory course on reduced basis methods and reduced order modelling, thanks to an object-oriented approach and an intuitive and versatile python interface."
+
+== Fluidsim
+
+https://fluidsim.readthedocs.io/en/latest/[`https://fluidsim.readthedocs.io/en/latest/`]
+
+"Fluidsim is an object-oriented library to develop solvers (mainly using pseudo-spectral methods) by writing mainly Python code. The result is very efficient even compared to a pure Fortran or C++ code since the time-consuming tasks are performed by optimized compiled functions.
+
+Fluidsim is a HPC code written mostly in Python. It uses the library Fluidfft to use very efficient FFT libraries. Fluidfft is written in C++, Cython and Python. Fluidfft and fluidsim take advantage of Pythran, a static Python compiler which produces very efficient binaries by compiling Python via C++11. Pythran is actually used in Fluidsim through Transonic, which is a new and cool project for HPC with Python."
+
+=== fluidsim_ocean
+
+https://foss.heptapod.net/fluiddyn/fluidsim_ocean[`https://foss.heptapod.net/fluiddyn/fluidsim_ocean`]
+
+"A fluidsim extension defining shallow-water solvers."
+
+== frictionless
+
+https://framework.frictionlessdata.io/[`https://framework.frictionlessdata.io/`]
+
+https://frictionlessdata.io/[`https://frictionlessdata.io/`]
+
+"A framework to describe, extract, validate, and transform tabular data in Python.
+The framework supports CSV, Excel, and JSON formats by default, and uses a plugin architecture to
+support SQL, Pandas, HTML, etc.
+The framework can be uses as a Python library, on the command line, or as a restful
+API server.
+
+The core of the Framework are the Frictionless Specifications. These specifications are a set of patterns for describing data including Data Package (for datasets), Data Resource (for files) and Table Schema (for tables). A Data Package is a simple container format used to describe and package a collection of data and metadata, including schemas. Frictionless-py lets users create data packages and schemas that conform to the Frictionless specifications."
+
+== geemap
+
+https://geemap.org/[`https://geemap.org/`]
+
+https://github.com/giswqs/geemap[`https://github.com/giswqs/geemap`]
+
+https://github.com/giswqs/geemap-tutorials[`https://github.com/giswqs/geemap-tutorials`]
+
+"geemap is a Python package for interactive mapping with Google Earth Engine (GEE), which is a cloud computing platform with a multi-petabyte catalog of satellite imagery and geospatial datasets. During the past few years, GEE has become very popular in the geospatial community and it has empowered numerous environmental applications at local, regional, and global scales. GEE provides both JavaScript and Python APIs for making computational requests to the Earth Engine servers.
+ It is built upon ipyleaflet and ipywidgets, and enables users to analyze and visualize Earth Engine datasets interactively within a Jupyter-based environment."
+
+== GeoCAT
+
+https://geocat.ucar.edu/[`https://geocat.ucar.edu/`]
+
+https://github.com/NCAR/geocat-comp[`https://github.com/NCAR/geocat-comp`]
+
+https://github.com/NCAR/geocat-f2py[`https://github.com/NCAR/geocat-f2py`]
+
+"GeoCAT is the Geoscience Community Analysis Toolkit. GeoCAT is a collection of Python tools related to NCL (NCAR Command Language).
+
+GeoCAT-comp is both the whole computational component of the GeoCAT project and a single Github repository as described in GeoCAT-comp. As the computational component of GeoCAT, GeoCAT-comp provides implementations of computational functions for operating on geosciences data. Many of these functions originated in NCL are pivoted into Python with the help of GeoCAT-comp; however, developers are welcome to come up with novel computational functions for geosciences data.
+
+GeoCAT-f2py wraps, in Python, the compiled language implementations of some of the computational functions found under the GeoCAT-comp umbrella. The compiled language functions contained in GeoCAT-f2py (i.e. this repository) as Fortran subroutines are wrapped up in corresponding Python wrapper files in the same repository with the help of Numpy.f2py's signature files (.pyf)."
+
+== GeoViews
+
+https://github.com/holoviz/geoviews[`https://github.com/holoviz/geoviews`]
+
+https://geoviews.org/[`https://geoviews.org/`]
+
+"GeoViews is a Python library that makes it easy to explore and visualize geographical, meteorological, and oceanographic datasets, such as those used in weather, climate, and remote sensing research.
+
+GeoViews is built on the HoloViews library for building flexible visualizations of multidimensional data. GeoViews adds a family of geographic plot types based on the Cartopy library, plotted using either the Matplotlib or Bokeh packages. With GeoViews, you can now work easily and naturally with large, multidimensional geographic datasets, instantly visualizing any subset or combination of them, while always being able to access the raw data underlying any plot."
+
+== GeoBO
+
+https://github.com/sebhaan/geobo[`https://github.com/sebhaan/geobo`]
+
+"GeoBO is build upon a probabilistic framework using Gaussian Process (GP) priors to jointly solve multi-linear forward models. This software generates multi-output 3D cubes of geophysical properties (e.g. density, magnetic susceptibility, mineral concentrations) and their uncertainties from 2D survey data (e.g. magnetics and gravity) and any pre-existing drillcore measurements. The reconstructed 3D model is then used to query the next most promising measurement location given an expensive cost function (e.g. for drillcores). A ranked list of new measurements is proposed based on user-defined objectives as defined in the acquisition function which typically aims to optimize exploration (reducing global model uncertainty) and exploitation (focusing on highly promising regions) while minimizing costs."
+
+== giotta-tda
+
+https://github.com/giotto-ai/giotto-tda[`https://github.com/giotto-ai/giotto-tda`]
+
+https://jmlr.org/papers/v22/20-325.html[`https://jmlr.org/papers/v22/20-325.html`]
+
+"A Python library that integrates high-performance topological data analysis with machine learning via a scikit-learn-compatible API and state-of-the-art C++ implementations. The library's ability to handle various types of data is rooted in a wide range of preprocessing techniques, and its strong focus on data exploration and interpretability is aided by an intuitive plotting API."
+
+== earthengine-py-notebooks
+
+https://github.com/giswqs/earthengine-py-notebooks[`https://github.com/giswqs/earthengine-py-notebooks`]
+
+"This repository is a collection of 360+ Jupyter Python notebook examples. I developed these examples by converting my other repo qgis-earthengine-examples from Python scripts to Jupyter notebooks. Now you can display Earth Engine data layers interactively in Jupyter notebooks without having to install QGIS. Several Python packages are being used in these examples, including the Earth Engine Python API, folium, ipyleaflet, and geemap."
+
+== GlobSim
+
+https://globsim.readthedocs.io/en/latest/[`https://globsim.readthedocs.io/en/latest/`]
+
+https://github.com/geocryology/globsim[`https://github.com/geocryology/globsim`]
+
+"GlobSim is developed to efficiently download, process and downscale currently available global atmospheric reanalysis data products, which include ERA_Interim from the European Centre for Medium-Range Weather Forecasts (ECMWF), MERRA2 from the National Aeronautics and Space Administration (NASA), and JRA55 from the Japan Meteorological Agency (JMA).
+
+The desired meteorological information is specified using simple control files, which prescribe coordinates of sites, elevation, time period, variable lists, and scaling parameters. GlobSim then produces the interpolated and downscaled time series for the specified sites. These output files are saved in the format of netCDF4."
+
+== gospl
+
+https://github.com/Geodels/gospl[`https://github.com/Geodels/gospl`]
+
+https://gospl.readthedocs.io/en/latest/[`https://gospl.readthedocs.io/en/latest/`]
+
+https://joss.theoj.org/papers/10.21105/joss.02804[`https://joss.theoj.org/papers/10.21105/joss.02804`]
+
+"gospl (short for Global Scalable Paleo Landscape Evolution) is an open source, GPL-licensed library providing a scalable parallelised Python-based numerical model to simulate landscapes and basins reconstruction at global scale."
+
+== GraKeL
+
+https://jmlr.org/papers/v21/18-370.html[`https://jmlr.org/papers/v21/18-370.html`]
+
+https://github.com/ysig/GraKeL[`https://github.com/ysig/GraKeL`]
+
+https://ysig.github.io/GraKeL/0.1a8/[`https://ysig.github.io/GraKeL/0.1a8/`]
+
+https://appliednetsci.springeropen.com/articles/10.1007/s41109-019-0195-3[`https://appliednetsci.springeropen.com/articles/10.1007/s41109-019-0195-3`]
+
+"GraKeL is a Python package which provides implementations of several graph kernels, a family of powerful methods which allow kernel-based learning approaches such as SVMs to work directly on graphs.
+
+Machine learning analysis of large, complex datasets has become an integral part of research in both the natural and social sciences. Largely, this development was driven by the empirical success of supervised learning of vector-valued data or image data. However, in many domains, such as chemo- and bioinformatics, social network analysis or computer vision, observations describe relations between objects or individuals and cannot be interpreted as vectors or fixed grids; instead, they are naturally represented by graphs. This poses a particular challenge in the application of traditional data mining and machine learning approaches. In order to learn successfully from such data, it is necessary for algorithms to exploit the rich information inherent to the graphs’ structure and annotations associated with their vertices and edges.
+
+A popular approach to learning with graph-structured data is to make use of graph kernels—functions which measure the similarity between graphs—plugged into a kernel machine, such as a support vector machine."
+
+== GT4Py
+
+https://github.com/GridTools/gt4py[`https://github.com/GridTools/gt4py`]
+
+=====
+GT4Py is a Python library for generating high performance implementations of stencil kernels from a high-level definition using regular Python functions. GT4Py uses the GridTools Framework for a native implementation of the kernel, but other code-generating backends are also available.
+
+The GridTools framework is a set of libraries and utilities to develop performance portable applications in the area of weather and climate. To achieve the goal of performance portability, the user-code is written in a generic form which is then optimized for a given architecture at compile-time. The core of GridTools is the stencil composition module which implements a DSL embedded in C++ for stencils and stencil-like patterns. Further, GridTools provides modules for halo exchanges, boundary conditions, data management and bindings to C and Fortran.
+
+=====
+
+== h5py
+
+https://github.com/h5py/h5py[`https://github.com/h5py/h5py`]
+
+https://docs.h5py.org/en/latest/index.html[`https://docs.h5py.org/en/latest/index.html`]
+
+"The h5py package is a Pythonic interface to the HDF5 binary data format."
+
+== hvPlot
+
+https://hvplot.holoviz.org/[`https://hvplot.holoviz.org/`]
+
+"A high-level plotting API for the PyData ecosystem built on HoloViews.
+The PyData ecosystem has a number of core Python data containers that allow users to work with a wide array of datatypes, including:
+
+* Pandas: DataFrame, Series (columnar/tabular data)
+* Rapids cuDF: GPU DataFrame, Series (columnar/tabular data)
+* Dask: DataFrame, Series (distributed/out of core arrays and columnar data)
+* XArray: Dataset, DataArray (labelled multidimensional arrays)
+* Streamz: DataFrame(s), Series(s) (streaming columnar data)
+* Intake: DataSource (data catalogues)
+* GeoPandas: GeoDataFrame (geometry data)
+* NetworkX: Graph (network graphs)
+
+Several of these libraries have the concept of a high-level plotting API that lets a user generate common plot types very easily. The native plotting APIs are generally built on Matplotlib, which provides a solid foundation, but it means that users miss out on the benefits of modern, interactive plotting libraries for the web like Bokeh and HoloViews.
+
+hvPlot provides a high-level plotting API built on HoloViews that provides a general and consistent API for plotting data in all the abovementioned formats. hvPlot can integrate neatly with the individual libraries if an extension mechanism for the native plot APIs is offered, or it can be used as a standalone component."
+
+https://hvplot.holoviz.org/[`https://hvplot.holoviz.org/`]
+
+== InfoMap
+
+https://mapequation.github.io/infomap/[`https://mapequation.github.io/infomap/`]
+
+https://www.mapequation.org/[`https://www.mapequation.org/`]
+
+https://link.springer.com/article/10.1140/epjst/e2010-01179-1[`https://link.springer.com/article/10.1140/epjst/e2010-01179-1`]
+
+https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2020JC016416[`https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2020JC016416`]
+
+https://aip.scitation.org/doi/10.1063/1.4908231[`https://aip.scitation.org/doi/10.1063/1.4908231`]
+
+https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.224503[`https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.98.224503`]
+
+"Infomap is a network clustering algorithm based on the Map equation."
+
+== Inlinino
+
+https://inlinino.readthedocs.io/en/latest/[`https://inlinino.readthedocs.io/en/latest/`]
+
+https://tos.org/oceanography/article/inlinino-a-modular-software-data-logger-for-oceanography[`https://tos.org/oceanography/article/inlinino-a-modular-software-data-logger-for-oceanography`]
+
+"Inlinino is an open-source software data logger for oceanographers. It primarily log measurements from optical instruments deployed on research vessels during month long campaigns. Secondarily, it provides real-time visualization, which helps users troubleshoot instruments in the field and ensure collection of quality data. Inlinino is designed to interface with either serial (RS-232) or analog instruments. The data received is logged in a timestamped raw format (as communicated by the instrument) or in a comma separated file (csv) for easy importation in data analysis software. Typically, a new log file is created every hour for simplicity of post-processing and easy backups. Instruments supported are: SeaBird TSG, Satlantic PAR, WET Labs ECO sensors (e.g. ECO-BB3, ECO-FLBBCD, ECO-BBFL2, ECO-3X1M, ECO-BB9, ECO-BBRT), WET Labs ACS, Sequoia LISST, and analog sensors through a data acquisition system (DataQ DI-1100 ). Other instruments can be added via the user interface if they output simple ascii data frame, otherwise the code is intended to be modular to support new instruments."
+
+== ipymesh
+
+https://github.com/erdc/ipymesh[`https://github.com/erdc/ipymesh`]
+
+"IPython widgets for mesh generation."
+
+== Iris
+
+https://scitools-iris.readthedocs.io/en/latest/[`https://scitools-iris.readthedocs.io/en/latest/`]
+
+*An Introduction to Iris* - https://mybinder.org/v2/gh/SciTools/courses/master?filepath=course_content%2Firis_course%2F0.Iris_Course_Intro.ipynb[`https://mybinder.org/v2/gh/SciTools/courses/master?filepath=course_content%2Firis_course%2F0.Iris_Course_Intro.ipynb`]
+
+"Iris implements a data model based on the CF conventions giving you a powerful, format-agnostic interface for working with your data. It excels when working with multi-dimensional Earth Science data, where tabular representations become unwieldy and inefficient.
+
+CF Standard names, units, and coordinate metadata are built into Iris, giving you a rich and expressive interface for maintaining an accurate representation of your data. Its treatment of data and associated metadata as first-class objects includes:
+
+* visualisation interface based on matplotlib and cartopy,
+* unit conversion,
+* subsetting and extraction,
+* merge and concatenate,
+* aggregations and reductions (including min, max, mean and weighted averages),
+* interpolation and regridding (including nearest-neighbor, linear and area-weighted), and
+* operator overloads (+, -, *, /, etc.).
+
+A number of file formats are recognised by Iris, including CF-compliant NetCDF, GRIB, and PP, and it has a plugin architecture to allow other formats to be added seamlessly.
+
+Building upon NumPy and dask, Iris scales from efficient single-machine workflows right through to multi-core clusters and HPC. Interoperability with packages from the wider scientific Python ecosystem comes from Iris’ use of standard NumPy/dask arrays as its underlying data storage."
+
+=== iris-grib
+
+https://iris-grib.readthedocs.io/en/latest/[`https://iris-grib.readthedocs.io/en/latest/`]
+
+"The library iris-grib provides functionality for converting between weather and climate datasets that are stored as GRIB files and Iris cubes. GRIB files can be loaded as Iris cubes using iris-grib so that you can use Iris for analysing and visualising the contents of the GRIB files. Iris cubes can be saved to GRIB files using iris-grib.
+
+The contents of iris-grib represent the former grib loading and saving capabilities of Iris itself. These capabilities have been separated into a discrete library so that Iris becomes less monolithic as a library."
+
+== jpy
+
+https://github.com/bcdev/jpy[`https://github.com/bcdev/jpy`]
+
+https://jpy.readthedocs.io/en/latest/[`https://jpy.readthedocs.io/en/latest/`]
+
+"A bi-directional Python-Java bridge which you can use to embed Java code in Python programs or the other way round. It has been designed particularly with regard to maximum data transfer speed between the two languages.  The features include:
+
+* Fully translates Java class hierarchies to Python
+* Transparently handles Java method overloading
+* Support of Java multi-threading
+* Fast and memory-efficient support of primitive Java array parameters via Python buffers (e.g. Numpy arrays)
+* Support of Java methods that modify primitive Java array parameters (mutable parameters)
+* Java arrays translate into Python sequence objects
+* Java API for accessing Python objects (jpy.jar)"
+
+== lbmpy
+
+https://i10git.cs.fau.de/pycodegen/lbmpy/[`https://i10git.cs.fau.de/pycodegen/lbmpy/`]
+
+https://arxiv.org/abs/2001.11806[`https://arxiv.org/abs/2001.11806`]
+
+https://www.walberla.net/[`https://www.walberla.net/`]
+
+"Lattice Boltzmann methods are a popular mesoscopic alternative to macroscopic computational fluid dynamics solvers. Many variants have been developed that vary in complexity, accuracy, and computational cost. Extensions are available to simulate multi-phase, multi-component, turbulent, or non-Newtonian flows. In this work we present lbmpy, a code generation package that supports a wide variety of different methods and provides a generic development environment for new schemes as well. A high-level domain-specific language allows the user to formulate, extend and test various lattice Boltzmann schemes. The method specification is represented in a symbolic intermediate representation. Transformations that operate on this intermediate representation optimize and parallelize the method, yielding highly efficient lattice Boltzmann compute kernels not only for single- and two-relaxation-time schemes but also for multi-relaxation-time, cumulant, and entropically stabilized methods. An integration into the HPC framework waLBerla makes massively parallel, distributed simulations possible."
+
+== ldcpy
+
+https://ldcpy.readthedocs.io/en/v0.12/[`https://ldcpy.readthedocs.io/en/v0.12/`]
+
+https://github.com/NCAR/ldcpy[`https://github.com/NCAR/ldcpy`]
+
+"A utility for gathering and plotting metrics from NetCDF or Zarr files using the Pangeo stack. It also contains a number of statistical and visual tools for gathering metrics and comparing Earth System Model data files."
+
+== MAOOAM
+
+https://github.com/Climdyn/MAOOAM[`https://github.com/Climdyn/MAOOAM`]
+
+https://gmd.copernicus.org/articles/9/2793/2016/[`https://gmd.copernicus.org/articles/9/2793/2016/`]
+
+"A reduced-order quasi-geostrophic coupled ocean–atmosphere model that allows for an arbitrary number of atmospheric and oceanic modes to be retained in the spectral decomposition. The modularity of this new model allows one to easily modify the model physics.
+
+The atmospheric component of the model is based on the papers of Charney and Straus (1980), Reinhold and Pierrehumbert (1982) and Cehelsky and Tung (1987), all published in the Journal of Atmospheric Sciences. The ocean component is based on the papers of Pierini (2012), Barsugli and Battisti (1998). The coupling between the two components includes wind forcings, radiative and heat exchanges."
+
+== MPAS
+
+=== COMPASS
+
+https://mpas-dev.github.io/compass/stable/[`https://mpas-dev.github.io/compass/stable/`]
+
+https://github.com/MPAS-Dev/compass[`https://github.com/MPAS-Dev/compass`]
+
+"Configuration Of Model for Prediction Across Scales Setups (COMPASS) is an automated system to set up test cases that match the MPAS-Model repository. All namelists and streams files begin with the default generated from the Registry.xml file, and only the changes relevant to the particular test case are altered in those files."
+
+=== geometric-features
+
+https://github.com/MPAS-Dev/geometric_features[`https://github.com/MPAS-Dev/geometric_features`]
+
+http://mpas-dev.github.io/geometric_features/stable/[`http://mpas-dev.github.io/geometric_features/stable/`]
+
+"A repository of geometric features relevant for climate science."
+
+=== MPAS-Analysis
+
+https://mpas-dev.github.io/MPAS-Analysis/stable/[`https://mpas-dev.github.io/MPAS-Analysis/stable/`]
+
+https://github.com/MPAS-Dev/MPAS-Analysis[`https://github.com/MPAS-Dev/MPAS-Analysis`]
+
+"Analysis for simulations produced with Model for Prediction Across Scales (MPAS) components and the Energy Exascale Earth System Model (E3SM), which used those components."
+
+=== MPAS-Tools
+
+http://mpas-dev.github.io/MPAS-Tools/stable/[`http://mpas-dev.github.io/MPAS-Tools/stable/`]
+
+https://github.com/MPAS-Dev/MPAS-Tools[`https://github.com/MPAS-Dev/MPAS-Tools`]
+
+"MPAS-Tools includes a python package, compiled Fortran, C and C++ tools, and scripts for supporting initialization, visualization and analysis of Model for Prediction Across Scales (MPAS) components. These tools are used by the COMPASS (Configuring of MPAS Setups) framework within MPAS-Model used to create ocean and land-ice test cases, the MPAS-Analysis package for analyzing simulations, and in other MPAS-related workflows."
+
+=== pyremap
+
+https://mpas-dev.github.io/pyremap/stable/[`https://mpas-dev.github.io/pyremap/stable/`]
+
+https://github.com/MPAS-Dev/pyremap[`https://github.com/MPAS-Dev/pyremap`]
+
+"Python remapping tools for climate and earth system models."
+
+== Nansat
+
+https://github.com/nansencenter/nansat[`https://github.com/nansencenter/nansat`]
+
+https://nansat.readthedocs.io/en/latest/[`https://nansat.readthedocs.io/en/latest/`]
+
+https://openresearchsoftware.metajnl.com/articles/10.5334/jors.120/[`https://openresearchsoftware.metajnl.com/articles/10.5334/jors.120/`]
+
+"Nansat is a scientist friendly Python toolbox for processing 2D satellite earth observation data.
+The main goal of Nansat is to facilitate
+easy development and testing of scientific algorithms,
+easy analysis of geospatial data, and
+efficient operational processing.
+
+Nansat is a Python toolbox for analysing and processing 2-dimensional geospatial data, such as satellite imagery, output from numerical models, and gridded in-situ data. It is created with strong focus on facilitating research, and development of algorithms and autonomous processing systems. Nansat extends the widely used Geospatial Abstraction Data Library (GDAL) by adding scientific meaning to the datasets through metadata, and by adding common functionality for data analysis and handling (e.g., exporting to various data formats). Nansat uses metadata vocabularies that follow international metadata standards, in particular the Climate and Forecast (CF) conventions, and the NASA Directory Interchange Format (DIF) and Global Change Master Directory (GCMD) keywords. Functionality that is commonly needed in scientific work, such as seamless access to local or remote geospatial data in various file formats, collocation of datasets from different sources and geometries, and visualization, is also built into Nansat."
+
+== OceanParcels
+
+https://oceanparcels.org/[`https://oceanparcels.org/`]
+
+https://gmd.copernicus.org/articles/10/4175/2017/gmd-10-4175-2017.html[`https://gmd.copernicus.org/articles/10/4175/2017/gmd-10-4175-2017.html`]
+
+"The OceanParcels project develops Parcels (Probably A Really Computationally Efficient Lagrangian Simulator), a set of Python classes and methods to create customisable particle tracking simulations using output from Ocean Circulation models. Parcels can be used to track passive and active particulates such as water, plankton, plastic and fish."
+
+== OGGM
+
+https://github.com/OGGM/oggm[`https://github.com/OGGM/oggm`]
+
+"OGGM is a modular open source model for glacier dynamics.
+The model accounts for glacier geometry (including contributory branches) and includes an explicit ice dynamics module. It can simulate past and future mass-balance, volume and geometry of (almost) any glacier in the world in a fully automated and extensible workflow. We rely exclusively on publicly available data for calibration and validation."
+
+== ordpy
+
+https://github.com/arthurpessa/ordpy[`https://github.com/arthurpessa/ordpy`]
+
+https://arxiv.org/abs/2102.06786[`https://arxiv.org/abs/2102.06786`]
+
+"A simple and open-source Python module that implements permutation entropy and several of the principal methods related to Bandt and Pompe's framework to analyze time series and two-dimensional data. In particular, ordpy implements permutation entropy, complexity-entropy plane, complexity-entropy curves, missing ordinal patterns, ordinal networks, and missing ordinal transitions for one-dimensional (time series) and two-dimensional (images) data as well as their multiscale generalizations."
+
+== p-3DNMF
+
+https://gmd.copernicus.org/articles/13/2763/2020/[`https://gmd.copernicus.org/articles/13/2763/2020/`]
+
+"A free software package for the computation of the three-dimensional normal modes of an hydrostatic atmosphere.
+This software performs the computations in isobaric coordinates and was developed for two user-friendly languages: MATLAB and Python. The software can be used to expand the global atmospheric circulation onto the 3-D normal modes. This expansion allows the computation of a 3-D energetic scheme, which partitions the energy reservoirs and energy interactions between 3-D spatial scales, barotropic and baroclinic components, and balanced (rotational) and unbalanced (divergent) circulation fields. Moreover, by retaining only a subset of the expansion coefficients, the 3-D normal mode expansion can be used for spatial-scale filtering of atmospheric motion, filtering of balanced motion and mass unbalanced motions, and barotropic and baroclinic components. Fixing the meridional scale, the 3-D normal mode filtering can be used to isolate tropical components of the atmospheric circulation."
+
+== PCAfold
+
+https://github.com/ElsevierSoftwareX/SOFTX-D-20-00048[`https://github.com/ElsevierSoftwareX/SOFTX-D-20-00048`]
+
+https://pcafold.readthedocs.io/en/latest/[`https://pcafold.readthedocs.io/en/latest/`]
+
+https://www.sciencedirect.com/science/article/pii/S2352711020303435[`https://www.sciencedirect.com/science/article/pii/S2352711020303435`]
+
+"An open-source Python library for generating, analyzing and improving low-dimensional manifolds obtained via Principal Component Analysis (PCA). It incorporates a variety of data preprocessing tools (including data clustering and sampling), uses PCA as a dimensionality reduction technique and utilizes a novel approach to assess the quality of the obtained low-dimensional manifolds."
+
+== PDE-NetGen
+
+https://gmd.copernicus.org/articles/13/3373/2020/[`https://gmd.copernicus.org/articles/13/3373/2020/`]
+
+https://github.com/opannekoucke/pdenetgen[`https://github.com/opannekoucke/pdenetgen`]
+
+"The PDE-NetGen package provides new means to automatically translate physical equations, given as partial differential equations (PDEs), into neural network architectures. PDE-NetGen combines symbolic calculus and a neural network generator. The latter exploits NN-based implementations of PDE solvers using Keras. With some knowledge of a problem, PDE-NetGen is a plug-and-play tool to generate physics-informed NN architectures. They provide computationally efficient yet compact representations to address a variety of issues, including, among others, adjoint derivation, model calibration, forecasting and data assimilation as well as uncertainty quantification."
+
+== psyplot
+
+https://github.com/psyplot[`https://github.com/psyplot`]
+
+https://psyplot.readthedocs.io/en/latest/[`https://psyplot.readthedocs.io/en/latest/`]
+
+"An open source python project that mainly combines the plotting utilities of matplotlib and the data management of the xarray package and integrates them into a software that can be used via command-line and via a GUI.
+The main purpose is to have a framework that allows a fast, attractive, flexible, easily applicable, easily reproducible and especially an interactive visualization of your data."
+
+=== psy-view
+
+https://github.com/psyplot/psy-view[`https://github.com/psyplot/psy-view`]
+
+"This package defines a viewer application for netCDF files, that is highly motivated by the ncview package but entirely built upon the psyplot framework. It supports strucutured and unstructured grids and provides an intuitive graphical user interface to quickly dive into the data inside a netCDF file."
+
+== PyAutoFit
+
+https://github.com/rhayes777/PyAutoFit[`https://github.com/rhayes777/PyAutoFit`]
+
+https://pyautofit.readthedocs.io/en/latest/[`https://pyautofit.readthedocs.io/en/latest/`]
+
+"Probabilistic programming languages provide a framework that allows users to easily specify a probabilistic model and perform inference automatically. PyAutoFit is a Python-based probabilistic programming language which:
+
+* Makes it simple to compose and fit models using a range of Bayesian inference libraries, such as emcee and dynesty.
+* Handles the ‘heavy lifting’ that comes with model-fitting, including model composition & customization, outputting results, visualization and parameter inference.
+* Is built for big-data analysis, whereby results are output as a database which can be loaded after model-fitting is complete.
+
+PyAutoFit supports advanced statistical methods such as massively parallel non-linear search grid-searches, chaining together model-fits and sensitivity mapping."
+
+== PyCLES
+
+https://github.com/pressel/pycles[`https://github.com/pressel/pycles`]
+
+"Python Cloud Large Eddy Simulation, or PyCLES (pronounced pickles), is a massively parallel anelastic atmospheric large eddy simulation infrastructure designed to simulate boundary layer clouds and deep convection. PyCLES is written in Python, Cython, and C."
+
+== PyDMD
+
+https://github.com/mathLab/PyDMD[`https://github.com/mathLab/PyDMD`]
+
+https://mathlab.github.io/PyDMD/[`https://mathlab.github.io/PyDMD/`]
+
+https://joss.theoj.org/papers/10.21105/joss.00530[`https://joss.theoj.org/papers/10.21105/joss.00530`]
+
+https://epubs.siam.org/doi/book/10.1137/1.9781611974508[`https://epubs.siam.org/doi/book/10.1137/1.9781611974508`]
+
+"PyDMD is a Python package that uses Dynamic Mode Decomposition for a data-driven model simplification based on spatiotemporal coherent structures.
+
+Dynamic Mode Decomposition (DMD) is a model reduction algorithm developed by Schmid.  Since then has emerged as a powerful tool for analyzing the dynamics of nonlinear systems. DMD relies only on the high-fidelity measurements, like experimental data and numerical simulations, so it is an equation-free algorithm. Its popularity is also due to the fact that it does not make any assumptions about the underlying system.
+
+In the last years many variants arose, such as multiresolution DMD, compressed DMD, forward backward DMD, and higher order DMD among others, in order to deal with noisy data, big dataset, or spurious data for example."
+
+== PyEMD
+
+https://pyemd.readthedocs.io/en/latest/index.html[`https://pyemd.readthedocs.io/en/latest/index.html`]
+
+https://github.com/laszukdawid/PyEMD[`https://github.com/laszukdawid/PyEMD`]
+
+"PyEMD is a Python implementation of Empirical Mode Decomposition (EMD) and its variations. One of the most popular expansion is Ensemble Empirical Mode Decomposition (EEMD), which utilises an ensemble of noise-assisted executions.
+
+As the name suggests, methods in this pakage take data (signal) and decompose it into a set of component. All these methods theoretically should decompose a signal into the same set of components but in practise there are plenty of nuances and different ways to handle noise. Regardless of the method, obtained components are often called Intrinsic Mode Functions (IMF) to highlight that they contain an intrisic (self) property which is a specific oscillation (mode). These are generic oscillations; their frequency and amplitude can change, however, no they are distinct within analyzed signal."
+
+== PyFR
+
+http://www.pyfr.org/[`http://www.pyfr.org/`]
+
+https://github.com/PyFR/PyFR[`https://github.com/PyFR/PyFR`]
+
+https://www.youtube.com/watch?v=zE8DJLql0AE[`https://www.youtube.com/watch?v=zE8DJLql0AE`]
+
+"PyFR is an open-source Python based framework for solving advection-diffusion type problems on streaming architectures using the Flux Reconstruction approach of Huynh. The framework is designed to solve a range of governing systems on mixed unstructured grids containing various element types. It is also designed to target a range of hardware platforms via use of an in-built domain specific language derived from the Mako templating engine."
+
+== PyGeode
+
+http://pygeode.github.io/[`http://pygeode.github.io/`]
+
+"PyGeode is a Python library intended to help with the management, analysis, and visualization of geophysical datasets. It was originally developed with the intent of dealing with the output of an atmospheric general circulation model (specifically the Canadian Middle Atmosphere Model), but the library should be general enough to apply to any gridded dataset.
+
+PyGeode is based on a number of existing third party libraries which it uses to perform the underlying computations and manipulations. Much of the underlying computation and manipulation is done using numpy, and PyGeode adopts many of its conventions. Some use is also made of scipy, and matplotlib is used for plotting. At present a small number of routines from the GSL are also used for interpolation; this may change in the future to remove this dependency."
+
+== PyGMT
+
+https://www.pygmt.org/latest/[`https://www.pygmt.org/latest/`]
+
+"A PyGMT is a Python wrapper for the Generic Mapping Tools (GMT), a command-line program widely used in the Earth Sciences. It provides capabilities for processing spatial data (gridding, filtering, masking, FFTs, etc) and making high quality plots and maps."
+
+== PyGran
+
+https://github.com/Andrew-AbiMansour/PyGran[`https://github.com/Andrew-AbiMansour/PyGran`]
+
+https://www.researchgate.net/publication/331147651_PyGran_An_object-oriented_library_for_DEM_simulation_and_analysis[`https://www.researchgate.net/publication/331147651_PyGran_An_object-oriented_library_for_DEM_simulation_and_analysis`]
+
+https://en.wikipedia.org/wiki/Discrete_element_method[`https://en.wikipedia.org/wiki/Discrete_element_method`]
+
+"PyGran is a simulation and analysis toolkit designed for particle systems with emphasis on discrete element method (DEM) simulation. PyGran enables DEM programmers to develop computational tools and perform interactive analysis of granular systems in Python. The toolkit provides an interface for running DEM simulations in parallel using the open-source LIGGGHTS-PUBLIC software, routines for performing structural and temporal analysis, and an intuitive way for building and manipulating granular systems. The object-oriented design of PyGran enables post-processing of coupled CFD–DEM simulation, and constructing coarse-grained representations of DEM systems."
+
+== PyKoopman
+
+https://pykoopman.readthedocs.io/en/latest/[`https://pykoopman.readthedocs.io/en/latest/`]
+
+https://github.com/dynamicslab/pykoopman[`https://github.com/dynamicslab/pykoopman`]
+
+https://arxiv.org/abs/2102.12086[`https://arxiv.org/abs/2102.12086`]
+
+https://arxiv.org/abs/2102.02522[`https://arxiv.org/abs/2102.02522`]
+
+https://arxiv.org/abs/2101.00555[`https://arxiv.org/abs/2101.00555`]
+
+"A Python package for computing data-driven approximations to the Koopman operator."
+
+== pymap3d
+
+https://github.com/geospace-code/pymap3d[`https://github.com/geospace-code/pymap3d`]
+
+"Pure Python (no prerequistes beyond Python itself) 3-D geographic coordinate conversions and geodesy. API similar to popular $1000 Matlab Mapping Toolbox routines for Python PyMap3D is intended for non-interactive use on massively parallel (HPC) and embedded systems."
+
+== PyRCN
+
+https://github.com/TUD-STKS/PyRCN[`https://github.com/TUD-STKS/PyRCN`]
+
+https://arxiv.org/abs/2103.04807[`https://arxiv.org/abs/2103.04807`]
+
+"PyRCN ("Python Reservoir Computing Networks") is a light-weight and transparent Python 3 framework for Reservoir Computing (currently only implementing Echo State Networks) and is based on widely used scientific Python packages, such as numpy or scipy. The API is fully scikit-learn-compatible, so that users of scikit-learn do not need to refactor their code in order to use the estimators implemented by this framework. Scikit-learn's built-in parameter optimization methods and example datasets can also be used in the usual way."
+
+== pyresample
+
+https://pyresample.readthedocs.io/en/stable/[`https://pyresample.readthedocs.io/en/stable/`]
+
+"Pyresample is a python package for resampling geospatial image data. It is the primary method for resampling in the SatPy library, but can also be used as a standalone library. Resampling or reprojection is the process of mapping input geolocated data points to a new target geographic projection and area.
+
+Pyresample can operate on both fixed grids of data and geolocated swath data. Pyresample offers multiple resampling algorithms including:
+
+* Nearest Neighbor
+* Elliptical Weighted Average (EWA)
+* Bilinear
+* Bucket resampling (count hits per bin, averaging, ratios)
+
+For nearest neighbor and bilinear interpolation pyresample uses a kd-tree approach by using the fast KDTree implementation provided by the pykdtree library."
+
+== pyROM
+
+https://github.com/CurtinIC/pyROM[`https://github.com/CurtinIC/pyROM`]
+
+https://www.sciencedirect.com/science/article/pii/S1877750318307518[`https://www.sciencedirect.com/science/article/pii/S1877750318307518`]
+
+"A Python framework for model order reduction. The goal of this framework is to provide an easy to use, efficient, and scalable package for the well-established ROM methods, as well as for the latest developments in the field. pyROM contains implementations of common model reduction methods such as proper orthogonal decomposition and dynamic mode decomposition, and discrete empirical interpolation method suitable for approximating nonlinear functions. 
+
+This tool is designed to satisfy the needs of wide range of users to deploy model reduction for reproducing the dynamic response of high-dimensional models with good accuracy while achieving significant computational savings. The framework is designed in an object-oriented way to be easy to use and extend and employs visualization tools from various Python libraries such as Matplotlib, Mayavi, and Bokeh."
+
+== pyts
+
+https://github.com/johannfaouzi/pyts[`https://github.com/johannfaouzi/pyts`]
+
+https://pyts.readthedocs.io/en/stable/[`https://pyts.readthedocs.io/en/stable/`]
+
+https://towardsdatascience.com/a-brief-introduction-to-time-series-classification-algorithms-7b4284d31b97[`https://towardsdatascience.com/a-brief-introduction-to-time-series-classification-algorithms-7b4284d31b97`]
+
+https://arxiv.org/abs/2010.00567[`https://arxiv.org/abs/2010.00567`]
+
+https://en.wikipedia.org/wiki/Statistical_classification[`https://en.wikipedia.org/wiki/Statistical_classification`]
+
+https://developersbay.se/time-series-classification-an-overview/[`https://developersbay.se/time-series-classification-an-overview/`]
+
+"A Python package dedicated to time series classification. It aims to make time series classification easily accessible by providing preprocessing and utility tools, and implementations of several time series classification algorithms. The package comes up with many unit tests and continuous integration ensures new code integration and backward compatibility.
+
+Time series classification consists of constructing algorithms dedicated to automatically label time series data.  In statistics, classification is the problem of identifying to which of a set of categories (sub-populations) a new observation belongs, on the basis of a training set of data containing observations (or instances) whose category membership is known. Examples are assigning a given email to the "spam" or "non-spam" class, and assigning a diagnosis to a given patient based on observed characteristics of the patient (sex, blood pressure, presence or absence of certain symptoms, etc.). Classification is an example of pattern recognition.
+
+In essence, time series classification is a type of supervised machine learning problem. Supervised problems have the following procedure: You get a set of time series, each with a class label. You typically divide the time series into three groups, the training data, the validation data and the test data. You train a number of algorithms/models on time series in the training data, observe which algorithm performs the best on the validation data and choose that one. Finally, you use the test data to determine the performance of the chosen algorithm.
+
+The difference to many classification problems in machine learning is that the data is ordered along the time dimension, and as such a good algorithm would need to exploit this property of the data."
+
+== PyVista
+
+https://github.com/pyvista/pyvista[`https://github.com/pyvista/pyvista`]
+
+"PyVista is a helper module for the Visualization Toolkit (VTK) that wraps the VTK library through NumPy and direct array access through a variety of methods and classes. This package provides a Pythonic, well-documented interface exposing VTK's powerful visualization backend to facilitate rapid prototyping, analysis, and visual integration of spatially referenced datasets.
+
+This module can be used for scientific plotting for presentations and research papers as well as a supporting module for other mesh 3D rendering dependent Python modules."
+
+=== PVGeo
+
+https://github.com/OpenGeoVis/PVGeo[`https://github.com/OpenGeoVis/PVGeo`]
+
+"The PVGeo Python package contains VTK powered tools for data visualization in geophysics which are wrapped for direct use within the application ParaView by Kitware or in a Python environment with PyVista. These tools are tailored to data visualization in the geosciences with a heavy focus on structured data sets like 2D or 3D time-varying grids."
+
+== qgs
+
+https://github.com/Climdyn/qgs[`https://github.com/Climdyn/qgs`]
+
+https://joss.theoj.org/papers/10.21105/joss.02597[`https://joss.theoj.org/papers/10.21105/joss.02597`]
+
+"qgs is a Python implementation of an atmospheric model for midlatitudes. It models the dynamics of a 2-layer quasi-geostrophic channel atmosphere on a beta-plane, coupled to a simple land or shallow-water ocean component."
+
+== Rechunker
+
+https://rechunker.readthedocs.io/en/latest/[`https://rechunker.readthedocs.io/en/latest/`]
+
+"Rechunker is a Python package which enables efficient and scalable manipulation of the chunk structure of chunked array formats such as Zarr and TileDB. Rechunker takes an input array (or group of arrays) stored in a persistent storage device (such as a filesystem or a cloud storage bucket) and writes out an array (or group of arrays) with the same data, but different chunking scheme, to a new location. Rechunker is designed to be used within a parallel execution framework such as Dask."
+
+== RockHound
+
+https://www.fatiando.org/rockhound/latest/[`https://www.fatiando.org/rockhound/latest/`]
+
+"RockHound is a Python library to download geophysical models and datasets (PREM, CRUST1.0, ETOPO1) and load them into Python data structures (pandas, numpy, xarray)."
+
+== SatPy
+
+https://github.com/pytroll/satpy[`https://github.com/pytroll/satpy`]
+
+https://satpy.readthedocs.io/en/stable/[`https://satpy.readthedocs.io/en/stable/`]
+
+"Satpy is a python library for reading, manipulating, and writing data from remote-sensing earth-observing meteorological satellite instruments. Satpy provides users with readers that convert geophysical parameters from various file formats to the common Xarray DataArray and Dataset classes for easier interoperability with other scientific python libraries. Satpy also provides interfaces for creating RGB (Red/Green/Blue) images and other composite types by combining data from multiple instrument bands or products. Various atmospheric corrections and visual enhancements are provided for improving the usefulness and quality of output images. Output data can be written to multiple output file formats such as PNG, GeoTIFF, and CF standard NetCDF files. Satpy also allows users to resample data to geographic projected grids (areas)."
+
+== SCAMPy
+
+https://github.com/CliMA/SCAMPy[`https://github.com/CliMA/SCAMPy`]
+
+"SCAMPy (Single Column Atmospheric Model in Python) provides a framework for testing parameterizations of clouds and turbulence. It is particularly designed to support eddy-diffusivity mass-flux modeling frameworks."
+
+== Shingle
+
+https://github.com/koldunovn/Shingle[`https://github.com/koldunovn/Shingle`]
+
+http://shingleproject.org/[`http://shingleproject.org/`]
+
+"Shingle is a generalised and accessible framework for model-independent and self-consistent geophysical domain discretisation, which accurately conform to fractal-like bounds and at varyingly resolved spatial scales. The full heterogeneous set of constraints are necessarily completely described by an extensible, hierarchical formal grammar with an intuitive natural language basis for geophysical domain features to achieve robust reproduction and consistent model intercomparisons.
+
+Geophysical model domains typically contain irregular, complex fractal-like boundaries and physical processes that act over a wide range of scales. Constructing geographically constrained boundary-conforming spatial discretisations of these domains with flexible use of anisotropic, fully unstructured meshes is a challenge. The problem contains a wide range of scales and a relatively large, heterogeneous constraint parameter space. Approaches are commonly ad hoc, model or application specific and insufficiently described. Development of new spatial domains is frequently time-consuming, hard to repeat, error prone and difficult to ensure consistent due to the significant human input required. As a consequence, it is difficult to reproduce simulations, ensure a provenance in model data handling and initialisation, and a challenge to conduct model intercomparisons rigorously. Moreover, for flexible unstructured meshes, there is additionally a greater potential for inconsistencies in model initialisation and forcing parameters. This library introduces a consistent approach to unstructured mesh generation for geophysical models, that is automated, quick-to-draft and repeat, and provides a rigorous and robust approach that is consistent to the source data throughout. The approach is enabling further new research in complex multi-scale domains, difficult or not possible to achieve with existing methods."
+
+== Siphon
+
+https://unidata.github.io/siphon/latest/[`https://unidata.github.io/siphon/latest/`]
+
+https://github.com/Unidata/siphon[`https://github.com/Unidata/siphon`]
+
+"Siphon is a collection of Python utilities for downloading data from remote data services. Much of Siphon’s current functionality focuses on access to data hosted on a THREDDS Data Server. It also provides clients to a variety of simple web services."
+
+== SIS
+
+https://sis.apache.org/[`https://sis.apache.org/`]
+
+=====
+Apache Spatial Information System (SIS) is a free software, Java language library for developing geospatial applications. SIS provides data structures for geographic features and associated metadata along with methods to manipulate those data structures. The library is an implementation of GeoAPI 3.0.1 interfaces and can be used for desktop or server applications.
+
+The SIS metadata module forms the base of the library and enables the creation of metadata objects which comply with the model of OGC/ISO international standards. The SIS referencing module enable the construction of geodetic data structures for geospatial referencing such as axis, projection and coordinate reference system definitions, along with the associated operations which enable the transformation of coordinates between different systems of reference. The SIS storage modules provide a common approach to the reading and writing of metadata, features and coverages applicable to simple imagery as to many dimensional data structures.
+
+Some Apache SIS features are:
+
+* Geographic metadata (ISO 19115-1:2014)
+** Read from or written to ISO 19115-3:2016 (current standard) or ISO 19139:2007 (older standard) compliant XML documents.
+** Read from netCDF, GeoTIFF, Landsat, GPX and Moving Feature CSV encoding.
+** Automatic conversions between the metadata model published in 2003 and the revision published in 2014.
+* Referencing by coordinates (ISO 19111:2007)
+** Well Known Text (WKT) version 1 and 2 (ISO 19162:2015).
+** Geographic Markup Language (GML) version 3.2 (ISO 19136:2007).
+** EPSG geodetic dataset for geodetic definitions and for coordinate operations. See the list of supported coordinate reference systems.
+** Mercator, Transverse Mercator, Lambert Conic Conformal, stereographic and more map projections. See the list of supported operation methods.
+* Referencing by identifiers (ISO 19112:2003)
+** Geohashes (a simple encoding of geographic coordinates into short strings of letters and digits).
+** Military Grid Reference System (MGRS), also used for some civilian uses.
+* Units of measurement
+** Implementation of JSR-363 with parsing, formating and unit conversion functionalities.
+=====
+
+== spectralDNS
+
+https://github.com/spectralDNS/spectralDNS[`https://github.com/spectralDNS/spectralDNS`]
+
+https://arxiv.org/abs/1701.03787[`https://arxiv.org/abs/1701.03787`]
+
+"spectralDNS contains a classical high-performance pseudo-spectral Navier-Stokes DNS solver for triply periodic domains. The most notable feature of this solver is that it's written entirely in Python using NumPy, MPI for Python (mpi4py) and pyFFTW. MPI decomposition is performed using either the "slab" or the "pencil" approach and, stripping away unnecessary pre- and post-processing steps, the slab solver is no more than 100 lines long, including the MPI.
+
+The efficiency of the pure NumPy/mpi4py solver has been enhanced using Cython for certain routines. The strong scaling results on Shaheen shown below have used the optimized Python/Cython solver, which is found to be faster than a pure C++ implementation of the same solver."
+
+== tapify
+
+https://github.com/aaryapatil/tapify[`https://github.com/aaryapatil/tapify`]
+
+https://tapify.readthedocs.io/en/latest/[`https://tapify.readthedocs.io/en/latest/`]
+
+https://arxiv.org/abs/2209.15027[`https://arxiv.org/abs/2209.15027`]
+
+=====
+A Python package that implements a suite of multitaper spectral estimation techniques for analyzing time series data. It supports analysis of both evenly and unevenly sampled time series data.
+
+The multitaper statistic was first proposed by Thomson (1982) as a non-parametric estimator of the spectrum of a time series. It is attractive because it tackles the problems of bias and consistency, which makes it an improvement over the classical periodogram for evenly sampled data and the Lomb-Scargle periodogram for uneven sampling. In basic statistical terms, this estimator allows us to confidently look at the properties of a time series in the frequency or Fourier domain.
+=====
+
+== TensorD
+
+https://github.com/Large-Scale-Tensor-Decomposition/tensorD[`https://github.com/Large-Scale-Tensor-Decomposition/tensorD`]
+
+https://tensord-v02.readthedocs.io/en/latest/[`https://tensord-v02.readthedocs.io/en/latest/`]
+
+"TensorD is a Python tensor library built on TensorFlow [1]. It provides basic decomposition methods, such as Tucker decomposition and CANDECOMP/PARAFAC (CP) decomposition, as well as new decomposition methods developed recently, for example, Pairwise Interaction Tensor Decomposition."
+
+== TensorLy
+
+http://tensorly.org/stable/index.html[`http://tensorly.org/stable/index.html`]
+
+https://jmlr.org/papers/v20/18-277.html[`https://jmlr.org/papers/v20/18-277.html`]
+
+"Tensors are higher-order extensions of matrices. While matrix methods form the cornerstone of traditional machine learning and data analysis, tensor methods have been gaining increasing traction. However, software support for tensor operations is not on the same footing. In order to bridge this gap, we have developed TensorLy, a Python library that provides a high-level API for tensor methods and deep tensorized neural networks. TensorLy aims to follow the same standards adopted by the main projects of the Python scientific community, and to seamlessly integrate with them. Its BSD license makes it suitable for both academic and commercial applications. TensorLy's backend system allows users to perform computations with several libraries such as NumPy or PyTorch to name but a few. They can be scaled on multiple CPU or GPU machines. In addition, using the deep-learning frameworks as backend allows to easily design and train deep tensorized neural networks."
+
+== TheDiaTo
+
+https://github.com/ValerioLembo/TheDiaTo_v1.0[`https://github.com/ValerioLembo/TheDiaTo_v1.0`]
+
+https://gmd.copernicus.org/articles/12/3805/2019/[`https://gmd.copernicus.org/articles/12/3805/2019/`]
+
+"A diagnostic tool for investigating the thermodynamics of climate systems with a wide range of applications, from sensitivity studies to model tuning. It includes a number of modules for assessing the internal energy budget, the hydrological cycle, the Lorenz energy cycle and the material entropy production. The routine takes as inputs energy fluxes at the surface and at the top of the atmosphere (TOA), which allows for the computation of energy budgets at the TOA, the surface and in the atmosphere as a residual. Meridional enthalpy transports are also computed from the divergence of the zonal mean energy budget from which the location and intensity of the maxima in each hemisphere are calculated."
+
+== tslearn
+
+https://github.com/tslearn-team/tslearn[`https://github.com/tslearn-team/tslearn`]
+
+https://tslearn.readthedocs.io/en/stable/[`https://tslearn.readthedocs.io/en/stable/`]
+
+https://jmlr.org/papers/v21/20-091.html[`https://jmlr.org/papers/v21/20-091.html`]
+
+"A Python package that provides machine learning tools for the analysis of time series. This package builds on (and hence depends on) scikit-learn, numpy and scipy libraries."
+
+== vaex
+
+https://github.com/vaexio/vaex[`https://github.com/vaexio/vaex`]
+
+https://vaex.io/docs/index.html[`https://vaex.io/docs/index.html`]
+
+"Vaex is a high performance Python library for lazy Out-of-Core DataFrames (similar to Pandas), to visualize and explore big tabular datasets. It calculates statistics such as mean, sum, count, standard deviation etc, on an N-dimensional grid for more than a billion (10^9) samples/rows per second. Visualization is done using histograms, density plots and 3d volume rendering, allowing interactive exploration of big data. Vaex uses memory mapping, zero memory copy policy and lazy computations for best performance (no memory wasted).  HDF5 and Apache Arrow are supported."
+
+== Verde
+
+https://github.com/fatiando/verde[`https://github.com/fatiando/verde`]
+
+https://github.com/fatiando/transform2020[`https://github.com/fatiando/transform2020`]
+
+A Python library for processing spatial data (bathymetry, geophysics surveys, etc) and interpolating it on regular grids (i.e., gridding).
+
+Most gridding methods in Verde use a Green's functions approach. A linear model is estimated based on the input data and then used to predict data on a regular grid (or in a scatter, a profile, as derivatives). The models are Green's functions from (mostly) elastic deformation theory. This approach is very similar to machine learning so we implement gridder classes that are similar to scikit-learn regression classes."
+
+== WeatherBench
+
+https://github.com/pangeo-data/WeatherBench[`https://github.com/pangeo-data/WeatherBench`]
+
+https://raspstephan.github.io/blog/weatherbench/[`https://raspstephan.github.io/blog/weatherbench/`]
+
+https://arxiv.org/abs/2002.00469[`https://arxiv.org/abs/2002.00469`]
+
+https://mediatum.ub.tum.de/1524895[`https://mediatum.ub.tum.de/1524895`]
+
+"A benchmark dataset for data-driven weather forecasting.
+Data-driven approaches, most prominently deep learning, have become powerful tools for prediction in many domains. A natural question to ask is whether data-driven methods could also be used to predict global weather patterns days in advance. First studies show promise but the lack of a common dataset and evaluation metrics make inter-comparison between studies difficult. Here we present a benchmark dataset for data-driven medium-range weather forecasting, a topic of high scientific interest for atmospheric and computer scientists alike. We provide data derived from the ERA5 archive that has been processed to facilitate the use in machine learning models. We propose simple and clear evaluation metrics which will enable a direct comparison between different methods. Further, we provide baseline scores from simple linear regression techniques, deep learning models, as well as purely physical forecasting models."
+
+== whitebox-python
+
+https://github.com/giswqs/whitebox-python[`https://github.com/giswqs/whitebox-python`]
+
+"The whitebox Python package is built on WhiteboxTools, an advanced geospatial data analysis platform developed by Prof. John Lindsay (webpage; jblindsay) at the University of Guelph's Geomorphometry and Hydrogeomatics Research Group."
+
+=== WhiteboxTools
+
+https://github.com/jblindsay/whitebox-tools[`https://github.com/jblindsay/whitebox-tools`]
+
+"WhiteboxTools can be used to perform common geographical information systems (GIS) analysis operations, such as cost-distance analysis, distance buffering, and raster reclassification. Remote sensing and image processing tasks include image enhancement (e.g. panchromatic sharpening, contrast adjustments), image mosaicing, numerous filtering operations, simple classification (k-means), and common image transformations. WhiteboxTools also contains advanced tooling for spatial hydrological analysis (e.g. flow-accumulation, watershed delineation, stream network analysis, sink removal), terrain analysis (e.g. common terrain indices such as slope, curvatures, wetness index, hillshading; hypsometric analysis; multi-scale topographic position analysis), and LiDAR data processing. LiDAR point clouds can be interrogated (LidarInfo, LidarHistogram), segmented, tiled and joined, analyized for outliers, interpolated to rasters (DEMs, intensity images), and ground-points can be classified or filtered. WhiteboxTools is not a cartographic or spatial data visualization package; instead it is meant to serve as an analytical backend for other data visualization software, mainly GIS."
+
+== windspharm
+
+https://ajdawson.github.io/windspharm/latest/[`https://ajdawson.github.io/windspharm/latest/`]
+
+"A Python package for performing computations on global wind fields in spherical geometry. It provides a high level interface for computations using spherical harmonics. windspharm is capable of computing the following quantities from an input vector wind:
+
+* divergence
+* vorticity (relative and absolute)
+* streamfunction
+* velocity potential
+* irrotational and non-divergent components of the wind (Helmholtz decomposition)
+* vector gradient of a scalar function
+* triangular truncation of a scalar field
+* magnitude (wind speed)"
+
+== xanthos
+
+https://github.com/JGCRI/xanthos[`https://github.com/JGCRI/xanthos`]
+
+"Xanthos is an open-source hydrologic model, written in Python, designed to quantify and analyze global water availability. Xanthos simulates historical and future global water availability on a monthly time step at a spatial resolution of 0.5 geographic degrees. Xanthos was designed to be extensible and used by scientists that study global water supply and work with the Global Change Analysis Model (GCAM). Xanthos uses a user-defined configuration file to specify model inputs, outputs and parameters. Xanthos has been tested using actual global data sets and the model is able to provide historical observations and future estimates of renewable freshwater resources in the form of total runoff, average streamflow, potential evapotranspiration, actual evapotranspiration, accessible water, hydropower potential, and more."
+
+== xarray
+
+http://xarray.pydata.org/en/stable/index.html[`http://xarray.pydata.org/en/stable/index.html`]
+
+"xarray (formerly xray) is an open source project and Python package that makes working with labelled multi-dimensional arrays simple, efficient, and fun!
+
+Xarray introduces labels in the form of dimensions, coordinates and attributes on top of raw NumPy-like arrays, which allows for a more intuitive, more concise, and less error-prone developer experience. The package includes a large and growing library of domain-agnostic functions for advanced analytics and visualization with these data structures.
+
+Xarray is inspired by and borrows heavily from pandas, the popular data analysis package focused on labelled tabular data. It is particularly tailored to working with netCDF files, which were the source of xarray’s data model, and integrates tightly with dask for parallel computing."
+
+=== Salem
+
+https://salem.readthedocs.io/en/latest/[`https://salem.readthedocs.io/en/latest/`]
+
+https://github.com/fmaussion/salem[`https://github.com/fmaussion/salem`]
+
+"Salem is a small library to do geoscientific data processing and plotting. It extends xarray to add geolocalised subsetting, masking, and plotting operations to xarray’s DataArray and DataSet structures."
+
+=== xclim
+
+https://github.com/Ouranosinc/xclim[`https://github.com/Ouranosinc/xclim`]
+
+https://xclim.readthedocs.io/en/stable/[`https://xclim.readthedocs.io/en/stable/`]
+
+"xclim is a library of functions to compute climate indices from observations or model simulations. It is built using xarray and can benefit from the parallelization handling provided by dask. Its objective is to make it as simple as possible for users to compute indices from large climate datasets and for scientists to write new indices with very little boilerplate.
+
+For applications where meta-data and missing values are important to get right, xclim provides a class for each index that validates inputs, checks for missing values, converts units and assigns metadata attributes to the output. This also provides a mechanism for users to customize the indices to their own specifications and preferences.
+
+xclim currently provides over 50 indices related to mean, minimum and maximum daily temperature, daily precipitation, streamflow and sea ice concentration."
+
+=== xroms
+
+https://github.com/hetland/xroms[`https://github.com/hetland/xroms`]
+
+"xroms contains functions for commonly used scripts for working with ROMS output in xarray."
+
+=== XrViz
+
+https://github.com/intake/xrviz[`https://github.com/intake/xrviz`]
+
+"XrViz is an interactive graphical user interface(GUI) for visually browsing Xarrays. You can view data arrays along various dimensions, examine data values, change color maps, extract series, display geographic data on maps and much more. It is built on Xarray, HvPlot and Panel. It can be used with Intake to ease the process of investigating and loading datasets."
+
+=== xshape
+
+https://xshape.readthedocs.io/en/latest/[`https://xshape.readthedocs.io/en/latest/`]
+
+"Tools for working with shapefiles, topographies, and polygons in xarray."
+
+== xcube
+
+https://xcube.readthedocs.io/en/latest/[`https://xcube.readthedocs.io/en/latest/`]
+
+"xcube is an open-source Python package and toolkit that has been developed to provide Earth observation (EO) data in an analysis-ready form to users. xcube achieves this by carefully converting EO data sources into self-contained data cubes that can be published in the cloud.
+
+An xcube dataset contains one or more (geo-physical) data variables whose values are stored in cells of a common multi-dimensional, spatio-temporal grid. The dimensions are usually time, latitude, and longitude, however other dimensions may be present.
+
+All xcube datasets are structured in the same way following a common data model. They are also self-describing by providing metadata for the cube and all cube’s variables following the CF conventions. For details regarding the common data model, please refer to the xcube Dataset Specification.
+
+A xcube dataset’s in-memory representation in Python programs is an xarray.Dataset instance. Each dataset variable is represented by multi-dimensional xarray.DataArray that is arranged in non-overlapping, contiguous sub-regions called data chunks."
+
+== xESMF
+
+https://github.com/pangeo-data/xESMF[`https://github.com/pangeo-data/xESMF`]
+
+"A  Python package for regridding.  It uses ESMF/ESMPy as backend and can regrid between general curvilinear grids with all ESMF regridding algorithms, such as bilinear, conservative and nearest neighbour.
+It abstracts away ESMF's complicated infrastructure and provides a simple, high-level API, compatible with xarray as well as basic numpy arrays.
+It is faster than ESMPy's original Fortran regridding engine in serial case, and also supports dask for out-of-core, parallel computation."
+
+== xgcm
+
+https://github.com/xgcm/xgcm[`https://github.com/xgcm/xgcm`]
+
+"xgcm is a python package for working with the datasets produced by numerical General Circulation Models (GCMs) and similar gridded datasets that are amenable to finite volume analysis. In these datasets, different variables are located at different positions with respect to a volume or area element (e.g. cell center, cell face, etc.) xgcm solves the problem of how to interpolate and difference these variables from one position to another.
+
+xgcm consumes and produces xarray data structures, which are coordinate and metadata-rich representations of multidimensional array data. xarray is ideal for analyzing GCM data in many ways, providing convenient indexing and grouping, coordinate-aware data transformations, and (via dask) parallel, out-of-core array computation. On top of this, xgcm adds an understanding of the finite volume Arakawa Grids commonly used in ocean and atmospheric models and differential and integral operators suited to these grids."
+
+== Zarr
+
+https://github.com/zarr-developers/zarr-python[`https://github.com/zarr-developers/zarr-python`]
+
+https://zarr.readthedocs.io/en/stable/[`https://zarr.readthedocs.io/en/stable/`]
+
+"Zarr is a format for the storage of chunked, compressed, N-dimensional arrays. These documents describe the Zarr format and its Python implementation.
+The capabilities include:
+
+* Create N-dimensional arrays with any NumPy dtype.
+* Chunk arrays along any dimension.
+* Compress and/or filter chunks using any NumCodecs codec.
+* Store arrays in memory, on disk, inside a Zip file, on S3, …
+* Read an array concurrently from multiple threads or processes.
+* Write to an array concurrently from multiple threads or processes.
+* Organize arrays into hierarchies via groups."
+
+=== Comp4NC
+
+https://github.com/NCAR/Comp4NC[`https://github.com/NCAR/Comp4NC`]
+
+"Python tool to compress data with zfp to Zarr and convert to NetCDF."
+
+=== nc2zarr
+
+https://github.com/bcdev/nc2zarr[`https://github.com/bcdev/nc2zarr`]
+
+"A Python tool that converts multiple NetCDF files to single Zarr datasets."
+

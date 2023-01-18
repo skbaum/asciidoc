@@ -1,0 +1,962 @@
+Deep-C Viewer:  An Instance of Open WebGIS (OWGIS)
+==================================================
+Steven K. Baum
+v0.1, 2012-11-11
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Recommendations
+---------------
+
+The Deep-C Viewer version of OWGIS can be found at:
+
+http://viewer.coaps.fsu.edu/DeepCProject/mapviewer[+http://viewer.coaps.fsu.edu/DeepCProject/mapviewer+]
+
+while the OWGIS site is at:
+
+http://owgis.org/[+http://owgis.org/+]
+
+A PDF format paper containing a description of OWGIS is at:
+
+http://coaps.fsu.edu/pub/eric/papers_html/Zavala_et_al_14.pdf[+http://coaps.fsu.edu/pub/eric/papers_html/Zavala_et_al_14.pdf+]
+
+What can the viewer system do?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+OWGIS can display maps with layers served through any server that
+complies with the Web Map Service (WMS) standard.  It is also capable
+of constructing sites that display 3D data served by THREDDS or
+ncWMS servers.
+
+Layers are separated into three categories in terms of their
+location:
+
+* a small number of background layers used as the spatial reference for the map;
+
+* hierarchically organized and grouped main layers displayed one at
+a time above background layers and below optional layers, usually
+containing raster data;
+
+* hierarchically organized optional layers that overlay main layers
+and which usually contain vector data.
+
+For example, you can choose a surface temperature field at a given
+time to display as a main layer over the Blue Marble background layer,
+and then choose temperature data from moorings to overlay this.
+
+The available features depend on the type of layer.  The layer types
+classified in terms of available features are:
+
+* *vector layers*;
+* raster layers from GeoTIFF files, or *GeoTIFF* layers; and
+* raster layers servered through ncWMS servers, or *ncWMS layers*.
+
+Features available for all layers are:
+
+* a mobile interface, which modifies the GIS interface for display
+on mobile phones or tablets;
+* multiple languages;
+* punctual data, which uses the WMS and WFS standards to request
+feature data at specific locations on the map;
+* downloading layers as KML, which allows the visualization of layers
+in clients that display KML data, for example, Google Earth;
+* transparency, which allows users to change the opacity of a layer.
+
+Features available only for vector layers are:
+
+* CQL filtering, which allows for filtering the vector data
+using Common Query Language (CQL), which applies filters according
+to the attribute names in the layers, e.g.
+
+http://docs.geoserver.org/stable/en/user/tutorials/cql/cql_tutorial.html[+http://docs.geoserver.org/stable/en/user/tutorials/cql/cql_tutorial.html+]
+
+Features available only for ncWMS layers are:
+
+* animations with a minimum time unit of one day (in version 1.0.0) and
+at three different resolutions;
+* vertical profiles and transects that can be requested at any location and
+which are obtained in real time by the ncWMS servers; 
+* time series, 
+* color palettes obtained from those available on the ncWMS servers;
+* depth selection for ncWMS layers containing a z-axis coordinate, with
+a separate window built that allows users to select from the available
+z-axis values.
+
+While model output and data in the horizontal plane can be compared via
+juxtaposing main and optional layers, there is no immediately obvious way
+to make such comparisons in the vertical.  However, if the observational data
+were stored in NetCDF format on a ncWMS server vertical comparisons could
+probably be made with some slight modifications to OWGIS.
+
+What are the components?
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The components are:
+
+* *OWGIS Server* - A program that reads a configuration file and creates a web
+interface that enables a user to interactively display images derived from the datasets
+included in the configuration file.
+This is a relatively static component
+that would only need to be modified if a new feature or capability is desired.
+
+* *OWGIS Configuration File* - A text file containing metadata about
+available layers and where they can be obtained.  This is a relatively
+dynamic component that needs to be modified as often as new datasets are added
+or old ones are modified.  This would need to be done programmatically.
+
+* *Layer Servers* - Other programs whose locations
+are specified in the configuration file and which do the heavy lifting of
+transforming vector, raster or pointwise datasets into the images that will
+be displayed by the OWGIS program.  These programs include:
+
+** http://www.unidata.ucar.edu/software/thredds/current/tds/[THREDDS], which provides metadata and data access for scientific datasets,
+and has a built-in WMS server that can provide layers for OWGIS;
+
+** http://geoserver.org[GeoServer], which allows users to share, process and edit geospatial data,
+and which produces output files in KML, Shapefile, JPEG, GIF and several
+other vector and raster formats for providing layers to OWGIS; and
+
+** http://www.resc.rdg.ac.uk/trac/ncWMS/[ncWMS], which provides a WMS server with 3-D capabilities - presently
+lacking in THREDDS - to allow the depth dimension in 3-D datasets to be
+supplied to OWGIS.
+
+It would be a good idea to deploy the OWGIS server and its configuration files
+on one machine, and the data servers on other local or remote machines.  This
+would allow the use of a relatively modest machine - in terms of processing
+power and storage capacity - to run the OWGIS server, and other machines to
+store the considerable number and size of the datasets that will be used to
+provide OWGIS with layers for display. 
+
+How well supported is the software stack?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The OWGIS program itself is the work of one person.  It is built on top of
+technologies such as Java, Javascript and HTML that are open source and as
+well supported as anything in the open source community.  Not much of the web
+these days isn't run on top of these technologies.
+
+Hardware requirements
+~~~~~~~~~~~~~~~~~~~~~
+
+For a machine running only the OWGIS server, the hardware requirements
+wouldn't be
+extremely onerous.
+If the data servers are external to the machine running only the OWGIS
+server, then all
+the OWGIS server machine will have to do is obtain layers from the
+data servers and display them.  These layers will almost always be very
+much
+smaller than the datasets from which they're created, and thus the latency
+of requiring them from remote servers will not be a huge problem.
+A machine with a few dozen gigabytes of RAM and a couple of terabytes of
+disk space would suffice for running only the OWGIS server.
+
+The machines running the THREDDS, GeoServer and ncWMS servers would have
+to be larger in terms of memory, disk space and processing power than the
+machine running only the OWGIS server.  They will need to contain on the
+order of a hundred gigabtyes of RAM, multiple multicore processors, and
+many terabtye RAID arrays to handle the size and number of datasets under
+consideration for supplying OWGIS with layers for display.  The exact
+specifications for the external machines running the layer servers
+would be dependent on expected usage and dataset sizes, as would the decision
+as to whether to put all the layer servers on a single machine or spread
+them around to separate machines.
+
+Putting the layer servers on geographically dispersed machines should
+not cause huge latency problems since the layers sent to the OWGIS
+server machine would be typically considerably smaller than the datasets
+from which they are derived.  That is, it would typically be a matter of a
+layer server sending a file containing several megabytes of layer
+information from an underlying NetCDF dataset containing many gigabytes
+or even terabytes of information.  If the OWGIS server is ever modified
+to additionally allow the serving of the data underlying the layer information,
+though, this would no longer be a good idea. 
+
+All of these software packages - for the OWGIS server as well as the various
+layer servers - run well and almost certainly best on
+COTS servers running the Linux OS.
+
+What skills are required to install, operate, maintain and enhance the OWGIS server?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The skill sets required for either the OWGIS and layer servers can be roughly
+divided into three categories:
+
+* *Install* - Basic Linux system administration skills.
+
+* *Configure, Operate and Maintain* - Same as for installation plus
+the ability to either manually modify an XML-based configuration
+file or, more realistically, the programming ability to create a script
+that can automatically create a configuration file that will almost certainly
+have to modified on an at least daily basis.  This basically means some
+programming skills with Python, Perl or some other scripting language.
+This is also the level required for dealing with the data servers that
+will be used by OWGIS.
+
+* *Enhance* - Same as above plus the ability to program in both Java and
+Javascript, the languages in which OWGIS is written.  Someone with sufficient
+Javascript skills could also write the program for automatically creating
+the configuration file using it.
+
+What skills are required to install and maintain an OWGIS system?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An OWGIS system is more than just the server.  The layers displayed by OWGIS
+must be supplied by layer servers located on the same machine, another
+local machine, remote machines, or some combination thereof.
+Consider two scenarios:
+
+OWGIS and Layer Servers at a Single Location on One or More Machines
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This would require at least one part-time person with the first two skill sets
+detailed above, and another occasional contract person to enhance the system
+should the first person not have the requisite skills.  Maintaining but
+not enhancing the OWGIS and layer servers require basically the same
+level of skill.  Shepherding datasets for the layer servers - THREDDS,
+GeoServer, ncWMS - involves the same process as with the OWGIS server of creating a configuration
+file for each server containing metadata and location data for the
+datasets.  The configuration files for the THREDDS and ncWMS servers, though,
+are more easily maintanable given the capability of those programs to
+automatically create configuration files from a hierarchy of filesystem
+directories.
+
+OWGIS at One Location and Layer Servers at Remote Locations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This would require as many part-time people as there are different locations for
+the OWGIS and layer servers.
+The comments for the scenario of all servers at a single location
+also apply here, albeit for each of the required people at the different
+locations.  Given the ease of using all the listed layer servers remotely,
+though, any such server already operational with any of the datasets desired to
+be served by OWGIS can be used basically as-is, with the only requirement
+being that whoever is presenting operating that server keeps doing so.
+
+
+How much time needed to install, operate, maintain and enhance the OWGIS server?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* *Installation* - Someone with basic sysadmin skills can do this in the
+timeframe of hours, although there were some portability issues encountered
+when installing a prototype that required interaction with the OWGIS program
+creator.
+
+* *Operation and Maintenance* -  This should be divided into initial and
+chronic tasks.  The initial task of creating the configuration file - which
+will almost certainly have to be done programmatically - should take on the
+order of weeks.  The chronic tasks of server maintanance - e.g. bringing the
+server or configuration file back up if it stops working, etc. - should only
+require a few hours per week, with a heavily front-loaded component of perhaps
+an order of magnitude more time per week while debugging the initial
+installation.
+
+* *System Enhancement Time* - A sufficiently skilled Java and Javascript
+programmer could modify the basic server in a matter of a week or two,
+although the debugging cycle will probably extend this to at least a month. 
+
+The time needed for the scenarios outlined above - that is, either all
+servers at a single location or different servers at different locations - is
+basically the time detailed above for the OWGIS server multipled by however
+many single part-time people are required for however many separate locations
+are employed, although the system enhancement time will probably not be needed
+for the actively developed layer servers.
+
+Executive Summary
+-----------------
+
+Overview
+~~~~~~~~
+
+This document describes the software used for the DeepCProject that is being
+proposed for use in the GCOOS project.
+It also describes the requirements for installing and maintaining the
+software, and provides a extensive and detailed tutorial for obtaining, installing and configuring
+an OWGIS server.
+
+Software
+~~~~~~~~
+
+The DeepCProject map viewer at:
+
+http://viewer.coaps.fsu.edu/DeepCProject/mapviewer[+http://viewer.coaps.fsu.edu/DeepCProject/mapviewer+]
+
+is a single instantiation of a software package called
+OWGIS (Open WebGIS) that is available at:
+
+http://owgis.org/[+http://owgis.org/+]
+
+The DeepCProject instantiation is featured in the gallery of OWGIS examples
+at:
+
+http://owgis.org/index.php?option=com_weblinks&view=category&id=13&Itemid=116[+http://owgis.org/index.php?option=com_weblinks&view=category&id=13&Itemid=116+]
+
+The OWGIS package is an open source Java Servlets web application that
+creates WebGIS sites by automatically writing HTML and JavaScript code. The
+WebGIS sites are configured by XML files that define which layers will be
+displayed on the maps as well as the texts to be used on the interface.  
+OWGIS provides images based on locally and remotely stored geographic data,
+but not the data itself.
+
+The OWGIS software reads a configuration file that contains information about
+the various layers/files one wishes to serve and creates a web interface that
+enables users to view the information in those files.  There is an additional
+configuration file that enables the default display parameters - e.g. the
+geographic extent of the view, the resolution, the default layer(s), etc. - to
+be modified.
+
+OWGIS does not in itself store or provide layer/file information, but instead
+obtains it from other servers like GeoServer and NcWMS.  GeoServer implements
+the OGC Web Map Service (WMS) specification for providing map images from
+locally stored data sources to remote clients.  The data sources contain
+geographic information stored in various vector (shapefiles, VDF, GML)
+raster (GeoTIFF, ArcGrid, WorldImage) data formats
+used in the GIS community.  NcWMS does the same, but provides the very
+useful additional feature of providing the map images directly from locally
+stored NetCDF format files that are not generally supported for such uses
+by the GIS community.
+
+Maintenance
+~~~~~~~~~~~
+
+The maintenance of an OWGIS server can be divided into three increasing levels
+of difficulty/complexity in terms of maintaining the layer configuration file:
+
+. The first level involves a server on the same machine as the relatively static number of
+layers it serves.  In this case a configuration file for the layers can be
+created by hand.  The occasional additional layer can also be incorporated
+into the configuration file by hand.
+
+. The second level involves a server on the same machine as the dynamically
+changing (e.g. on a daily basis) number of layers it serves.  In this case a
+new configuration file should be programmatically created as often as new layers
+are added, or at least on a daily basis.  A typical method of doing this is
+to maintain another (meta)configuration file that contains a list of the directories
+containing the layer files you wish to serve.  The program that creates the
+OWGIS configuration file will read this file, traverse all the listed directories to
+gather information about all the layers/files contained therein, and create an
+appropriate configuration file from that information.  It is generally much
+easier to create and occasionally maintain a program to create a frequently
+changing configuration file than to directly maintain that file.  There are 
+many languages that can be used to create such a program, although it is
+highly recommended to use Python.
+
+. The third level involves a server that serves a set of dynamically changing
+layers that exist both locally and on remote machines, as is the plan for
+GCOOS.  In this case all of the tasks detailed for the second level must be
+performed on the dynamically changing layer filesets on both the local and remote
+machine(s).  The additional complexity involves transferring the information
+about the remote filesets to the server machine on a regular and robust basis.
+This can be done straightforwardly using such tools as remote copying and cron
+jobs, although it will entail further complexity in the program that creates
+the configuration program to gracefully deal with the inevitably fickle
+nature of a group of remote data sources.  For example, if a given remote
+source is down the program can either ignore that source when creating today's
+configuration file, or use a cached copy of the information it obtained most
+recently from that source.  Remote data sources make robustness a much
+trickier proposition, and as such increase programming and maintenance
+requirements.
+
+
+Preface
+-------
+
+This document explains how to install and configure OWGIS.
+
+:numbered:
+
+Installation
+------------
+
+This is as simple as downloading the latest stable version from:
+
+-----
+git clone git@github.com:olmozavala/OWGIS.git
+-----
+
+and dropping into the +webapps+ subdirectory of your Tomcat distribution.
+
+Configuration Overview
+----------------------
+
+A given instantiation of OWGIS for a specific situation consists of:
+
+. configuring the general display options in a Java properties file; and
+. configuring each layer that is to be displayed in the map in an XML file.
+
+Display Option Configuration
+----------------------------
+
+The display options of the Web GIS interface are configured
+in the Java properties file at:
+
+-----
+TOMCAT_ROOT/webapps/OWGISTemplate/WEB-INF/conf/MapViewConfig.properties
+-----
+
+where +TOMCAT_ROOT+ on +gcoos1.tamu.edu+ is +/opt/tomcat7+.
+
+The file shipped with the distribution looks like:
+
+-----
+basepath=/OWGISTemplate
+
+# OpenLayers default configuration related with map
+
+# --------- MAP information -------
+# Tiles origin 
+tilesOrigin=-180,-90
+# zoom = 0 is the farthes away, zoom = 5 is the closest. 
+zoom=1
+numZoomLevels=8
+mapcenter=lon=-87.81606, lat=28.45786
+# Bigger number means you can see the map from farther away
+maxResolution=0.07
+# Smaller number means you can see the map closer
+minResolution=0.0002
+
+restrictedExtent=-180.0,-90.0,180.0,90.0
+mapBounds=-180,-90,180,90
+
+#Defines the design of the menu ('topMenu', 'sideMenu')
+menuDesign=topMenu
+
+#Define if the dropdown menu of the layers should be created horizontal or
+vertical
+baseLayerMenuOrientation=vertical
+
+# This variable can be used to force the use of an specific language
+defaultLanguage=EN
+-----
+
+This default configuration centers the map, i.e.
+
+-----
+mapcenter=lon=-87.81606, lat=28.45786
+-----
+
+in the Gulf of Mexico.  The URL at which this default Gulf of Mexico
+configuration can be viewed is:
+
+http://gcoos1.tamu.edu:8080/OWGISTemplate/mapviewer[+http://gcoos1.tamu.edu:8080/OWGISTemplate/mapviewer+]
+
+where we see that the specification for +basepath+ in the
+configuration file is simply sandwiched
+between the Internet address +gcoos1.tamu.edu:8080+ and the trailing
++mapviewer+ to create the URL.
+
+Available Parameters
+~~~~~~~~~~~~~~~~~~~~
+
+The available parameters are:
+
+* +basepath+ - the name of the website, with the default value
++OWGISTemplate+;
+
+* +tilesOrigin+ - the location used by OpenLayers to generate tiles, with a
+default value of +-180,-90+;
+
+* +numZoomLevels+ - defines the number of levels available, with level 0
+corresponding to +maxResolution+, and +numZoomLevels+ corresponding to
++minResolution+;
+
+* +zoom+ - the initial zoom level to use, ranging from 0 to
++numZoomLevels+, with a default value of +4+;
+
+* +mapBounds+ - defines the latitude and longitude bounds
+of the displayed map, with a default
+value of +-180,-90,180,90+;
+
+* +mapcenter+ - defines the initial center of the map, with
+default value +lat=0,lon=0+;
+
+* +maxResolution+ - defines the maximum resolution of the map,
+with larger numbers allowing the map to be seen farther away,
+and a default value of +0.15+;
+
+* +minResolution+ - defines the minimum resolution of the map,
+with smaller numbers allowing closer views of the map, and a default
+value of +0.0002+;
+
+* +restrictedExtent+ - restricts the domain where the user can move
+on the map, with the default value of +-180,-90,180,90+ indicating
+no restriction;
+
+* +defaultLanguage+ - defines the default language to be used, with
+the default of +EN+ indicating English;
+
+* +menuDesign+ - defines if the design of the menu will be on the top
+or the side via, respectively, +topMenu+ and +sideMenu+;
+
+* +baseLayerMenuOrientation+ - defines if the dropdown layer menu should be
+created horizontally or vertically, with a default value of
++vertical+.
+
+Layer Configuration
+-------------------
+
+An XML file is used to configure the layers that will be displayed on
+the map as well as the texts of the menus to be used in the
+interface.  These files will probably be frequently modified.
+This XML configuration file is located in the directory:
+
+-----
+TOMCAT_ROOT/webapps/OWGISTemplate/layers
+-----
+
+with the example file named +TestLayers.xml+, i.e.
+
+-----
+TOMCAT_ROOT/webapps/OWGISTemplate/layers/TestLayers.xml
+-----
+
+There are four main elements used in the layer configuration
+files:
+
+* +MenuEntry+ - a tag for creating independent menus to which
+multiple layers can point, e.g. layers holding temperature data
+from the month of January for different years can all point to the
+same menu +January+; 
+* +BackgroundLayers+ - a tag for creating background layers used as the
+spatial reference for the map;
+* +MainLayers+ - a tag for creating main layers typically containing raster
+data; and
+* +OptionalLayers+ - a tag for creating optional layers typically
+containing vector data.
+
+Sample Configuration File
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The +TestLayers.xml+ that comes with the distribution is:
+
+[source,xml]
+-----
+<MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
+        <!-- This are the menus that are available to display entries -->
+        <MenuEntries>
+                <MenuEntry ID="lev1" EN="Level 1" ES="Nivel 1"/>
+                <MenuEntry ID="vectest" EN="Vector layer" ES="Ejemplo Vectorial"/>
+                <MenuEntry ID="veccqltest" EN="Vector CQL demo" ES="Ejemplo CQL"/>
+                <MenuEntry ID="geotifftest" EN="Raster (GeoTIFF)" ES="Ejemplo capa raster "/>
+                <MenuEntry ID="ncwmsMultDateMultDepth" EN="ncWMS MultZ MultDate" ES="ESP ncWMS MultZ MultDate"/>
+                <MenuEntry ID="ncwmsMultDateOneZ" EN="ncWMS OneZ MultDate" ES="ESP ncWMS OneZ MultDate"/>
+                <MenuEntry ID="ncwmsOneDateMultZ" EN="ncWMS MultZ OneDate" ES="ESP ncWMS MultZ OneDate"/>
+                <MenuEntry ID="ncwmsOneDepthOneZ" EN="ncWMS OneZ OneDate " ES="ESP ncWMS OneZ OneDate "/>
+                <MenuEntry ID="ncwmvelocity" EN="ncWMS velocity field" ES="ESP ncWMS velocity field"/>
+
+                <MenuEntry ID="vector" EN="Vector Layers" ES="Vectoriales"/>
+                <MenuEntry ID="raster" EN="Raster Layers" ES="Capas Raster"/>
+                <MenuEntry ID="ncwms" EN="ncWMS Layers" ES="Capas ncWMS"/>
+                <MenuEntry ID="states" EN="US states" ES="Estados"/>
+                <MenuEntry ID="countries" EN="Countries" ES="Paises"/>
+        </MenuEntries>
+
+        <BackgroundLayers BBOX="-180,90,-90,180" server="http://viewer.coaps.fsu.edu/geoserver/wms">
+                <layer name="comm:pyrResult512" featureInfo="comm:gebco"/>
+        </BackgroundLayers>
+
+        <!-- Optional layers -->
+        <OptionalLayers BBOX="-171.79111060289117,18.916190000000142,-66.96465999999998,71.35776357694175"
+                                  server="http://owgis.servehttp.com:8080/geoserver/wms"
+                                  vectorLayer="true">
+                <layer Menu="countries" name="demo:world_countries" />
+                <layer Menu="lev1,states" name="demo:us_states" />
+        </OptionalLayers>
+
+        <!-- Vector layer -->
+        <MainLayers BBOX="-175.22056447761656,-41.29997393927641,179.21664709402887,64.15002361973922"
+                                server="http://owgis.servehttp.com:8080/geoserver/wms"
+                                vectorLayer="true">
+                <layer Menu='vector,vectest' EN='Vector layer demo. World big cities. ' 
+                           ES='Ejemplo de una capa vectorial. Grandes ciudades del mundo' name='demo:world_cities' />
+        </MainLayers>
+
+        <!-- Vector CQL layer -->
+        <MainLayers BBOX="-175.22056447761656,-41.29997393927641,179.21664709402887,64.15002361973922"
+                                server="http://owgis.servehttp.com:8080/geoserver/wms"
+                                cqlcols="NAME" >
+                <layer Menu="vector,veccqltest" name="demo:world_cities" 
+                           EN="Demo CQL filtering. Estimated population in 2010 more 2 million" 
+                           ES="Ejemplo de filtrado con CQL. Grandes ciudades con mas de 2 millones de personas en 2010"
+                           CQL="MAX_POP10 > 2000000" />
+        </MainLayers>
+
+        <!-- GeotiffLayer -->
+        <MainLayers BBOX="-125.0,4.999999999999975,-75.00000000000003,35.0"
+                                server="http://owgis.servehttp.com:8080/geoserver/wms">
+                <layer Menu="raster,geotifftest" 
+                           EN="Demo of a raster (GeoTIFF) layer. Maximum average temperature of July month." 
+                           ES="Ejemplo de capa raster (GeoTIFF). Temperatura maxima promedio del mes de julio." name="demo:temp_max_mex"/>
+        </MainLayers>
+
+        <!-- ncWMS with one date-->
+        <MainLayers BBOX="-98.0,18.09164810180664,-76.400024,31.960647583007812" 
+                                format="image/gif"  server="http://owgis.servehttp.com:8080/ncWMS-1.1.1/wms"
+                                ncWMS="true">
+                <layer Menu="ncwms,ncwmsOneDateMultZ" 
+                           EN="Demo of an ncWMS layer with only one day. World eastward wind."
+                           ES="Ejemplo de una capa ncWMS con multiples z-axis. Vientos hacia el este." name="world_temp/ua"  />
+        </MainLayers>
+        <!-- ncWMS velocity-->
+        <MainLayers BBOX="-98.0,18.09164810180664,-76.400024,31.960647583007812" 
+                                format="image/gif"  server="http://owgis.servehttp.com:8080/ncWMS-1.1.1/wms"
+                                ncWMS="true">
+                <layer Menu="ncwms,ncwmvelocity" EN="Demo of an ncWMS velocity layer. Ocean currents of the Gulf of Mexico" 
+                           ES="Ejemplo de una capa de velocidad de servidor ncWMS. Velocidad de corrientes del Gulfo de Mexico" 
+                           name="gulf_vel/sea_water_velocity" style="vector" />
+        </MainLayers>
+
+        <!-- ncWMS with one depth-->
+        <MainLayers BBOX="-180.0, -88.927734375, 180.0, 88.927734375"
+                                format="image/gif"  server="http://owgis.servehttp.com:8080/ncWMS-1.1.1/wms"
+                                ncWMS="true" >
+                <layer Menu="ncwms,ncwmsOneDepthOneZ" 
+                           EN="Demo of an ncWMS layer with only one depth. World precipitation flux."
+                           ES="Ejemplo de una capa ncWMS con solo una elevacion. Flujo de precipitacion." name="world_temp/pr"  />
+        </MainLayers>
+
+        <!-- ncWMS all -->
+        <MainLayers BBOX="-98.0,18.09164810180664,-76.400024,31.960647583007812" 
+                                format="image/gif"  server="http://owgis.servehttp.com:8080/ncWMS-1.1.1/wms"
+                                ncWMS="true" >
+                <layer Menu="ncwms,ncwmsMultDateMultDepth" 
+                           EN="Demo of an ncWMS layer with different times and depths. Gulf of Mexico temperature "
+                           ES="Ejemplo de una capa ncWMS con diferentes fechas y profundidades. Temperatura del Golfo de Mexico" name="gulf_temp/temperature"  />
+        </MainLayers>
+</MenuConf>
+-----
+
+Basic XML Structure
+~~~~~~~~~~~~~~~~~~~
+
+Thus we see that the basic structure of the XML configuration file is:
+
+[source,xml]
+-----
+<MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
+
+        <MenuEntries>
+                <MenuEntry ... />
+                ...
+        </MenuEntries>
+
+        <BackgroundLayers ...>
+                <layer .../>
+        </BackgroundLayers>
+
+        <OptionalLayers ...>
+                <layer ... />
+                ...
+        </OptionalLayers>
+
+        <MainLayers ... >
+                <layer ... />
+                ...
+        </MainLayers>
+
+</MenuConf>
+-----
+
+
++MenuConf+ Tag
+~~~~~~~~~~~~~~
+
+The entire layer configuration file is contained within the +MenuConf+ tag:
+
+[source, xml]
+-----
+<MenuConf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schema.xsd">
+    ...
+</MenuConf>
+-----
+
++MenuEntries+ and +MenuEntry+ Tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The available layers are accessed via a menu contained within the
++MenuEntries+ tag:
+
+[source,xml]
+-----
+<MenuEntries>
+   ...
+</MenuEntries>
+-----
+
+Each entry in the menu is contained with a +MenuEntry+ tag, for instance a
+GeoTIFF raster entry:
+
+[source,xml]
+-----
+<MenuEntries>
+     ...
+     <MenuEntry ID="geotifftest" EN="Raster (GeoTIFF)" ES="Ejemplo capa raster "/>  
+     ...
+</MenuEntries>
+-----
+
+The elements within the +MenuEntry+ tag are:
+
+. +ID+ - which links the menu entry to a corresponding layer tag (as we will
+see below);
+. +EN+ - an English name for the menu entry; and
+. +ES+ - a Spanish name for the menu entry.
+
+Each of the +MenuEntry+ tags has a corresponding layer tag in XML file
+section immediately following the closure of the +MenuEntries+ tag, although
+there may be layer tags without corresponding +MenuEntry+ tags.
+
++BackgroundLayer+ Tag
+~~~~~~~~~~~~~~~~~~~~~
+
+In this example, the +BackgroundLayers+ tag is not present within
++MenuEntries+ since it contains layer information that the designer desires to
+be displayed as
+a background feature for all available optional layers.  In our example, this
+entry is:
+
+[source,xml]
+-----
+        <BackgroundLayers BBOX="-180,90,-90,180" server="http://viewer.coaps.fsu.edu/geoserver/wms">
+                <layer name="comm:pyrResult512" featureInfo="comm:gebco"/>
+        </BackgroundLayers>
+-----
+
+which fetches a WMS version of the +comm:pyrResult512+ layer from the given server.
+The OWGIS software combines the server string:
+
+-----
+http://viewer.coaps.fsu.edu/geoserver/wms
+-----
+
+with the layer name:
+
+-----
+comm:pyrResult512
+-----
+
+and additional required WMS boilerplate to create the actual WMS request string:
+
+-----
+http://viewer.coaps.fsu.edu/geoserver/comm/wms?service=WMS&version=1.1.0&request=GetMap&layers=comm:pyrResult512&styles=&bbox=-180.0,-90.00000000000018,180.00000000000037,90.0&width=660&height=330&srs=EPSG:4326&format=application/openlayers
+-----
+
+Attributes
+^^^^^^^^^^
+
+The available attributes for the +BackgroundLayers+ tag are:
+
+* +BBOX+ - the default boundary box, with a default value of +-180,-90,180,90
+
+* +format+ - the default image format, with a default value of +image/jpeg+
+
+* +proj+ - the default layer projection, with a default value of +EPSG:4326+
+
+* +server+ - the default WMS URL server
+
+* +trans_effect+ - the transition effect used by OpenLayers when zooming the
+map, which is one by default and must be set to +none+ to skip the
+transition effect
+
+* +tiled+ - defines if the layer should be requested as tiles or as a single
+image, with a default value of +true+ for tiles
+
+* +layer+ - sets specific attributes for the layers and allows overwriting any
+of the attributes in Level 2, with the following available attributes:
+
+** +MenuIDs+ - a required list of menu IDs used to select a layer;
+
+** +name+ - a required name of the layer in the WMS or ncWMS server;
+
+** +featureInfo+ - the name of a different layer to make punctual data
+requests, with the default being WFS requests being made to the same layer;
+
+** +vectorlayer+ - a boolean attribute indicating if the layer is a vector
+layer, with a default value of +false+.
+
++OptionalLayers+ Tag
+~~~~~~~~~~~~~~~~~~~~
+
+The +OptionalLayers+ tag always has a corresponding +MenuEntry+ tag, with the two
+linked by an identical value - in this case +countries+ - assigned for the +ID+ element of the latter:
+
+[source,xml]
+-----
+        <MenuEntries>
+                ...
+                <MenuEntry ID="countries" EN="Countries" ES="Paises"/>
+                ...
+      </MenuEntries>
+-----
+
+and the +Menu+ element of the +layer+ subtag of the former:
+
+[source,xml]
+-----
+        <OptionalLayers BBOX="-171.79111060289117,18.916190000000142,-66.96465999999998,71.35776357694175"
+                                  server="http://owgis.servehttp.com:8080/geoserver/wms"
+                                  vectorLayer="true">
+                <layer Menu="countries" name="demo:world_countries" />
+        </OptionalLayers>
+-----
+
+The +OptionalLayers+ tag elements are:
+
+. +BBOX+ - which supplies the lon/lat bounds of the surrounding box;
+. +server+ - which provides the base name of the server; and
+. +vectorLayer+ - which indicates whether the layer is a vector layer.
+
+and the +layer+ subtag elements are:
+
+. +Menu+ - which links the layer to a corresponding menu item; and
+. +name+ - which provides the server with the name of the specific layer file
+being requested.
+
+
+The OWGIS software again takes the +OptionalLayers+ tag +server+ element value:
+
+-----
+http://owgis.servehttp.com:8080/geoserver/wms
+-----
+
+and the +layer+ tag +name+ element value:
+
+-----
+demo:world_countries
+-----
+
+to construct the following proper WMS request for the server:
+
+-----
+http://owgis.servehttp.com:8080/geoserver/demo/wms?service=WMS&version=1.1.0&request=GetMap&layers=demo:world_countries&styles=&bbox=-179.99999999999997,-90.00000000000003,180.00000000000014,83.64513000000001&width=684&height=330&srs=EPSG:4326&format=application/openlayers
+-----
+
++MainLayers+ Tag
+~~~~~~~~~~~~~~~~
+
+The +MainLayers+ tag always has a corresponding +MenuEntry+ tag, with the two
+linked by an identical value - in this case +vectest+ - assigned for the
++ID+ element of the latter:
+
+[source,xml]
+-----
+        <MenuEntries>
+                ...
+                <MenuEntry ID="vectest" EN="Vector layer" ES="Ejemplo Vectorial"/>
+                ...
+        </MenuEntries>
+-----
+
+and the +Menu+ element of the +layer+ subtag of the former:
+
+[source,xml]
+-----
+        <MainLayers BBOX="-175.22056447761656,-41.29997393927641,179.21664709402887,64.15002361973922"
+                                server="http://owgis.servehttp.com:8080/geoserver/wms"
+                                vectorLayer="true">
+               <layer Menu='vector,vectest' EN='Vector layer demo. World big cities. '
+                           ES='Ejemplo de una capa vectorial. Grandes ciudades del mundo' name='demo:world_cities' />
+        </MainLayers>
+-----
+
+The +MainLayers+ tag elements are:
+
+. +BBOX+ - a set of values supplying the lon/lat bounds of the surround box;
+. +server+ - a value providing the base name of the server; and
+. +vectorLayer+ - a value indicating whether the layer is a vector layer.
+
+and the +layer+ subtag elements are:
+
+. +Menu+ - a value linking the layer to a corresponding menu item;
+. +EN+ - an English name for labeling the layer;
+. +ES+ - a Spanish name for labeling the layer; and
+. +name+ -  a value providing the server with the name of the specific layer
+being requested.
+
+Programmatic Layer Configuration
+--------------------------------
+
+Configuration files in XML format are notoriously tricky and unforgiving of
+error.  This is not especially a problem if you're creating a configuration
+file for a relatively static set of layers/files, but can become monstrously
+difficult when you have a large and dynamically changing set of layers/files
+to configure.
+The simplest solution is to write a program to create the configuration
+profile.  The program can traverse a list of the directories that contain the
+layers/files you wish to serve, and automatically create the corresponding
+configuration file.  Once the program has been sufficiently (heh) debugged,
+it can create flawless XML code for any number of layers/files, and can do so
+as often as the list of files might change.  It is easier to maintain hundreds
+of lines of program code than thousands of lines of XML configuration code.
+
+Data Sources/Servers
+--------------------
+
+Any server that implements the OGC WMS specification properly can be used by
+OWGIS.  Herein we describe two of them.
+
+ncWMS
+~~~~~
+
+In the example, one of the data sources are an ncWMS server at:
+
+http://owgis.servehttp.com:8080/ncWMS-1.1.1/[+http://owgis.servehttp.com:8080/ncWMS-1.1.1/+]
+
+The ncWMS server is available from:
+
+http://www.resc.rdg.ac.uk/trac/ncWMS/[+http://www.resc.rdg.ac.uk/trac/ncWMS/+]
+
+and provides an OGC WMS for geospatial data stored in CF-compliant NetCDF
+files.
+
+An example of a layer obtained from this server is a world eastward wind
+field:
+
+[source,xml]
+-----
+        <!-- ncWMS with one date-->
+        <MainLayers BBOX="-98.0,18.09164810180664,-76.400024,31.960647583007812"
+                                format="image/gif"  server="http://owgis.servehttp.com:8080/ncWMS-1.1.1/wms"
+                                ncWMS="true">
+                <layer Menu="ncwms,ncwmsOneDateMultZ"
+                           EN="Demo of an ncWMS layer with only one day. World eastward wind."
+                           ES="Ejemplo de una capa ncWMS con multiples z-axis. Vientos hacia el este." name="world_temp/ua"  />
+        </MainLayers>
+-----
+
+GeoServer
+~~~~~~~~~
+
+The other data sources are GeoServers at:
+
+http://owgis.servehttp.com:8080/geoserver/web/[+http://owgis.servehttp.com:8080/geoserver/web/+]
+
+and
+
+http://viewer.coaps.fsu.edu/geoserver/web/[+http://viewer.coaps.fsu.edu/geoserver/web/+]
+
+The GeoServer software is available from:
+
+http://geoserver.org/display/GEOS/Welcome[+http://geoserver.org/display/GEOS/Welcome+]
+
+and is a reference implementation of the OGC WFS, WCS and WMS standards.
+
+An example of a layer served by the first GeoServer is a vector layer containing information
+about big cities:
+
+[source,xml]
+-----
+
+        <!-- Vector layer -->
+        <MainLayers BBOX="-175.22056447761656,-41.29997393927641,179.21664709402887,64.15002361973922"
+                                server="http://owgis.servehttp.com:8080/geoserver/wms"
+                                vectorLayer="true">
+                <layer Menu='vector,vectest' EN='Vector layer demo. World big cities. '
+                           ES='Ejemplo de una capa vectorial. Grandes ciudades del mundo' name='demo:world_cities' />
+        </MainLayers>
+-----

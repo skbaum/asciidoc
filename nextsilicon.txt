@@ -1,0 +1,1055 @@
+
+= NextSilicon Notes
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Introduction
+
+This document collects scattered information about how to install and configure a NextSilicon card.
+It also contains a brief overview of the software stack used in the NextSilicon system.
+Section headings are also links to the original documents.
+
+Other important documents not included herein are:
+
+* https://userdocs.nextsilicon.com/en/latest/users/overview/[NextSilicon User Guide]
+* https://userdocs.nextsilicon.com/en/latest/UIUX/launcher/[GUI Applications Guide]
+* https://userdocs.nextsilicon.com/en/latest/troubleshooting/known-issues/[Troubleshooting]
+* https://userdocs.nextsilicon.com/en/latest/reference/glossary/[Glossary]
+* https://userdocs.nextsilicon.com/en/latest/release/overview/[Release Notes]
+
+There are four key procedures for setting up the NextSilicon system: xref:hardware_installation[hardware installation], 
+xref:software_installation[software installation],
+xref:installation_verification[installation verification], 
+and xref:runtime_configuration[runtime configuration].
+
+[[hardware_installation]]
+== https://userdocs.nextsilicon.com/en/latest/setup/HWinstall/[Hardware Installation]
+
+Directions on how to install and test the NextSilicon Maverick PCIe card in a single card per server environment.
+
+=== Package Contents
+
+The following list includes all contents included in package delivery. Upon opening the package, please verify that all contents are included. Please contact your NextSilicon support team if the package contents differ from this list:
+
+* Maverick NXT10500KV148R64GB PCIe module
+* PCIe Gen 5 12VHPWR to EPS-12V power cable adapter-splitter with two 8-pin connectors
+
+=== Installation Prerequisites
+
+Before beginning installation of the NextSilicon Maverick PCIe card, ensure you have the following prerequisites:
+
+* A server with at least 4 cores and 64 GB RAM (see supported servers list below)
+* 5 GB of disk space
+* Available PCIe Gen 3, Gen 4, or Gen 5 x16-lane slot
+* 300 W power delivery per card, and airflow to cool 300 W (at least 48 CFM air flow-through per card for 50 °C operation)
+* PCIe 5 12VHPWR cable, or one or two EPS-12V 8-pin connectors and cables
+
+*Note*: Certain applications may demand greater resources, so check your application’s specific requirements. We recommend at least 64 GB RAM per Maverick card on the server for running applications.
+
+=== Pre-Installation Configuration
+
+NextSilicon hardware requires:
+
+* Minimum hardware requirements
+** PCIe Gen 4
+** 4 CPU cores
+** 64 GB memory
+* BIOS settings
+** xref:above_4g_decoding[Above 4G decoding]
+** Resize BAR support
+** xref:iommu[IOMMU] support
+* Operating system
+** Debian 10 or RHEL 8.5
+** Enable xref:iommu[IOMMU] in pass-through mode
+** Set PCIe card cooling fan control to maximum
+
+=== Safety Precautions
+
+Before beginning the installation, take these safety precautions:
+
+* Shut down the server or computer and remove its power cable.
+* Wait until internal heat dissipates before opening the cabinet.
+* Prevent ESD (electrostatic discharge) by touching a grounded surface or wearing a grounded antistatic wrist strap.
+
+=== PCIe Card Installation
+
+Follow this procedure to install the Maverick card:
+
+* Unplug the system’s power cable.
+* Open the system cabinet.
+* Find an empty double-wide, full-height, full-length PCIe x16 card slot with appropriate airflow.
+* If the slot has a locking latch or retaining clip, open it.
+* If the slot has a cover or guard plate, remove it.
+* Insert the Maverick card connectors carefully into the slot. Press firmly to seat the card, placing your fingers on the card directly over the slot. Do not use excessive force.
+* Close the locking latch or retaining clip, if present.
+* Attach the system’s power cable to the power socket on the back of the Maverick card. Use the provided EPS-12V Maverick power cable adapter-splitter if needed.
+** Connect the #4 connector (with four yellow wires) first. Up to 300 W will be drawn from the single 8-pin header.
+** If necessary, connect the #2 connector (with two yellow wires) as well. Up to 200 W will be drawn from the #4 header, and up to 100 W from the #2 header.
+** When the installation of the Maverick card is complete, close the cabinet.
+
+*Note*: The cable adapter-splitter has two 8-pin CPU EPS-12V headers.
+
+=== Low-Level Verification
+
+Verify that the server recognizes the Maverick card:
+
+-----
+$ lspci -d cdfa:
+01:00.0 Processing accelerators: Device cdfa:0007 (rev 01)
+-----
+
+=== Installation Troubleshooting
+
+*Warning*: To ensure safer and more stable use of the Maverick card, we recommend setting the default fan speed to 90% on your server. This will help prevent the Maverick card from overheating. 
+
+Please refer to the https://userdocs.nextsilicon.com/en/latest/troubleshooting/known-issues/[known issues]
+and https://userdocs.nextsilicon.com/en/latest/troubleshooting/faqs/[FAQs] pages within the troubleshooting guide for more details.
+
+== https://userdocs.nextsilicon.com/en/latest/setup/SWinstall/[Software Specifications]
+
+Your guide to installing and testing the NextSilicon software stack and simulator on Debian-, or RHEL- distributions.
+
+=== Supported OS
+
+* Debian 10, kernel version 4.19.0-18 or higher
+* RHEL 8.5, kernel version 4.18.0-348.12.2 or higher
+
+=== Installation Prerequisites
+
+* A server with at least 4 cores and 64 GB RAM, with a Maverick card installed according to the Hardware installation guide.
+* OS:
+** Debian 10 (kernel version 4.19.0-18 or higher)
+** RHEL 8.5 (kernel version 4.18.0-348.12.2 or higher)
+* Connection to an internal or external Debian 10 or RHEL 8.5 package repository
+* If not connected to physical NextSilicon hardware, a virtual machine (VM) instance is supported for use with the NextSilicon simulator
+* A Docker container is supported only when using the simulator, and not with Maverick card. When using Docker:
+** Increase /dev/shm size by running the Docker with --shm-size=10G
+** Add the `SYS_PTRACE` capability by running the Docker with `--cap-add=SYS_PTRACE`
+** `$USER` must be a member of the Docker group
+* `sudo` privilege
+* Internet connection (required for the installation only)
+
+=== Pre-Installation Configuration
+
+Ensure that this OS option has been configured before software installation:
+
+* VT-d/IOMMU (Input–Output Memory Management Unit), enable in passthrough mode
+
+[[software_installation]]
+== https://userdocs.nextsilicon.com/en/latest/setup/SWinstall_RHEL/[Software Installation on RHEL-Based Installations]
+
+=== Install NextSilicon Dependencies
+
+For RHEL-based distributions, you must first register your system and then enable the following repos using these commands.
+Update the available repositories via:
+
+-----
+sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+sudo subscription-manager repos --enable rhel-8-for-x86_64-baseos-rpms
+-----
+
+Install all required sytem package dependencies:
+
+-----
+sudo yum install -y binutils glibc-devel libuv patchelf libatomic mpfr file graphviz spawn-fcgi fcgi-devel nginx zlib kernel-debug-devel-$(uname -r) dkms kernel-devel-$(uname -r) kernel-headers-$(uname -r) cmake git wget
+-----
+
+=== Download
+
+Download the NextSilicon software stack via:
+
+-----
+wget --user <NS-USER> --password <NS-PASSWORD> http://repo.nextsilicon.net/release/rhel-8/0.10.0/ns-sw-kit-rhel-8-0.10.0-308.tar.bz2
+-----
+
+Extract it with:
+
+-----
+tar xvf ns-sw-kit-rhel-8-0.10.0-308.tar.bz2
+cd ns-sw-kit-0.10.0/rhel-8
+-----
+
+=== Install the DKMS Driver Packages
+
+Install the drivers when using the Maverick card, not when using the simulator.
+
+Compile, install and load the `nextsi` and `nextuvm` drivers from the `rhel-8` subdirectory via:
+
+-----
+sudo rpm -Uvh nextsi-0.10.0-3383.x86_64.rpm
+sudo rpm -Uvh nextuvm-0.10.0-3383.x86_64.rpm
+sudo modprobe nextsi
+sudo modprobe nextuvm
+-----
+
+=== Verify Driver Installation
+
+Verify the driver status with:
+
+-----
+echo ">>> dkms status <<<"
+sudo dkms status | grep next
+echo ">>> modinfo nextsi <<<"
+sudo modinfo nextsi
+echo ">>> modinfo nextuvm <<<"
+sudo modinfo nextuvm
+echo ">>> dmesg output <<<"
+sudo dmesg | grep next
+echo ">>> lspci output <<<"
+lspci | grep accelerators
+-----
+
+The expected output is:
+
+-----
+>>> dkms status <<<
+nextsi/0.10.0, 4.18.0-372.9.1.el8.x86_64, x86_64: installed
+nextuvm/0.10.0, 4.18.0-372.9.1.el8.x86_64, x86_64: installed
+>>> modinfo nextsi <<<
+filename:       /lib/modules/4.18.0-372.9.1.el8.x86_64/extra/nextsi.ko.xz
+softdep:        post: nextuvm
+version:        0.10.0
+description:    NextSilicon Driver
+license:        GPL
+rhelversion:    8.6
+srcversion:     F36FF2837E68F4430575408
+alias:          pci:v0000CDFAd00000007sv*sd*bc*sc*i*
+depends:
+name:           nextsi
+vermagic:       4.18.0-372.9.1.el8.x86_64 SMP mod_unload modversions
+parm:           mem:int
+>>> modinfo nextuvm <<<
+filename:       /lib/modules/4.18.0-372.9.1.el8.x86_64/extra/nextuvm.ko.xz
+version:        0.10.0
+description:    NextSilicon Driver
+license:        GPL
+rhelversion:    8.6
+srcversion:     5B56459F361E13BE4B356C0
+depends:
+name:           nextuvm
+vermagic:       4.18.0-372.9.1.el8.x86_64 SMP mod_unload modversions
+>>> dmesg output <<<
+[   25.722943] nextsi 0000:01:00.0: PCIE atomic ops is not supported
+[   25.746113] using nextsilicon pci device!
+[   26.634162] nextuvm loaded! api_ver 0x6
+[   26.634165] nextuvm detected support for avx512x4 memcpy offload
+>>> lspci output <<<
+01:00.0 Processing accelerators: Device cdfa:0007 (rev 01)
+-----
+
+*Note*: The module verification error can be ignored.
+
+=== Install NextSilicon Packages
+
+Install the `nextllvm`, `nextruntime` and `nextsilicon-ui-apps` packages via:
+
+-----
+sudo rpm -Uvh nextllvm-12.0.1-1101.x86_64.rpm
+sudo rpm -Uvh nextruntime-RelWithDebInfo-0.10.0-3383.x86_64.rpm
+sudo rpm -Uvh nextsilicon-ui-apps-0.10.0-40.x86_64.rpm
+sudo reboot
+-----
+
+After the reboot, enter the command:
+
+-----
+sudo dmesg | grep next
+-----
+
+to see the expected output:
+
+-----
+[    5.552130] systemd[1]: Set hostname to <vm-srv14-rhel-8-03.il.nextsilicon.com>.
+[    6.367713] nextsi: loading out-of-tree module taints kernel.
+[    6.371074] nextsi: module verification failed: signature and/or required key missing - tainting kernel
+[    6.401436] nextsi 0000:01:00.0: PCIE atomic ops is not supported
+[    6.425743] using nextsilicon pci device!
+[    6.811490] nextuvm loaded! api_ver 0x3
+-----
+
+=== Set Up the NextSilicon Environment
+
+Set up a NextSilicon environment via:
+
+-----
+source /etc/profile.d/nextsilicon.sh
+-----
+
+[[installation_verification]]
+== https://userdocs.nextsilicon.com/en/latest/setup/SWinstall_check/[Installation Verification]
+
+NextSilicon provides a script that verifies that the NextSilicon hardware and software have been installed correctly. If they are not, it generates error messages that help NextSilicon identify the error.
+
+=== Running the Verification Script
+
+The verification script is saved in a read-only directory. The following commands copy it to a smoketest directory in your home directory, where error messages and any other output can be saved if necessary, and then run the script.
+
+*Warning*:  If you don't run the command from the specified directory, it will fail.
+
+The commands are:
+
+-----
+cp -r /opt/nextsilicon/share/smoketest ~/smoketest
+cd ~/smoketest/
+./run_smoketest.sh 2>&1 | tee output.log
+-----
+
+=== Expected Results
+
+The script creates two reports, `output.log` and `nextcli.log`. Both are saved to `~/smoketest`, the same directory the script was saved to.
+
+If you see the following trailing output on the screen when the script terminates, the verification was successful and your system is properly set up:
+
+-----
+Expected output from smoketest
+-----
+
+*Note*: If the smoketest script fails early on, nextcli.log might not be generated, in which case output.log will be sufficient for troubleshooting.
+
+[[runtime_configuration]]
+== https://userdocs.nextsilicon.com/en/latest/setup/config/[Runtime Configuration]
+
+How to set up the basic runtime configuration for the NextSilicon utilities.
+
+=== Static Configuration
+
+The configuration file for the NextSilicon utilities is the YAML file located, by default, at `$NEXT_HOME/etc/next_runtime.conf`. You can directly update `$NEXT_HOME/etc/next_runtime.conf` using sudo or by copying it to a dedicated path. The advantage of editing in the default path is that you will not need to specify `--cfg-fle <new-config-file>` on every command execution.
+
+=== Prerequisite Network Communication
+
+Various modules in the NextSilicon runtime – `nextdaemon`, `nextloader`, `nextcli`, `nextprofiler`
+(see Introduction to command-line utilities for more information) – use network packets to communicate.
+It is mandatory to update the network configuration first.
+
+When setting ports in the configuration (first-port, simulator port, daemon-port), make sure these ports are not used by other processes in your machine.
+
+The elrond service binds additional ports starting from the first-port, then incrementing by one. To avoid port conflicts with simulator port and daemon-port, make sure that first-port is the higher port number, as shown here:
+
+-----
+daemon:
+  elrond:
+    ...
+    first-port: 7003
+    ...
+simulator:
+  - port: 7002
+...
+system:
+  daemon-port: 7001
+  daemon-host: 0.0.0.0
+...
+-----
+
+Use `0.0.0.0` and not `127.0.0.1` as the socket bind address.
+
+=== Example Configuration
+
+An example of a configuration file is:
+
+-----
+system:
+  daemon-port: 7001
+  daemon-host: 0.0.0.0
+  generation: gen1
+
+daemon:
+  # debug: false
+  elrond:
+    path: elrond
+    first-port: 7003
+    # Note that increasing the maximum elrond count would decrease the maximum
+    # possible VFIDs, which could cause problems for some apps.
+    count: 1
+  simulator:
+  - port: 7002
+  # Enable eventlog: a trace for system events
+  # enable-eventlog: true
+  # Run the software simulator, even if the hardware is present.
+  # force-software-only: false
+
+  # device-init:
+  # Set to change to override DRAM initialization binary: (default: ../lib/firmware/nextsilicon/sbus_master.hbm2e.0x000c_1032.rom)
+  #   dram-rom-path: <path>
+  # Set to change default pattern DRAM memory is set to after being initialized (default: 0x00000000)
+  #   dram-default-pattern: <value>
+  # Uncomment lines below to skip device configuration state.
+  # Changing these may affect system performance and stability!
+  #   skip-host-ghi: true
+  #   skip-bins: true
+  #   skip-grid-pll: true
+  #   skip-hbm: true
+  # Set the bin cache line size: (default: 64)
+  #   cache-line-size: default | 64 | 128
+  # Make the bin scramble the input address: (default: no-scramble)
+  #   mapcont-scramble: no-scramble | xor-tag-bits | xor-mul-17
+
+  # RISC settings.
+  # risc:
+  #   Set to activate RISC complexes: (default: both)
+  #   In SCU-only mode, a complex will be initialized for SCU execution,
+  #   but no cores will be available to elrond, and MNG services will not function.
+  #   mode: default | none | scu-only | east | west | both
+  #   Set to change firmware binary to be loaded at runtime: (default: ../nextrisc/bin/mngfw[p].bin)
+  #   firmware-path: <path>
+  #   Set to readback firmware upon upload and check its contents: (default: false)
+  #   verified-upload: <value>
+  #   Do not use HBM as MNG channel backing memory: (default: false)
+  #   mng-private-mode: <value>
+  #   Use native emulation for uemu blocks (and type of support, default: enabled/x86-simulated [device/direct-mode]):
+  #   native-support: default | none | enabled | x86-simulated
+  #   cores-disable-west-mask: West complex mask value for cores disabled, for cores 0-23
+  #   cores-disable-east-mask: East complex mask value for cores disabled, for cores 0-23
+  #   Optimize the interpreter's slots by liveliness when enabled, only relevant for interpreted uCG BBGs
+  #   optimize-bytecode: true
+  #   If true, store RISC thread data on the hbm, otherwise store it on the SRAM (default: false)
+  #   hbm-thread-data: false
+  #   openmp:
+  #     When enabled OpenMP calls will be deployed to the RISC mngfw, instead of being implemented on the Host
+  #     enable: false
+  #     Sets the number of continuously-preallocated threads IDs to be used in RISC OpenMP implementation
+  #     preallocate-threads: 1024
+
+  # SCU state polling interval, in seconds.
+  # scu-state-poll-interval: 5
+
+  # SCU (system control unit) settings.
+  # Changing these may affect system performance and stability!
+  # scu:
+  #   Set to change SCU mode: (default: protection)
+  #   mode: default | disabled | protection
+  #   Set to change core reserved for SCU: (default: 1)
+  #   core: <value>
+  #   Set to change sampling frequency: (default: 1000.0Hz)
+  #   sample-frequency: <value>
+  #   Set to change protection threshold temperature: (default: 100.0C)
+  #   protection-threshold: <value>
+
+execution:
+  deploy-scheme:
+    # Assign mill peripheral BBGs to host/risc (default: risc):
+    mill-peripheral: default
+    # Assign mill core BBGs to host/risc/grid (default: grid):
+    mill-core: default
+
+  # Enables or disables the use of nextuvm
+  # enable-uvm: true
+
+  # device-telemetry:
+  #   Telemetry sample interval in milliseconds: (default: 1000)
+  #   sample-interval: <value>
+  #   switch between select set counters and global writer set counters.
+  #   These counters are mutually exclusive for they share HW resources (default: global-ws)
+  #   global-grid-telemetry-mode: default | sls | global-ws
+  #
+  #   tlb:
+  #     Enable hardware tlb telemetry collection: (default: true)
+  #     Note - the tlb telemetries are very spamming.
+  #     At 1.4GHz clock, a packet will be sent from each tlb every 0.2ms
+  #     enable: true | false
+  #   gmu:
+  #     Each latency bucket will be of size 2^n cycles where n is the value
+  #     of this field. 0 means disable.
+  #     Nonzero values must be between 2 and 10: (default: 0)
+  #     mep-latency-bucket-size: <value>
+  #
+  #     Enable hardware gmu telemetry collection: (default: true)
+  #     enable: true | false
+  #
+  #     0 - MEP: requests, responses, backpressure to GCU, MIU backpressure
+  #         BIN: miss, backpressure to MIU REQ and from MIU RSP,
+  #              dlink backpressure, HIT or FIP
+  #         MMU: hit, miss
+  #     1 - MEP: split, unaligned
+  #         BIN: fetch, fill, hit, fip, scratchpad, miss_no_alloc, hit or fip
+  #         MMU: hit, miss
+  #     2 - 16 bins aggregating different rtts. bin size is defined by
+  #         mep-latency-bucket-size.
+  #     Choose the mem counters you want to collect:
+  #     (default: custom. Defined in TELEM_GMU_SRC_DEFAULT_CFG)
+  #     global-telem-mode: The modes below are supported:
+  #           default: A mixed-mode default per counter, "0000000000011000000011"
+  #                    '1' at offset #i (right to left) ==>
+  #                        Indicates that counter#i is configured to mode_1.
+  #                    '0' at offset #i (right to left) ==>
+  #                        Indicates that counter#i is configured to mode_0.
+  #                    custom: Per user request.
+  #                    mode_0 / mode_1 / mode_rtt: Global all counters set to mode_0 or mode_1 or mode_rtt.
+  #     global-telem-mode: default | mode_0 | mode_1 | mode_rtt | custom
+  #     #EXAMPLE: counter-0: mode_0 | mode_1 | default
+  #     telem-mode-custom:
+  #       All counters custom configuration below:
+  #       counter-0: mode_1
+  #       counter-1: mode_1
+  #       ...
+  #       counter-21: mode_0
+  #     Enable telemetries about the state of the osq pointers (head, tail, size/peep) (default: false)
+  #     osq-telem-enable: false | true
+
+  # Set to ignore mill thread limits, as configured by the optimizer. (default: false)
+  # ignore-thread-limits: <value>
+
+  # Prepare the change objects but do not apply them onto the domains.
+  # skip-apply: false
+
+  # instance-selection:
+  # Set XFLD mask that is applied to tid before selecting duplication instance, int value (default: -1, don't apply)
+  #   xfld-mask: <value>
+
+projection:
+  # duplication:
+    # Create boundry box of tiles out of the existing projection, and duplicate it across the remaining space on the grid.
+    # tiles: false
+    # Create boundry box of clusters out of the existing projected tiles, and duplicate it across the remaining space inside the tiles.
+    # clusters: false
+  # pre-process:
+    # Queue redirection depends on `use-next-research`
+    # enable-queue-redirection: true
+    # topology-prioritization-factor: 1.0
+  #
+  # projection experimental configuration:
+  # note that fields under experimental:
+  # 1. are subject to change at any time without notice
+  # 2. can introduce instability and thus usage is risky
+  # experimental:
+    # redirect-queues-to-gsu: false
+    # redirect-feeder-sets-to-gsu: false
+    # use projection boundaries to bound the projection. units in clusters
+    # note that the boundaries are bounded by grid absolute boundaries
+    # set all to -1 to ignore projection boundaries
+    # projection-boundaries:
+      # offset-row: -1
+      # offset-column: -1
+      # rows: -1
+      # columns: -1
+    # relocate projection bounding box upon the load of projection result by hwcg.
+    # the units are in clusters. set all to -1 to ignore relocation
+    # relocate-on-load:
+      # row: -1
+      # column: -1
+    # clusters and tiles to skip when duplicating the projection
+    # duplication-exclude-clusters:
+      # tiles we don't want to use in duplications. Should contain a list of numbers between 0 and 7
+      # 0 being top left, 1 top right etc.
+      # tiles: []
+      # Clusters inside each tile we want to skip. Should contain a list of numbers between 0 and 31.
+      # The skipped clusters will be ignored in all 8 tiles.
+      # clusters: []
+
+  use-next-research: true
+  # disjoint-windows-plan: false
+  # Limits the number of process project.py can use
+  # workers-limit: 16
+  # Projection mode - (default: regular)
+  # mode: default | regular | cluster-based
+  # Projection split mode - (default: pre-projection)
+  # split-mode: default | disabled | pre-projection | recursive
+
+elrond:
+  # optimizer: true
+  simulator:
+  #   To enable jitting while running BBGs not on grid/device, set to true, otherwise set to false.
+  #   This comes into effect for all BBGs when running without hardware and on unlikely BBGs when running with a device
+  #   jit: true
+  #
+  #   To save jit coredump set the dump path. This will save a BBG if the lifter failed to compile it.
+  #   jit-coredump: $NEXT_HOME/var/log/nextsilicon/
+  #
+  #   To enable jitted code to be interrupted and report telemetry at loop head,
+  #   set the following value to a non-zero value. After every <value> static jumps,
+  #   the interrupt callback will be called. Note that this will cause a slowdown
+  #   for values closer to zero.
+    interrupt-threshold: 1000
+  #
+  #   To set the maximum number of simulator threads that will run at the same
+  #   time, uncomment the next line and set the number:
+  #   threads: <num>
+  #
+  #   To limit device memory size in the software simulator, set the desired
+  #   devmem size here, in amounts of clusters (256MB). If left unset, a full
+  #   silicon layout will be used, enabling 64GiB of device memory. This value
+  #   cannot be more than 256 (full silicon layout).
+  #   When not running in software simulator, this setting is ignored.
+  #   memory-clusters: <value>
+    cachesim:
+      #  To enable cache simulator use gen1 or gen2 as the mode.
+      mode: disabled
+      #
+      # To get a human readable cachesim report set its path below
+      # info-log-path : $NEXT_HOME/cs.log
+      #
+      # To get a machine readable cachesim report set its path below
+      # json-log_path : $NEXT_HOME/cs.json.log
+      #
+      # Number of wall clock seconds between each report
+      # report-interval : <num>
+  #
+  # enable eventlog: a trace for system events
+  # enable-eventlog: true
+  # enable builtins: Load from ../etc/codegraph_builtins. Enabled by default.
+  # Uncomment to disable
+  # enable-builtins: false
+  #
+  # In order to disable mem-trap uncomment the line `disable-mem-trap: <value>` and
+  # replace `<value>` with `true`.
+  # disable-mem-trap: <value>
+  #
+  # In order to disable inclusion of mtrap memory in core dumps, set to false.
+  # Note that device memory will not be included in core dumps regardless of the
+  # value supplied here due to technical limitations.
+  mtrap-in-core-dumps: true
+  #
+  # To set source path substitution, uncomment the following lines and apply the
+  # pairs of paths (first to replace, the second the replacement) separated by a
+  # colon:
+  # source-path-sub:
+  # - /from/sample/dir:/to/sample/dir
+  # - /another/sample/dir:/to/another/sample/location
+  # - ...
+  #
+  # To stop Elrond on (somewhat) recoverable errors (recommended to be set on
+  #   test environments):
+  # strict: true
+  #
+  # To enable or disable control-plane handoffs, which causes the interception
+  # and injection of certain functions for internal next control-plane purposes,
+  # set the following setting. Possible values are true/false
+  # control-plane-handoffs: true
+  #
+  # The memory allocation policy for the memory manager.
+  # Possible values:
+  # - `default`: If running with a device use `migrate-one-way`, otherwise use
+  #              `host-only`
+  # - `host-only`: All memory is allocated on the host. Can be used for
+  #                testing without device memory constraints.
+  # - `device-only`: All memory is allocated on the device.
+  # - `migrate-one-way`: Memory can be allocated either on host or on device.
+  #                Host memory is migrated to device on first device access,
+  #                but device memory is never migrated to host.
+  # mmu-policy: default
+  #
+  # Atomic shadow space is a memory region used to catch atomic operations from the host on migrated memory
+  # disable-atomic-shadow-space: false
+  #
+  # The memory migration maximal chunk size in bytes
+  # Note that actual migration size may be smaller in cases
+  # where the assorted memory allocation was smaller than the chunk size
+  # This setting also decides the maximal page size.
+  # For 2MiB pages, set at least 2097152. For 1GiB pages, set at least 1073741824.
+  # The default is 2 MiB
+  # max-migration-chunk: 2097152
+  #
+  # Set to true to zero memory used as application stack
+  zero-stack: false
+  #
+  # To set thread stack size (in bytes)
+  # thread-stack-size: 0x20000
+  # To change libcall load policy, which controls how libcall implementations
+  # are loaded into Codegraph from disk, set this value to:
+  # - `compliant-only` (the default): Allow only IEEE-compliant implementations.
+  # - `prefer-fast`: Prefer selecting fast versions (no-NaNs, no-Infs,
+  #   flush-to-zero, denormals-are-zero) if available, otherwise fall back to
+  #   IEEE-compliant implementations.
+  # libcall-load-policy: compliant-only
+  #
+  # To disable the MMU, set the following value to true. This will cause all
+  # memory allocations to be served directly from linear memory.
+  # disable-mmu: <value>
+  #
+  # In order to enable or disable function overlays, which replaces some
+  # non-libcall functions with ns-optimized implementations of them, set the
+  # following value to true/false. Defaults to true
+  # enable-overlay: true
+  #
+  # Number of seconds to wait before sending a daemon keepalive request, after
+  # receiving an answer to the previous query:
+  # daemon-keepalive-send: 5
+  # Number of seconds until Elrond considers the daemon unresponsive, and enters
+  # failed state:
+  # daemon-keepalive-wait: 45
+
+loader5:
+  use_ld_so_plugin: false
+  # Enable eventlog: Log for system events
+  enable-eventlog: true
+
+codegraph_db:
+  # remove-unused: true
+  # To enable or disable the select_set simplification set the following
+  # value to true/false. The simplification splits select_set nodes into select
+  # nodes before optimization and reassembles them after.
+  simplify-select-sets: true
+  # Libcalls mode can be one of the following values:
+  # - legacy
+  # - gen1 (Default if not provided)
+  # - gen2
+  libcalls-mode: gen1
+  feeder-optimization:
+    feeder-recalculation:
+      disable: false
+      depth-limit: 4
+      added-compute-limit: 20
+    feeder-spilling:
+      slots-per-thread: 0x200
+    feeder-rarely-used:
+      disable: false
+      gain-threshold: 10
+    feeder-used-in-unlikely:
+      disable: false
+      gain-threshold: 5
+  memory-optimization:
+    disable-eliminate-barriers: false
+    enable-eliminate-barriers-force: false
+    loop-pipelining-hack: false
+    classification:
+      # Treat OR nodes as ADD nodes in address calculation
+      # even when we can't prove they're equivalent (see mem_class.cpp)
+      unsafe-or-as-add: false
+    reordering:
+      # reordering can change the order of memory accesses including atomics
+      disable: false
+      # is reordering of two read only is allowed.
+      # for safe x86 like behavior non-atomic-only
+      read-only: all
+      # is reordering of two memory accesses that do not overlap is allowed
+      # for safe x86 like behavior non-atomic-only
+      non-alias: all
+      # UNSAFE: treat atomics and non-atomics as non-aliasing
+      unsafe-deorder-atomics-from-non-atomics: true
+      # UNSAFE: treat pointers from different stack frames as non-aliasing
+      unsafe-deorder-distinct-stack-frames: false
+    coalescing:
+      disable: false
+      max-size-bytes: 16
+      enable-heuristic-alignment-optimization: false
+      # Experimental heuristic to prevent split memory transactions during
+      # iteration of struct arrays with sizes that do not align well with the
+      # bin size (in gen1, 128bits).
+      enable-struct-array-size-heuristic: false
+    super-unsafe:
+      # for research. don't turn on unless you know what you are doing
+      enable-unsafe-remove-memread-cond: false
+      # Disable all memory accesses without modifying topology
+      enable-total-memory-suppression: false
+      # Attempt to coalesce simple read-mutate-write access patterns
+      enable-read-mutate-write-coalesce: false
+
+# Original (report_tool)
+optimizer:
+#  blacklist-functions:
+#  - foo
+#  - bar
+# abs-topo-lim should have different value depending on optimization usage
+# Value should be larger then 'topology-min-counter' below
+# When optimizing function: use number that is <= to your number of test.
+#   10k is recommended but if the func is slow, you can lower it to 1k
+# For full apps: 30k is a good number to start with.
+#   For fine tuning, use report tool to create CSV file.
+#   look at 'loops loads' for better estimated value
+  abs-topo-lim: 30000
+  call-inline-factor: 0.005
+  check-load-except-intervals: 100000
+  collect-counters-duration: 10000000
+  consolidate-unlikely:
+    min-lower-lim: 10
+    prob-lim-loop-edge: 0.8
+    prob-lim: 0.9
+    prob-lower-lim: 0.02
+  fast-mode: true
+  inline-validity-threshold: 0.0
+  merge-limit: 0.001
+  minimal-print: false
+  new-counters-interval: 10000000
+  new-counters-validity: 0.0
+  simple-optimization-stop-ratio: 1000
+  topo-lim-factor: 0.01
+  topology-min-counter: 1000
+  topology-min-duration-factor: 1.5
+  allow-exit-paths: false
+
+# Modern (elrond_core)
+optimizer-pi:
+  millable-functions: []
+    # Optimizer will skip mills which are not from those functions, ignore if empty.
+    # format is Muid_Zuid or debug name
+  unmillable-functions: []
+    # Optimizer will skip mills which are from those functions.
+    # format is Muid_Zuid or debug name
+  inline-blacklist-functions: []
+    # - Muid_Zuid
+  import-blacklist-functions: []
+    # - Muid_Zuid
+  blacklist-mills: []
+    # - "<func_name>: <bbg_id>" (note the quotes, they are a MUST)
+    # - "main: 33"
+    # - "step_10: 9"
+  small-mill-limit: 1
+  # Will duplicate simple mills (single BBG that underwent feeder spilling) by
+  # this count, which must be a power of 2.
+  simple-mill-duplication-count: 0
+  use-unoptimized: false
+  # if projection fails on a loop or on an epilogue, downgrade the entire loop
+  # with all of its epilogues and not just the failed BBG
+  downgrade-entire-loop-on-failure: true
+  # if projection fails on a loop and it has a closer parent loop, downgrade
+  # the parent loop as well
+  prevent-closer-parent-loops: true
+  # none - None of the mills created by the optimizer will be drafted
+  # all - All mills created by the optimizer will be draft mills,
+  #       Allows the user to select the wanted mills and apply them through nextcli/UI
+  # unstable - Only unstable mills will be drafted
+  draft-mills: none
+  loop-flattening:
+    enabled: false
+    # total number of MEPs in outer head and epilogue
+    memory-access-threshold: 0
+    # total number of LEs in outer head and epilogue
+    compute-nodes-threshold: 200
+  discovery:
+    # Ignore this much time of the application's initial telemetry
+    noise-skip-ms: 5000
+    # Start sending for imports only after accumulating at least this much
+    # application-telemetry-time.
+    initial-data-ms: 10000
+    # Minimum time, in milliseconds, for which requested telemetry must be
+    # collected after the final import request (i.e. no new import requests being
+    # made since the most recent one's completion) to advance to inline stage
+    import-stable-ms: 10000
+
+    # Any discovery telemetry less than this is completely discarded:
+    #   max(max_importable_func_load / threshold_factor, threshold_minimum)
+    # This is a noise-cancellation mechanism.
+
+    # Both of the following must hold:
+    # 1. Only import function f if load(f) > import-threshold-minimum.
+    # 2. Import highest load function f_hi.
+    #    Import any function f if load(f) > load(f_hi) / import-threshold-factor.
+    import-threshold-minimum: 100000
+    import-threshold-factor: 4096
+
+  plan:
+
+    # Both of the following must hold:
+    # 1. Only keep edges e if load(e) > edge-threshold-minimum.
+    # 2. Keep highest load edge e_hi.
+    #    Keep edge e only if load(e) > load(e_hi) / edge-threshold-factor.
+    # The connected subgraphs that are left are mill candidates.
+    edge-threshold-minimum: 100000
+    edge-threshold-factor: 4096
+
+    # Both of the following must hold:
+    # 1. Only keep mills m if load(m) > mill-threshold-minimum.
+    #    load(m) on a mill is equal to the edge with the highest load in the mill.
+    # 2. Keep highest load mill m_hi.
+    #    Keep mill m only if load(m) > load(m_hi) / mill-threshold-factor.
+    mill-threshold-minimum: 100000
+    mill-threshold-factor: 4096
+
+    # Only keep mills m with mill-iteration-count(m) > mill-iter-threshold.
+    # Example: nested loops, outer loop has iters = 3, inner loop has iters = 4.
+    #          Then the mill iteration count is 3 x 4 = 12.
+    mill-iter-threshold: 1000.0
+
+    # Only applies to functions with flag NS_MARK_HINT_LIKELY in source code.
+    # Values between 0 and 1.
+    # Multiplying thresholds by this factor makes the marked functions more
+    # likely to have mills.
+    # The following thresholds are affected by likely-hint-factor:
+    # mill-iter-threshold; loop-threshold; edge-threshold
+    # where loop-threshold = max(mill-threshold-minimum, max_edge_load / mill-threshold-factor)
+    # (max_edge_load is the maximal edge load of the entire application)
+    likely-hint-factor: 0.5
+
+  refine:
+    unlikely-edge-ratio: 1024
+    bbg-load-ratio: 100
+  # Can be used to disable break commutative (uncomment):
+  # disable-break-commutative: true
+  # Can be used to disable feeder spilling (uncomment):
+  # disable-feeder-spilling: true
+  # Can be used to disable inlining order calls (uncomment):
+  # disable-inline-order-call: true
+  # Disable reoptimize mode. False = reoptimize enabled, True = refine enabled.
+  # Reoptimize mode means that all counters will be cleared on stage2 completion
+  # and reoptimize will happen periodically (by the following config) or manually (cli)
+  disable-reoptimize: false
+  # Time in seconds to trigger reoptimize
+  reoptimize-period: 0
+  # Size of reoptimize phase cache
+  phase-cache-size: 10
+
+  exploration:
+    # This weight will be assigned to parent loop edges by default when calling
+    # mill from parent loop. The weight also can be set in the command itself.
+    mill-from-parent-loop-weight: 1024.0
+
+    # This config controlls merging epilogues backward into predecessors to spare bbgs for projection
+    merge-epilogue-backward:
+      enabled: false
+      # Maximal number of MEPs in epilogue to merge
+      memory-access-threshold: 0
+      # Maximal number of LEs in epilogue to merge
+      compute-nodes-threshold: 200
+-----
+
+== NextSilicon Software Guide
+
+=== Command Line Utilities
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextdaemon/[`nextdaemon`]
+
+The `nextdaemon` command is the daemon managing the NextSilicon hardware and software system.
+This daemon performs the various aspects of seamless software offloading and acceleration on behalf of the user applications.
+It is responsible for various crucial tasks, such as live telemetry collection, optimization, and memory migration, as well as providing data for other tools such as `nextcli` and `webapps-server`. Each application, all executed through `nextloader`, communicates with the daemon from the moment it is started, throughout its entire run time, and finally during its teardown.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextengined/[`nextengined`]
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextloader/[`nextloader`]
+
+The `nextloader` command is the NextSilicon application loader.
+It is used to execute an application binary through the NextSilicon software acceleration stack.
+Given an executable application and its command line options, `nextloader` loads and executes the application, provided that a daemon (`nextdaemon` for hardware or `nextengined` for simulator) is running.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextmonitor/[`nextmonitor`]
+
+The `nextmonitor` command is the metrics aggregation agent.
+It is a performance metrics and eventlog aggregation system. At predefined time intervals, it samples the system metrics and the event log. The sample is written into an SQL database.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextmonitor_to_json/[`nextmonitor_to_json`]
+
+The `nextmonitor_to_json` utility is used to convert the content of the `nextmonitor` SQLite database into JSON
+to be loaded into the Perfetto graphical utility.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/webapps-server/[`webapps-server`]
+
+The `webapps-server` programs runs and allows connection to NextSilicon’s custom-developed visualization tools that help developers and researchers understand how their code behaves on the NextSilicon platform. 
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/next_perf_analyzer/[`next_perf_analyzer`]
+
+The `next_perf_analyzer` utility is a text based performance report utility for single threaded performance. It is recommended to generate a nextmonitor database via a hardware run with only one thread running on the device e.g. setting `OMP_NUM_THREADS=1` through the environment.
+This is a textual report whose goal is to help find basic performance bottlenecks. This tool is for users who are comfortable with NextSilicon hardware and understand basic concepts.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextcli/[`nextcli`]
+
+The `nextcli` utility is the NextSilicon software acceleration stack command-line control interface.
+It is used through subcommands, which you can list with `nextcli -h`. Most commands also accept command-line arguments that guide them in controlling specific accelerators or applications being accelerated. Each subcommand is documented in separate, per-command help, which can be displayed with `nextcli <subcommand> --help` or `nextcli <subcommand> -h`. Each subcommand comprises one or more words.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/mpirun/[`mpirun`]
+
+The `mpirun` command executes serial and parallel jobs in OpenMPI.  It sends the name of the directory where it was invoked on the local node to each of the remote nodes, and attempts to change to that directory. Note that `mpirun`, `mpiexec`, and `orterun` are all synonyms for each other.
+
+=== Compiler Wrappers
+
+Compiler wrappers
+
+NextSilicon provides compiler wrappers along with the NextSilicon LLVM-based toolchain. These wrappers serve two purposes:
+
+* Building libraries and executables against the provided sysroot (linking against musl-libc, using it as the runtime dynamic linker, linking against runtime libraries provided in the sysroot).
+* Enriching specific binaries for runtime optimization through extraction of dataflow graphs, and bridging the application binary interface (ABI) between offloaded and non-offloaded code.
+
+The wrappers do this by injecting extra parameters to the compiler and linker invocations. They act as intermediaries to the toolchain’s front-end drivers, so both linker and compiler invocations should pass through them.
+These wrappers are subdivided into three sets.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/flatcc/[`flatcc`, `flatcxx`, `flatfort`]
+
+Minimal compiler drivers for the NextSilicon Clang-based C, C++, and Fortran compilers. Code compiled through one of these compilers does not contain enriched code sections, but is linked with NextSilicon’s sysroot. These are used in creating enriched libraries from which the runtime manager can extract computation graph representations and perform optimizations and ABI bridging. This process involves using the linker’s link time optimization (LTO) capabilities, but without using the actual LTO pipeline.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/nextcc/[`nextcc`, `nextcxx`, `nextfort`] 
+
+Main compiler drivers for the NextSilicon enriching Clang-based C, C++, and Fortran compilers. Code compiled through one of these compilers contains enriched code sections as well as being linked with NextSilicon’s sysroot. These are used in creating enriched libraries from which the runtime manager can extract computation graph representations and perform optimizations and ABI bridging. This process involves using the linker’s LTO capabilities, but without using the actual LTO optimization pipeline.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/command-line-utilities/mpicc/[`mpicc`, `mpicxx`, `mpifort`]
+
+OpenMPIs compiler wrappers for MPI applications. These are to be used in conjuction with nextcc, nextcxx, and nextfort, respectively.
+
+==== https://userdocs.nextsilicon.com/en/latest/software/wrappers/[Enrichment-Enabling Wrappers]
+
+=== https://userdocs.nextsilicon.com/en/latest/software/APIs/NSAPI/Overview/[NSAPI]
+
+NSAPI is a unified API that can be called from application code to query or control NextSilicon-specific runtime properties. This additional form of runtime-level granular control can help applications programmatically harness the full power of NextSilicon hardware and software capabilities.
+
+==== Categories
+
+NSAPI is divided thematically into the following categories:
+
+* xref:handoff[Handoff]: Dealing with the processes of importing and handing off functions
+* xref:threading[Threading]: Threading in the NextSilicon hardware context
+* xref:function[Function and loop marks]: Using function and loop marks as additional control mechanisms for the optimizer
+* xref:memory[Memory]
+* xref:devices[Devices]
+
+[[handoff]]
+==== https://userdocs.nextsilicon.com/en/latest/software/APIs/NSAPI/Handoff/[Handoff]
+
+These are the NSAPI functions related to the importing and handoff processes. Once a function is handed off, additional information (such as NextSilicon thread capacity) can be queried. In addition, import and handoff of a function can be forced or restricted by “marking” the function accordingly. Use `#include <nsapi/handoff.h>` to use these functions in your application.
+
+[[threading]]
+==== https://userdocs.nextsilicon.com/en/latest/software/APIs/NSAPI/Thread/[Threading]
+
+The NSAP functions related to NextSilicon threading. Threads running on NextSilicon hardware are identified by a unique NextSilicon thread ID and process ID (unrelated to POSIX TID and PID).
+
+NSAPI provides functions to query the currently running NextSilicon thread and process IDs, as well as checking whether the currently running code is running in the NextSilicon device context (hardware or software simulator).
+
+Additional API is provided to allocate NextSilicon TIDs and start them with a given function.
+
+[[function]]
+==== https://userdocs.nextsilicon.com/en/latest/software/APIs/NSAPI/Marks/[Function and Loop Marks]
+
+Function and loop marks act as an additional means to control Optimizer decisions at run time. The mark can act as a manual command or as a hint.
+
+Manual commands override Optimizer decisions about the function or loop (e.g., whether to import it).
+
+Hints don’t change the decision directly, but put factors on various thresholds, making a specific decision more likely than others.
+
+Function marks must come directly above a function signature; loop marks must come directly above a `for`, `do`, or `while` statement.
+
+[[memory]]
+==== https://userdocs.nextsilicon.com/en/latest/software/APIs/NSAPI/Memory/[Memory]
+
+The NSAPI functions concerning NextSilicon hardware memory. The main goal of these functions is to provide a POSIX-like API for memory operations, implemented to run efficiently on NextSilicon hardware.
+
+[[devices]]
+==== https://userdocs.nextsilicon.com/en/latest/software/APIs/NSAPI/Devices/[Devices]
+
+The NSAPI functions concerning the NextSilicon hardware. In an architecture containing multiple NextSilicon devices, those functions provide a way to query them, as well as control a specific device.
+
+== Glossary
+
+[[above_4g_decoding]]
+=== Above 4G Decoding
+
+=====
+The Above 4G Decoding checkbox is definitely required in order for the Resizable Bar to work for Radeon 6000 (RDNA2) and NVIDIA RTX 3000 (Ampere) users. Moreover, both functions can already be enabled on modern motherboards with a fresh BIOS.
+
+What's the difference between these two technologies?
+
+* *Above 4G Decoding* affects the amount of RAM allocated at a time for the processor to work with video memory. And this explains some increase in the consumption of RAM. Previously, you had to huddle in a 4GB block, while with the Above 4G, you can use the whole area.
+* *Resizable BAR* allows the graphics API to pass large blocks of memory to the graphics card. Previously, they communicated in chunks of 256 megabytes, but now you can send a lot at once and from any part of the memory.
+=====
+
+*What Is Above 4G Decoding?* (2021) - https://www.gameunion.tv/en/games/above-4g-decoding-your-bioss-dark-horse-what-it-and-should-it-be-105[`https://www.gameunion.tv/en/games/above-4g-decoding-your-bioss-dark-horse-what-it-and-should-it-be-105`]
+
+[[iommu]]
+=== IOMMU
+
+=====
+In computing, an input–output memory management unit (IOMMU) is a memory management unit (MMU) connecting a direct-memory-access–capable (DMA-capable) I/O bus to the main memory. Like a traditional MMU, which translates CPU-visible virtual addresses to physical addresses, the IOMMU maps device-visible virtual addresses (also called device addresses or I/O addresses in this context) to physical addresses. Some units also provide memory protection from faulty or malicious devices. 
+=====
+
+https://en.wikipedia.org/wiki/Input%E2%80%93output_memory_management_unit[`https://en.wikipedia.org/wiki/Input%E2%80%93output_memory_management_unit`]
+
+=====
+Intel has published a specification for IOMMU technology as Virtualization Technology for Directed I/O, abbreviated VT-d.
+
+"VT-d" stands for "Intel Virtualization Technology for Directed I/O".  The relationship between VT and VT-d is that the former is an "umbrella" term referring to all Intel virtualization technologies and the latter is a particular solution within a suite of solutions under this umbrella.The overall concept behind VT is hardware support for isolating and restricting device accesses to the owner of the partition managing the device.  A VMM may support various models for I/O virtualization, including emulating the device API, assigning physical I/O devices to VMs, or permitting I/O device sharing in various manners.   The key problem is how to isolate device access so that one resource cannot access a device being managed by another resource.  VT-d, at the time of this writing, includes four key capabilities1. I/O device assignment.  This feature allows an administrator to assign I/O devices to VMs in any desired configuration.2. DMA remapping.  Supports address translations for device DMA data transfers.3. Interrupt remapping.  Provides VM routing and isolation of device interrupts.4. Reliability features.  Reports and records system software DMA and interrupt erros that may otherwise corrupt memory of impact VM isolation.Note that VT-d is not dependent on VT-x.  That is, a VT-x enabled system can operate without VT-d, or without VT-d enabled or configured.  You simply miss the benefits of the feature. 
+=====
+
+*Recent Enhancements in Intel Virtualization Technology* (2018) - https://01.org/blogs/ashokraj/2018/recent-enhancements-intel-virtualization-technology-directed-i/o-intel-vt-d[`https://01.org/blogs/ashokraj/2018/recent-enhancements-intel-virtualization-technology-directed-i/o-intel-vt-d`]
+
+*Understanding VT-d* - https://www.facebook.com/notes/intel/understanding-vt-d-intel-virtualization-technology-for-directed-io/97079447067/[`https://www.facebook.com/notes/intel/understanding-vt-d-intel-virtualization-technology-for-directed-io/97079447067/`]
+
+*Intel Virtualization Technology for Directed I/O Architecture Specification* (2022, PDF) - https://www.intel.com/content/www/us/en/content-details/671081/intel-virtualization-technology-for-directed-i-o-architecture-specification.html[`https://www.intel.com/content/www/us/en/content-details/671081/intel-virtualization-technology-for-directed-i-o-architecture-specification.html`]
+
+

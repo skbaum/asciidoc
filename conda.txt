@@ -1,0 +1,289 @@
+Conda
+=====
+Steven K. Baum
+v0.1, 2016-12-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+
+Conda Tricks
+------------
+
+Creating an Environment
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To create a new conda environment, use:
+
+-----
+conda create --name test_env
+-----
+
+and you will receive the following information and request:
+
+-----
+Fetching package metadata .........
+Solving package specifications: 
+Package plan for installation in environment /opt/anaconda3/envs/testenv:
+
+Proceed ([y]/n)? y
+
+#
+# To activate this environment, use:
+# > source activate testenv
+#
+# To deactivate this environment, use:
+# > source deactivate testenv
+#
+-----
+
+Additional Arguments for Environment Creation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can also specify a specific Python version and packages to install in
+a new environment.  To create a new environment called +mojo+ with
+Python 3 and the packages +astroid+ and +babel+, use:
+
+-----
+conda create --name mojo python=3 astroid babel
+-----
+
+Remove an Environment
+~~~~~~~~~~~~~~~~~~~~~
+
+An environment can be removed with:
+
+-----
+conda remove --name testenv --all
+-----
+
+Activate/Deactivate an Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To change to another environment, use:
+
+-----
+source activate testenv
+-----
+
+To deactivate and exit the new environment, use:
+
+-----
+source deactivate
+-----
+
+Listing Available Environments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To obtain a list of available environments, use:
+
+-----
+conda info --envs
+-----
+
+This will also show you which environment you're presently in
+with an asterisk next to the currently active environment.
+
+Export an Environment
+~~~~~~~~~~~~~~~~~~~~~
+
+If you want to enable someone else to create an exact copy of
+your environment, you export the active environment file by
+first activating it:
+
+-----
+source activate testenv
+-----
+
+and then exporting the environment details to a file:
+
+-----
+conda env create -f environment.yml
+-----
+
+This file will contain both the pip and conda packages
+within the environment.
+
+The environment can then be recreated anywhere with:
+
+-----
+conda env create -f environment.yml
+-----
+
+and then activate with:
+
+-----
+source activate testenv
+-----
+
+Note that you need to convey the name of the environment
+in addition to the +environment.yml+ file.
+
+
+Listing Available Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To list all of the packages available in your active environment, use:
+
+-----
+conda list
+-----
+
+Search for a Package
+~~~~~~~~~~~~~~~~~~~~
+
+To see if a specific package is available for conda to install, use:
+
+-----
+conda search cartopy
+-----
+
+Installing a Package
+~~~~~~~~~~~~~~~~~~~~
+
+A package can be installed into the current active environment by:
+
+-----
+conda install cartopy
+-----
+
+and to any available environment via:
+
+-----
+conda install --name testenv cartopy
+-----
+
+Adding/Removing a Channel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to add the +intel+ or +conda-forge+ channel:
+
+-----
+conda config --add channels conda-forge
+-----
+
+If you want to remove the same channel:
+
+-----
+conda config --remove channels conda-forge
+-----
+
+Prioritizing Channels
+~~~~~~~~~~~~~~~~~~~~~
+
+The command:
+
+-----
+conda config --add channels new_channel
+-----
+
+adds a channel to the top of the channel list, thus making
+it the highest priority.  Thus, if you want something from the
++defaults+ channel rather than the +new_channel+, you have to
+remove the +new_channel+ via:
+
+-----
+conda config --remove channels new_channel
+-----
+
+There are a couple of commands that give you finer control over
+this procedure.  To specifically make a +new_channel+ the highest
+priority you use the command:
+
+-----
+conda config --prepend channels new_channel
+-----
+
+To add a +new_channel+ but make it a lower priority than the
+existing channels use the command:
+
+-----
+conda config --append channels new_channel
+-----
+
+
+
+
+
+
+
+
+
+Difficult Packages Available Via Conda
+--------------------------------------
+
+Dolfin
+------
+
+https://anaconda.org/juanlu001/dolfin[+https://anaconda.org/juanlu001/dolfin+]
+
+-----
+https://anaconda.org/juanlu001/dolfin
+-----
+
+Dolfin-Adjoint
+--------------
+
+https://anaconda.org/conda-forge/dolfin-adjoint[+https://anaconda.org/conda-forge/dolfin-adjoint+]
+
+-----
+conda install -c conda-forge dolfin-adjoint=2016.2.0 
+-----
+
+PyFerret
+--------
+
+https://anaconda.org/conda-forge/pyferret[+https://anaconda.org/conda-forge/pyferret+]
+
+-----
+conda install -c conda-forge pyferret=7.0.1.dev 
+-----
+
+PyNGL
+-----
+
+https://anaconda.org/conda-forge/pyngl[+https://anaconda.org/conda-forge/pyngl+]
+
+-----
+conda install -c conda-forge pyngl=1.5.0_beta20161122 
+-----
+
+PyNIO
+-----
+
+https://anaconda.org/dbrown[+https://anaconda.org/dbrown+]
+
+-----
+conda install -c dbrown pynio 
+-----
+
+Tensorflow
+----------
+
+https://anaconda.org/conda-forge/tensorflow[+https://anaconda.org/conda-forge/tensorflow+]
+
+-----
+conda install -c conda-forge tensorflow=1.0.0
+-----
+
+https://anaconda.org/jjhelmus/repo[+https://anaconda.org/jjhelmus/repo+]
+
+-----
+conda install -c jjhelmus tensorflow=0.12.0rc0 
+-----
+
+TRILINOS
+--------
+
+https://anaconda.org/guyer[+https://anaconda.org/guyer+]
+
+-----
+conda install -c guyer trilinos=12.10.1
+-----
+
+
+

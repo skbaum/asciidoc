@@ -1,0 +1,1008 @@
+
+= Software Installation Method Hierarchy
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Introduction
+
+There is a hierarchy of methods for attempting to compile and install a software package.
+This hierarchy ranges from discovering an already installed package to bypassing EasyBuild
+and building a package from scratch from the source code to finding and running a docker file
+with Singularity.  While EasyBuild also basically
+builds a package from scratch, it is typically easier when one is starting out with EasyBuild
+to build and install a package from scratch yourself until you're sufficiently familiar with
+all the magical incantations needed to create an easyconfig file to do it for you.
+
+== Using an Already Installed Package
+
+=== The Short Version
+
+If a software package named `Armadillo` is requested, look for already installed versions via:
+
+-----
+module spider Armadillo
+-----
+
+Find out how to load a specific version - with the default being the most recent one - via:
+
+-----
+module spider Armadillo/10.7.5
+-----
+
+Load the software version and the listed dependencies via:
+
+-----
+module load GCC/10.3.0  OpenMPI/4.1.1 Armadillo/10.7.5
+-----
+
+If this doesn't work look for help in the following section.
+
+=== The Long Version
+
+One should first check to see if a requested software package is already locally installed.
+This can be done via the command:
+
+-----
+module spider packagename
+-----
+
+A specific example is:
+
+-----
+module spider Armadillo/10.7.5
+-----
+
+which obtains:
+
+-----
+----------------------------------------------------------------------------------------------
+  Armadillo:
+----------------------------------------------------------------------------------------------
+    Description:
+      Armadillo is an open-source C++ linear algebra library (matrix maths) aiming towards a good balance between speed and ease of use. Integer, floating point and
+      complex numbers are supported, as well as a subset of trigonometric and statistics functions.
+
+     Versions:
+        Armadillo/9.700.2
+        Armadillo/9.880.1
+        Armadillo/9.900.1
+        Armadillo/10.5.3
+        Armadillo/10.7.5
+
+----------------------------------------------------------------------------------------------
+  For detailed information about a specific "Armadillo" package (including how to load the modules) use the module's full name.
+  Note that names that have a trailing (E) are extensions provided by other modules.
+  For example:
+
+     $ module spider Armadillo/10.7.5
+----------------------------------------------------------------------------------------------
+...
+-----
+
+There can be many available versions of a software package already installed.
+If a specific version is not requested the default choice should be the most recent version.
+
+The available versions can also be found by locating the installation directory and listing the versions contained therein.
+
+-----
+ls -l /sw/eb/sw/Armadillo
+
+dr-xr-sr-x 6 baum     staff 4096 Sep  6  2021 10.5.3-foss-2020b
+dr-xr-sr-x 6 baum     staff 4096 Dec 21  2021 10.7.5-foss-2021a
+dr-xr-sr-x 6 j-perdue staff 4096 Jan  1  2021 9.700.2-foss-2019a
+dr-xr-sr-x 6 j-perdue staff 4096 Dec 31  2020 9.880.1-foss-2020a
+dr-xr-sr-x 6 j-perdue staff 4096 Dec 23  2020 9.900.1-foss-2019b
+dr-xr-sr-x 6 j-perdue staff 4096 Dec 27  2020 9.900.1-foss-2020a
+-----
+
+A final check can be made by checking the easyconfig files available in the appropriate
+cleaned directory.  
+The last two elements of the path shown below indicate the cluster on
+which the installation is being performed - in this case `grace` - and
+the name of the software being installation - in this case `Armadillo`.
+There is a possibility that a version found in the installation
+directory didn't complete the installation process, in which case it will not
+be listed in the cleaned directory.
+
+-----
+ls -l /sw/eb/ebfiles_repo_cleaned/grace/Armadillo/
+
+-rw-rw-r-- 1 francis staff 728 Sep  6  2021 Armadillo-10.5.3-foss-2020b.eb
+-rw-rw-r-- 1 francis staff 721 Dec 21  2021 Armadillo-10.7.5-foss-2021a.eb
+-rw-rw-r-- 1 francis staff 895 Jan  1  2021 Armadillo-9.700.2-foss-2019a.eb
+-rw-rw-r-- 1 francis staff 895 Dec 31  2020 Armadillo-9.880.1-foss-2020a.eb
+-rw-rw-r-- 1 francis staff 894 Dec 30  2020 Armadillo-9.900.1-foss-2019b.eb
+-rw-rw-r-- 1 francis staff 894 Dec 30  2020 Armadillo-9.900.1-foss-2020a.eb
+-----
+
+After the appropriate software package and/or version has been found you can
+find what other packages might also be required via:
+
+-----
+module spider Armadillo/10.7.5
+
+...
+    You will need to load all module(s) on any one of the lines below before the "Armadillo/10.7.5" module is available to load.
+
+      GCC/10.3.0  OpenMPI/4.1.1
+...
+-----
+
+at which point you can load your package and its dependencies via:
+
+-----
+module load GCC/10.3.0  OpenMPI/4.1.1 Armadillo/10.7.5
+-----
+
+and check to see what has been loaded via:
+
+-----
+module list
+
+Currently Loaded Modules:
+  1) GCCcore/10.3.0     10) OpenSSL/1.1       19) ScaLAPACK/2.1.0-fb
+  2) zlib/1.2.11        11) libevent/2.1.12   20) bzip2/1.0.8
+  3) binutils/2.36.1    12) UCX/1.10.0        21) ICU/69.1
+  4) GCC/10.3.0         13) libfabric/1.12.1  22) Boost/1.76.0
+  5) numactl/2.0.14     14) PMIx/3.2.3        23) Eigen/3.3.9
+  6) XZ/5.2.5           15) OpenMPI/4.1.1     24) arpack-ng/3.8.0
+  7) libxml2/2.9.10     16) OpenBLAS/0.3.15   25) Armadillo/10.7.5
+  8) libpciaccess/0.16  17) FlexiBLAS/3.0.4
+  9) hwloc/2.4.1        18) FFTW/3.3.9
+-----
+
+A considerable number of packages can be loaded based on the dependencies.
+
+If the package is not already installed we must move on to the next section wherein
+we will attempt to install a package via its easyconfig file.
+
+== Installing from an Available Easyconfig File
+
+=== Finding an Easyconfig File
+
+A step up in complexity is installing a package from an available easyconfig file.
+It involves searching the available easyconfig files that are archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs[`https://github.com/easybuilders/easybuild-easyconfigs/tree/develop/easybuild/easyconfigs`]
+
+to see if one is available for the desired software package.
+The packages are kept in separate alphanumerical subdirectories on Github.
+Click on the appropriate letter/number and scroll down or search the subdirectory for your software
+package name.  Note that packages whose names start with capital letters are listed before the
+lower-case names.
+
+If you can't find the package name by scrolling try searching for it since you can
+never be sure what combination of upper- and lower-case letters are being used.
+If you're uncertain about the name try using the Github search box on the upper left
+to simultaneously search through all the subdirectories.
+If you still can't find it then it's probably not there and you'll have to proceed to
+further sections.
+
+=== Compiling/Installing an Easyconfig File
+
+== Modifying an Existing Easyconfig File
+
+== Creating a New Easyconfig File for a Generic Easyblock
+
+Making small modifications to an existing easyconfig file works quite well when you are attempting
+to install a new version of a software package that isn't yet available in the EB archives, or if
+you want to update the compiler chain for an older version.
+If there is not an existing easyconfig file for any version of a software package you wish to
+install, you need to take the next step of using an existing easyconfig file that includes the
+easyblock file you will need for your particular instance.
+
+In the first example below, we're attempting to install a Python module for which there is no
+official EB easyconfig file available.  Our strategy is to find an existing easyconfig file that uses
+the easyblock file we require - in this example the `PythonBundle` easyblock file - and extensively modify it
+to meet our needs.
+
+This example more-or-less follows exactly what was done to transmogrify the template easyconfig file
+to the final production easyconfig file.  As such it shows some trial-and-error as various strategies
+are introduced and tried.  The important thing is to get familiar with these strategies so they can
+be readily applied to your own situation.
+
+=== Installing Binaries via the BinariesTarball and Binary Easyblocks
+
+The `BinariesTarball` easyconfig files can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=binariestarball[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=binariestarball`]
+
+The `Binary` easyconfig files can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=%22easyblock+%3D+%27Binary%27%22[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=%22easyblock+%3D+%27Binary%27%22`]
+
+=== Installing Packages Via the CmdCp Easyblock
+
+The `CmdCp` easyblock is for installing software that does not use the traditional
+`configure; make; make install` procedure for installation.
+
+The Github easyconfigs that use `CmdCp` can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=cmdcp[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=cmdcp`]
+
+=== Installing Source Packages Via the ConfigureMake Easyblock
+
+The `ConfigureMake` easyblock is for configuring a build with the traditional (mostly) GNU-based
+`configure` script, and then building it via GNU `make`.
+
+The Github easyconfigs that use `ConfigureMake` can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=configuremake[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=configuremake`]
+
+=== Installing Source Packages Via the CMakeMake
+
+The `CMakeMake` easyblock is for configuring a build with *CMake* instead of with the traditional
+GNU-based `configure` script.  *CMake is:
+
+=====
+a cross-platform free and open-source software for build automation, testing, packaging and
+installation of software by using a compiler-independent method. CMake is not a build
+system itself; it generates another system's build files. It supports directory hierarchies
+and applications that depend on multiple libraries. It is used in conjunction with native
+build environments such as Make, Qt Creator, Ninja, Android Studio, Apple's Xcode, and Microsoft
+Visual Studio. It has minimal dependencies, requiring only a C++ compiler on its own build system. 
+=====
+
+This easyblock uses GNU make to compile a package after it has been configured via *CMake*.
+
+The Github easyconfigs that use `CMakeMake` can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=cmakemake[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=cmakemake`]
+
+=== Installing Software Via the MesonNinja Easyblock
+
+The `MesonNinja` easyblock provides support for building and installing software
+with `meson` and `ninja`.
+
+The Github easyconfigs that use `MesonNinja` can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=mesonninja[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=mesonninja`]
+
+=== Installing Python Modules Via the `PythonPackage` Easyblock
+
+This easyblock builds and installs a Python package, and provides a dedicated module file.
+
+==== Finding Dependencies for the easyconfig File
+
+A general strategy is to build the module via 'pip' to discover what other modules are installed
+as prerequisites, and then transfer this information to the easyconfig file.
+The steps for doing this are detailed in the following subsections.
+
+===== Loading the Python Module
+
+We must first load a Python module to make available a version of pip that is not the system-wide version.
+It is a good idea to load a `*-bare` version of a Python module since the non-`bare` versions typically load
+dozens of additional modules that might conflict with those you will be attempting to load in your discovery
+process.  A good choice would be:
+
+-----
+module load GCCcore/11.2.0 Python/3.9.6-bare
+-----
+
+===== Clearing the Cache and the Site Module Directory
+
+The contents of both the pip cache and the locally installed Python module directory should be deleted
+before running pip so all the prerequisites are freshly downloaded and processed.  You can find the location of
+the pip cache via:
+
+-----
+pip cache dir
+-----
+
+and remove the existing files from that directory, or just remove the contents via:
+
+-----
+pip cache remove "*"
+-----
+
+You can find the location of your user site module directory via:
+
+-----
+python -m site --user_site
+/home/baum/.local/lib/python3.9/site-packages
+-----
+
+and proceed to remove the modules from therein via, e.g.
+
+-----
+rm -r -f /home/baum/.local/lib/python3.9/*
+-----
+
+The user base directory - which contains the site directory - is found via:
+
+-----
+python -m site --user_base
+/home/baum/.local
+-----
+
+The default location of the Python user base directory on Linux is `~/.local`, although it can be set otherwise with
+the `PYTHONUSERBASE` environment variable.
+
+===== Installing a Module with pip
+
+Now install a Python module with pip.  Let's use `statsmodels` as an example.
+
+-----
+pip install statsmodels --no-binary statsmodels
+-----
+
+We use the `--no-binary` argument because we want to download a source code version
+of the package and compile it into a wheel for local installation.  If a binary wheel is
+downloaded and directly installed we will not obtain all the dependency information
+that we require.
+
+===== Obtaining a Dependency Tree
+
+After the install has finished, install `pipdeptree` to obtain a most useful diagnostic tool.
+
+-----
+pip install pipdeptree
+-----
+
+Now use `pipdeptree` to obtain a dependency tree for `statsmodels`.
+
+-----
+pipdeptree --package statsmodels
+statsmodels==0.13.5
+  - numpy [required: >=1.17, installed: 1.23.5]
+  - packaging [required: >=21.3, installed: 21.3]
+    - pyparsing [required: >=2.0.2,!=3.0.5, installed: 3.0.9]
+  - pandas [required: >=0.25, installed: 1.5.2]
+    - numpy [required: >=1.20.3, installed: 1.23.5]
+    - python-dateutil [required: >=2.8.1, installed: 2.8.2]
+      - six [required: >=1.5, installed: 1.16.0]
+    - pytz [required: >=2020.1, installed: 2022.6]
+  - patsy [required: >=0.5.2, installed: 0.5.3]
+    - numpy [required: >=1.4, installed: 1.23.5]
+    - six [required: Any, installed: 1.16.0]
+  - scipy [required: >=1.3, installed: 1.9.3]
+    - numpy [required: >=1.18.5,<1.26.0, installed: 1.23.5]
+-----
+
+===== Python Prerequisites in the easyconfig File
+
+If the Python module we wish to install via an easyconfig file is dependent on other Python modules,
+we must include these in the easyconfig file either via `dependencies` or `exts_list`.
+In the case of our `statsmodels` example, we find that the `dependencies` section for, e.g.
+`statsmodels-0.13.1-foss-2021b.eb` is:
+
+-----
+dependencies = [
+    ('Python', '3.9.6'),
+    ('SciPy-bundle', '2021.10'),
+]
+-----
+
+Both the `Python/3.9.6` and `SciPy-bundle/2021.10` EB modules contain other Python
+modules that are installed with them.  You can obtain a list of the modules they contain via
+the commands:
+
+-----
+module spider Python/3.9.6
+module spider SciPy-bundle/2021.10
+-----
+
+which produce listings that each contain an *Included extensions* section.
+
+The general procedure at this point is to compare the entries in the dependency tree
+produced with `pipdeptree` to the entries in the *Included extensions* section.  Any
+entry in the former that is not found in the latter must be added to the easyconfig
+file via the `exts_list` section.  In this case we discover that only the `patsy` Python
+module is included in neither the `Python` or `SciPy-bundle` EB modules.  This results in
+the following `exts_list` section.
+
+-----
+exts_list = [
+    ('patsy', '0.5.2', {
+        'checksums': ['5053de7804676aba62783dbb0f23a2b3d74e35e5bfa238b88b7cbf148a38b69d'],
+    }),
+    (name, version, {
+        'checksums': ['006ec8d896d238873af8178d5475203844f2c391194ed8d42ddac37f5ff77a69'],
+    }),
+]
+-----
+
+===== Version Numbers
+
+The dependency tree created by `pipdeptree` will also provide guidance as to which
+versions of each Python module are required.  A `pip install` command where the
+module name is supplied without a version number will automatically download and install
+the most recent version of that model and its dependencies.  As such, simply transfer the
+appropriate numbers from dependency tree to the easyconfig file to also install the most
+recent version, unless there is some pressing reason to decrement to a previous version.
+Be wary that versions of the Python modules included in the `Python` and `SciPy-bundle` EB modules
+may not be as recent as those installed via `pip install`, so some fiddling around with
+version numbers may be needed to satisfy all the version requirements. 
+
+==== Example of Installing a Binary Module File Without an `exts_list`
+
+The example below shows how the `einops` package is installed via its binary wheel file
+available from PyPi.  The binary file is specified via the EB template constant `SOURCE_PY3_WHL` which
+stands for the template name `%(name)s-%(version)s-py3-none-any.whl`.  A list of such templates is found at:
+
+https://docs.easybuild.io/en/latest/version-specific/easyconfig_templates.html[`https://docs.easybuild.io/en/latest/version-specific/easyconfig_templates.html`]
+
+The actual binary `einops` file is found at https://pypi.org/project/einops/#files[`https://pypi.org/project/einops/#files`]
+and is `einops-0.6.0-py3-none-any.whl`.
+
+-----
+easyblock = 'PythonPackage'
+  
+name = 'einops'
+version = '0.6.0'
+
+homepage = 'https://einops.rocks/'
+description = """
+Flexible and powerful tensor operations for readable and reliable code.
+Supports numpy, pytorch, tensorflow, jax, and others."""
+
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+
+sources = [SOURCE_PY3_WHL]
+checksums = ['c7b187a5dc725f079860ec2d330c1820448948622d826273345a8dd8d5f695bd']
+
+builddependencies = [
+    ('binutils', '2.37'),
+]
+
+dependencies = [
+    ('Python', '3.9.6'),
+]
+
+download_dep_fail = True
+use_pip = True
+
+sanity_pip_check = True
+
+moduleclass = 'math'
+-----
+
+=== Installing Python Modules Via the PythonBundle Easyblock
+
+The `PythonBundle` easyblock is one of a set of generic easyblocks, as opposed to
+easyblocks that are for specific software packages.  This easyblock is for the generic situation of
+where you want to install a Python module that may or may not have other Python modules as
+prerequisites.
+
+The Github easyconfigs that use `PythonBundle` are documented at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=pythonbundle[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=pythonbundle`]
+
+The internals of the `PythonBundle` are documented at:
+
+https://docs.easybuild.io/en/latest/version-specific/generic_easyblocks.html#pythonbundle[`https://docs.easybuild.io/en/latest/version-specific/generic_easyblocks.html#pythonbundle`]
+
+which is a section of the full generic easyblock documentation page at:
+
+https://docs.easybuild.io/en/latest/version-specific/generic_easyblocks.html[`https://docs.easybuild.io/en/latest/version-specific/generic_easyblocks.html`]
+
+This documents the extra easyconfig parameters that might be needed when using
+the `PythonBundle` easyblock.
+
+==== Finding a Template
+
+The PythonBundle easyblock is a starting point for installing Python modules that are not yet
+available as easyconfig files.  The easyconfig file for `statsmodels` will serve as a template.
+
+-----
+easyblock = 'PythonBundle'
+
+name = 'statsmodels'
+version = '0.12.1'
+
+homepage = 'https://www.statsmodels.org/'
+description = """Statsmodels is a Python module that allows users to explore data, estimate statistical models,
+and perform statistical tests."""
+
+toolchain = {'name': 'foss', 'version': '2020b'}
+
+dependencies = [
+    ('Python', '3.8.6'),
+    ('SciPy-bundle', '2020.11'),
+]
+
+use_pip = True
+sanity_pip_check = True
+
+exts_list = [
+    ('patsy', '0.5.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    (name, version, {
+        'checksums': ['a271b4ccec190148dccda25f0cbdcbf871f408fc1394a10a7dc1af4a62b91c8e'],
+    }),
+]
+
+moduleclass = 'math'
+-----
+
+==== Modifying the Template
+
+A real-world example involves the installation of a Python module called *Colossus* that is a
+toolkit for calculations pertaining to cosmology, the large-scale structure of the universe, and the properties of dark matter halos.
+The installation page for *Colossus* at:
+
+https://bdiemer.bitbucket.io/colossus/installation.html[`https://bdiemer.bitbucket.io/colossus/installation.html`]
+
+tells us that it requires *Numpy*, *SciPy* and *Six*, and that the *Astropy* and *Camb* packages are optional.
+
+The various parts of the *statsmodels* easyconfig file will now be modified to obtain an easyconfig
+file for *Colossus*.
+
+===== Modifying the Descriptive Section
+
+First, we change the `name` and `version` values appropriately.  Version numbers are not given to this package so
+the date of the most recent update is used.
+We also change `homepage` and `description` to match the package.
+
+-----
+name = 'Colossus'
+version = '1.3.1'
+
+homepage = 'https://bdiemer.bitbucket.io/colossus/index.html'
+description = """Colossus is a python toolkit for calculations pertaining to cosmology,
+the large-scale structure of the universe, and the properties of dark matter halos."""
+-----
+
+===== Modifying the `toolchain` Section
+
+Next, we update the `toolchain` if a more recent one is available.  In this case we've updated from `foss/2020b` to
+`foss/2021b`.  We may not always choose the most recent version of the toolchain, though, since the various
+required modules may only be readily available as already-installed EB packages in an earlier version of the
+toolchain.
+
+-----
+toolchain = {'name': 'foss', 'version': '2021b'}
+-----
+
+===== Modifying and Expanding the `dependencies` Section
+
+We will keep `Python` and `SciPy-bundle` in the `dependencies` section, although we will upgrade the version of `Python`
+from `3.8.6` to `3.9.6`, the version that corresponds to the upgraded `toolchain` version `foss/2021b`.  We can find the compiler used in
+`foss/2021b` by loading and then listing the loaded modules via:
+
+-----
+module purge
+module load foss/2021b
+module list
+Currently Loaded Modules:
+  1) EasyBuild/4.6.0     12) OpenSSL/1.1
+  2) EasyBuild-faster/0  13) libevent/2.1.12
+  3) GCCcore/11.2.0      14) UCX/1.11.2
+  4) zlib/1.2.11         15) libfabric/1.13.2
+  5) binutils/2.37       16) PMIx/4.1.0
+  6) GCC/11.2.0          17) OpenMPI/4.1.1
+  7) numactl/2.0.14      18) OpenBLAS/0.3.18
+  8) XZ/5.2.5            19) FlexiBLAS/3.0.4
+  9) libxml2/2.9.10      20) FFTW/3.3.10
+ 10) libpciaccess/0.16   21) ScaLAPACK/2.1.0-fb
+ 11) hwloc/2.5.0         22) foss/2021b
+-----
+
+which shows us that `foss/2021b` corresponds to `GCC/11.2.0`.  To find the Python
+version that is compatible with these we use:
+
+-----
+module spider Python
+...
+	Python/3.8.6
+        Python/3.9.5-bare
+        Python/3.9.5
+        Python/3.9.6-bare
+        Python/3.9.6
+        Python/3.10.4-bare
+        Python/3.10.4
+...
+-----
+
+after which we search for the version with the right toolchain via trial and error to
+arrive at:
+
+-----
+module spider Python/3.9.6
+...
+    You will need to load all module(s) on any one of the lines below
+    before the "Python/3.9.6" module is available to load.
+
+      GCCcore/11.2.0
+...
+-----
+
+An alternate and perhaps quicker way of finding this information is to obtain a list
+of the local directory that contains all the Python versions.  At TAMU HPRC this is done via:
+
+-----
+...
+dr-xr-sr-x 8 j-perdue  staff 4096 Dec 25  2020 3.8.2-GCCcore-9.3.0
+dr-xr-sr-x 8 j-perdue  staff 4096 Dec 31  2020 3.8.6-GCCcore-10.2.0
+drwxrwsr-x 2 baum      staff 4096 Aug 26  2021 3.8.6-intel-2020b
+dr-xr-sr-x 8 baum      staff 4096 Jul 20  2021 3.9.5-GCCcore-10.3.0
+dr-xr-sr-x 7 baum      staff 4096 Jul 19  2021 3.9.5-GCCcore-10.3.0-bare
+dr-xr-sr-x 8 baum      staff 4096 Sep  9  2021 3.9.6-GCCcore-11.2.0
+dr-xr-sr-x 7 baum      staff 4096 Sep  8  2021 3.9.6-GCCcore-11.2.0-bare
+-----
+
+which gives us what we need to know with just a single commmand.
+
+We upgrade
+`SciPy-bundle` from `2020.11` to `2021.10` in a similar way.
+
+Now we are left with the required *Six* module and the optional
+*Astropy* and *Camb* modules.
+The EB `Python` easyconfig file includes dozens of modules in additional to basic Python, so it
+is worth a small bit of effort to see if any of the remaining dependencies are in there.  We can
+obtain a list of the additional modules via:
+
+-----
+module whatis Python/3.9.6
+...
+Python/3.9.6        : Extensions: alabaster-0.7.12, appdirs-1.4.4, asn1crypto-1.4.0, atomicwrites-1.4.0, attrs-21.2.0, Babel-2.9.1, backports.entry_points_selectable-1.1.0, backports.functools_lru_cache-1.6.4, bcrypt-3.2.0, bitstring-3.1.9, blist-1.3.6, CacheControl-0.12.6, cachy-0.3.0, certifi-2021.5.30, cffi-1.14.6, chardet-4.0.0, charset-normalizer-2.0.4, cleo-0.8.1, click-8.0.1, clikit-0.6.2, colorama-0.4.4, crashtest-0.3.1, cryptography-3.4.7, Cython-0.29.24, decorator-5.0.9, distlib-0.3.2, docopt-0.6.2, docutils-0.17.1, ecdsa-0.17.0, filelock-3.0.12, flit-3.3.0, flit-core-3.3.0, fsspec-2021.7.0, future-0.18.2, glob2-0.7, html5lib-1.1, idna-3.2, imagesize-1.2.0, importlib_metadata-4.6.3, importlib_resources-5.2.2, iniconfig-1.1.1, intervaltree-3.1.0, intreehooks-1.0, ipaddress-1.0.23, jeepney-0.7.1, Jinja2-3.0.1, joblib-1.0.1, jsonschema-3.2.0, keyring-21.2.0, keyrings.alt-4.1.0, liac-arff-2.5.0, lockfile-0.12.2, MarkupSafe-2.0.1, mock-4.0.3, more-itertools-8.8.0, msgpack-1.0.2, netaddr-0.8.0, netifaces-0.11.0, nose-1.3.7, packaging-20.9, paramiko-2.7.2, pastel-0.2.1, pathlib2-2.3.6, paycheck-1.0.2, pbr-5.6.0, pexpect-4.8.0, pip-21.2.2, pkginfo-1.7.1, platformdirs-2.2.0, pluggy-0.13.1, poetry-1.1.7, poetry-core-1.0.3, psutil-5.8.0, ptyprocess-0.7.0, py-1.10.0, py_expression_eval-0.3.13, pyasn1-0.4.8, pycparser-2.20, pycrypto-2.6.1, Pygments-2.9.0, pylev-1.4.0, PyNaCl-1.4.0, pyparsing-2.4.7, pyrsistent-0.18.0, pytest-6.2.4, python-dateutil-2.8.2, pytoml-0.1.21, pytz-2021.1, regex-2021.8.3, requests-2.26.0, requests-toolbelt-0.9.1, scandir-1.10.0, SecretStorage-3.3.1, semantic_version-2.8.5, setuptools-57.4.0, setuptools-rust-0.12.1, setuptools_scm-6.0.1, shellingham-1.4.0, simplegeneric-0.8.1, simplejson-3.17.3, six-1.16.0, snowballstemmer-2.1.0, sortedcontainers-2.4.0, Sphinx-4.1.2, sphinx-bootstrap-theme-0.7.1, sphinxcontrib-applehelp-1.0.2, sphinxcontrib-devhelp-1.0.2, sphinxcontrib-htmlhelp-2.0.0, sphinxcontrib-jsmath-1.0.1, sphinxcontrib-qthelp-1.0.3, sphinxcontrib-serializinghtml-1.1.5, sphinxcontrib-websupport-1.2.4, tabulate-0.8.9, threadpoolctl-2.2.0, toml-0.10.2, tomlkit-0.7.2, typing_extensions-3.10.0.0, ujson-4.0.2, urllib3-1.26.6, virtualenv-20.7.0, wcwidth-0.2.5, webencodings-0.5.1, wheel-0.36.2, xlrd-2.0.1, zipfile36-0.1.3, zipp-3.5.0
+-----
+
+and one of them is `six` which takes care of our last required dependency.
+
+===== Another EB Module Install vs. an Extension
+
+We now search for available versions of the optional module *Astropy* via:
+
+-----
+ls -l /sw/eb/sw/astropy
+...
+dr-xr-sr-x 5 j-perdue  staff 4096 Dec 27  2020 4.0.1-foss-2020a-Python-3.8.2
+dr-xr-sr-x 5 j-perdue  staff 4096 Dec 27  2020 4.0.1-intel-2020a-Python-3.8.2
+dr-xr-sr-x 5 cmdickens staff 4096 Mar 21  2022 4.2.1-foss-2020b
+dr-xr-sr-x 5 cmdickens staff 4096 Jun 23 09:42 4.3.1-foss-2020b
+dr-xr-sr-x 5 cmdickens staff 4096 May 20 11:54 5.0.4-foss-2020b
+-----
+
+and find that there aren't any local versions compiled with the `foss/2021b` toolchain.
+We can search the list of all available EasyBuild supported software to see if a `foss/2021b`
+is available at:
+
+https://docs.easybuild.io/en/latest/version-specific/Supported_software.html[`https://docs.easybuild.io/en/latest/version-specific/Supported_software.html`]
+
+and the `astropy` section shows us the following:
+
+-----
+version         versionsuffix     toolchain
+
+2.0.12          -Python-2.7.15    foss/2018b, intel/2018b
+2.0.14 	                          foss/2019a
+4.0.1           -Python-3.7.4     foss/2019b
+4.0.1           -Python-3.8.2     foss/2020a, intel/2020a
+4.2.1                             intelcuda/2020b
+4.3.1                             foss/2021a, foss/2021b, intel/2021a
+5.0.4                             foss/2021a
+-----
+
+which tells us that an easyconfig file is available for `astropy/4.3.1` that employs the `foss/2021b` toolchain.
+We can either go ahead and install this versions of *Astropy* via the usual EB method and then add that
+EB module to the `dependencies` section, or we can attempt to add it as an extension as
+is described in the following section.
+
+===== Modifying the `exts_list` Section
+
+It is possible to incorporate extensions to the software - in this case Python - within the EB build.
+This is done via an `exts_list` array.
+Each entry in `exts_list` is a three-component tuple containing the name, version number, and a dictionary
+of configuration options for the entry, e.g.
+
+-----
+exts_list = [
+    ('name', 'version', { 'option':'value', 'option':'value' })
+]
+-----
+
+The `exts_list` from the `statsmodel` easyconfig file we're using as a template is:
+
+-----
+exts_list = [
+    ('patsy', '0.5.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    (name, version, {
+        'checksums': ['a271b4ccec190148dccda25f0cbdcbf871f408fc1394a10a7dc1af4a62b91c8e'],
+    }),
+]
+-----
+
+A first, naive cut at a modified `exts_list` for our *Colossus* module example is:
+
+-----
+exts_list = [
+    ('astropy', '4.3.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    ('camb', '1.3.6', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    (name, version, {
+        'checksums': ['a271b4ccec190148dccda25f0cbdcbf871f408fc1394a10a7dc1af4a62b91c8e'],
+    }),
+]
+-----
+
+===== The Dependency Hierarchy
+
+But dependencies can have dependencies - and it's really dependencies rather than turtles
+all the way down - so we need to check the `astropy-4.3.1-foss-2021b.eb` file at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/astropy/astropy-4.3.1-foss-2021b.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/astropy/astropy-4.3.1-foss-2021b.eb`]
+
+to find the following `exts_list` section:
+
+-----
+exts_list = [
+    ('pyerfa', '2.0.0.1', {
+        'modulename': 'erfa',
+        'checksums': ['2fd4637ffe2c1e6ede7482c13f583ba7c73119d78bef90175448ce506a0ede30'],
+    }),
+    ('extension-helpers', '0.1', {
+        'checksums': ['ac8a6fe91c6d98986a51a9f08ca0c7945f8fd70d95b662ced4040ae5eb973882'],
+    }),
+    (name, version, {
+        'checksums': ['2d3951223b4eb7f368fcad8c8340d27374c5d8e3b635a636275acdb38f35cd51'],
+    }),
+]
+-----
+
+These will have to be added to the `exts_list`, and the order matters.  These should be prepended in this order to
+our first cut list to ensure the proper order of prerequisites.
+
+Finally, we have *camb* to deal with.  There is no EB easyconfig file for this so we have to figure out
+the prerequisites without the use of that file.  If we go to the Github location of *camb* we can probably find a
+`requirements.txt` file that will list the prerequisites.  And the file at:
+
+https://github.com/cmbant/CAMB/blob/master/requirements.txt[`https://github.com/cmbant/CAMB/blob/master/requirements.txt`]
+
+contains:
+
+-----
+sympy>=1.0
+scipy>=1.0
+-----
+
+*SciPy* is already included via the `SciPy-bundle`, but *SymPy* isn't, so we need to poke around another Github
+site to see if we can find whatever dependencies the latter might have.
+There is no `requirements.txt` file the *SymPy* Github site at:
+
+https://github.com/sympy/sympy[`https://github.com/sympy/sympy`]
+
+but the *Installation* section on the main pages tells us that *SymPy* has a hard dependency on
+*mpmath*.  And the documentation at the *mpmath* site at:
+
+https://mpmath.org/[`https://mpmath.org/`]
+
+reveals that it has no dependencies.
+
+We therefore need to add *mpmath*, *sympy* and *camb* to our `exts_list` in that order.
+
+Our provisional final `exts_list` is then:
+
+-----
+exts_list = [
+    ('mpmath', '1.2.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    ('sympy', '1.11.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    ('camb', '1.3.6', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    ('pyerfa', '2.0.0.1', {
+        'modulename': 'erfa',
+        'checksums': ['2fd4637ffe2c1e6ede7482c13f583ba7c73119d78bef90175448ce506a0ede30'],
+    }),
+    ('extension-helpers', '0.1', {
+        'checksums': ['ac8a6fe91c6d98986a51a9f08ca0c7945f8fd70d95b662ced4040ae5eb973882'],
+    }),
+    ('astropy', '4.3.1', {
+        'checksums': ['f115cec4201e1465cd58b9866b0b0e7b941caafec129869057405bfe5b5e3991'],
+    }),
+    (name, version, {
+        'checksums': ['a271b4ccec190148dccda25f0cbdcbf871f408fc1394a10a7dc1af4a62b91c8e'],
+    }),
+]
+-----
+
+Note that the final item in the list is always the package itself, included via the
+`name` and `version` variables included at the top of the easyconfig file.
+
+===== Differences Between the Pip Installation of Binary and Source Distributions
+
+At this point we'd preprocess the finished easyconfig file seen in the next section via
+the command:
+
+-----
+eb --force Colossus-1.3.1-foss-2021b.eb --inject-checksums
+-----
+
+which would both check the dependencies and replace the placeholder checksums
+with the actual ones for each of the Python modules.
+We've
+been cutting and pasting to get the `name` and `version` parts of the Python
+modules we've added to the `exts_list`, and just dragging along the checksums
+as part of that process.  We could have removed the checksums while cutting and
+pasting, but it's just easier to drag them along and then simply overwrite them
+via the `--force` part of the `eb` command.
+
+If we run this command on the ostensibly finished easyconfig file 
+containing the `exts_list` section above, we will
+obtain an error message along the lines of:
+
+-----
+...
+== fetching sources & patches for Colossus-1.3.1-foss-2021b.eb...
+ERROR: Couldn't find file Colossus-1.3.1.tar.gz anywhere, and downloading it didn't work either
+...
+-----
+
+The `pip` installation process - and the `Colossus*.eb` easyconfig and `PythonBundle` easyblock files are
+basically just a convenience wrapper that runs `pip` - can install either source code
+or binary distributions.  All the modules in the `exts_list` up to the final one for
+*Colossus* download source distributions of the Python modules and compile them locally.
+The *Colossus* module is only available via PyPi as a binary or `wheel` file, which can 
+be ascertained by clicking on the *Download files* link on the PyPi home page of the module.
+In this case the home page is:
+
+https://pypi.org/project/colossus/[`https://pypi.org/project/colossus/`]
+
+and the download page is:
+
+https://pypi.org/project/colossus/#files[`https://pypi.org/project/colossus/#files`]
+
+which shows - as of 2022-10-1 - a single built distribution named:
+
+-----
+colossus-1.3.1-py2.py3-none-any.whl
+-----
+
+This calls for a slightly different format to the *Colossus* entry in `exts_list`, changing it from:
+
+-----
+(name, version, {
+        'checksums': ['5169a0d5b25999cf351feeddfe5b305007e5bb4c6d9c2151a4a8fe2ec849e0c4'],
+    }),
+-----
+
+wherein the `name` and `version` are matched to source distributions of the module at PyPi of
+the form `name-version.tar.gz`, to:
+
+-----
+(name, version, {
+        'source_tmpl': '%(name)s-%(version)s-py2.py3-none-any.whl',
+        'unpack_sources': False,
+        'checksums': ['5169a0d5b25999cf351feeddfe5b305007e5bb4c6d9c2151a4a8fe2ec849e0c4'],
+    }),
+-----
+
+where the `source_tmpl` parameter provides a template string for the file
+to be downloaded, in this case `%(name)s-%(version)s-py2.py3-none-any.whl`,
+which is indeed what we see there as `colossus-1.3.1--py2.py3-none-any.whl`.
+The `unpack_sources` parameter tells EB whether or not to unpack sources prior to building/installing.
+This defaults to `True` except for `*.whl` files, so it's probably not strictly
+required here.
+
+===== The Finished Easyconfig File
+
+Putting all the pieces together we get our finished easyconfig file as:
+
+-----
+easyblock = 'PythonBundle'
+
+name = 'Colossus'
+version = '1.3.1'
+
+homepage = 'https://bdiemer.bitbucket.io/colossus/index.html'
+description = """Colossus is a python toolkit for calculations pertaining to cosmology, the large-scale structure
+of the universe, and the properties of dark matter halos."""
+
+toolchain = {'name': 'foss', 'version': '2021b'}
+
+dependencies = [
+    ('Python', '3.9.6'),
+    ('SciPy-bundle', '2021.10'),
+]
+
+use_pip = True
+sanity_pip_check = True
+
+exts_list = [
+    ('mpmath', '1.2.1', {
+        'checksums': ['79ffb45cf9f4b101a807595bcb3e72e0396202e0b1d25d689134b48c4216a81a'],
+    }),
+    ('sympy', '1.11.1', {
+        'checksums': ['e32380dce63cb7c0108ed525570092fd45168bdae2faa17e528221ef72e88658'],
+    }),
+    ('camb', '1.3.6', {
+        'checksums': ['5f485304031178bf12dcbd734df7dadff13be4972595fbad42d95f3af3a0cfea'],
+    }),
+    ('pyerfa', '2.0.0.1', {
+        'modulename': 'erfa',
+        'checksums': ['2fd4637ffe2c1e6ede7482c13f583ba7c73119d78bef90175448ce506a0ede30'],
+    }),
+    ('extension-helpers', '0.1', {
+        'checksums': ['ac8a6fe91c6d98986a51a9f08ca0c7945f8fd70d95b662ced4040ae5eb973882'],
+    }),
+    ('astropy', '4.3.1', {
+        'checksums': ['2d3951223b4eb7f368fcad8c8340d27374c5d8e3b635a636275acdb38f35cd51'],
+    }),
+    (name, version, {
+        'source_tmpl': 'colossus-%(version)s-py2.py3-none-any.whl',
+        'unpack_sources': False,
+        'checksums': ['5169a0d5b25999cf351feeddfe5b305007e5bb4c6d9c2151a4a8fe2ec849e0c4'],
+    }),
+]
+
+moduleclass = 'astro'
+-----
+
+===== Installing and Testing
+
+We can now install our finished easyconfig file via:
+
+-----
+eb Colossus-1.3.1-foss-2021b.eb --parallel=8 >& colossus.log &
+-----
+
+And after we find what prerequisities needed to also be loaded via:
+
+-----
+module spider Colossus/1.3.1
+-----
+
+We can load it via:
+
+-----
+module load module load GCC/11.2.0 OpenMPI/4.1.1 Colossus/1.3.1
+-----
+
+The installation page at:
+
+https://bdiemer.bitbucket.io/colossus/installation.html[`https://bdiemer.bitbucket.io/colossus/installation.html`]
+
+tells how to run a series of unit tests.
+
+-----
+python
+Python 3.9.6 (default, Sep  9 2021, 11:21:17) 
+[GCC 11.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from colossus.tests import run_tests
+test_get_version (colossus.tests.test_utils.TCVersions) ... ok
+test_versions (colossus.tests.test_utils.TCVersions) ... ok
+...
+test_leastsq (colossus.tests.test_halo_profile.TCFitting) ... ok
+test_pdf (colossus.tests.test_halo_profile.TCNFW) ... ok
+Ran 105 tests in 21.008s
+OK
+-----
+
+=== Installing Python Modules Via the PythonPackage Easyblock
+
+The Github easyconfigs that use this easyblock can be found via:
+
+https://github.com/easybuilders/easybuild-easyconfigs/search?q=pythonpackage[`https://github.com/easybuilders/easybuild-easyconfigs/search?q=pythonpackage`]
+
+=== Installing R Modules Via the RPackage Easyblock
+
+== Compiling/Installing a Package in a Python/R Environment
+
+=== Systemwide Installation
+
+=== Userspace Installation
+
+== Compiling a Package from the Source Code With Make/CMake
+
+=== Systemwide Installation
+
+=== Userspace Installation
+
+== Finding and Running a Docker Image Using Singularity
+
+
+

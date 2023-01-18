@@ -1,0 +1,1618 @@
+THREDDS Examples
+================
+Steven K. Baum
+v0.1, 2014-06-05
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Overview
+--------
+
+THREDDS server examples from:
+
+http://barataria.tamu.edu:8080/thredds/catalog.html[+http://barataria.tamu.edu:8080/thredds/catalog.html+]
+
+
+TXLA Aggregation
+----------------
+
+The location is:
+
+http://barataria.tamu.edu:8080/thredds/catalog.html?dataset=TXLA-Nesting6[+http://barataria.tamu.edu:8080/thredds/catalog.html?dataset=TXLA-Nesting6+]
+
+The NetCDF subset server page is at:
+
+http://barataria.tamu.edu:8080/thredds/ncss/grid/NcML/txla_nesting6.nc/dataset.html[+http://barataria.tamu.edu:8080/thredds/ncss/grid/NcML/txla_nesting6.nc/dataset.html+]
+
+For this dataset, the XML code:
+
+* xref:txla_aggregate[aggregates] the 196 individual NetCDF files into a single virtual file;
+
+* xref:txla_union[unions] a separate file containing lon/lat fields with the aggregated
+dataset; and
+
+* makes the following xref:txla_substitution[substitutions] for the dimensions of the variables:
+
+** +eta_rho,xi_rho+ becomes +lat_rho,lon_rho+
+** +eta_u,xi_u+ becomes +lat_u,lon_u+
+** +eta_v,xi_v+ becomes +lat_v,lon_v+
+** +eta_psi,xi_psi+ becomes +lat_psi,lon_psi+
+
+XML Code
+~~~~~~~~
+
+The XML code for +catalog.xml+ is:
+
+[source,xml]
+-----
+   <dataset name="TXLA Nesting6 Aggregation" ID="TXLA-Nesting6" urlPath="NcML/txla_nesting6.nc" dataType="GRID">
+      <serviceName>all</serviceName>
+      <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+-----
+[[txla_union]]
+[source,xml]
+-----
+        <!-- Union the grid file containing just the lon/lat fields. -->
+        <aggregation type="union">
+          <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2"
+                location="/raid/data/txla_nesting6/txla_grd_v4_new_lonlat.nc"/>
+-----
+[[txla_aggregate]]
+[source,xml]
+-----
+          <!-- Aggregate the history files ocean_his_*.nc. -->
+          <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+            <aggregation dimName="ocean_time" type="joinExisting">
+              <scan location="/raid/data/txla_nesting6/"
+                    regExp=".*ocean_his_[0-9]{4}\.nc$"/>
+            </aggregation>
+          </netcdf>
+        </aggregation>
+-----
+[[txla_substitution]]
+[source,xml]
+-----
+        <!-- Make the dimension name substitutions for the variables. -->
+        <variable name="temp">
+         <attribute name="coordinates" value="ocean_time s_rho lat_rho lon_rho"/>
+        </variable>
+        <variable name="salt">
+         <attribute name="coordinates" value="ocean_time s_rho lat_rho lon_rho"/>
+        </variable>
+        <variable name="u">
+         <attribute name="coordinates" value="ocean_time s_rho lat_u lon_u"/>
+        </variable>
+        <variable name="ubar">
+         <attribute name="coordinates" value="ocean_time lat_u lon_u"/>
+        </variable>
+        <variable name="v">
+         <attribute name="coordinates" value="ocean_time s_rho lat_v lon_v"/>
+        </variable>
+        <variable name="vbar">
+         <attribute name="coordinates" value="ocean_time lat_v lon_v"/>
+        </variable>
+        <variable name="zeta">
+         <attribute name="coordinates" value="ocean_time lat_rho lon_rho"/>
+        </variable>
+        <variable name="angle">
+         <attribute name="coordinates" value="lat_rho lon_rho"/>
+        </variable>
+        <variable name="bustr">
+         <attribute name="coordinates" value="ocean_time lat_u lon_u"/>
+        </variable>
+        <variable name="bvstr">
+         <attribute name="coordinates" value="ocean_time lat_v lon_v"/>
+        </variable>
+        <variable name="f">
+         <attribute name="coordinates" value="lat_rho lon_rho"/>
+        </variable>
+        <variable name="h">
+         <attribute name="coordinates" value="lat_rho lon_rho"/>
+        </variable>
+        <variable name="mask_psi">
+         <attribute name="coordinates" value="lat_psi lon_psi"/>
+        </variable>
+        <variable name="mask_rho">
+         <attribute name="coordinates" value="lat_rho lon_rho"/>
+        </variable>
+        <variable name="mask_u">
+         <attribute name="coordinates" value="lat_u lon_u"/>
+        </variable>
+        <variable name="sustr">
+         <attribute name="coordinates" value="ocean_time lat_u lon_u"/>
+        </variable>
+        <variable name="svstr">
+         <attribute name="coordinates" value="ocean_time lat_v lon_v"/>
+        </variable>
+        <variable name="mask_v">
+         <attribute name="coordinates" value="lat_v lon_v"/>
+        </variable>
+        <variable name="pm">
+         <attribute name="coordinates" value="lat_rho lon_rho"/>
+        </variable>
+        <variable name="pn">
+         <attribute name="coordinates" value="lat_rho lon_rho"/>
+        </variable>
+        <variable name="dye_01">
+         <attribute name="coordinates" value="ocean_time s_rho lat_rho lon_rho"/>
+        </variable>
+        <variable name="dye_02">
+         <attribute name="coordinates" value="ocean_time s_rho lat_rho lon_rho"/>
+        </variable>
+        <variable name="dye_03">
+         <attribute name="coordinates" value="ocean_time s_rho lat_rho lon_rho"/>
+        </variable>
+        <variable name="dye_04">
+         <attribute name="coordinates" value="ocean_time s_rho lat_rho lon_rho"/>
+        </variable>
+      </netcdf>
+    </dataset>
+-----
+
+
+The files are located at:
+
++barataria.tamu.edu:/raid/data/txla_nesting6+
+
+and
+
++barataria.tamu.edu:/raid/dj/tmp/txla_h_2012+
+
++barataria.tamu.edu:/raid/dj/tmp/txla_h_2013+
+
++barataria.tamu.edu:/raid/dj/tmp/txla_h_2014_hglo+
+
+and are:
+
+-----
+                            Time                No.
+File Name              Start         End       Times
+
+ocean_his_0001.nc     1044057600 (01/02/03 00:00) to 1045497600 (17/02/03 16:00)  101      barataria.tamu.edu:/raid/data/txla_nesting6
+ocean_his_0002.nc     1045512000 (17/02/03 20:00) to 1046937600 (06/03/03 08:00)  100
+ocean_his_0003.nc     1046952000 (06/03/03 12:00) to 1048377600 (23/03/03 00:00)  100
+ocean_his_0004.nc     1048392000 to 1049817600  100
+ocean_his_0005.nc     1049832000 to 1051257600  100
+ocean_his_0006.nc     1051272000 to 1052697600  100
+ocean_his_0007.nc     1052712000 to 1054137600  100
+ocean_his_0008.nc     1054152000 to 1055577600  100
+ocean_his_0009.nc     1055592000 to 1057017600  100
+ocean_his_0010.nc     1057032000 to 1058457600  100
+...
+ocean_his_0173.nc     1291752000 to 1293177600  100
+ocean_his_0174.nc     1293192000 to 1293840000   46
+ocean_his_0175.nc     1293854400 to 1295280000  100
+...
+ocean_his_0195.nc     1322654400 (30/11/11 12:00) to 1324080000 (17/12/11 00:00) 100
+ocean_his_0196.nc     1324094400 (17/12/11 04:00) to 1325376000 (01/01/12 00:00)  90
+
+                                      Total  19537
+
+ocean_his_0022.nc     1324094400 (17/12/11 04:00) to 1325520000 (02/01/12 16:00) 100      barataria.tamu.edu:/raid/dj/tmp/txla_h_2012
+ocean_his_0022_rev.nc 1325390400 (01/01/12 04:00) to 1325520000 (02/01/12 16:00)  10
+...
+ocean_his_0044.nc     1355774400 (17/12/12 20:00) to 1356998400 (01/01/13 00:00)  86
+
+
+ocean_his_0001.nc     1357012800 (01/01/13 04:00) to 1359590400 (32/02/13 00:00) 180      barataria.tamu.edu:/raid/dj/tmp/txla_h_2013
+...
+ocean_his_0013.nc     1386777600 (11/12/13 16:00) to 1388563200 (01/01/14 08:00) 125
+ocean_his_0014.nc     1388505600 (31/12/13 16:00) to 1388534400 (01/01/14 00:00)   3
+ocean_his_0014_sub.nc 1388505600 (31/12/13 16:00) to 1388520000 (31/12/13 20:00)   2
+
+ocean_his_01.nc       1388534400 (01/01/14 00:00) to 1391126400 (31/01/14 00:00) 181      barataria.tamu.edu:/raid/dj/tmp/txla_h_2014_hglo
+...
+ocean_his_09.nc       1409270400 (29/08/14 00:00) to 1411862400 (28/09/14 00:00) 181
+00:00) 181
+-----
+
+Unix Timestamp to Date/Time Calculator:  http://www.onlineconversion.com/unix_time.htm[+http://www.onlineconversion.com/unix_time.htm+]
+
+Input File Header
+~~~~~~~~~~~~~~~~~
+
+A typical NetCDF file header of the raw files is:
+
+-----
+netcdf ocean_his_0001 {
+dimensions:
+	tracer = 6 ;
+	s_rho = 30 ;
+	s_w = 31 ;
+	boundary = 4 ;
+	eta_rho = 191 ;
+	xi_rho = 671 ;
+	ocean_time = UNLIMITED ; // (101 currently)
+	eta_u = 191 ;
+	xi_u = 670 ;
+	eta_v = 190 ;
+	xi_v = 671 ;
+	eta_psi = 190 ;
+	xi_psi = 670 ;
+variables:
+	double Akk_bak ;
+		Akk_bak:long_name = "background vertical mixing coefficient for turbulent energy" ;
+		Akk_bak:units = "meter2 second-1" ;
+	double Akp_bak ;
+		Akp_bak:long_name = "background vertical mixing coefficient for length scale" ;
+		Akp_bak:units = "meter2 second-1" ;
+	double Akt_bak(tracer) ;
+		Akt_bak:long_name = "background vertical mixing coefficient for tracers" ;
+		Akt_bak:units = "meter2 second-1" ;
+	double Akv_bak ;
+		Akv_bak:long_name = "background vertical mixing coefficient for momentum" ;
+		Akv_bak:units = "meter2 second-1" ;
+	double Cs_r(s_rho) ;
+		Cs_r:long_name = "S-coordinate stretching curves at RHO-points" ;
+		Cs_r:valid_min = -1. ;
+		Cs_r:valid_max = 0. ;
+		Cs_r:field = "Cs_r, scalar" ;
+	double Cs_w(s_w) ;
+		Cs_w:long_name = "S-coordinate stretching curves at W-points" ;
+		Cs_w:valid_min = -1. ;
+		Cs_w:valid_max = 0. ;
+		Cs_w:field = "Cs_w, scalar" ;
+	double FSobc_in(boundary) ;
+		FSobc_in:long_name = "free-surface inflow, nudging inverse time scale" ;
+		FSobc_in:units = "second-1" ;
+	double FSobc_out(boundary) ;
+		FSobc_out:long_name = "free-surface outflow, nudging inverse time scale" ;
+		FSobc_out:units = "second-1" ;
+	double Falpha ;
+		Falpha:long_name = "Power-law shape barotropic filter parameter" ;
+	double Fbeta ;
+		Fbeta:long_name = "Power-law shape barotropic filter parameter" ;
+	double Fgamma ;
+		Fgamma:long_name = "Power-law shape barotropic filter parameter" ;
+	int LtracerSrc(tracer) ;
+		LtracerSrc:long_name = "tracer point sources and sink activation switch" ;
+		LtracerSrc:flag_values = 0, 1 ;
+		LtracerSrc:flag_meanings = ".FALSE. .TRUE." ;
+	double M2nudg ;
+		M2nudg:long_name = "2D momentum nudging/relaxation inverse time scale" ;
+		M2nudg:units = "day-1" ;
+	double M2obc_in(boundary) ;
+		M2obc_in:long_name = "2D momentum inflow, nudging inverse time scale" ;
+		M2obc_in:units = "second-1" ;
+	double M2obc_out(boundary) ;
+		M2obc_out:long_name = "2D momentum outflow, nudging inverse time scale" ;
+		M2obc_out:units = "second-1" ;
+	double M3nudg ;
+		M3nudg:long_name = "3D momentum nudging/relaxation inverse time scale" ;
+		M3nudg:units = "day-1" ;
+	double M3obc_in(boundary) ;
+		M3obc_in:long_name = "3D momentum inflow, nudging inverse time scale" ;
+		M3obc_in:units = "second-1" ;
+	double M3obc_out(boundary) ;
+		M3obc_out:long_name = "3D momentum outflow, nudging inverse time scale" ;
+		M3obc_out:units = "second-1" ;
+	double Tcline ;
+		Tcline:long_name = "S-coordinate surface/bottom layer width" ;
+		Tcline:units = "meter" ;
+	double Tnudg(tracer) ;
+		Tnudg:long_name = "Tracers nudging/relaxation inverse time scale" ;
+		Tnudg:units = "day-1" ;
+	double Tobc_in(boundary, tracer) ;
+		Tobc_in:long_name = "tracers inflow, nudging inverse time scale" ;
+		Tobc_in:units = "second-1" ;
+	double Tobc_out(boundary, tracer) ;
+		Tobc_out:long_name = "tracers outflow, nudging inverse time scale" ;
+		Tobc_out:units = "second-1" ;
+	int Vstretching ;
+		Vstretching:long_name = "vertical terrain-following stretching function" ;
+	int Vtransform ;
+		Vtransform:long_name = "vertical terrain-following transformation equation" ;
+	double Znudg ;
+		Znudg:long_name = "free-surface nudging/relaxation inverse time scale" ;
+		Znudg:units = "day-1" ;
+	double Zob ;
+		Zob:long_name = "bottom roughness" ;
+		Zob:units = "meter" ;
+	double Zos ;
+		Zos:long_name = "surface roughness" ;
+		Zos:units = "meter" ;
+	double angle(eta_rho, xi_rho) ;
+		angle:long_name = "angle between XI-axis and EAST" ;
+		angle:units = "radians" ;
+		angle:coordinates = "x_rho y_rho" ;
+		angle:field = "angle, scalar" ;
+	float bustr(ocean_time, eta_u, xi_u) ;
+		bustr:long_name = "bottom u-momentum stress" ;
+		bustr:units = "newton meter-2" ;
+		bustr:time = "ocean_time" ;
+		bustr:coordinates = "x_u y_u ocean_time" ;
+		bustr:field = "bottom u-momentum stress, scalar, series" ;
+		bustr:_FillValue = 1.e+37f ;
+	float bvstr(ocean_time, eta_v, xi_v) ;
+		bvstr:long_name = "bottom v-momentum stress" ;
+		bvstr:units = "newton meter-2" ;
+		bvstr:time = "ocean_time" ;
+		bvstr:coordinates = "x_v y_v ocean_time" ;
+		bvstr:field = "bottom v-momentum stress, scalar, series" ;
+		bvstr:_FillValue = 1.e+37f ;
+	double dstart ;
+		dstart:long_name = "time stamp assigned to model initilization" ;
+		dstart:units = "days since 1970-01-01 00:00:00" ;
+	double dt ;
+		dt:long_name = "size of long time-steps" ;
+		dt:units = "second" ;
+	double dtfast ;
+		dtfast:long_name = "size of short time-steps" ;
+		dtfast:units = "second" ;
+	float dye_01(ocean_time, s_rho, eta_rho, xi_rho) ;
+		dye_01:long_name = "dye concentration, type 01" ;
+		dye_01:units = "kilogram meter-3" ;
+		dye_01:time = "ocean_time" ;
+		dye_01:coordinates = "x_rho y_rho s_rho ocean_time" ;
+		dye_01:field = "dye_01, scalar, series" ;
+		dye_01:_FillValue = 1.e+37f ;
+	float dye_02(ocean_time, s_rho, eta_rho, xi_rho) ;
+		dye_02:long_name = "dye concentration, type 02" ;
+		dye_02:units = "kilogram meter-3" ;
+		dye_02:time = "ocean_time" ;
+		dye_02:coordinates = "x_rho y_rho s_rho ocean_time" ;
+		dye_02:field = "dye_02, scalar, series" ;
+		dye_02:_FillValue = 1.e+37f ;
+	float dye_03(ocean_time, s_rho, eta_rho, xi_rho) ;
+		dye_03:long_name = "dye concentration, type 03" ;
+		dye_03:units = "kilogram meter-3" ;
+		dye_03:time = "ocean_time" ;
+		dye_03:coordinates = "x_rho y_rho s_rho ocean_time" ;
+		dye_03:field = "dye_03, scalar, series" ;
+		dye_03:_FillValue = 1.e+37f ;
+	float dye_04(ocean_time, s_rho, eta_rho, xi_rho) ;
+		dye_04:long_name = "dye concentration, type 04" ;
+		dye_04:units = "kilogram meter-3" ;
+		dye_04:time = "ocean_time" ;
+		dye_04:coordinates = "x_rho y_rho s_rho ocean_time" ;
+		dye_04:field = "dye_04, scalar, series" ;
+		dye_04:_FillValue = 1.e+37f ;
+	double el ;
+		el:long_name = "domain length in the ETA-direction" ;
+		el:units = "meter" ;
+	double f(eta_rho, xi_rho) ;
+		f:long_name = "Coriolis parameter at RHO-points" ;
+		f:units = "second-1" ;
+		f:coordinates = "x_rho y_rho" ;
+		f:field = "coriolis, scalar" ;
+	double gamma2 ;
+		gamma2:long_name = "slipperiness parameter" ;
+	double h(eta_rho, xi_rho) ;
+		h:long_name = "bathymetry at RHO-points" ;
+		h:units = "meter" ;
+		h:coordinates = "x_rho y_rho" ;
+		h:field = "bath, scalar" ;
+	double hc ;
+		hc:long_name = "S-coordinate parameter, critical depth" ;
+		hc:units = "meter" ;
+	double mask_psi(eta_psi, xi_psi) ;
+		mask_psi:long_name = "mask on psi-points" ;
+		mask_psi:flag_values = 0., 1. ;
+		mask_psi:flag_meanings = "land water" ;
+		mask_psi:coordinates = "x_psi y_psi" ;
+	double mask_rho(eta_rho, xi_rho) ;
+		mask_rho:long_name = "mask on RHO-points" ;
+		mask_rho:flag_values = 0., 1. ;
+		mask_rho:flag_meanings = "land water" ;
+		mask_rho:coordinates = "x_rho y_rho" ;
+	double mask_u(eta_u, xi_u) ;
+		mask_u:long_name = "mask on U-points" ;
+		mask_u:flag_values = 0., 1. ;
+		mask_u:flag_meanings = "land water" ;
+		mask_u:coordinates = "x_u y_u" ;
+	double mask_v(eta_v, xi_v) ;
+		mask_v:long_name = "mask on V-points" ;
+		mask_v:flag_values = 0., 1. ;
+		mask_v:flag_meanings = "land water" ;
+		mask_v:coordinates = "x_v y_v" ;
+	int nHIS ;
+		nHIS:long_name = "number of time-steps between history records" ;
+	int nRST ;
+		nRST:long_name = "number of time-steps between restart records" ;
+		nRST:cycle = "only latest two records are maintained" ;
+	int ndefHIS ;
+		ndefHIS:long_name = "number of time-steps between the creation of history files" ;
+	int ndtfast ;
+		ndtfast:long_name = "number of short time-steps" ;
+	double nl_tnu2(tracer) ;
+		nl_tnu2:long_name = "nonlinear model Laplacian mixing coefficient for tracers" ;
+		nl_tnu2:units = "meter2 second-1" ;
+	double nl_visc2 ;
+		nl_visc2:long_name = "nonlinear model Laplacian mixing coefficient for momentum" ;
+		nl_visc2:units = "meter2 second-1" ;
+	int ntimes ;
+		ntimes:long_name = "number of long time-steps" ;
+	double ocean_time(ocean_time) ;
+		ocean_time:long_name = "time since initialization" ;
+		ocean_time:units = "seconds since 1970-01-01 00:00:00" ;
+		ocean_time:calendar = "gregorian" ;
+		ocean_time:field = "time, scalar, series" ;
+	double pm(eta_rho, xi_rho) ;
+		pm:long_name = "curvilinear coordinate metric in XI" ;
+		pm:units = "meter-1" ;
+		pm:coordinates = "x_rho y_rho" ;
+		pm:field = "pm, scalar" ;
+	double pn(eta_rho, xi_rho) ;
+		pn:long_name = "curvilinear coordinate metric in ETA" ;
+		pn:units = "meter-1" ;
+		pn:coordinates = "x_rho y_rho" ;
+		pn:field = "pn, scalar" ;
+	double rdrg ;
+		rdrg:long_name = "linear drag coefficient" ;
+		rdrg:units = "meter second-1" ;
+	double rdrg2 ;
+		rdrg2:long_name = "quadratic drag coefficient" ;
+	double rho0 ;
+		rho0:long_name = "mean density used in Boussinesq approximation" ;
+		rho0:units = "kilogram meter-3" ;
+	double s_rho(s_rho) ;
+		s_rho:long_name = "S-coordinate at RHO-points" ;
+		s_rho:valid_min = -1. ;
+		s_rho:valid_max = 0. ;
+		s_rho:positive = "up" ;
+		s_rho:standard_name = "ocean_s_coordinate_g1" ;
+		s_rho:formula_terms = "s: s_rho C: Cs_r eta: zeta depth: h depth_c: hc" ;
+		s_rho:field = "s_rho, scalar" ;
+	double s_w(s_w) ;
+		s_w:long_name = "S-coordinate at W-points" ;
+		s_w:valid_min = -1. ;
+		s_w:valid_max = 0. ;
+		s_w:positive = "up" ;
+		s_w:standard_name = "ocean_s_coordinate_g1" ;
+		s_w:formula_terms = "s: s_w C: Cs_w eta: zeta depth: h depth_c: hc" ;
+		s_w:field = "s_w, scalar" ;
+	float salt(ocean_time, s_rho, eta_rho, xi_rho) ;
+		salt:long_name = "salinity" ;
+		salt:time = "ocean_time" ;
+		salt:coordinates = "x_rho y_rho s_rho ocean_time" ;
+		salt:field = "salinity, scalar, series" ;
+		salt:_FillValue = 1.e+37f ;
+	int spherical ;
+		spherical:long_name = "grid type logical switch" ;
+		spherical:flag_values = 0, 1 ;
+		spherical:flag_meanings = "Cartesian spherical" ;
+	float sustr(ocean_time, eta_u, xi_u) ;
+		sustr:long_name = "surface u-momentum stress" ;
+		sustr:units = "newton meter-2" ;
+		sustr:time = "ocean_time" ;
+		sustr:coordinates = "x_u y_u ocean_time" ;
+		sustr:field = "surface u-momentum stress, scalar, series" ;
+		sustr:_FillValue = 1.e+37f ;
+	float svstr(ocean_time, eta_v, xi_v) ;
+		svstr:long_name = "surface v-momentum stress" ;
+		svstr:units = "newton meter-2" ;
+		svstr:time = "ocean_time" ;
+		svstr:coordinates = "x_v y_v ocean_time" ;
+		svstr:field = "surface v-momentum stress, scalar, series" ;
+		svstr:_FillValue = 1.e+37f ;
+	float temp(ocean_time, s_rho, eta_rho, xi_rho) ;
+		temp:long_name = "potential temperature" ;
+		temp:units = "Celsius" ;
+		temp:time = "ocean_time" ;
+		temp:coordinates = "x_rho y_rho s_rho ocean_time" ;
+		temp:field = "temperature, scalar, series" ;
+		temp:_FillValue = 1.e+37f ;
+	double theta_b ;
+		theta_b:long_name = "S-coordinate bottom control parameter" ;
+	double theta_s ;
+		theta_s:long_name = "S-coordinate surface control parameter" ;
+	float u(ocean_time, s_rho, eta_u, xi_u) ;
+		u:long_name = "u-momentum component" ;
+		u:units = "meter second-1" ;
+		u:time = "ocean_time" ;
+		u:coordinates = "x_u y_u s_rho ocean_time" ;
+		u:field = "u-velocity, scalar, series" ;
+		u:_FillValue = 1.e+37f ;
+	float ubar(ocean_time, eta_u, xi_u) ;
+		ubar:long_name = "vertically integrated u-momentum component" ;
+		ubar:units = "meter second-1" ;
+		ubar:time = "ocean_time" ;
+		ubar:coordinates = "x_u y_u ocean_time" ;
+		ubar:field = "ubar-velocity, scalar, series" ;
+		ubar:_FillValue = 1.e+37f ;
+	float v(ocean_time, s_rho, eta_v, xi_v) ;
+		v:long_name = "v-momentum component" ;
+		v:units = "meter second-1" ;
+		v:time = "ocean_time" ;
+		v:coordinates = "x_v y_v s_rho ocean_time" ;
+		v:field = "v-velocity, scalar, series" ;
+		v:_FillValue = 1.e+37f ;
+	float vbar(ocean_time, eta_v, xi_v) ;
+		vbar:long_name = "vertically integrated v-momentum component" ;
+		vbar:units = "meter second-1" ;
+		vbar:time = "ocean_time" ;
+		vbar:coordinates = "x_v y_v ocean_time" ;
+		vbar:field = "vbar-velocity, scalar, series" ;
+		vbar:_FillValue = 1.e+37f ;
+	double x_psi(eta_psi, xi_psi) ;
+		x_psi:long_name = "x-locations of PSI-points" ;
+		x_psi:units = "meter" ;
+		x_psi:field = "x_psi, scalar" ;
+	double x_rho(eta_rho, xi_rho) ;
+		x_rho:long_name = "x-locations of RHO-points" ;
+		x_rho:units = "meter" ;
+		x_rho:field = "x_rho, scalar" ;
+	double x_u(eta_u, xi_u) ;
+		x_u:long_name = "x-locations of U-points" ;
+		x_u:units = "meter" ;
+		x_u:field = "x_u, scalar" ;
+	double x_v(eta_v, xi_v) ;
+		x_v:long_name = "x-locations of V-points" ;
+		x_v:units = "meter" ;
+		x_v:field = "x_v, scalar" ;
+	double xl ;
+		xl:long_name = "domain length in the XI-direction" ;
+		xl:units = "meter" ;
+	double y_psi(eta_psi, xi_psi) ;
+		y_psi:long_name = "y-locations of PSI-points" ;
+		y_psi:units = "meter" ;
+		y_psi:field = "y_psi, scalar" ;
+	double y_rho(eta_rho, xi_rho) ;
+		y_rho:long_name = "y-locations of RHO-points" ;
+		y_rho:units = "meter" ;
+		y_rho:field = "y_rho, scalar" ;
+	double y_u(eta_u, xi_u) ;
+		y_u:long_name = "y-locations of U-points" ;
+		y_u:units = "meter" ;
+		y_u:field = "y_u, scalar" ;
+	double y_v(eta_v, xi_v) ;
+		y_v:long_name = "y-locations of V-points" ;
+		y_v:units = "meter" ;
+		y_v:field = "y_v, scalar" ;
+	float zeta(ocean_time, eta_rho, xi_rho) ;
+		zeta:long_name = "free-surface" ;
+		zeta:units = "meter" ;
+		zeta:time = "ocean_time" ;
+		zeta:coordinates = "x_rho y_rho ocean_time" ;
+		zeta:field = "free-surface, scalar, series" ;
+		zeta:_FillValue = 1.e+37f ;
+
+// global attributes:
+		:file = "ocean_his_0001.nc" ;
+		:format = "netCDF-3 classic file" ;
+		:Conventions = "CF-1.4" ;
+		:type = "ROMS/TOMS history file" ;
+		:title = "Texas and Louisiana Shelf case (Nesting)" ;
+		:rst_file = "ocean_rst.nc" ;
+		:his_base = "ocean_his" ;
+		:grd_file = "txla_grd_v4_new.nc" ;
+		:ini_file = "txla_ini_hycom_20030201.nc" ;
+		:frc_file_01 = "txla_blk_narr_2003.nc" ;
+		:frc_file_02 = "TXLA_river_4dyes_2011.nc" ;
+		:frc_file_03 = "txla_flx_frc_9911.nc" ;
+		:bry_file = "txla_bry_2003_new.nc" ;
+		:clm_file = "txla_clm_2003_new.nc" ;
+		:script_file = "External/ocean_txla.in" ;
+		:svn_url = "https://www.myroms.org/svn/src/trunk" ;
+		:svn_rev = "exported" ;
+		:code_dir = "/scratch/zhangxq/ROMS" ;
+		:header_dir = "/scratch/zhangxq/projects/txla_nesting6" ;
+		:header_file = "txla.h" ;
+		:os = "Linux" ;
+		:cpu = "x86_64" ;
+		:compiler_system = "ifort" ;
+		:compiler_command = "/g/software/openmpi/1.4.3/intel/bin/mpif90" ;
+		:compiler_flags = "-heap-arrays -fp-model precise -assume 2underscores -convert big_endian -ip -O3 -free" ;
+		:tiling = "016x032" ;
+		:history = "Mon Feb 11 10:12:04 2013: ncks -O -x -v lat_psi,lon_psi,lat_u,lon_u,lat_v,lon_v,lat_rho,lon_rho ocean_his_0001.nc ocean_0001.nc\n",
+			"Thu Feb  7 16:42:06 2013: ncatted -a field,lat_psi,c,c,lat_psi, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:41:51 2013: ncatted -a standard_name,lat_psi,c,c,latitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:41:36 2013: ncatted -a units,lat_psi,c,c,degree_north ocean_his_0001.nc\n",
+			"Thu Feb  7 16:41:21 2013: ncatted -a long_name,lat_psi,c,c,latitude of PSI-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:41:06 2013: ncatted -a field,lon_psi,c,c,lon_psi, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:40:51 2013: ncatted -a standard_name,lon_psi,c,c,longitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:40:35 2013: ncatted -a units,lon_psi,c,c,degree_east ocean_his_0001.nc\n",
+			"Thu Feb  7 16:40:20 2013: ncatted -a long_name,lon_psi,c,c,longitude of PSI-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:40:05 2013: ncatted -a field,lat_v,c,c,lat_v, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:39:50 2013: ncatted -a standard_name,lat_v,c,c,latitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:39:35 2013: ncatted -a units,lat_v,c,c,degree_north ocean_his_0001.nc\n",
+			"Thu Feb  7 16:39:20 2013: ncatted -a long_name,lat_v,c,c,latitude of V-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:39:04 2013: ncatted -a field,lon_v,c,c,lon_v, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:38:49 2013: ncatted -a standard_name,lon_v,c,c,longitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:38:34 2013: ncatted -a units,lon_v,c,c,degree_east ocean_his_0001.nc\n",
+			"Thu Feb  7 16:38:19 2013: ncatted -a long_name,lon_v,c,c,longitude of V-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:38:03 2013: ncatted -a field,lat_u,c,c,lat_u, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:37:48 2013: ncatted -a standard_name,lat_u,c,c,latitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:37:32 2013: ncatted -a units,lat_u,c,c,degree_north ocean_his_0001.nc\n",
+			"Thu Feb  7 16:37:17 2013: ncatted -a long_name,lat_u,c,c,latitude of U-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:37:02 2013: ncatted -a field,lon_u,c,c,lon_u, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:36:47 2013: ncatted -a standard_name,lon_u,c,c,longitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:36:31 2013: ncatted -a units,lon_u,c,c,degree_east ocean_his_0001.nc\n",
+			"Thu Feb  7 16:36:16 2013: ncatted -a long_name,lon_u,c,c,longitude of U-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:36:01 2013: ncatted -a field,lat_rho,c,c,lat_rho, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:35:46 2013: ncatted -a standard_name,lat_rho,c,c,latitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:35:30 2013: ncatted -a units,lat_rho,c,c,degree_north ocean_his_0001.nc\n",
+			"Thu Feb  7 16:35:15 2013: ncatted -a long_name,lat_rho,c,c,latitude of RHO-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:34:59 2013: ncatted -a field,lon_rho,c,c,lon_rho, scalar ocean_his_0001.nc\n",
+			"Thu Feb  7 16:34:44 2013: ncatted -a standard_name,lon_rho,c,c,longitude ocean_his_0001.nc\n",
+			"Thu Feb  7 16:34:29 2013: ncatted -a units,lon_rho,c,c,degree_east ocean_his_0001.nc\n",
+			"Thu Feb  7 16:34:15 2013: ncatted -a long_name,lon_rho,c,c,longitude of RHO-points ocean_his_0001.nc\n",
+			"Thu Feb  7 16:30:33 2013: ncks -A -v lon_rho,lat_rho,lon_u,lat_u,lon_v,lat_v,lon_psi,lat_psi txla_grd_v4_new.nc ocean_his_0001.nc\n",
+			"ROMS/TOMS, Version 3.4, Saturday - October 29, 2011 -  9:13:56 AM" ;
+		:ana_file = "/scratch/zhangxq/projects/txla_nesting6/Functionals/ana_btflux.h, /scratch/zhangxq/projects/txla_nesting6/Functionals/ana_hmixcoef.h, /scratch/zhan
+gxq/projects/txla_nesting6/Functionals/ana_nudgcoef.h, /scratch/zhangxq/projects/txla_nesting6/Functionals/ana_stflux.h" ;
+		:CPP_options = "TXLA, ANA_BSFLUX, ANA_BTFLUX, ASSUMED_SHAPE, BULK_FLUXES, CURVGRID, DIFF_GRID, DJ_GRADPS, DOUBLE_PRECISION, EAST_FSCHAPMAN, EAST_M2FLATHER, EAST
+_M3NUDGING, EAST_M3RADIATION, EAST_TNUDGING, EAST_TRADIATION, EMINUSP, LONGWAVE, M3CLIMATOLOGY, M3CLM_NUDGING, MASKING, MIX_GEO_TS, MIX_S_UV, MPI, MY25_MIXING, NONLINEAR, NONLI
+N_EOS, NORTHERN_WALL, N2S2_HORAVG, POWER_LAW, PROFILE, QCORRECTION, K_GSCHEME, !RST_SINGLE, SALINITY, SOLAR_SOURCE, SOLVE3D, SOUTH_FSCHAPMAN, SOUTH_M2FLATHER, SOUTH_M3NUDGING, 
+SOUTH_M3RADIATION, SOUTH_TNUDGING, SOUTH_TRADIATION, SPLINES, TCLIMATOLOGY, TCLM_NUDGING, THREE_GHOST, T_PASSIVE, TS_MPDATA, TS_DIF2, TS_PSOURCE, UV_ADV, UV_COR, UV_U3HADVECTIO
+N, UV_C4VADVECTION, UV_LOGDRAG, UV_PSOURCE, UV_VIS2, VAR_RHO_2D, VISC_GRID, WEST_FSCHAPMAN, WEST_M2FLATHER, WEST_M3NUDGING, WEST_M3RADIATION, WEST_TNUDGING, WEST_TRADIATION" ;
+		:NCO = "4.0.8" ;
+data:
+...
+-----
+
+
+IMARS Satellite Data
+--------------------
+
+This is found at:
+
+http://csanady.tamu.edu:8080/thredds/gcoos_seadas.html[+http://csanady.tamu.edu:8080/thredds/gcoos_seadas.html+]
+
+with separate directories for SST:
+
+http://csanady.tamu.edu:8080/thredds/gcoos_seadas.html?dataset=gcoos/seadas_sst[+http://csanady.tamu.edu:8080/thredds/gcoos_seadas.html?dataset=gcoos/seadas_sst+]
+
+and for chlorophyll:
+
+http://csanady.tamu.edu:8080/thredds/gcoos_seadas.html?dataset=gcoos/seadas[+http://csanady.tamu.edu:8080/thredds/gcoos_seadas.html?dataset=gcoos/seadas+]
+
+SST
+~~~
+
+XML Code
+^^^^^^^^
+
+The XML code for the SST is:
+
+[source,xml]
+-----
+  <dataset name="USF IMaRS MODIS SST" ID="gcoos/seadas_sst" serviceName="allServices" urlPath="gcoos/seadas_sst">
+
+    <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+
+      <aggregation dimName="time" type="joinNew" recheckEvery="5 min">
+        <variableAgg name="seadas_sst"/>
+        <variableAgg name="cloud_mask"/>
+        <variableAgg name="l2_flags"/>
+        <scan location="/d3/thredds/seadas_sst" regExp=".*MODIS.*\.gcoos.seadas_sst.hdf$" dateFormatMark="MODIS.#yyyyDDD'.'hhmmss" subdirs="false"/>
+      </aggregation>
+
+      <dimension name="lon" orgName="fakeDim1"/>
+      <dimension name="lat" orgName="fakeDim0"/>
+
+      <variable name="lon" shape="lon" type="double">
+        <attribute name="units" value="degrees_east"/>
+        <values start="-98.0" increment="0.00909"/>
+      </variable>
+
+      <variable name="lat" shape="lat" type="double">
+        <attribute name="units" value="degrees_north"/>
+        <values start="31.0" increment="-0.00909"/>
+      </variable>
+
+      <variable name="seadas_sst" shape="time lat lon" type="double">
+        <attribute name="standard_name" value="sea_surface_temperature"/>
+        <attribute name="units" value="Celsius"/>
+        <attribute name="scale_factor" type="float" value="0.005"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="l2_flags" shape="time lat lon" type="int">
+        <attribute name="units" value="1"/>
+      </variable>
+      <variable name="cloud_mask" shape="time lat lon" type="byte">
+        <attribute name="units" value="1"/>
+      </variable>
+    </netcdf>
+
+  </dataset>
+-----
+
+HDF4 Input File Header
+^^^^^^^^^^^^^^^^^^^^^^
+
+A typical header for one of the raw HDF4 files is:
+
+-----
+netcdf MODIS.2009285.043806.gcoos.seadas_sst {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+	fakeDim2 = 1430 ;
+	fakeDim3 = 2090 ;
+	fakeDim4 = 1430 ;
+	fakeDim5 = 2090 ;
+
+variables:
+	short seadas_sst(fakeDim0, fakeDim1) ;
+		seadas_sst:long_name = "Sea Surface Temperature" ;
+		seadas_sst:slope = "[  0.005]" ;
+		seadas_sst:units = "degrees-C" ;
+		seadas_sst:intercept = "[0]" ;
+	long l2_flags(fakeDim2, fakeDim3) ;
+		l2_flags:f02_name = "LAND" ;
+		l2_flags:long_name = "Level-2 Processing Flags" ;
+		l2_flags:f32_name = "OCEAN" ;
+		l2_flags:f03_name = "BADANC" ;
+		l2_flags:f21_name = "MODGLINT" ;
+		l2_flags:f10_name = "CLDICE" ;
+		l2_flags:f05_name = "HILT" ;
+		l2_flags:f06_name = "HISATZEN" ;
+		l2_flags:f07_name = "COASTZ" ;
+		l2_flags:f08_name = "NEGLW" ;
+		l2_flags:f25_name = "SEAICE" ;
+		l2_flags:f20_name = "MAXAERITER" ;
+		l2_flags:f13_name = "HISOLZEN" ;
+		l2_flags:f31_name = "SPARE" ;
+		l2_flags:f19_name = "TRICHO" ;
+		l2_flags:f18_name = "ABSAER" ;
+		l2_flags:f30_name = "HIPOL" ;
+		l2_flags:f04_name = "HIGLINT" ;
+		l2_flags:f17_name = "NAVWARN" ;
+		l2_flags:f01_name = "ATMFAIL" ;
+		l2_flags:f26_name = "NAVFAIL" ;
+		l2_flags:f24_name = "DARKPIXEL" ;
+		l2_flags:f16_name = "CHLFAIL" ;
+		l2_flags:f28_name = "SSTWARN" ;
+		l2_flags:f15_name = "LOWLW" ;
+		l2_flags:f11_name = "COCCOLITH" ;
+		l2_flags:f12_name = "TURBIDW" ;
+		l2_flags:f23_name = "ATMWARN" ;
+		l2_flags:f09_name = "STRAYLIGHT" ;
+		l2_flags:f22_name = "CHLWARN" ;
+		l2_flags:f29_name = "SSTFAIL" ;
+		l2_flags:f27_name = "FILTER" ;
+		l2_flags:f14_name = "HITAU" ;
+		l2_flags:units = "dimensionless" ;
+	byte cloud_mask(fakeDim4, fakeDim5) ;
+
+// global attributes:
+		:Map Projection Category = "Proj 4.4.7" ;
+		:Data Source Type = "Direct Broadcast" ;
+		:L3 Software Name = "/usr/bin/map_modis.pl" ;
+		:L3 Software Version = "4.2" ;
+		:Map Limit = "18, -98, 31, -79" ;
+		:Processing Status = "final" ;
+		:Collection Location = "USF Institute for Marine Remote Sensing" ;
+		:Satellite = "Terra" ;
+		:Input File(s) = "/tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285043759.GEO, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285043759.L2_LAC_SST, /tm
+p/s4p_run_map_modis_2.3_4aPH9lb4/T2009285044029.GEO, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285044029.L2_LAC_SST, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T200
+9285044259.GEO, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285044259.L2_LAC_SST, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285044529.GEO, /tmp/s4p_run_map_modi
+s_2.3_4aPH9lb4/T2009285044529.L2_LAC_SST, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285044759.GEO, /tmp/s4p_run_map_modis_2.3_4aPH9lb4/T2009285044759.L2_LAC_
+SST" ;
+		:Map Projection Name = "eqc" ;
+		:Proj Projection Parameters = "#Equidistant Cylindrical (Plate Caree)\n",
+    "#\tCyl, Sph\n",
+    "#\tlat_ts=\n",
+    "# +proj=eqc +ellps=WGS84" ;
+		:Temporal Resolution = "pass" ;
+		:Spatial Resolution = "1000" ;
+
+data:
+...
+-----
+
+NetCDF Output File Header
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A typical header for a NetCDF file obtained from the subset page at:
+
+http://csanady.tamu.edu:8080/thredds/ncss/grid/gcoos/seadas_sst/dataset.html[+http://csanady.tamu.edu:8080/thredds/ncss/grid/gcoos/seadas_sst/dataset.html+]
+
+is:
+
+-----
+netcdf seadas_sst {
+dimensions:
+	time = 1 ;
+	lat = 1430 ;
+	lon = 2090 ;
+	time_strlen = 20 ;
+variables:
+	byte cloud_mask(time, lat, lon) ;
+		cloud_mask:_Unsigned = "true" ;
+		cloud_mask:units = "1" ;
+		cloud_mask:coordinates = "time lat lon lat lon" ;
+	char time(time, time_strlen) ;
+		time:_CoordinateAxisType = "Time" ;
+	double lat(lat) ;
+		lat:units = "degrees_north" ;
+		lat:_CoordinateAxisType = "Lat" ;
+		lat:standard_name = "latitude" ;
+	double lon(lon) ;
+		lon:units = "degrees_east" ;
+		lon:_CoordinateAxisType = "Lon" ;
+		lon:standard_name = "longitude" ;
+	int l2_flags(time, lat, lon) ;
+		l2_flags:f02_name = "LAND" ;
+		l2_flags:long_name = "Level-2 Processing Flags" ;
+		l2_flags:f32_name = "OCEAN" ;
+		l2_flags:f03_name = "BADANC" ;
+		l2_flags:f21_name = "MODGLINT" ;
+		l2_flags:f10_name = "CLDICE" ;
+		l2_flags:f05_name = "HILT" ;
+		l2_flags:f06_name = "HISATZEN" ;
+		l2_flags:f07_name = "COASTZ" ;
+		l2_flags:f08_name = "NEGLW" ;
+		l2_flags:f25_name = "SEAICE" ;
+		l2_flags:f20_name = "MAXAERITER" ;
+		l2_flags:f13_name = "HISOLZEN" ;
+		l2_flags:f31_name = "SPARE" ;
+		l2_flags:f19_name = "TRICHO" ;
+		l2_flags:f18_name = "ABSAER" ;
+		l2_flags:f30_name = "HIPOL" ;
+		l2_flags:f04_name = "HIGLINT" ;
+		l2_flags:f17_name = "NAVWARN" ;
+		l2_flags:f01_name = "ATMFAIL" ;
+		l2_flags:f26_name = "NAVFAIL" ;
+		l2_flags:f24_name = "DARKPIXEL" ;
+		l2_flags:f16_name = "CHLFAIL" ;
+		l2_flags:f28_name = "SSTWARN" ;
+		l2_flags:f15_name = "LOWLW" ;
+		l2_flags:f11_name = "COCCOLITH" ;
+		l2_flags:f12_name = "TURBIDW" ;
+		l2_flags:f23_name = "ATMWARN" ;
+		l2_flags:f09_name = "STRAYLIGHT" ;
+		l2_flags:f22_name = "CHLWARN" ;
+		l2_flags:f29_name = "SSTFAIL" ;
+		l2_flags:f27_name = "FILTER" ;
+		l2_flags:f14_name = "HITAU" ;
+		l2_flags:units = "1" ;
+		l2_flags:coordinates = "time lat lon lat lon" ;
+	double seadas_sst(time, lat, lon) ;
+		seadas_sst:long_name = "Sea Surface Temperature" ;
+		seadas_sst:slope = "[  0.005]" ;
+		seadas_sst:units = "Celsius" ;
+		seadas_sst:intercept = "[0]" ;
+		seadas_sst:standard_name = "sea_surface_temperature" ;
+		seadas_sst:coordinates = "time lat lon lat lon" ;
+
+// global attributes:
+		:Map_Projection_Category = "Proj 4.4.7" ;
+		:Data_Source_Type = "Direct Broadcast" ;
+		:L3_Software_Name = "/usr/bin/map_modis.pl" ;
+		:L3_Software_Version = "4.2" ;
+		:Map_Limit = "18, -98, 31, -79" ;
+		:Processing_Status = "intermediate" ;
+		:Collection_Location = "USF Institute for Marine Remote Sensing" ;
+		:Satellite = "Aqua" ;
+		:Input_File\(s\) = "/tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059074928.GEO, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059074928.L2_LAC_SST, /
+tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059075158.GEO, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059075158.L2_LAC_SST, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2
+013059075428.GEO, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059075428.L2_LAC_SST, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059075658.GEO, /tmp/s4p_run_map_mo
+dis_2.3_BOxkI5Rx/A2013059075658.L2_LAC_SST, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059075928.GEO, /tmp/s4p_run_map_modis_2.3_BOxkI5Rx/A2013059075928.L2_LA
+C_SST" ;
+		:Map_Projection_Name = "eqc" ;
+		:Proj_Projection_Parameters = "#Equidistant Cylindrical (Plate Caree)\n",
+			"#\tCyl, Sph\n",
+			"#\tlat_ts=\n",
+			"# +proj=eqc +ellps=WGS84" ;
+		:Temporal_Resolution = "pass" ;
+		:Spatial_Resolution = "1000" ;
+		:_History = "Direct read of HDF4 file through CDM library" ;
+		:HDF4_Version = "4.2.1 (NCSA HDF Version 4.2 Release 1, February 17, 2005)" ;
+		:Conventions = "CF-1.0" ;
+		:History = "Translated to CF-1.0 Conventions by Netcdf-Java CDM (NetcdfCFWriter)\n",
+			"Original Dataset = gcoos/seadas_sst; Translation Date = Thu Jun 05 15:27:45 CDT 2014" ;
+data:
+...
+-----
+
+
+Chlorophyll
+~~~~~~~~~~~
+
+XML Code
+^^^^^^^^
+
+The XML for the chlorophyll files is:
+
+[source,xml]
+-----
+  <dataset name="USF IMaRS MODIS Chlorophyll" ID="gcoos/seadas"
+         serviceName="allServices" urlPath="gcoos/seadas">
+
+    <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+
+      <aggregation dimName="time" type="joinNew" recheckEvery="5 min">
+        <variableAgg name="senz"/>
+        <variableAgg name="nLw_443"/>
+        <variableAgg name="aph_443_qaa"/>
+        <variableAgg name="flh"/>
+        <variableAgg name="seadas_K_490"/>
+        <variableAgg name="chl_carder"/>
+        <variableAgg name="nLw_531"/>
+        <variableAgg name="nLw_412"/>
+        <variableAgg name="taua_551"/>
+        <variableAgg name="nLw_488"/>
+        <variableAgg name="taua_869"/>
+        <variableAgg name="Kd_488_lee"/>
+        <variableAgg name="l2_flags"/>
+        <variableAgg name="chlor_a"/>
+        <variableAgg name="nLw_869"/>
+        <variableAgg name="adg_443_carder"/>
+        <variableAgg name="nLw_748"/>
+        <variableAgg name="adg_443_qaa"/>
+        <variableAgg name="nLw_551"/>
+        <variableAgg name="cfe"/>
+        <variableAgg name="sena"/>
+        <variableAgg name="nLw_678"/>
+        <variableAgg name="angstrom_551"/>
+        <variableAgg name="nLw_667"/>
+        <variableAgg name="tsm_clark"/>
+        <variableAgg name="bbp_551_qaa"/>
+        <variableAgg name="eps_78"/>
+        <scan location="/d3/thredds/seadas" regExp=".*MODIS.*\.gcoos.seadas.hdf$" dateFormatMark="MODIS.#yyyyDDD'.'hhmmss" subdirs="false"/>
+      </aggregation>
+
+      <dimension name="lon" orgName="fakeDim1"/>
+      <dimension name="lat" orgName="fakeDim0"/>
+
+      <variable name="lon" shape="lon" type="double">
+        <attribute name="units" value="degrees_east"/>
+        <values start="-98.0" increment="0.00909"/>
+      </variable>
+
+      <variable name="lat" shape="lat" type="double">
+        <attribute name="units" value="degrees_north"/>
+        <values start="31.0" increment="-0.00909"/>
+      </variable>
+
+      <variable name="senz" shape="time lat lon" type="short">
+        <attribute name="standard_name" value="zenith_angle"/>
+        <attribute name="units" value="degree"/>
+        <attribute name="scale_factor" type="float" value="0.00277778"/>
+        <attribute name="add_offset" type="float" value="90.0"/>
+      </variable>
+      <variable name="nLw_443" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="aph_443_qaa" shape="time lat lon" type="short">
+        <attribute name="units" value="m-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="2.5"/>
+      </variable>
+      <variable name="flh" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="1.0"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="seadas_K_490" shape="time lat lon" type="short">
+        <attribute name="units" value="m-1"/>
+        <attribute name="scale_factor" type="float" value="0.0002"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="chl_carder" shape="time lat lon" type="short">
+        <attribute name="units" value="mg m-3"/>
+        <attribute name="scale_factor" type="float" value="1.0"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="nLw_531" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="nLw_412" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="taua_551" shape="time lat lon" type="short">
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="nLw_488" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="taua_869" shape="time lat lon" type="short">
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="Kd_488_lee" shape="time lat lon" type="short">
+        <attribute name="units" value="m-1"/>
+        <attribute name="scale_factor" type="float" value="0.0002"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="l2_flags" shape="time lat lon" type="int">
+        <attribute name="units" value="1"/>
+      </variable>
+      <variable name="chlor_a" shape="time lat lon" type="short">
+        <attribute name="units" value="mg m-3"/>
+        <attribute name="scale_factor" type="float" value="1.0"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="nLw_869" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="adg_443_carder" shape="time lat lon" type="short">
+        <attribute name="units" value="m-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="2.5"/>
+      </variable>
+      <variable name="nLw_748" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="adg_443_qaa" shape="time lat lon" type="short">
+        <attribute name="units" value="m-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="2.5"/>
+      </variable>
+      <variable name="nLw_551" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="2.5"/>
+      </variable>
+      <variable name="cfe" shape="time lat lon" type="short">
+        <attribute name="scale_factor" type="float" value="1.0"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="sena" shape="time lat lon" type="short">
+        <attribute name="units" value="degree"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="nLw_678" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="angstrom_551" shape="time lat lon" type="short">
+        <attribute name="scale_factor" type="float" value="0.0002"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="nLw_667" shape="time lat lon" type="short">
+        <attribute name="units" value="mW cm-2 um-1 sr-1"/>
+        <attribute name="scale_factor" type="float" value="0.0001"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="tsm_clark" shape="time lat lon" type="short">
+        <attribute name="units" value="mg-1"/>
+        <attribute name="scale_factor" type="float" value="1.0"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+      <variable name="bbp_551_qaa" shape="time lat lon" type="short">
+        <attribute name="units" value="m-1"/>
+        <attribute name="scale_factor" type="float" value="0.000005"/>
+        <attribute name="add_offset" type="float" value="0.16"/>
+      </variable>
+      <variable name="eps_78" shape="time lat lon" type="short">
+        <attribute name="scale_factor" type="float" value="0.01"/>
+        <attribute name="add_offset" type="float" value="0.0"/>
+      </variable>
+    </netcdf>
+  </dataset>
+-----
+
+HDF4 Input File Header
+^^^^^^^^^^^^^^^^^^^^^^
+
+A typical header for these HDF4 files is:
+
+-----
+netcdf MODIS.2009296.180218.gcoos.seadas {
+dimensions:
+	fakeDim0 = 1430 ;
+	fakeDim1 = 2090 ;
+	fakeDim2 = 1430 ;
+	fakeDim3 = 2090 ;
+	fakeDim4 = 1430 ;
+	fakeDim5 = 2090 ;
+	fakeDim6 = 1430 ;
+	fakeDim7 = 2090 ;
+	fakeDim8 = 1430 ;
+	fakeDim9 = 2090 ;
+	fakeDim10 = 1430 ;
+	fakeDim11 = 2090 ;
+	fakeDim12 = 1430 ;
+	fakeDim13 = 2090 ;
+	fakeDim14 = 1430 ;
+	fakeDim15 = 2090 ;
+	fakeDim16 = 1430 ;
+	fakeDim17 = 2090 ;
+	fakeDim18 = 1430 ;
+	fakeDim19 = 2090 ;
+	fakeDim20 = 1430 ;
+	fakeDim21 = 2090 ;
+	fakeDim22 = 1430 ;
+	fakeDim23 = 2090 ;
+	fakeDim24 = 1430 ;
+	fakeDim25 = 2090 ;
+	fakeDim26 = 1430 ;
+	fakeDim27 = 2090 ;
+	fakeDim28 = 1430 ;
+	fakeDim29 = 2090 ;
+	fakeDim30 = 1430 ;
+	fakeDim31 = 2090 ;
+	fakeDim32 = 1430 ;
+	fakeDim33 = 2090 ;
+	fakeDim34 = 1430 ;
+	fakeDim35 = 2090 ;
+	fakeDim36 = 1430 ;
+	fakeDim37 = 2090 ;
+	fakeDim38 = 1430 ;
+	fakeDim39 = 2090 ;
+	fakeDim40 = 1430 ;
+	fakeDim41 = 2090 ;
+	fakeDim42 = 1430 ;
+	fakeDim43 = 2090 ;
+	fakeDim44 = 1430 ;
+	fakeDim45 = 2090 ;
+	fakeDim46 = 1430 ;
+	fakeDim47 = 2090 ;
+	fakeDim48 = 1430 ;
+	fakeDim49 = 2090 ;
+	fakeDim50 = 1430 ;
+	fakeDim51 = 2090 ;
+	fakeDim52 = 1430 ;
+	fakeDim53 = 2090 ;
+
+variables:
+	short senz(fakeDim0, fakeDim1) ;
+		senz:long_name = "Sensor Zenith Angle" ;
+		senz:slope = "[0.00277778]" ;
+		senz:valid_range = "[0 180]" ;
+		senz:units = "degree" ;
+		senz:intercept = "[90]" ;
+	short nLw_443(fakeDim2, fakeDim3) ;
+		nLw_443:long_name = "Normalized water-leaving radiance at 443 nm" ;
+		nLw_443:slope = "[  0.001]" ;
+		nLw_443:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_443:intercept = "[0]" ;
+	short aph_443_qaa(fakeDim4, fakeDim5) ;
+		aph_443_qaa:long_name = "Absorption due to phytoplankton at 443 nm, QAA algorithm" ;
+		aph_443_qaa:slope = "[  1e-04]" ;
+		aph_443_qaa:valid_range = "[0 5]" ;
+		aph_443_qaa:units = "m^-1" ;
+		aph_443_qaa:intercept = "[2.5]" ;
+	float flh(fakeDim6, fakeDim7) ;
+		flh:long_name = "Fluorescence Line Height" ;
+		flh:slope = "[1]" ;
+		flh:units = "mW cm^-2 um^-1 sr^-1" ;
+		flh:intercept = "[0]" ;
+	short seadas_K_490(fakeDim8, fakeDim9) ;
+		seadas_K_490:long_name = "Diffuse attenuation coefficient at 490 nm (OBPG)" ;
+		seadas_K_490:slope = "[ 0.0002]" ;
+		seadas_K_490:units = "m^-1" ;
+		seadas_K_490:intercept = "[0]" ;
+	float chl_carder(fakeDim10, fakeDim11) ;
+		chl_carder:long_name = "Chlorophyll Concentration, Carder model" ;
+		chl_carder:slope = "[1]" ;
+		chl_carder:units = "mg m^-3" ;
+		chl_carder:intercept = "[0]" ;
+	short nLw_531(fakeDim12, fakeDim13) ;
+		nLw_531:long_name = "Normalized water-leaving radiance at 531 nm" ;
+		nLw_531:slope = "[  0.001]" ;
+		nLw_531:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_531:intercept = "[0]" ;
+	short nLw_412(fakeDim14, fakeDim15) ;
+		nLw_412:long_name = "Normalized water-leaving radiance at 412 nm" ;
+		nLw_412:slope = "[  0.001]" ;
+		nLw_412:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_412:intercept = "[0]" ;
+	short taua_551(fakeDim16, fakeDim17) ;
+		taua_551:long_name = "Aerosol optical thickness at 551 nm" ;
+		taua_551:slope = "[  1e-04]" ;
+		taua_551:units = "dimensionless" ;
+		taua_551:intercept = "[0]" ;
+	short nLw_488(fakeDim18, fakeDim19) ;
+		nLw_488:long_name = "Normalized water-leaving radiance at 488 nm" ;
+		nLw_488:slope = "[  0.001]" ;
+		nLw_488:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_488:intercept = "[0]" ;
+	short taua_869(fakeDim20, fakeDim21) ;
+		taua_869:long_name = "Aerosol optical thickness at 869 nm" ;
+		taua_869:slope = "[  1e-04]" ;
+		taua_869:units = "dimensionless" ;
+		taua_869:intercept = "[0]" ;
+	short Kd_488_lee(fakeDim22, fakeDim23) ;
+		Kd_488_lee:long_name = "Diffuse Attenuation Coefficient at 488 nm, Lee Algorithm" ;
+		Kd_488_lee:slope = "[ 0.0002]" ;
+		Kd_488_lee:valid_range = "[0 5]" ;
+		Kd_488_lee:units = "m^-1" ;
+		Kd_488_lee:intercept = "[0]" ;
+	long l2_flags(fakeDim24, fakeDim25) ;
+		l2_flags:f02_name = "LAND" ;
+		l2_flags:long_name = "Level-2 Processing Flags" ;
+		l2_flags:f32_name = "OCEAN" ;
+		l2_flags:f03_name = "BADANC" ;
+		l2_flags:f21_name = "MODGLINT" ;
+		l2_flags:f10_name = "CLDICE" ;
+		l2_flags:f05_name = "HILT" ;
+		l2_flags:f06_name = "HISATZEN" ;
+		l2_flags:f07_name = "COASTZ" ;
+		l2_flags:f08_name = "NEGLW" ;
+		l2_flags:f25_name = "SEAICE" ;
+		l2_flags:f20_name = "MAXAERITER" ;
+		l2_flags:f13_name = "HISOLZEN" ;
+		l2_flags:f31_name = "SPARE" ;
+		l2_flags:f19_name = "TRICHO" ;
+		l2_flags:f18_name = "ABSAER" ;
+		l2_flags:f30_name = "HIPOL" ;
+		l2_flags:f04_name = "HIGLINT" ;
+		l2_flags:f17_name = "NAVWARN" ;
+		l2_flags:f01_name = "ATMFAIL" ;
+		l2_flags:f26_name = "NAVFAIL" ;
+		l2_flags:f24_name = "DARKPIXEL" ;
+		l2_flags:f16_name = "CHLFAIL" ;
+		l2_flags:f28_name = "SSTWARN" ;
+		l2_flags:f15_name = "LOWLW" ;
+		l2_flags:f11_name = "COCCOLITH" ;
+		l2_flags:f12_name = "TURBIDW" ;
+		l2_flags:f23_name = "ATMWARN" ;
+		l2_flags:f09_name = "STRAYLIGHT" ;
+		l2_flags:f22_name = "CHLWARN" ;
+		l2_flags:f29_name = "SSTFAIL" ;
+		l2_flags:f27_name = "FILTER" ;
+		l2_flags:f14_name = "HITAU" ;
+		l2_flags:units = "dimensionless" ;
+	float chlor_a(fakeDim26, fakeDim27) ;
+		chlor_a:long_name = "Chlorophyll Concentration, OC3 Algorithm" ;
+		chlor_a:slope = "[1]" ;
+		chlor_a:units = "mg m^-3" ;
+		chlor_a:intercept = "[0]" ;
+	short nLw_869(fakeDim28, fakeDim29) ;
+		nLw_869:long_name = "Normalized water-leaving radiance at 869 nm" ;
+		nLw_869:slope = "[  1e-04]" ;
+		nLw_869:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_869:intercept = "[0]" ;
+	short adg_443_carder(fakeDim30, fakeDim31) ;
+		adg_443_carder:long_name = "Absorption due to gelbstof and detrital material at 443 nm, Carder algorithm" ;
+		adg_443_carder:slope = "[  1e-04]" ;
+		adg_443_carder:valid_range = "[0 5]" ;
+		adg_443_carder:units = "m^-1" ;
+		adg_443_carder:intercept = "[2.5]" ;
+	short nLw_748(fakeDim32, fakeDim33) ;
+		nLw_748:long_name = "Normalized water-leaving radiance at 748 nm" ;
+		nLw_748:slope = "[  1e-04]" ;
+		nLw_748:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_748:intercept = "[0]" ;
+	short adg_443_qaa(fakeDim34, fakeDim35) ;
+		adg_443_qaa:long_name = "Absorption due to gelbstof and detrital material at 443 nm, QAA algorithm" ;
+		adg_443_qaa:slope = "[  1e-04]" ;
+		adg_443_qaa:valid_range = "[0 5]" ;
+		adg_443_qaa:units = "m^-1" ;
+		adg_443_qaa:intercept = "[2.5]" ;
+	short nLw_551(fakeDim36, fakeDim37) ;
+		nLw_551:long_name = "Normalized water-leaving radiance at 551 nm" ;
+		nLw_551:slope = "[  0.001]" ;
+		nLw_551:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_551:intercept = "[0]" ;
+	float cfe(fakeDim38, fakeDim39) ;
+		cfe:long_name = "Fluorescence Efficiency" ;
+		cfe:slope = "[1]" ;
+		cfe:units = "dimensionless" ;
+		cfe:intercept = "[0]" ;
+	short sena(fakeDim40, fakeDim41) ;
+		sena:long_name = "Sensor Azimuth Angle" ;
+		sena:slope = "[0.0111111]" ;
+		sena:valid_range = "[-180 180]" ;
+		sena:units = "degree" ;
+		sena:intercept = "[0]" ;
+	short nLw_678(fakeDim42, fakeDim43) ;
+		nLw_678:long_name = "Normalized water-leaving radiance at 678 nm" ;
+		nLw_678:slope = "[  1e-04]" ;
+		nLw_678:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_678:intercept = "[0]" ;
+	short angstrom_551(fakeDim44, fakeDim45) ;
+		angstrom_551:long_name = "Angstrom coefficient, 551 to 869 nm" ;
+		angstrom_551:slope = "[ 0.0002]" ;
+		angstrom_551:units = "dimensionless" ;
+		angstrom_551:intercept = "[0]" ;
+	short nLw_667(fakeDim46, fakeDim47) ;
+		nLw_667:long_name = "Normalized water-leaving radiance at 667 nm" ;
+		nLw_667:slope = "[  1e-04]" ;
+		nLw_667:units = "mW cm^-2 um^-1 sr^-1" ;
+		nLw_667:intercept = "[0]" ;
+	float tsm_clark(fakeDim48, fakeDim49) ;
+		tsm_clark:long_name = "Total Suspended Matter, D. Clark, 2003" ;
+		tsm_clark:slope = "[1]" ;
+		tsm_clark:units = "mg l^-1" ;
+		tsm_clark:intercept = "[0]" ;
+	short bbp_551_qaa(fakeDim50, fakeDim51) ;
+		bbp_551_qaa:long_name = "Particulate backscatter at 551 nm, QAA algorithm" ;
+		bbp_551_qaa:slope = "[  5e-06]" ;
+		bbp_551_qaa:valid_range = "[0 1]" ;
+		bbp_551_qaa:units = "m^-1" ;
+		bbp_551_qaa:intercept = "[   0.16]" ;
+	byte eps_78(fakeDim52, fakeDim53) ;
+		eps_78:long_name = "Epsilon of aerosol correction at 765 and 865 nm" ;
+		eps_78:slope = "[   0.01]" ;
+		eps_78:units = "dimensionless" ;
+		eps_78:intercept = "[0]" ;
+
+// global attributes:
+		:Map Projection Category = "Proj 4.4.7" ;
+		:Data Source Type = "Direct Broadcast" ;
+		:L3 Software Name = "/usr/bin/map_modis.pl" ;
+		:L3 Software Version = "4.2" ;
+		:Map Limit = "18, -98, 31, -79" ;
+		:Processing Status = "final" ;
+		:Collection Location = "USF Institute for Marine Remote Sensing" ;
+		:Satellite = "Aqua" ;
+		:Input File(s) = "/tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296180211.GEO, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296180211.L2_LAC, /tmp/s4
+p_run_map_modis_2.3_5K1IKxrC/A2009296180441.GEO, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296180441.L2_LAC, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A20092961807
+11.GEO, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296180711.L2_LAC, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296180941.GEO, /tmp/s4p_run_map_modis_2.3_5K1IKx
+rC/A2009296180941.L2_LAC, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296181211.GEO, /tmp/s4p_run_map_modis_2.3_5K1IKxrC/A2009296181211.L2_LAC" ;
+		:Map Projection Name = "eqc" ;
+		:Proj Projection Parameters = "#Equidistant Cylindrical (Plate Caree)\n",
+    "#\tCyl, Sph\n",
+    "#\tlat_ts=\n",
+    "# +proj=eqc +ellps=WGS84" ;
+		:Temporal Resolution = "pass" ;
+		:Spatial Resolution = "1000" ;
+
+data:
+...
+-----
+
+NetCDF Output File Header
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A typical header of a NetCDF output file obtained via the
+subset server at:
+
+http://csanady.tamu.edu:8080/thredds/ncss/grid/gcoos/seadas/dataset.html[+http://csanady.tamu.edu:8080/thredds/ncss/grid/gcoos/seadas/dataset.html+]
+
+is:
+
+-----
+netcdf seadas {
+dimensions:
+	time = 1 ;
+	lat = 1430 ;
+	lon = 2090 ;
+	time_strlen = 20 ;
+variables:
+	float Kd_488_lee(time, lat, lon) ;
+		Kd_488_lee:long_name = "Diffuse Attenuation Coefficient at 488 nm, Lee Algorithm" ;
+		Kd_488_lee:slope = "[ 0.0002]" ;
+		Kd_488_lee:valid_range = "[0 5]" ;
+		Kd_488_lee:units = "m-1" ;
+		Kd_488_lee:intercept = "[0]" ;
+		Kd_488_lee:coordinates = "time lat lon lat lon" ;
+	char time(time, time_strlen) ;
+		time:_CoordinateAxisType = "Time" ;
+	double lat(lat) ;
+		lat:units = "degrees_north" ;
+		lat:_CoordinateAxisType = "Lat" ;
+		lat:standard_name = "latitude" ;
+	double lon(lon) ;
+		lon:units = "degrees_east" ;
+		lon:_CoordinateAxisType = "Lon" ;
+		lon:standard_name = "longitude" ;
+	float adg_443_carder(time, lat, lon) ;
+		adg_443_carder:long_name = "Absorption due to gelbstof and detrital material at 443 nm, Carder algorithm" ;
+		adg_443_carder:slope = "[  1e-04]" ;
+		adg_443_carder:valid_range = "[0 5]" ;
+		adg_443_carder:units = "m-1" ;
+		adg_443_carder:intercept = "[2.5]" ;
+		adg_443_carder:coordinates = "time lat lon lat lon" ;
+	float adg_443_qaa(time, lat, lon) ;
+		adg_443_qaa:long_name = "Absorption due to gelbstof and detrital material at 443 nm, QAA algorithm" ;
+		adg_443_qaa:slope = "[  1e-04]" ;
+		adg_443_qaa:valid_range = "[0 5]" ;
+		adg_443_qaa:units = "m-1" ;
+		adg_443_qaa:intercept = "[2.5]" ;
+		adg_443_qaa:coordinates = "time lat lon lat lon" ;
+	float angstrom_551(time, lat, lon) ;
+		angstrom_551:long_name = "Angstrom coefficient, 551 to 869 nm" ;
+		angstrom_551:slope = "[ 0.0002]" ;
+		angstrom_551:units = "dimensionless" ;
+		angstrom_551:intercept = "[0]" ;
+		angstrom_551:coordinates = "time lat lon lat lon" ;
+	float aph_443_qaa(time, lat, lon) ;
+		aph_443_qaa:long_name = "Absorption due to phytoplankton at 443 nm, QAA algorithm" ;
+		aph_443_qaa:slope = "[  1e-04]" ;
+		aph_443_qaa:valid_range = "[0 5]" ;
+		aph_443_qaa:units = "m-1" ;
+		aph_443_qaa:intercept = "[2.5]" ;
+		aph_443_qaa:coordinates = "time lat lon lat lon" ;
+	float bbp_551_qaa(time, lat, lon) ;
+		bbp_551_qaa:long_name = "Particulate backscatter at 551 nm, QAA algorithm" ;
+		bbp_551_qaa:slope = "[  5e-06]" ;
+		bbp_551_qaa:valid_range = "[0 1]" ;
+		bbp_551_qaa:units = "m-1" ;
+		bbp_551_qaa:intercept = "[   0.16]" ;
+		bbp_551_qaa:coordinates = "time lat lon lat lon" ;
+	float cfe(time, lat, lon) ;
+		cfe:long_name = "Fluorescence Efficiency" ;
+		cfe:slope = "[1]" ;
+		cfe:units = "dimensionless" ;
+		cfe:intercept = "[0]" ;
+		cfe:coordinates = "time lat lon lat lon" ;
+	float chl_carder(time, lat, lon) ;
+		chl_carder:long_name = "Chlorophyll Concentration, Carder model" ;
+		chl_carder:slope = "[1]" ;
+		chl_carder:units = "mg m-3" ;
+		chl_carder:intercept = "[0]" ;
+		chl_carder:coordinates = "time lat lon lat lon" ;
+	float chlor_a(time, lat, lon) ;
+		chlor_a:long_name = "Chlorophyll Concentration, OC3 Algorithm" ;
+		chlor_a:slope = "[1]" ;
+		chlor_a:units = "mg m-3" ;
+		chlor_a:intercept = "[0]" ;
+		chlor_a:coordinates = "time lat lon lat lon" ;
+	float eps_78(time, lat, lon) ;
+		eps_78:long_name = "Epsilon of aerosol correction at 765 and 865 nm" ;
+		eps_78:slope = "[   0.01]" ;
+		eps_78:units = "dimensionless" ;
+		eps_78:intercept = "[0]" ;
+		eps_78:coordinates = "time lat lon lat lon" ;
+	float flh(time, lat, lon) ;
+		flh:long_name = "Fluorescence Line Height" ;
+		flh:slope = "[1]" ;
+		flh:units = "mW cm-2 um-1 sr-1" ;
+		flh:intercept = "[0]" ;
+		flh:coordinates = "time lat lon lat lon" ;
+	int l2_flags(time, lat, lon) ;
+		l2_flags:f02_name = "LAND" ;
+		l2_flags:long_name = "Level-2 Processing Flags" ;
+		l2_flags:f32_name = "OCEAN" ;
+		l2_flags:f03_name = "BADANC" ;
+		l2_flags:f21_name = "MODGLINT" ;
+		l2_flags:f10_name = "CLDICE" ;
+		l2_flags:f05_name = "HILT" ;
+		l2_flags:f06_name = "HISATZEN" ;
+		l2_flags:f07_name = "COASTZ" ;
+		l2_flags:f08_name = "NEGLW" ;
+		l2_flags:f25_name = "SEAICE" ;
+		l2_flags:f20_name = "MAXAERITER" ;
+		l2_flags:f13_name = "HISOLZEN" ;
+		l2_flags:f31_name = "SPARE" ;
+		l2_flags:f19_name = "TRICHO" ;
+		l2_flags:f18_name = "ABSAER" ;
+		l2_flags:f30_name = "HIPOL" ;
+		l2_flags:f04_name = "HIGLINT" ;
+		l2_flags:f17_name = "NAVWARN" ;
+		l2_flags:f01_name = "ATMFAIL" ;
+		l2_flags:f26_name = "NAVFAIL" ;
+		l2_flags:f24_name = "DARKPIXEL" ;
+		l2_flags:f16_name = "CHLFAIL" ;
+		l2_flags:f28_name = "SSTWARN" ;
+		l2_flags:f15_name = "LOWLW" ;
+		l2_flags:f11_name = "COCCOLITH" ;
+		l2_flags:f12_name = "TURBIDW" ;
+		l2_flags:f23_name = "ATMWARN" ;
+		l2_flags:f09_name = "STRAYLIGHT" ;
+		l2_flags:f22_name = "CHLWARN" ;
+		l2_flags:f29_name = "SSTFAIL" ;
+		l2_flags:f27_name = "FILTER" ;
+		l2_flags:f14_name = "HITAU" ;
+		l2_flags:units = "1" ;
+		l2_flags:coordinates = "time lat lon lat lon" ;
+	float nLw_412(time, lat, lon) ;
+		nLw_412:long_name = "Normalized water-leaving radiance at 412 nm" ;
+		nLw_412:slope = "[  0.001]" ;
+		nLw_412:units = "mW cm-2 um-1 sr-1" ;
+		nLw_412:intercept = "[0]" ;
+		nLw_412:coordinates = "time lat lon lat lon" ;
+	float nLw_443(time, lat, lon) ;
+		nLw_443:long_name = "Normalized water-leaving radiance at 443 nm" ;
+		nLw_443:slope = "[  0.001]" ;
+		nLw_443:units = "mW cm-2 um-1 sr-1" ;
+		nLw_443:intercept = "[0]" ;
+		nLw_443:coordinates = "time lat lon lat lon" ;
+	float nLw_488(time, lat, lon) ;
+		nLw_488:long_name = "Normalized water-leaving radiance at 488 nm" ;
+		nLw_488:slope = "[  0.001]" ;
+		nLw_488:units = "mW cm-2 um-1 sr-1" ;
+		nLw_488:intercept = "[0]" ;
+		nLw_488:coordinates = "time lat lon lat lon" ;
+	float nLw_531(time, lat, lon) ;
+		nLw_531:long_name = "Normalized water-leaving radiance at 531 nm" ;
+		nLw_531:slope = "[  0.001]" ;
+		nLw_531:units = "mW cm-2 um-1 sr-1" ;
+		nLw_531:intercept = "[0]" ;
+		nLw_531:coordinates = "time lat lon lat lon" ;
+	float nLw_551(time, lat, lon) ;
+		nLw_551:long_name = "Normalized water-leaving radiance at 551 nm" ;
+		nLw_551:slope = "[  0.001]" ;
+		nLw_551:units = "mW cm-2 um-1 sr-1" ;
+		nLw_551:intercept = "[0]" ;
+		nLw_551:coordinates = "time lat lon lat lon" ;
+	float nLw_667(time, lat, lon) ;
+		nLw_667:long_name = "Normalized water-leaving radiance at 667 nm" ;
+		nLw_667:slope = "[  1e-04]" ;
+		nLw_667:units = "mW cm-2 um-1 sr-1" ;
+		nLw_667:intercept = "[0]" ;
+		nLw_667:coordinates = "time lat lon lat lon" ;
+	float nLw_678(time, lat, lon) ;
+		nLw_678:long_name = "Normalized water-leaving radiance at 678 nm" ;
+		nLw_678:slope = "[  1e-04]" ;
+		nLw_678:units = "mW cm-2 um-1 sr-1" ;
+		nLw_678:intercept = "[0]" ;
+		nLw_678:coordinates = "time lat lon lat lon" ;
+	float nLw_748(time, lat, lon) ;
+		nLw_748:long_name = "Normalized water-leaving radiance at 748 nm" ;
+		nLw_748:slope = "[  1e-04]" ;
+		nLw_748:units = "mW cm-2 um-1 sr-1" ;
+		nLw_748:intercept = "[0]" ;
+		nLw_748:coordinates = "time lat lon lat lon" ;
+	float nLw_869(time, lat, lon) ;
+		nLw_869:long_name = "Normalized water-leaving radiance at 869 nm" ;
+		nLw_869:slope = "[  1e-04]" ;
+		nLw_869:units = "mW cm-2 um-1 sr-1" ;
+		nLw_869:intercept = "[0]" ;
+		nLw_869:coordinates = "time lat lon lat lon" ;
+	float seadas_K_490(time, lat, lon) ;
+		seadas_K_490:long_name = "Diffuse attenuation coefficient at 490 nm (OBPG)" ;
+		seadas_K_490:slope = "[ 0.0002]" ;
+		seadas_K_490:units = "m-1" ;
+		seadas_K_490:intercept = "[0]" ;
+		seadas_K_490:coordinates = "time lat lon lat lon" ;
+	float sena(time, lat, lon) ;
+		sena:long_name = "Sensor Azimuth Angle" ;
+		sena:slope = "[0.0111111]" ;
+		sena:valid_range = "[-180 180]" ;
+		sena:units = "degree" ;
+		sena:intercept = "[0]" ;
+		sena:coordinates = "time lat lon lat lon" ;
+	float senz(time, lat, lon) ;
+		senz:long_name = "Sensor Zenith Angle" ;
+		senz:slope = "[0.00277778]" ;
+		senz:valid_range = "[0 180]" ;
+		senz:units = "degree" ;
+		senz:intercept = "[90]" ;
+		senz:standard_name = "zenith_angle" ;
+		senz:coordinates = "time lat lon lat lon" ;
+	float taua_551(time, lat, lon) ;
+		taua_551:long_name = "Aerosol optical thickness at 551 nm" ;
+		taua_551:slope = "[  1e-04]" ;
+		taua_551:units = "dimensionless" ;
+		taua_551:intercept = "[0]" ;
+		taua_551:coordinates = "time lat lon lat lon" ;
+	float taua_869(time, lat, lon) ;
+		taua_869:long_name = "Aerosol optical thickness at 869 nm" ;
+		taua_869:slope = "[  1e-04]" ;
+		taua_869:units = "dimensionless" ;
+		taua_869:intercept = "[0]" ;
+		taua_869:coordinates = "time lat lon lat lon" ;
+	float tsm_clark(time, lat, lon) ;
+		tsm_clark:long_name = "Total Suspended Matter, D. Clark, 2003" ;
+		tsm_clark:slope = "[1]" ;
+		tsm_clark:units = "mg-1" ;
+		tsm_clark:intercept = "[0]" ;
+		tsm_clark:coordinates = "time lat lon lat lon" ;
+
+// global attributes:
+		:Map_Projection_Category = "Proj 4.4.7" ;
+		:Data_Source_Type = "Direct Broadcast" ;
+		:L3_Software_Name = "/usr/bin/map_modis.pl" ;
+		:L3_Software_Version = "4.2" ;
+		:Map_Limit = "18, -98, 31, -79" ;
+		:Processing_Status = "intermediate" ;
+		:Collection_Location = "USF Institute for Marine Remote Sensing" ;
+		:Satellite = "Aqua" ;
+		:Input_File\(s\) = "/tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058194349.GEO, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058194349.L2_LAC, /tmp/
+s4p_run_map_modis_2.3_FdIY0mBG/A2013058194619.GEO, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058194619.L2_LAC, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A201305819
+4849.GEO, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058194849.L2_LAC, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058195119.GEO, /tmp/s4p_run_map_modis_2.3_FdIY
+0mBG/A2013058195119.L2_LAC, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058195349.GEO, /tmp/s4p_run_map_modis_2.3_FdIY0mBG/A2013058195349.L2_LAC" ;
+		:Map_Projection_Name = "eqc" ;
+		:Proj_Projection_Parameters = "#Equidistant Cylindrical (Plate Caree)\n",
+			"#\tCyl, Sph\n",
+			"#\tlat_ts=\n",
+			"# +proj=eqc +ellps=WGS84" ;
+		:Temporal_Resolution = "pass" ;
+		:Spatial_Resolution = "1000" ;
+		:_History = "Direct read of HDF4 file through CDM library" ;
+		:HDF4_Version = "4.2.1 (NCSA HDF Version 4.2 Release 1, February 17, 2005)" ;
+		:Conventions = "CF-1.0" ;
+		:History = "Translated to CF-1.0 Conventions by Netcdf-Java CDM (NetcdfCFWriter)\n",
+			"Original Dataset = gcoos/seadas; Translation Date = Thu Jun 05 15:33:39 CDT 2014" ;
+data:
+...
+-----
+
+

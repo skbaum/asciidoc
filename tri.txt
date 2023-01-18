@@ -1,0 +1,321 @@
+
+[[Trilinos]]
+Trilinos
+~~~~~~~~
+
+An effort to develop algorithms and enabling technologies within an object-oriented software framework for the solution of large-scale, complex multi-physics engineering and scientific problems. A unique design feature of Trilinos is its focus on packages.
+
+Each Trilinos package is a self-contained, independent piece of software with its own set of requirements, its own development team and group of users. Because of this, Trilinos itself is designed to respect the autonomy of packages. Trilinos offers a variety of ways for a particular package to interact with other Trilinos packages. It also offers a set of tools that can assist package developers with builds across multiple platforms, generating documentation and regression testing across a set of target platforms. At the same time, what a package must do to be called a Trilinos package is minimal, and varies with each package.
+
+https://trilinos.org/[+https://trilinos.org/+]
+
+*Trilinos Hands-On Tutorial* - https://code.google.com/p/trilinos/wiki/TrilinosHandsOnTutorial[+https://code.google.com/p/trilinos/wiki/TrilinosHandsOnTutorial+]
+
+*ETUG Meeting 2015* - https://trilinos.org/community/events/european-trilinos-user-group-meeting-2015/[+https://trilinos.org/community/events/european-trilinos-user-group-meeting-2015/+]
+
+[[Amesos]]
+Amesos
+^^^^^^
+
+The direct sparse solver package in xref:Trilinos[Trilinos].
+The goal of Amesos is to make AX=B as easy as it sounds, at least for direct methods.
+It provides clean and consistent interfaces for
+xref:LAPACK[LAPACK], xref:UMFPACK[UMFPACK], xref:TAUCS[TAUCS],
+xref:PARDISO[PARDISO], xref:SuperLU[SuperLU], xref:DSCPACK[DSCPACK],
+xref:SCALAPACK[SCALAPACK] and xref:MUMPS[MUMPS].
+
+[[Anasazi]]
+Anasazi
+^^^^^^^
+
+An extensible and interoperable framework for large-scale eigenvalue algorithms in
+xref:Trilinos[Trilinos].
+The motivation for this framework is to provide a generic interface to a collection of algorithms for solving large-scale eigenvalue problems. Anasazi is interoperable because both the matrix and vectors (defining the eigenspace) are considered to be opaque objects—only knowledge of the matrix and vectors via elementary operations is necessary.  One of the goals of Anasazi is to allow the user the flexibility to specify the data representation for the matrix and vectors and so leverage any existing software investment.
+
+An implementation of Anasazi is accomplished via the use of interfaces. Current interfaces available include Epetra and Tpetra.  This means any libraries that understand Epetra and Tpetra matrices and vectors (such as AztecOO and Belos) may also be used in conjunction with Anasazi.
+
+https://trilinos.org/packages/anasazi/[+https://trilinos.org/packages/anasazi/+]
+
+[[AztecOO]]
+AztecOO
+^^^^^^^
+
+Provides an object-oriented interface the the well-known xref:Aztec[Aztec] solver library. Furthermore, it allows flexible construction of matrix and vector arguments via Epetra matrix and vector classes. Finally, AztecOO provide additional functionality not found in Aztec and any future enhancements to the Aztec package will be available only through the AztecOO interfaces.
+
+https://trilinos.org/packages/aztecoo/[+https://trilinos.org/packages/aztecoo/+]
+
+[[Belos]]
+Belos
+^^^^^
+
+This xref:Trilinos[Trilinos] package
+provides next-generation iterative linear solvers and a powerful linear solver developer framework. 
+Belos provides abstract interfaces to linear algebra using traits mechanisms. This allows the user to leverage any existing investment in their description of matrices and vectors. The provided concrete linear algebra adapters enable Belos to be used anywhere xref:Epetra[Epetra] and xref:Thyra[Thyra] are employed for linear algebra services.
+
+Belos also provides interfaces to orthogonalization; implementations of iterated classical Gram-Schmidt (ICGS); classical Gram-Schmidt with a DGKS correction step; iterated modified Gram-Schmidt (IMGS); iteration kernels; and implementations of conjugate gradient (CG), block CG, block GMRES, pseudo-block GMRES, block flexible GMRES, and GCRO-DR iterations.
+
+Powerful solver managers are provided for solving a linear system using CG or block CG, GMRES or block GMRES with restarting, pseudo-block GMRES for performing single-vector GMRES simultaneously on multiple right-hand sides, and a single-vector recycled Krylov method (GCRO-DR).
+A basic linear problem class is provided for the user to define a unpreconditioned or preconditioned (left, right, two-sided) linear system for Belos to solve.
+
+https://trilinos.org/packages/belos/[+https://trilinos.org/packages/belos/+]
+
+[[Epetra]]
+Epetra
+^^^^^^
+
+This provides the fundamental construction routines and services function that are required for serial and parallel linear algebra libraries.
+This includes both construction and use of sparse graphs, sparse matrices, and dense vectors.
+Epetra provides the underlying foundation for all xref:Trilinos[Trilinos] solvers.
+
+https://trilinos.org/packages/epetra/[+https://trilinos.org/packages/epetra/+]
+
+[[Fei]]
+Fei
+^^^
+
+A general interface for assembling finite-element data into a linear system of equations. It is an abstraction layer that insulates finite-element application codes from linear-algebra issues such as sparse matrix storage formats and mappings from nodes and solution fields to distributed equation spaces. It puts a common face on various linear solvers, allowing finite-element applications to switch from one solver library to another with minimal changes to application code. FEI provides natural mechanisms for assembling finite-element data such as element-wise stiffness arrays and load vectors, boundary-condition specifications and constraint relations. It accepts data from multi-physics problems, allowing arbitrarily complicated elements with multiple solution fields per node, and cell centered fields. It is designed for use in distributed-memory parallel finite-element applications, to assemble and solve distributed linear systems using scalable underlying solver libraries.
+
+https://trilinos.org/packages/fei/[+https://trilinos.org/packages/fei/+]
+
+[[Galeri]]
+Galeri
+^^^^^^
+
+A suite of utilities and classes to generate a variety of (distributed) linear systems. Galeri’s functionalities are very close to that of the MATLAB’s +gallery()+ function.
+
+https://trilinos.org/packages/galeri/[+https://trilinos.org/packages/galeri/+]
+
+[[IFPACK]]
+IFPACK
+^^^^^^
+
+A suite of object-oriented algebraic preconditioners for the solution of preconditioned iterative solvers. IFPACK constructors expect an Epetra_RowMatrix object for construction. IFPACK is part of the Trilinos Solver Project and IFPACK object interact well with other Trilinos classes. In particular, IFPACK can be used as a preconditioner for xref:AztecOO[AztecOO].
+
+IFPACK contains one-level domain decomposition preconditioners of overlapping type. Each “subdomain” is defined by the set of rows assigned to a given processors. Several options are available for the local solution, ranging from simple relaxation schemes, to incomplete factorizations, to direct solvers (through the Amesos package).
+
+To compile IFPACK, one needs the xref:Epetra[Epetra] and xref:Teuchos[Teuchos] packages of Trilinos. It is convenient to enable
+the xref:AztecOO[AztecOO] and xref:Galeri[Galeri] packages to compile and run some of the examples, and
+xref:Amesos[Amesos] to enable direct solvers. xref:ML[ML] can take advantage of IFPACK to define smoothers.
+
+https://trilinos.org/packages/ifpack/[+https://trilinos.org/packages/ifpack/+]
+
+[[Intrepid]]
+Intrepid
+^^^^^^^^
+
+A library of interoperable xref:Trilinos[Trilinos] tools for compatible discretizations of PDEs.
+The latest version of Intrepid is intended primarily for application developers who want to reuse large parts of their existing code frameworks such as I/O, data structures, assembly routines, etc. while gaining access to advanced discretization capabilities provided.
+In such cases the bulk of the data is owned and managed by the user rather than by Intrepid. To avoid unnecessary and possibly expensive copying of data to and from Intrepid, the expert version of the package comprises of mostly stateless classes operating on user-owned data.Virtually all numerical data required by PDE codes can be represented as a multi-dimensional array of scalar values. For this reason, and to enahnce interoprability, Intrepid classes are templated on generic multi-dimensional arrays. The xref:Shards[Shards] package provides an implementation of a multi-dimensional array that can be used for that purpose, or users can write their own multi-dimensional arrays as long as a minimal interface is supported.
+
+https://trilinos.org/packages/intrepid/[+https://trilinos.org/packages/intrepid/+]
+
+[[Mesquite]]
+Mesquite
+^^^^^^^^
+
+A linkable software library that applies a variety of node-movement algorithms to improve the quality and/or adapt a given mesh. 
+Mesquite improves surface or volume meshes which are structured, unstructured, hybrid, or non-comformal. A variety of element types are permitted. Mesquite is designed to be as efficient as possible so that large meshes can be improved.
+
+The Mesquite mesh quality improvement toolkit is a software library that can be run stand-alone using provided drivers or called directly from an application code to improve meshes via node-movement techniques.
+Mesquite architecture is derived directly from the underlying mathematical mesh optimization theory.
+For example, at the highest level Mesquite consists of objects and classes such as mesh quality metrics, objective function templates, mesh quality improvement solvers), mesh quality assessors, and Target-matrix calculators. The latter class provides the crucial link between geometric mesh properties such as length, area, angles, and orientation and solution properties such as gradients, curvature, and local error estimates.
+
+https://trilinos.org/packages/mesquite/[+https://trilinos.org/packages/mesquite/+]
+
+[[ML]]
+ML
+^^
+
+The main multigrid conditioning package for xref:Trilinos[Trilinos].
+ML is designed to solve large sparse linear systems of equations arising primarily from elliptic PDE discretizations. ML is used to define and build multigrid solvers and preconditioners, and it contains black-box classes to construct highly-scalable smoothed aggregation preconditioners. ML preconditioners have been used on thousands of processors for a variety of problems, including the incompressible Navier-Stokes equations with heat and mass transfer, linear and nonlinear elasticity equations, the Maxwell equations, semiconductor equations, and more.
+
+ML can also be used as a framework to generate new multigrid methods. Using ML’s internal aggregation routines and Galerkin products, it is possible to focus on new types of inter-grid transfer operators without having to address the cumbersome aspects of generating an entirely new parallel algebraic multigrid code. We have used this flexibility to produce special multilevel methods using coarse grid finite element functions to serve as inter-grid transfers.
+
+https://trilinos.org/packages/ml/[+https://trilinos.org/packages/ml/+]
+
+[[Moertel]]
+Moertel
+^^^^^^^
+
+A xref:Trilinos[Trilinos] package that supplies capabilities for nonconforming mesh tying and contact formulations in 2 and 3 dimensions using Mortar methods. Mortar methods are a type of Lagrange Multiplier constraint that can be used in contact formulations and in non-conforming or conforming mesh tying as well as in domain decomposition techniques. Originally introduced as a domain decomposition method for spectral elements, Mortar methods are used in a large class of nonconforming situations such as the surface coupling of different physical models, discretization schemes or non-matching triangulations along interior interfaces of a domain.
+
+https://trilinos.org/packages/moertel/[+https://trilinos.org/packages/moertel/+]
+
+[[MOOCHO]]
+MOOCHO
+^^^^^^
+
+The Multifunctional Object-Oriented arCHitecture for Optimization (MOOCHO) package for
+xref:Trilinos[Trilinos] is designed to solve large-scale, equality and inequality nonlinearly constrained, non-convex optimization problems (i.e. nonlinear programs) using reduced-space successive quadratic programming (SQP) methods.
+MOOCHO was initially developed to solve general sparse optimization problems where there is no clear distinction between state variables and optimization parameters. For these types of problems a serial sparse direct solver must be used (i.e. MA28) to find a square basis that is needed for the variable reduction decompositions that are current supported.
+
+More recently, MOOCHO has been interfaced through xref:Thyra[Thyra] to address very large-scale, massively parallel, simulation-constrained optimization problems.
+For simulation-constrained optimization problems, MOOCHO can utilize the full power of the massively parallel iterative linear solvers and preconditioners available in Trilinos through Thyra through the Stratimikos package by just flipping a few switches in a parameter list.
+These include all of the direct solves in Amesos, the preconditioners in Ifpack and ML, and the iterative Krylov solvers in xref:AztecOO[AztecOO] and xref:Belos[Belos].
+
+https://trilinos.org/packages/moocho/[+https://trilinos.org/packages/moocho/+]
+
+[[PAMGEN]]
+PAMGEN
+^^^^^^
+
+A xref:Trilinos[Trilinos] package that creates hexahedral or quadrilateral (in 2D) finite element meshes of simple shapes (cubes and cylinders) in parallel. When linked to an application as a library, it allows each process of a parallel simulation to generate its finite element domain representation at execution time.
+
+Serial generation of large finite-element meshes is a serious bottleneck for large parallel simulations. PAMGEN, a parallel mesh generation library, surmounts this barrier by allowing on-the-fly scalable generation of simple finite element meshes.  While each processor is provided with a complete specification of the mesh, it only creates a full representation of the elements that will be local to that processor. Since each processor has a complete specification of the mesh, no inter-processor communication is performed. The mesh generation proceeds through steps of decomposition, local element creation, and communication information generation. The final product of the library is a data structure that may be queried to determine local mesh geometry and topology as well as inter-processor connections. 
+
+https://trilinos.org/packages/pamgen/[+https://trilinos.org/packages/pamgen/+]
+
+[[Phalanx]]
+Phalanx
+^^^^^^^
+
+A local graph-based field evaluation toolkit for xref:Trilinos[Trilinos].
+The intended use case is for solving general partial differential equations (PDEs), but there is
+no specific code implemented for PDEs in Phalanx. It can be applied to any system that requires function evaluation. In terms of PDE discretization schemes it can be used for finite element, finite difference and finite volume.
+
+Phalanx is a local node evaluation tool. Phalanx relies on the xref:Kokkos[Kokkos] package for performance portability and provides a simple performant interface to multicore and manycore architectures. While its main use is for large scale parallel high performance computing, the MPI communication (possibly required for ghosting) must be handled by other packages in the toolchain (separation of concerns). Users can handle this manually as Phalanx places no requirements on this but we recomend the xref:Tpetra[Tpetra] package be leveraged.
+
+The main goal of Phalanx is to decompose a complex problem into a number of simpler problems with managed dependencies to support rapid development and extensibility. Through the use of template metaprogramming concepts, Phalanx supports arbitrary user defined data types and evaluation types. This allows for extreme flexibility in integration with user applications and provides extensive support for embedded technology such as automatic differentiation for sensitivity analysis, optimization, and uncertainty quantification. This approach, coupled with the template capabilities of C++ offers a number of unique and powerful capabilities.
+
+https://trilinos.org/packages/phalanx/[+https://trilinos.org/packages/phalanx/+]
+
+[[Piro]]
+Piro
+^^^^
+
+A top-level, unifying xref:Trilinos[Trilinos] package providing embedded nonlinear
+analysis capabilities.
+The main purpose of the package is to provide driver classes for the common uses of Trilinos nonlinear analysis tools. These so-called Solvers all can be constructed similarly, with a Model Evaluator and a parameter list, to make it simple to switch between different types of analysis. As Reponse-Only Model Evaluators, they also all derive from the same base classes so that the resulting analysis can in turn be driven by non-intrusive analysis routines.
+
+https://trilinos.org/packages/piro/[+https://trilinos.org/packages/piro/+]
+
+[[Pliris]]
+Pliris
+^^^^^^
+
+This xref:Trilinos[Trilinos] package provides an object-oriented interface to a LU solver for dense matrices on parallel platforms. These matrices are double precision real matrices distributed on a parallel machine.
+The matrix is torus-wrap mapped onto the processors(transparent to the user) and uses partial pivoting during the factorization of the matrix. Each processor contains a portion of the matrix and the right hand sides determined by a distribution function to optimally load balance the computation and communication during the factorization of the matrix. The general prescription is that no processor can have no more(or less) than one row or column of the matrix than any other processor. Since the input matrix is not torus-wrapped permutation of the results is performed to "unwrap the results" which is transparent to the user.
+
+https://trilinos.org/packages/pliris/[+https://trilinos.org/packages/pliris/+]
+
+[[PyTrilinos]]
+PyTrilinos
+^^^^^^^^^^
+
+A set of python wrappers for selected Trilinos packages. This allows a python programmer to dynamically import Trilinos packages into a python script or the python command-line interpreter, allowing the creation and manipulation of Trilinos objects and the execution of Trilinos algorithms, without the need to constantly recompile.
+
+https://trilinos.org/packages/pytrilinos/[+https://trilinos.org/packages/pytrilinos/+]
+
+*Distributed Sparse Linear Algebra with PyTrilinos* (PDF) - http://trilinos.org/oldsite/packages/pytrilinos/UsersGuide.pdf[+http://trilinos.org/oldsite/packages/pytrilinos/UsersGuide.pdf+]
+
+[[ROL]]
+ROL
+^^^
+
+The Rapid Optimization Library (ROL) is a xref:Trilinos[Trilinos] `C++` package
+for large-scale optimization. It is used for the solution of optimal design, optimal control and inverse problems in large-scale engineering applications. Other uses include mesh optimization and image processing. 
+
+https://trilinos.org/packages/rol/[+https://trilinos.org/packages/rol/+]
+
+[[RTOp]]
+RTOp
+^^^^
+
+The xref:Trilinos[Trilinos] Reduction/Transformation Operators provide the basic mechanism for implementing vector operations in a flexible and efficient manner.
+
+https://trilinos.org/packages/rtop/[+https://trilinos.org/packages/rtop/+]
+
+[[Rythmos]]
+Rythmos
+^^^^^^^
+
+A transient integrator for ordinary differential equations and differential-algebraic equations with support for explicit, implicit, one-step and multi-step algorithms. The fundamental design of Rythmos is aimed at supporting operator-split algorithms, multi-physics applications, block linear algebra, and adjoint integration.
+Rythmos is dependent on xref:Thyra[Thyra], xref:RTOp[RTOp] and xref:Teuchos[Teuchos].
+
+https://trilinos.org/packages/rythmos/[+https://trilinos.org/packages/rythmos/+]
+
+[[Sacado]]
+Sacado
+^^^^^^
+
+A set of automatic differentiation tools for C++ applications. It provides templated classes for forward, reverse and Taylor mode automatic differentiation.
+
+https://trilinos.org/packages/sacado/[+https://trilinos.org/packages/sacado/+]
+
+https://trilinos.org/docs/dev/packages/sacado/doc/html/index.html[+https://trilinos.org/docs/dev/packages/sacado/doc/html/index.html+]
+
+[[Shards]]
+Shards
+^^^^^^
+
+This xref:Trilinos[Trilinos] package provides a suite of common tools for numerical and topological data that facilitate interoperability between typical software modules used to solve Partial Differential Equations (PDEs) by finite element, finite volume and finite difference methods. Shards comprises of two categories of tools: methods to manage and access information about cell topologies used in mesh-based methods for PDEs, and methods to work with multi-dimensional arrays used to store numerical data in corresponding computer codes. The basic cell topology functionality of Shards includes methods to query adjacencies of subcells, find subcell permutation with respect to a global cell and create user-defined custom cell topologies. Multi-dimensional array part of the package provides specialized compile-time dimension tags, multi-index access methods, rank and dimension queries.
+
+Shards design is based on a domain model for cell topology data motivated by algebraic topology. In this approach the mesh is viewed as a chain complex consisting of 0,1,2 and 3-dimensional cells representing the nodes, edges, faces and elements in the mesh. Cell topologies are explicitly defined by a composition of subcells of dimension less or equal to that of the parent cell.
+
+https://trilinos.org/packages/shards/[+https://trilinos.org/packages/shards/+]
+
+[[ShyLU]]
+ShyLU
+^^^^^
+
+A xref:Trilinos[Trilinos] package for solving sparse linear systems. It can be used either as a preconditioner, or as a solver. Currently, we recommend using it as an xref:IFPACK[IFPACK] preconditioner.
+ShyLU was designed as a node-level solver. It can use both MPI and threads in several ways. ShyLU was designed (a) to solve difficult but medium-size problems, and (b) to be used as a subdomain solver or smoother for very large problems within an iterative scheme. It is a purely algebraic method so can be used as a black-box solver. ShyLU has been particularly successful in electrical circuit simulation.
+
+https://trilinos.org/packages/shylu/[+https://trilinos.org/packages/shylu/+]
+
+[[STK]]
+STK
+^^^
+
+The Sierra Toolkit Mesh product provides a unstructured mesh in-memory, parallel-distributed database. Mesh capabilities include a mesh topology data structure, mesh subsetting, coefficient data, mesh field data, support for changing the mesh topology, and support for parallel operations on the mesh.
+
+https://trilinos.org/packages/stk/[+https://trilinos.org/packages/stk/+]
+
+[[Stokhos]]
+Stokhos
+^^^^^^^
+
+A package for intrusive stochastic Galerkin uncertainty quantification methods. It provides methods for computing well-known intrusive stochastic Galerkin projections such as Polynomial Chaos and Generalized Polynomial Chaos, interfaces for forming the resulting nonlinear systems, and linear solver methods for solving block stochastic Galerkin linear systems.
+Stokhos uses xref:BLAS[BLAS], xref:LAPACK[LAPACK], xref:MPI[MPI], xref:UQTk[UQTk] and xref:Dakota[Dakota].
+
+https://trilinos.org/packages/stokhos/[+https://trilinos.org/packages/stokhos/+]
+
+[[Teuchos]]
+Teuchos
+^^^^^^^
+
+This provides a suite of common tools for Trilinos for developers to use.  These tools include memory management classes such as "smart" pointers and arrays, "parameter lists" for communicating hierarchical lists of parameters between library or application layers, templated wrappers for the BLAS and xref:LAPACK[LAPACK], XML parsers, and other utilities. They provide a unified "look and feel" across Trilinos packages, and help avoid common programming mistakes.
+
+https://trilinos.org/packages/teuchos/[+https://trilinos.org/packages/teuchos/+]
+
+[[Thyra]]
+Thyra
+^^^^^
+
+A set of xref:Trilinos[Trilinos] interfaces and supporting code that defines basic interoperability mechanisms between different types of numerical software. The foundation of all of these interfaces are the mathematical concepts of vectors, vector spaces, and linear operators. All other interfaces and support software is built on the basic operator/vector interfaces.
+
+https://trilinos.org/packages/thyra/[+https://trilinos.org/packages/thyra/+]
+
+[[Tpetra]]
+Tpetra
+^^^^^^
+
+A xref:Trilinos[Trilinos] package that implements linear algebra objects
+including sparse graphs, sparse matrices, and dense vectors.
+Many Trilinos package and applications produce, modify, or consume Tpetra’s linear algebra objects, or depend on Tpetra’s parallel data redistribution facilities.
+Tpetra uses the xref:Kokkos[Kokkos] package shared-memory parallel programming model for
+data structures and computational kernels.
+
+Tpetra also understands parallel distributions of data.  It has objects called Maps that let users represent a particular distribution of data over one or more parallel processes.   Users may also construct data migrations (Import or Export) between two distributions, and use them either on Tpetra native objects, or on their own objects that implement a simple data packing and unpacking interface (DistObject).
+Matrices and vectors may contain many different kinds of data, such as floating-point types of different precision, complex-valued types, automatic differentiation objects from the xref:Sacado[Sacado] package, or stochastic PDE discretization types from the xref:Stokhos[Stokhos] package.
+
+https://trilinos.org/packages/tpetra/[+https://trilinos.org/packages/tpetra/+]
+
+[[TriKota]]
+TriKota
+^^^^^^^
+
+A wrapper for the xref:Dakota[Dakota] Toolkit. It provides a mechanism for building and installing Dakota as a Trilinos package for access to the library-mode usage of Dakota. TriKota also provides adapters between the Dakota and Trilinos interfaces for analysis algorithms.
+
+https://trilinos.org/packages/trikota/[+https://trilinos.org/packages/trikota/+]
+

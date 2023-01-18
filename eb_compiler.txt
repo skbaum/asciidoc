@@ -1,0 +1,1921 @@
+= Installing a New Compiler Chain with Useful Extras
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Introduction
+
+This is an excruciatingly detailed guide on how to install from scratch
+a new compiler chain in EasyBuild.  This example is specific to
+`GCC-11.2.0` but should be generally applicable to future and even
+past versions to the GCC compiler family.
+
+This is also useful for installing Intel compiler chains since those chains
+have included a contemporary version of GCC for several years, and thus
+versions of things like `zlib`, `Autotools` and the like don't have to be
+recompiled with the Intel compilers.  The GCC compiled versions can be used,
+which means that installing a GCC compiler chain does most of the work also
+needed to install an Intel compiler chain.
+
+A GCC tool chain isn't of itself sufficient for the full use of a massively
+parallel computer cluster, so we will also show how to install
+packages beyond
+the basic compiler chain that are mandatory for installing
+almost anything useful beyond that compiler chain.
+This includes such packages as `CMake`, `Perl`, `Python` and `Autotools` as
+well as all their dependencies, which are themselves typically required
+for the installation of many other modules.
+
+Then we will move on to installing those modules needed to take
+advantage of the parallel capabilities of the cluster, including
+MPI, CUDA, BLAS/LAPACK and FFTW modules, as well as all of the dependencies
+they require for compilation.
+Then we will install what are extended compiler modules that include
+the `GCC[core]-11.2.0` module as well as one or more of these modules
+that enable the parallelization of computer codes.
+These are the
+`foss`, `fosscuda`, `gcccuda`, `gompi` and `gompic` modules.
+
+Note that this document was created based on very recent experience in
+installing both the `GCC-10.3.0` and `GCC-11.2.0` compiler chains.
+While it (hopefully) presents a smooth path from start to finish with
+no bumps or backward steps, the installation of both those compiler chains
+was bumpy and filled with backward steps.  And even after that experience 
+the writing of this required more than a few edits to swap modules and
+even entire sections around to ensure (hopefully) a smooth progression from
+start to finish without having to throw it in reverse at 60 MPH.
+
+This document can also serve as the source for a script that automates
+the entire installation process.  Just extract the lines that begin with
+`eb ` and you have a list of all the modules you need to install in exactly
+the order in which they must be installed.  A script is in the works for this.
+
+== Bootstrapping a Compiler Chain from Scratch
+
+Here we will build the compiler chain for GCC 11.2.0 and related modules.
+This procedure must be performed in a specific order because of dependencies, and
+bootstrapping via the system toolchain is also needed which can make things even more
+interesting.
+
+=== GCCcore and GCC
+
+Start with the GCCcore module, which uses the system toolchain and downloads
+and compiles everything it needs to create the binaries - but for a couple of
+dependencies - for the GCC compiler
+system.  The easyconfig file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GCCcore/GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GCCcore/GCCcore-11.2.0.eb`]
+
+The dependencies for `GCCcore-11.2.0` are:
+
+-----
+toolchain = SYSTEM
+builddependencies = [
+    ('M4', '1.4.19'),
+    ('binutils', '2.37'),
+]
+-----
+
+We will now install these dependencies, along with their dependencies, etc.
+
+==== M4-1.4.19 with SYSTEM
+
+We begin by compiling the appropriate `M4-1.4.19` version with the `SYSTEM`
+toolchain.  There are no dependencies other than the system toolchain.
+The easyconfig file is located at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/m/M4/M4-1.4.19.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/m/M4/M4-1.4.19.eb`]
+
+Install it via:
+
+-----
+eb M4-1.4.19.eb
+-----
+
+==== binutils
+
+The next dependency for `GCCcore-11.2.0` is `binutils-2.37`, which is the `SYSTEM`
+toolchain version.
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/binutils/binutils-2.37.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/binutils/binutils-2.37.eb`]
+
+and the dependencies section is:
+
+-----
+toolchain = SYSTEM
+builddependencies = [
+    ('flex', '2.6.4'),
+    ('Bison', '3.7.6'),
+    ('zlib', '1.2.11'),
+]
+-----
+
+so we must install these dependencies before getting back to `GCCcore-11.2.0`.
+We will start with `Bison` at its dependencies are already installed.
+
+===== Bison-3.7.6 with SYSTEM
+
+Next we compile `Bison-3.7.6` with the system toolchain since its only
+dependency is `M4-1.4.19` compiled with the system toolchain.  The easyconfig file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/Bison/Bison-3.7.6.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/Bison/Bison-3.7.6.eb`]
+
+Install it via:
+
+-----
+eb Bison-3.7.6.eb
+-----
+
+===== flex-2.6.4 with SYSTEM
+
+Next we compile `flex-2.6.4` with the system toolchain since its only
+dependencies are `M4-1.4.18` and `Bison-3.7.6` compiled with the system
+toolchain.  The easyconfig file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/flex/flex-2.6.4.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/flex/flex-2.6.4.eb`]
+
+Install it with:
+
+-----
+eb flex-2.6.4.eb
+-----
+
+===== zlib-1.2.11 with SYSTEM
+
+Next up is `zlib-1.2.11` compiled with the system toolchain.  It has no
+other dependencies.  The easyconfig file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/z/zlib/zlib-1.2.11.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/z/zlib/zlib-1.2.11.eb`]
+
+Install it with:
+
+-----
+eb zlib-1.2.11
+-----
+
+===== binutils-2.37 with SYSTEM
+
+Now we can compile `binutils-2.37` with the system toolchain and finish the
+dependencies needed to compile GCCcore.
+The dependencies here are what we have just finished compiled:  `flex-1.6.4`,
+`Bison-3.7.6` and `zlib-1.2.11`.
+The easyconfig file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/binutils/binutils-2.37.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/binutils/binutils-2.37.eb`]
+
+Install it via:
+
+-----
+eb binutils-2.37.eb
+-----
+
+==== GCCcore-11.2.0 with SYSTEM
+
+Now that both levels of dependencies have been installed we can go ahead
+and install `GCCcore-11.2.0` via:
+
+-----
+eb GCCcore-11.2.0.eb
+-----
+
+==== binutils
+
+Now we need to build `binutils` with the `GCCcore-11.2.0` compiler rather than
+the `SYSTEM` compiler.
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/binutils/binutils-2.37-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/binutils/binutils-2.37-GCCcore-11.2.0.eb`]
+
+and the dependency section is:
+
+-----
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+builddependencies = [
+    ('flex', '2.6.4'),
+    ('Bison', '3.7.6'),
+    # use same binutils version that was used when building GCC toolchain, to 'bootstrap' this binutils
+    ('binutils', version, '', True)
+]
+dependencies = [
+    ('zlib', '1.2.11'),
+]
+-----
+
+Note that the `toolchain` is now `GCCcore-11.2.0` so all the dependencies must
+also be built again with the new toolchain.
+They will also be built with the `SYSTEM` version of `binutils-2.37`, an
+unavoidable bit of bootstrapping.
+
+===== M4-1.4.19 with GCCcore-11.2.0 and SYSTEM binutils-2.37
+
+The easyconfig file for `M4` is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/m/M4/M4-1.4.19-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/m/M4/M4-1.4.19-GCCcore-11.2.0.eb`]
+
+Now build `M4-1.4.19` since the only dependency is the `GCCcore-11.2.0` we just compiled.
+
+-----
+eb M4-1.4.19-GCCcore-11.2.0.eb
+-----
+
+===== Bison-3.7.6 with GCCcore 11.2.0 and SYSTEM binutils-2.37
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/Bison/Bison-3.7.6-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/Bison/Bison-3.7.6-GCCcore-11.2.0.eb`]
+
+Now we can compile `Bison-3.7.6-GCCcore-11.2.0` 
+since it only depends on `M4-1.4.19-GCCcore-11.2.0` and the system
+toolchain `binutils-2.37`.
+
+-----
+eb Bison-3.7.6-GCCcore-11.2.0.eb
+-----
+
+===== flex
+
+The easybuild file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/flex/flex-2.6.4-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/flex/flex-2.6.4-GCCcore-11.2.0.eb`]
+
+and the dependencies are:
+
+-----
+builddependencies = [
+    ('Bison', '3.7.6'),
+    ('help2man', '1.48.3'),
+    ('binutils', '2.37', '', True),
+]
+dependencies = [
+    ('M4', '1.4.19'),
+]
+-----
+
+While the `SYSTEM` version of this depended only on `Bison` and `M4`, this `GCC-11.2.0`
+has snuck in `help2man` dependency that we must first install.
+
+====== help2man-1.48.3 with GCCcore 11.2.0 and SYSTEM binutils-2.37
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/h/help2man/help2man-1.48.3-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/h/help2man/help2man-1.48.3-GCCcore-11.2.0.eb`]
+
+The `help2man-1.48.3-GCCcore-11.2.0` dependency for `flex-2.6.4` is now compiled
+as is depends only on the system compiled `binutils-2.37`.
+Install it via:
+
+-----
+eb help2man-1.48.3-GCCcore-11.2.0.eb
+-----
+
+====== flex-2.6.4 with GCCcore 11.2.0 and SYSTEM binutils-2.37
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/h/help2man/help2man-1.48.3-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/h/help2man/help2man-1.48.3-GCCcore-11.2.0.eb`]
+
+Now compile `flex-2.6.4-GCCcore-11.2.0` with its last dependency installed.
+Install it via:
+
+-----
+eb flex-2.6.4-GCCcore-11.2.0.eb
+-----
+
+===== zlib-1.2.11 with GCCcore 11.2.0 and SYSTEM binutils-2.37
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/z/zlib/zlib-1.2.11-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/z/zlib/zlib-1.2.11-GCCcore-11.2.0.eb`]
+
+Time to compile `zlib-1.2.11-GCCcore-11.2.0` which depends only on the system compiled
+`binutils-2.37`.
+
+-----
+eb zlib-1.2.11-GCCcore-11.2.0.eb
+-----
+
+===== binutils-2.37 with GCCcore 11.2.0 and SYSTEM binutils-2.37
+
+Now all the pieces are in place to compile `binutils-2.37` with the
+`GCCcore-11.2.0` toolchain and the `SYSTEM` version of itself.
+Install it with:
+
+-----
+eb binutils-2.37.1-GCCcore-11.2.0.eb
+-----
+
+==== GCC-11.2.0 with GCCcore-11.2.0
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/z/zlib/zlib-1.2.11-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/z/zlib/zlib-1.2.11-GCCcore-11.2.0.eb`]
+
+Everything up to this point was done to obtain a version of `binutils-2.37.1` compiled
+with the `GCCcore-11.2.0` toolchain rather than the `SYSTEM` toolchain.  This wraps it up
+for the required bootstrapping, and now we can move on and compile everything from here on
+with `binutils-2.37.1-GCCcore-11.2.0`, which is a required dependency for pretty much everything
+that will be compiled with the `GCCcore-11.2.0` toolchain.
+
+We'll start by compiling the compiler-only toolchain `GCC-11.2.0` with the freshly
+compiled `binutils-2.37.1-GCCcore-11.2.0` and the `GCCcore-11.2.0` toolchain.
+
+-----
+eb GCC-11.2.0.eb
+-----
+
+== Installing Often Used Packages for a New Compiler Chain
+
+In the previous section we bootstrapped the `GCC[core]-11.2.0` compiler chain.
+Further tools are required to make a new compiler chain fully useful, and most of
+the following tools are used almost all the time.  This
+section will show how this is done.
+
+=== CMake
+
+The `CMake` and GNU `make` programs are used for over 90% of programs as tools
+for automating the compilation and installation of complex packages.  We
+will now install a version of `CMake` appropriate for the `GCC-11.2.0` toolchain
+installed in the previous section.  The easyconfig file
+`CMake-3.21.1-GCCcore-11.2.0.eb` is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/CMake/CMake-3.21.1-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/CMake/CMake-3.21.1-GCCcore-11.2.0.eb`]
+
+and the dependencies sections are:
+
+-----
+builddependencies = [
+    ('binutils', '2.37'),
+]
+dependencies = [
+    ('ncurses', '6.2'),
+    ('zlib', '1.2.11'),
+    ('bzip2', '1.0.8'),
+    ('cURL', '7.78.0'),
+    ('libarchive', '3.5.1'),
+    ('OpenSSL', '1.1', '', True),
+]
+-----
+
+We already compiled the appropriate versions of `zlib` and `binutils` when
+bootstrapping the compiler.  We will now compile the rest of the dependencies.
+
+==== ncurses-6.2 with GCCcore-11.2.0
+
+The easyconfig file for this is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/n/ncurses/ncurses-6.2-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/n/ncurses/ncurses-6.2-GCCcore-11.2.0.eb`]
+
+and only depends on `GCCcore-11.2.0` and `binutils-2.37-GCCcore-11.2.0`.  Compile it with:
+
+-----
+eb ncurses-6.2-GCCcore-11.2.0.eb
+-----
+
+==== bzip2-1.0.8 with GCCcore-11.2.0
+
+The easyconfig file for this is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/bzip2/bzip2-1.0.8-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/b/bzip2/bzip2-1.0.8-GCCcore-11.2.0.eb`]
+
+and also only depends on `GCCcore-11.2.0` and `binutils-2.37-GCCcore-11.2.0`.
+Coqmpile it with:
+
+-----
+eb bzip2-1.0.8-GCCcore-11.2.0.eb
+-----
+
+==== OpenSSL for SYSTEM (with another dependency level)
+
+The easyconfig file for this is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenSSL/OpenSSL-1.1.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenSSL/OpenSSL-1.1.eb`]
+
+and the toolchain and dependencies sections (as of 2021-9-8) are:
+
+-----
+toolchain = SYSTEM
+osdependencies = ['perl']
+builddependencies = [('pkg-config', '0.29.2')]
+-----
+
+This uses the SYSTEM `perl` version and requires a SYSTEM built `pkg-config-0.29.2`.
+The version of `pkg-config` on the system on which this example is being constructed is:
+
+-----
+pkg-config --version
+0.27.1
+-----
+
+which is not the requested SYSTEM version.
+We must then install `pkg-config-0.29.2` - a dependency within a dependency - which
+is archived at:
+
+https://raw.githubusercontent.com/easybuilders/easybuild-easyconfigs/develop/easybuild/easyconfigs/p/pkg-config/pkg-config-0.29.2.eb[`https://raw.githubusercontent.com/easybuilders/easybuild-easyconfigs/develop/easybuild/easyconfigs/p/pkg-config/pkg-config-0.29.2.eb`]
+
+Compile it via:
+
+-----
+eb pkg-config-0.29.2.eb
+-----
+
+And now we can compile `OpenSSL` via:
+
+-----
+eb OpenSSL-1.1.eb
+-----
+
+==== cURL with GCCcore-11.2.0
+
+The easyconfig file for this is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/cURL/cURL-7.78.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/cURL/cURL-7.78.0-GCCcore-11.2.0.eb`]
+
+and the only dependency beyond what was compiled creating the `GCCcore-11.2.0` compiler chain
+is the `OpenSSL-1.1` we just compiled.  So we compile this via:
+
+-----
+eb cURL-7.78.0-GCCcore-11.2.0.eb
+-----
+
+==== libarchive with GCCcore-11.2.0 (with two more dependency levels)
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libarchive/libarchive-3.5.1-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libarchive/libarchive-3.5.1-GCCcore-11.2.0.eb`]
+
+and the dependency section is:
+
+-----
+dependencies = [
+    ('zlib', '1.2.11'),
+    ('XZ', '5.2.5'),
+    ('OpenSSL', '1.1', '', True),
+]
+-----
+
+We have everything but `XZ-5.2.5-GCCcore-11.2.0` - another dependency within a dependency - for
+which the easyconfig file is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/x/XZ/XZ-5.2.5-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/x/XZ/XZ-5.2.5-GCCcore-11.2.0.eb`]
+
+The dependency section for `XZ-5.2.5-GCCcore-11.2.0` is:
+
+-----
+builddependencies = [
+    # use gettext built with system toolchain as build dep to avoid cyclic dependency (XZ -> gettext -> libxml2 -> XZ)
+    ('gettext', '0.21', '', True),
+    ('binutils', '2.37'),
+]
+-----
+
+where we find `gettext-0.21.eb`, which we've not yet installed, which makes it
+a dependency within a dependency within a dependency.
+(Note also that the SYSTEM version is needed to avoid a cyclic dependency with `XZ`.
+That is, the `GCCcore-11.2.0` version of `gettext-0.21` requires `libxml2-2.9.10` which
+itself requires `XZ-5.2.5`, so we must use the SYSTEM version of `gettext-0.21` that
+does not require `XZ-5.2.5`.)
+If this is not installed then we must install it.  The easyconfig file for this is archived
+at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gettext/gettext-0.21.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gettext/gettext-0.21.eb`]
+
+and we fortunately discover than there are no dependencies we haven't yet installed.
+We install this via:
+
+-----
+eb gettext-0.21.eb
+-----
+
+Now we can get back to `XZ`.
+Install it via:
+
+-----
+eb XZ-5.2.5-GCCcore-11.2.0.eb
+-----
+
+And now finally we can install `libarchive` via:
+
+-----
+eb libarchive-3.5.1-GCCcore-11.2.0.eb
+-----
+
+==== CMake with GCCcore-11.2.0
+
+Now that all the dependencies have been installed we can install `CMake` with:
+
+-----
+eb CMake-3.21.1-GCCcore-11.2.0.eb
+-----
+
+=== gettext
+
+In the previous section we installed a SYSTEM version of `gettext` to avoid a
+cyclic dependency.  We must now circle back and install
+`gettext-0.21-GCCcore-11.2.0` for further uses.
+The easyconfig file for this is archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gettext/gettext-0.21-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gettext/gettext-0.21-GCCcore-11.2.0.eb`]
+
+and the dependency section is:
+
+-----
+dependencies = [
+    ('libxml2', '2.9.10'),
+    ('ncurses', '6.2'),
+]
+-----
+
+==== libxml2 with GCCcore-11.2.0
+
+We have not yet installed `libxml2` so we must do so now.
+The easyconfig file at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libxml2/libxml2-2.9.10-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libxml2/libxml2-2.9.10-GCCcore-11.2.0.eb`]
+
+includes dependencies on the `XZ` and `zlib` versions we've already installed,
+so we can install this via:
+
+-----
+eb libxml2-2.9.10-GCCcore-11.2.0.eb
+-----
+
+==== gettext with GCCcore-11.2.0
+
+and then install `gettext` via:
+
+-----
+eb gettext-0.21-GCCcore-11.2.0.eb
+-----
+
+=== Perl
+
+Although the Perl scripting language has been greatly eclipsed by Python in the last decade,
+it is still used in quite a few widely-used tools and so must be installed.
+The appropriate easyconfig file is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/Perl/Perl-5.34.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/Perl/Perl-5.34.0-GCCcore-11.2.0.eb`]
+
+and the dependencies are:
+
+-----
+builddependencies = [
+    ('binutils', '2.37'),
+    ('groff', '1.22.4'),
+]
+dependencies = [
+    ('zlib', '1.2.11'),  # for Net::SSLeay
+    ('expat', '2.4.1'),  # for XML::Parser
+    ('ncurses', '6.2'),  # for Term::ReadLine::Gnu
+    ('libreadline', '8.1'),  # for Term::ReadLine::Gnu
+    ('DB', '18.1.40'),  # for DB_File
+    ('OpenSSL', '1.1', '', True),  # required for Net::SSLeay
+]
+-----
+
+We need to install the dependencies `groff`, `expat`, `libreadline` and `DB`.
+
+==== groff with GCCcore-11.2.0
+
+The easyconfig file for `groff-1.22.4` is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/groff/groff-1.22.4-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/groff/groff-1.22.4-GCCcore-11.2.0.eb`]
+
+and shows `binutils` to be the only dependency, so we install it via:
+
+-----
+eb groff-1.22.4-GCCcore-11.2.0.eb
+-----
+
+==== expat with GCCcore-11.2.0
+
+The easyconfig file for `expat-2.4.1` is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/e/expat/expat-2.4.1-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/e/expat/expat-2.4.1-GCCcore-11.2.0.eb`]
+
+and shows that is also depends only on `binutils`, so install it with:
+
+-----
+eb expat-2.4.1-GCCcore-11.2.0.eb
+-----
+
+==== libreadline with GCCcore-11.2.0
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libreadline/libreadline-8.1-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libreadline/libreadline-8.1-GCCcore-11.2.0.eb`]
+
+and we see it depends only on the `binutils` and `ncurses` packages we've
+already installed, so we install this via:
+
+-----
+eb libreadline-8.1-GCCcore-11.2.0.eb
+-----
+
+==== DB with GCCcore-11.2.0
+
+The easyconfig file for `DB-18.1.40` is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/d/DB/DB-18.1.40-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/d/DB/DB-18.1.40-GCCcore-11.2.0.eb`]
+
+wherein we find it depends only on `binutils` and `OpenSSL`, so we install it via:
+
+-----
+eb DB-18.1.40-GCCcore-11.2.0.eb
+-----
+
+==== Perl with GCCcore-11.2.0
+
+Now that we have installed the final dependency pieces for it, we can
+install `Perl-5.34.0-GCCcore-11.2.0` via:
+
+-----
+eb Perl-5.34.0-GCCcore-11.2.0.eb
+-----
+
+=== The Autotools Hierarchy
+
+Another group of often-used tools are `Autotools`, `Automake` and `Autoconf`.
+
+==== Autoconf with GCCcore-11.2.0
+
+We start the dependency climb by installing `Autoconf`, for which the easyconfig
+file is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Autoconf/Autoconf-2.71-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Autoconf/Autoconf-2.71-GCCcore-11.2.0.eb`]
+
+wherein we discover that the dependencies are `binutils`, `Perl` and `M4`.
+It's a good thing we installed `Perl` in the immediately previous section, isn't it?
+Now we install this with:
+
+-----
+eb Autoconf-2.71-GCCcore-11.2.0.eb
+-----
+
+==== Automake with GCCcore-11.2.0
+
+The easyconfig file for this is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Automake/Automake-1.16.4-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Automake/Automake-1.16.4-GCCcore-11.2.0.eb`]
+
+wherein the dependencies are `binutils`, `Perl` and `Autoconf`.  We have all these
+installed so we install `Automake` with:
+
+-----
+eb Automake-1.16.4-GCCcore-11.2.0.eb
+-----
+
+==== libtool with GCCcore-11.2.0
+
+We anticipate the need of `libtool` for `Autotools`.  The easyconfig file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libtool/libtool-2.4.6-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libtool/libtool-2.4.6-GCCcore-11.2.0.eb`]
+
+and depends on `binutils` and `M4`, so it can be immediately installed via:
+
+-----
+eb libtool-2.4.6-GCCcore-11.2.0.eb
+-----
+
+==== Autotools with GCCcore-11.2.0
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Autotools/Autotools-20210726-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Autotools/Autotools-20210726-GCCcore-11.2.0.eb`]
+
+and it depends on `Autoconf`, `Automake` and `libtool`.  Install it via:
+
+-----
+eb Autotools-20210726-GCCcore-11.2.0.eb
+-----
+
+== Installing Python for a New Compiler Chain
+
+We will now install `Python` for our new compiler chain.
+There are actually a couple of competing/complementary methods for installing Python
+and its many modules.
+This section shows how to install straight Python along with over 100 modules that
+are included in the standard easyconfig file for it.
+The next section will show how to install the `Anaconda` alternative.
+
+The appropriate version is `Python-3.9.6` with the easyconfig file archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/Python/Python-3.9.6-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/Python/Python-3.9.6-GCCcore-11.2.0.eb`]
+
+The dependencies are:
+
+-----
+builddependencies = [
+    ('UnZip', '6.0'),
+    ('Rust', '1.54.0'),  # required for setuptools-rust, which is needed for cryptography
+]
+dependencies = [
+    ('binutils', '2.37'),
+    ('bzip2', '1.0.8'),  # required for bz2 package in Python stdlib
+    ('zlib', '1.2.11'),
+    ('libreadline', '8.1'),
+    ('ncurses', '6.2'),
+    ('SQLite', '3.36'),
+    ('XZ', '5.2.5'),
+    ('GMP', '6.2.1'),  # required for pycrypto
+    ('libffi', '3.4.2'),
+    ('OpenSSL', '1.1', '', True),
+]
+-----
+
+With the benefit of some hindsight, let's first take a look at the `Rust`
+dependency.  The easyconfig file for the appropriate version is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/r/Rust/Rust-1.54.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/r/Rust/Rust-1.54.0-GCCcore-11.2.0.eb`]
+
+and has the dependencies:
+
+-----
+builddependencies = [
+    ('binutils', '2.37'),
+    ('CMake', '3.21.1'),
+    ('Python', '3.9.6', '-bare'),
+    ('pkg-config', '0.29.2'),
+]
+-----
+
+wherein we immediately notice that `Python` itself is a dependency, although there's
+a `-bare` tacked on the end of it.  And there is indeed another version of it
+labeled `Python-3.9.6-GCCcore-11.2.0-bare` to avoid a circular dependency.
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/Python/Python-3.9.6-GCCcore-11.2.0-bare.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/Python/Python-3.9.6-GCCcore-11.2.0-bare.eb`] and the
+dependencies are:
+
+-----
+builddependencies = [
+    ('UnZip', '6.0'),
+]
+
+dependencies = [
+    ('binutils', '2.37'),
+    ('bzip2', '1.0.8'),  # required for bz2 package in Python stdlib
+    ('zlib', '1.2.11'),
+    ('libreadline', '8.1'),
+    ('ncurses', '6.2'),
+    ('SQLite', '3.36'),
+    ('XZ', '5.2.5'),
+    ('libffi', '3.4.2'),
+    ('OpenSSL', '1.1', '', True),
+]
+-----
+
+which, upon inspection, are the same as for the non-`-bare` version but for
+`Rust` and `GMP`.  So if we install this and all its dependencies we'll only
+be two more dependencies away from installing the main version.
+Note that another huge difference between this and the non-`-bare` version is that
+the latter also compiles over a hundred additional modules while the former adds no
+modules.
+
+We've already
+installed everything but `SQLite` and `libffi` in the previous couple
+of examples sections, so let's do those now.
+
+=== SQLite with GCCcore-11.2.0
+
+The easyconfig file for `SQLite` is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/s/SQLite/SQLite-3.36-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/s/SQLite/SQLite-3.36-GCCcore-11.2.0.eb`]
+
+and the dependencies are:
+
+-----
+dependencies = [
+    ('libreadline', '8.1'),
+    ('Tcl', '8.6.11'),
+]
+-----
+
+We have just installed `libreadline`, but we haven't installed `Tcl`.
+The easyconfig file for `Tcl` is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/t/Tcl/Tcl-8.6.11-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/t/Tcl/Tcl-8.6.11-GCCcore-11.2.0.eb`]
+
+and requires only `binutils` and `zlib` so we can straightaway install it via:
+
+-----
+eb Tcl-8.6.11-GCCcore-11.2.0.eb
+-----
+
+and then install `SQLite` via:
+
+-----
+eb SQLite-3.36-GCCcore-11.2.0.eb
+-----
+
+=== libffi with GCCcore-11.2.0
+
+The easyconfig file for `libffi` is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libffi/libffi-3.4.2-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libffi/libffi-3.4.2-GCCcore-11.2.0.eb`]
+
+with the only dependency being `binutils`, so we install it with:
+
+-----
+eb libffi-3.4.2-GCCcore-11.2.0.eb
+-----
+
+=== Python-3.9.6-bare for GCC-11.2.0
+
+Having install all the dependencies, we can install the `-bare` version of `Python` with:
+
+-----
+Python-3.9.6-GCCcore-11.2.0-bare.eb
+-----
+
+=== Rust-1.54.0 with GCCcore-11.2.0
+
+Now that `Python-3.9.6-GCCcore-11.2.0-bare` has been installed, we can install `Rust` via:
+
+-----
+eb Rust-1.54.0-GCCcore-11.2.0.eb
+-----
+
+=== GMP-6.2.1 with GCCcore-11.2.0
+
+The easyconfig file for `GMP` is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GMP/GMP-6.2.1-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GMP/GMP-6.2.1-GCCcore-11.2.0.eb`]
+
+and depends only on `Autotools` and `binutils`.  Install it with:
+
+-----
+eb GMP-6.2.1-GCCcore-11.2.0.eb
+-----
+
+=== Python-3.9.6 for GCC-11.2.0
+
+Now that all of its dependencies have been installed, we can install `Python` via:
+
+-----
+Python-3.9.6-GCCcore-11.2.0.eb
+-----
+
+This will take a while as over 100 modules are compiled with Python after it is compiled.
+
+== Installing Python as Anaconda
+
+Another way to get Python and desired Python modules installed is via `Anaconda3`,
+although it is best to consider this to be complementary to the Python installation
+of the previous section and have both available to increase your Python flexibility.
+The base distribution - typically downloaded as a file named `Anaconda3-2021.05-Linux-x86_64.sh` -
+contains a very recent version of Python 3 and well over 500 modules, and once
+the `Anaconda3` module is loaded any of nearly 7500 other Python modules can be
+loaded via either `pip` or `conda`.  The modules not contained in the distribution
+will be stored in an appropriate subdirectory structure in the user's home directory.
+
+This is a good option for the situation where a user requires a single Python
+module not contained within the Anaconda distribution, or perhaps not even contained
+within the other modules installable via `pip` or `conda`.  For the former case the desired module
+can be quickly installed via the internal package commands.  For the latter case
+the Python source code can be downloaded, and once the Anaconda3 module is loaded
+can be compiled and installed the old-fashioned way.
+
+The easyconfig file for the latest available Anaconda3 package - `2021.05` as of
+2021-09-06 - is found at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Anaconda3/Anaconda3-2021.05.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/a/Anaconda3/Anaconda3-2021.05.eb`]
+
+and requires only the SYSTEM toolchain for installation.  Install it via:
+
+-----
+eb Anaconda3-2021.05.eb
+-----
+
+== CUDA etc.
+
+CUDA (formerly Compute Unified Device Architecture) is a parallel
+computing platform and programming model created by NVIDIA and implemented by the
+graphics processing units (GPUs) that they produce. CUDA gives developers access
+to the virtual instruction set and memory of the parallel computational elements in CUDA GPUs.
+
+=== CUDAcore-11.4.1
+
+We must first install `CUDAcore`.  The latest version of this easyconfig file
+is for `CUDAcore-11.3.0`.
+The dependencies in this are:
+
+-----
+name = 'CUDAcore'
+version = '11.3.0'
+local_nv_version = '465.19.01'
+toolchain = SYSTEM
+-----
+
+If we look at our local sources directory, i.e.
+
+-----
+ls -l /sw/eb/sources/c/CUDAcore
+-rw-rw-r-- 1 j-perdue staff 3066694836 Oct 31  2020 cuda_11.0.2_450.51.05_linux.run
+-rw-rw-r-- 1 j-perdue staff 3532172082 Nov 27  2020 cuda_11.1.1_455.32.00_linux.run
+-rw-r--r-- 1 francis  staff 3158494112 Jul 21 13:37 cuda_11.3.1_465.19.01_linux.run
+-rw-rw-r-- 1 francis  staff 3796641626 Aug 26 16:19 cuda_11.4.1_470.57.02_linux.run
+-----
+
+we find a more recent version `11.4.1` for which we can create
+an easyconfig file called `CUDAcore-11.4.1.eb` containing:
+
+-----
+name = 'CUDAcore'
+version = '11.4.1'
+local_nv_version = '470.57.02'
+toolchain = SYSTEM
+-----
+
+We create the following off-reservation easyconfig file `CUDAcore-11.4.1.eb` by
+editing the `CUDAcore-11.3.0.eb` file, changing the values for `version`
+and `local_nv_version`, removing the checksums, adding new checksums via:
+
+-----
+eb CUDAcore-11.4.1.eb --inject-checksums
+-----
+
+to obtain:
+
+-----
+easyblock = 'EB_CUDA'
+
+name = 'CUDAcore'
+version = '11.4.1'
+local_nv_version = '470.57.02'
+
+homepage = 'https://developer.nvidia.com/cuda-toolkit'
+description = """CUDA (formerly Compute Unified Device Architecture) is a parallel
+ computing platform and programming model created by NVIDIA and implemented by the
+ graphics processing units (GPUs) that they produce. CUDA gives developers access
+ to the virtual instruction set and memory of the parallel computational elements in CUDA GPUs."""
+
+toolchain = SYSTEM
+
+source_urls = ['https://developer.download.nvidia.com/compute/cuda/%(version)s/local_installers/']
+sources = ['cuda_%%(version)s_%s_linux%%(cudaarch)s.run' % local_nv_version]
+checksums = ['dd6c339a719989d2518f5d54eeac1ed707d0673f8664ba0c4d4b2af7c3ba0005']
+
+moduleclass = 'system'
+-----
+
+so we can have a `CUDAcore-11.4.1` installation until the official easyconfig
+file is released, at which point this one will be replaced if it differs from
+the official release.
+We install this provisional version via:
+
+-----
+eb CUDAcore-11.4.1.eb
+-----
+
+=== CUDA-11.4.1 for GCC-11.2.0
+
+The easybuild file for the version of CUDA required for this compiler chain is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/CUDA/CUDA-11.4.1.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/CUDA/CUDA-11.4.1.eb`]
+
+There are no dependencies, and this is installed via:
+
+-----
+eb CUDA-11.4.1.eb
+-----
+
+=== Check for GCC-11.2.0 
+
+In another bit of anticipation (i.e. hindsight, really) we will now install
+two more modules that will be needed soon, and had to wait for
+the installation of `CUDAcore` to satisfy a dependency.
+Actually, `Check` doesn't depend on `CUDAcore` but `GDRCopy` - which does - is up
+next and requires `Check`.
+
+There is no `Check-11.2.0` as yet (2021-9-10) so we find the closest match at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/Check/Check-0.15.2-GCCcore-10.3.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/c/Check/Check-0.15.2-GCCcore-10.3.0.eb`]
+
+The dependencies therein for `GCCcore-10.3.0` are:
+
+-----
+toolchain = {'name': 'GCCcore', 'version': '10.3.0'}
+builddependencies = [
+    ('binutils', '2.36.1'),
+    ('Autotools', '20210128'),
+    ('pkg-config', '0.29.2'),
+]
+-----
+
+The modifications for `GCCcore-11.2.0` are:
+
+-----
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('pkg-config', '0.29.2'),
+]
+-----
+
+which enables us to create a `Check-0.15.2-GCCcore-11.2.0.eb` file as:
+
+-----
+easyblock = 'ConfigureMake'
+
+name = 'Check'
+version = '0.15.2'
+
+homepage = 'https://libcheck.github.io/check/'
+description = """
+Check is a unit testing framework for C. It features a simple interface for
+defining unit tests, putting little in the way of the developer. Tests are
+run in a separate address space, so both assertion failures and code errors
+that cause segmentation faults or other signals can be caught. Test results
+are reportable in the following: Subunit, TAP, XML, and a generic logging
+format."""
+
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+toolchainopts = {'pic': True}
+
+github_account = 'libcheck'
+source_urls = [GITHUB_LOWER_SOURCE]
+sources = ['%(version)s.tar.gz']
+checksums = ['998d355294bb94072f40584272cf4424571c396c631620ce463f6ea97aa67d2e']
+
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('pkg-config', '0.29.2'),
+]
+
+preconfigopts = "autoreconf -f -i && "
+configopts = "--disable-build-docs"
+
+sanity_check_paths = {
+    'files': ['bin/checkmk', 'lib/libcheck.a', 'lib/libcheck.%s' % SHLIB_EXT],
+    'dirs': ['include', 'share']
+}
+
+moduleclass = 'lib'
+-----
+
+We install our provisional module via:
+
+-----
+eb Check-0.15.2-GCCcore-11.2.0.eb
+-----
+
+=== GDRCopy for GCC-11.2.0 and CUDA-11.4.1
+
+Now to install a provisional version of `GDRCopy`.
+Note that we are installing this now not only because the last dependency was
+just installed, but also because `GDRCopy` is a dependency of `UCX` in the
+next section on installing `OpenMPI`, which itself requires `UCX`.
+Again we have no official release so we'll be riffing off of the
+most recent easyconfig file `GDRCopy-2.1-GCCcore-10.2.0-CUDA-11.1.1.eb`
+located at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GDRCopy/GDRCopy-2.1-GCCcore-10.2.0-CUDA-11.1.1.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/GDRCopy/GDRCopy-2.1-GCCcore-10.2.0-CUDA-11.1.1.eb`]
+
+The significant bits of this file are:
+
+-----
+name = 'GDRCopy'
+version = '2.1'
+local_cudaversion = '11.1.1'
+versionsuffix = '-CUDA-%s' % local_cudaversion
+toolchain = {'name': 'GCCcore', 'version': '10.2.0'}
+builddependencies = [
+    ('binutils', '2.35'),
+    ('Autotools', '20200321'),
+    ('pkg-config', '0.29.2'),
+]
+dependencies = [
+    ('CUDAcore', local_cudaversion, '', True),  # needed by GDRCopy binaries, which are tools for testing
+    ('Check', '0.15.2'),
+]
+-----
+
+We will create a file called `GDRCopy-2.1-GCCcore-11.2.0-CUDA-11.4.1.eb` using
+this as a template.  The modified significant bits are:
+
+-----
+name = 'GDRCopy'
+version = '2.1'
+local_cudaversion = '11.4.1'
+versionsuffix = '-CUDA-%s' % local_cudaversion
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('pkg-config', '0.29.2'),
+]
+dependencies = [
+    ('CUDAcore', local_cudaversion, '', True),  # needed by GDRCopy binaries, which are tools for testing
+    ('Check', '0.15.2'),
+]
+-----
+
+This enables us to create the following `GDRCopy-2.1-GCCcore-11.2.0-CUDA-11.4.1.eb`
+easyconfig file.  The last part of this is omitted since it is identical to
+the template file `GDRCopy-2.1-GCCcore-10.3.0-CUDA-11.1.1.eb`.
+
+-----
+easyblock = 'ConfigureMake'
+
+name = 'GDRCopy'
+version = '2.1'
+local_cudaversion = '11.4.1'
+versionsuffix = '-CUDA-%s' % local_cudaversion
+
+homepage = 'https://github.com/NVIDIA/gdrcopy'
+description = "A low-latency GPU memory copy library based on NVIDIA GPUDirect RDMA technology."
+
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+toolchainopts = {'pic': True}
+
+github_account = 'NVIDIA'
+source_urls = [GITHUB_SOURCE]
+sources = ['v%(version)s.tar.gz']
+checksums = ['cecc7dcc071107f77396f5553c9109790b6d2298ae29eb2dbbdd52b2a213e4ea']
+
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('pkg-config', '0.29.2'),
+]
+
+dependencies = [
+    ('CUDAcore', local_cudaversion, '', True),  # needed by GDRCopy binaries, which are tools for testing
+    ('Check', '0.15.2'),
+]
+...
+-----
+
+We can now install this via:
+
+-----
+eb GDRCopy-2.1-GCCcore-11.2.0-CUDA-11.4.1.eb
+-----
+
+== OpenMPI etc.
+
+There are several software instantiations of the MPI standard, although the one with
+by far the most archived easyconfig files is `OpenMPI`.  The Intel MPI version is in
+second place, and will be dealt with elsewhere.  We will thus focus on
+`OpenMPI` as the MPI version of choice here.
+
+We desire an easyconfig file called `OpenMPI-4.1.1-gcccuda-2021.07.eb`, which will
+be analogous to and based on the available `OpenMPI-4.0.5-gcccuda-2020b.eb` file.
+That file is available at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenMPI/OpenMPI-4.0.5-gcccuda-2020b.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenMPI/OpenMPI-4.0.5-gcccuda-2020b.eb`]
+
+and the significant parts of it are:
+
+-----
+name = 'OpenMPI'
+version = '4.0.5'
+toolchain = {'name': 'gcccuda', 'version': '2020b'}
+patches = ['OpenMPI-4.0.1_remove-pmix-check-in-pmi-switch.patch']
+dependencies = [
+    ('zlib', '1.2.11'),
+    ('hwloc', '2.2.0'),
+    ('libevent', '2.1.12'),
+    ('UCX', '1.9.0', '-CUDA-11.1.1'),
+    ('libfabric', '1.11.0'),
+    ('PMIx', '3.1.5'),
+]
+-----
+
+The changes we need to make are:
+
+-----
+name = 'OpenMPI'
+version = '4.1.1'
+toolchain = {'name': 'gcccuda', 'version': '2021.07'}
+patches = [
+    'OpenMPI-4.1.1_opal-pmix-package-rank.patch',
+    'OpenMPI-4.1.1_fix-bufferoverflow-in-common_ofi.patch',
+    'OpenMPI-4.1.1_pmix3x-protection.patch',
+]
+dependencies = [
+    ('zlib', '1.2.11'),
+    ('hwloc', '2.5.0'),
+    ('libevent', '2.1.12'),
+    ('UCX', '1.11.0', '-CUDA-11.4.1'),
+    ('libfabric', '1.13.0'),
+    ('PMIx', '4.1.0'),
+]
+-----
+
+We must first, though, install the dependencies we're missing, i.e. `hwloc`, `libevent`,
+`UCX`, `libfabric` and `PMIx`.
+
+=== hwloc
+
+The Portable Hardware Locality (hwloc) software package provides a portable
+abstraction (across OS, versions, architectures, ...) of the hierarchical
+topology of modern architectures, including NUMA memory nodes, sockets, shared
+caches, cores and simultaneous multithreading. It also gathers various system
+attributes such as cache and memory information as well as the locality of I/O
+devices such as network interfaces, InfiniBand HCAs or GPUs. It primarily
+aims at helping applications with gathering information about modern computing
+hardware so as to exploit it accordingly and efficiently.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/h/hwloc/hwloc-2.5.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/h/hwloc/hwloc-2.5.0-GCCcore-11.2.0.eb`]
+
+and the dependencies are:
+
+-----
+dependencies = [
+    ('numactl', '2.0.14'),
+    ('libxml2', '2.9.10'),
+    ('libpciaccess', '0.16'),
+]
+-----
+
+Now we will install this second level of dependencies.
+
+==== numactl for GCC-11.2.0
+
+The numactl program allows you to run your application program on specific
+cpu's and memory nodes. It does this by supplying a NUMA memory policy to
+the operating system before running your program. The libnuma library provides
+convenient ways for you to add NUMA memory policies into your own program.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/n/numactl/numactl-2.0.14-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/n/numactl/numactl-2.0.14-GCCcore-11.2.0.eb`]
+
+and the only dependencies are `binutils` and `Autotools`.  It can be installed via:
+
+-----
+eb numactl-2.0.14-GCCcore-11.2.0.eb
+-----
+
+==== libpciaccess
+
+A generic PCI access library.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libpciaccess/libpciaccess-0.16-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libpciaccess/libpciaccess-0.16-GCCcore-11.2.0.eb`]
+
+and the dependencies are:
+
+-----
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('xorg-macros', '1.19.3'),
+]
+-----
+
+We haven't yet installed `xorg-macros`, a third level dependency.
+
+===== xorg-macros with GCCcore-11.2.0
+
+A set of x.org macro utilities.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/x/xorg-macros/xorg-macros-1.19.3-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/x/xorg-macros/xorg-macros-1.19.3-GCCcore-11.2.0.eb`]
+
+and the only dependencies are the `binutils` and `Autotools` modules we've already installed.
+Install this via:
+
+-----
+eb xorg-macros-1.19.3-GCCcore-11.2.0.eb
+-----
+
+===== libpciaccess with GCCcore-11.2.0
+
+Now we can install `libpciaccess` via:
+
+-----
+eb libpciaccess-0.16-GCCcore-11.2.0.eb
+-----
+
+==== hwloc with GCCcore-11.2.0
+
+And finally we can install `hwloc` with:
+
+-----
+eb hwloc-2.5.0-GCCcore-11.2.0.eb
+-----
+
+=== libevent with GCCcore-11.2.0
+
+The libevent API provides a mechanism to execute a callback function when
+a specific event occurs on a file descriptor or after a timeout has been
+reached.  Furthermore, libevent also support callbacks due to signals or
+regular timeouts.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libevent/libevent-2.1.12-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libevent/libevent-2.1.12-GCCcore-11.2.0.eb`]
+
+There are no dependencies that haven't yet been installed so we
+can install this via:
+
+-----
+eb libevent-2.1.12-GCCcore-11.2.0.eb
+-----
+
+=== UCX for GCC-11.2.0 (with CUDA-11.4.1)
+
+An open-source production grade communication framework for data centric
+and high-performance applications.
+
+As of this writing (2021-09-14) a desired 
+`UCX-1.11.0-GCCcore-11.2.0-CUDA-11.4.1.eb` easyconfig file is not available.
+However, both `UCX-1.11.0-GCCcore-11.2.0.eb` and
+`UCX-1.8.0-GCCcore-9.3.0-CUDA-11.0.2.eb` are available, and some combination
+of those will be used to create the easyconfig file we desire.
+
+The `UCX-1.9.0-GCCcore-10.2.0-CUDA-11.1.1.eb` file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/u/UCX/UCX-1.9.0-GCCcore-10.2.0-CUDA-11.1.1.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/u/UCX/UCX-1.9.0-GCCcore-10.2.0-CUDA-11.1.1.eb`]
+
+The `UCX-1.11.0-GCCcore-11.2.0.eb` file is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/u/UCX/UCX-1.11.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/u/UCX/UCX-1.11.0-GCCcore-11.2.0.eb`]
+
+The vital bits of these files are:
+
+-----
+name = 'UCX'
+version = '1.9.0'
+local_cudaversion = '11.1.1'
+versionsuffix = '-CUDA-%s' % local_cudaversion
+toolchain = {'name': 'GCCcore', 'version': '10.2.0'}
+builddependencies = [
+    ('binutils', '2.35'),
+    ('Autotools', '20200321'),
+    ('pkg-config', '0.29.2'),
+]
+dependencies = [
+    ('numactl', '2.0.13'),
+    ('CUDAcore', local_cudaversion, '', True),
+    ('GDRCopy', '2.1', versionsuffix),
+]
+-----
+
+The modifications that need to be made to create a `UCX-1.9.0-GCCcore-11.2.0-CUDA-11.4.1.eb`
+easyconfig file are:
+
+-----
+name = 'UCX'
+version = '1.9.0'
+local_cudaversion = '11.4.1'
+versionsuffix = '-CUDA-%s' % local_cudaversion
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('pkg-config', '0.29.2'),
+]
+dependencies = [
+    ('numactl', '2.0.14'),
+    ('CUDAcore', local_cudaversion, '', True),
+    ('GDRCopy', '2.1', versionsuffix),
+]
+-----
+
+Our provisional `UCX-1.11.0-GCCcore-11.2.0-CUDA-11.4.1.eb` is then:
+
+-----
+easyblock = 'ConfigureMake'
+
+name = 'UCX'
+version = '1.11.0'
+local_cudaversion = '11.4.1'
+versionsuffix = '-CUDA-%s' % local_cudaversion
+
+homepage = 'http://www.openucx.org/'
+description = """Unified Communication X
+An open-source production grade communication framework for data centric
+and high-performance applications
+"""
+
+toolchain = {'name': 'GCCcore', 'version': '11.2.0'}
+toolchainopts = {'pic': True}
+
+source_urls = ['https://github.com/openucx/ucx/releases/download/v%(version)s']
+sources = ['%(namelower)s-%(version)s.tar.gz']
+checksums = ['b7189b69fe0e16e3c03784ef674e45687a9c520750bd74a45125c460ede37647']
+
+builddependencies = [
+    ('binutils', '2.37'),
+    ('Autotools', '20210726'),
+    ('pkg-config', '0.29.2'),
+]
+
+osdependencies = [OS_PKG_IBVERBS_DEV]
+
+dependencies = [
+    ('numactl', '2.0.14'),
+    ('CUDAcore', local_cudaversion, '', True),
+    ('GDRCopy', '2.1', versionsuffix),
+]
+
+configure_cmd = "contrib/configure-release"
+configopts = '--enable-optimizations --enable-cma --enable-mt --with-verbs '
+configopts += '--without-java --disable-doxygen-doc '
+configopts += '--with-cuda=$EBROOTCUDACORE --with-gdrcopy=$EBROOTGDRCOPY '
+
+prebuildopts = 'unset CUDA_CFLAGS && unset LIBS && '
+buildopts = 'V=1'
+
+sanity_check_paths = {
+    'files': ['bin/ucx_info', 'bin/ucx_perftest', 'bin/ucx_read_profile'],
+    'dirs': ['include', 'lib', 'share']
+}
+
+sanity_check_commands = ["ucx_info -d"]
+
+moduleclass = 'lib'
+-----
+
+We can install our provisional `UCX` via:
+
+-----
+eb UCX-1.9.0-GCCcore-11.2.0-CUDA-11.4.1.eb
+-----
+
+
+=== libfabric for GCC-11.2.0
+
+Libfabric is a core component of OFI. It is the library that defines and exports
+the user-space API of OFI, and is typically the only software that applications
+deal with directly. It works in conjunction with provider libraries, which are
+often integrated directly into libfabric.
+
+This easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libfabric/libfabric-1.13.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/l/libfabric/libfabric-1.13.0-GCCcore-11.2.0.eb`]
+
+and the dependencies are `binutils`, `pkg-config`, `Autotools` and `numactl`.  It
+can be installed via:
+
+-----
+eb libfabric-1.13.0-GCCcore-11.2.0.eb
+-----
+
+=== PMIx with GCCcore-11.2.0
+
+PMI Exascale (PMIx) represents an attempt to
+provide an extended version of the PMI standard specifically designed
+to support clusters up to and including exascale sizes.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/PMIx/PMIx-4.1.0-GCCcore-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/p/PMIx/PMIx-4.1.0-GCCcore-11.2.0.eb`]
+
+and the dependencies are `libevent`, `zlib` and `hwloc`, all of which have already been
+installed.  Install this via:
+
+-----
+eb PMIx-4.1.0-GCCcore-11.2.0.eb
+-----
+
+=== gcccuda with GCCcore-11.2.0
+
+The most recent available version of this is `gcccuda-2020b`
+available at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gcccuda/gcccuda-2020b.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gcccuda/gcccuda-2020b.eb`]
+
+and the dependencies are:
+
+-----
+name = 'gcccuda'
+version = '2020b'
+local_gcc_version = '10.2.0'
+dependencies = [
+    ('GCC', local_gcc_version),
+    ('CUDA', '11.1.1', '', ('GCC', local_gcc_version)),
+]
+-----
+
+We will create an easyconfig file called `gcccuda-2021.07.eb` to keep in line with
+the `gompi-2021.07.eb` archived at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gompi/gompi-2021.07.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gompi/gompi-2021.07.eb`]
+
+The `gcccuda-2021.07.eb` file will contain the following:
+
+-----
+name = 'gcccuda'
+version = '2021.07'
+local_gcc_version = '11.2.0'
+dependencies = [
+    ('GCC', local_gcc_version),
+    ('CUDA', '11.4.1', '', ('GCC', local_gcc_version)),
+]
+-----
+
+which we will install via:
+
+-----
+eb gcccuda-2021.07.eb
+-----
+
+=== OpenMPI with gcccuda-2021.07
+
+Now that all the dependencies for `OpenMPI` have been installed we
+can install it using the provisional easyconfig file we have created:
+
+-----
+name = 'OpenMPI'
+version = '4.1.1'
+
+homepage = 'https://www.open-mpi.org/'
+description = """The Open MPI Project is an open source MPI-3 implementation."""
+
+toolchain = {'name': 'gcccuda', 'version': '2021.07'}
+
+source_urls = ['https://www.open-mpi.org/software/ompi/v%(version_major_minor)s/downloads']
+sources = [SOURCELOWER_TAR_GZ]
+patches = [
+    'OpenMPI-4.1.1_opal-pmix-package-rank.patch',
+    'OpenMPI-4.1.1_fix-bufferoverflow-in-common_ofi.patch',
+    'OpenMPI-4.1.1_pmix3x-protection.patch',
+]
+checksums = [
+    'd80b9219e80ea1f8bcfe5ad921bd9014285c4948c5965f4156a3831e60776444',  # openmpi-4.1.1.tar.gz
+    '04353672cf7be031e5306c94068d7012d99e6cd94b69d93230797ffcd7f31903',  # OpenMPI-4.1.1_opal-pmix-package-rank.patch
+    # OpenMPI-4.1.1_fix-bufferoverflow-in-common_ofi.patch
+    'a189d834506f3d7c31eda6aa184598a3631ea24a94bc551d5ed1f053772ca49e',
+    '384ef9f1fa803b0d71dae2ec0748d0f20295992437532afedf21478bda164ff8',  # OpenMPI-4.1.1_pmix3x-protection.patch
+]
+
+builddependencies = [
+    ('pkg-config', '0.29.2'),
+]
+
+dependencies = [
+    ('zlib', '1.2.11'),
+    ('hwloc', '2.5.0'),
+    ('libevent', '2.1.12'),
+    ('UCX', '1.11.0', '-CUDA-11.4.1'),
+    ('libfabric', '1.13.0'),
+    ('PMIx', '4.1.0'),
+]
+
+# disable MPI1 compatibility for now, see what breaks...
+# configopts = '--enable-mpi1-compatibility '
+
+# to enable SLURM integration (site-specific)
+# configopts += '--with-slurm --with-pmi=/usr/include/slurm --with-pmi-libdir=/usr'
+
+moduleclass = 'mpi'
+-----
+
+This is installed via:
+
+-----
+eb OpenMPI-4.1.1-gcccuda-2021.07.eb
+-----
+
+=== OpenMPI-4.1.1 with GCC-11.2.0
+
+We will also need a version of OpenMPI compiled with `GCC` rather than `gcccuda`.
+The easyconfig file for this is available at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenMPI/OpenMPI-4.1.1-GCC-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenMPI/OpenMPI-4.1.1-GCC-11.2.0.eb`]
+
+and since all the dependencies are install we can install this immediately via:
+
+-----
+eb OpenMPI-4.1.1-GCC-11.2.0.eb
+-----
+
+== BLAS and LAPACK etc.
+
+=== OpenBLAS-0.3.17 for GCC-11.2.0
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenBLAS/OpenBLAS-0.3.17-GCC-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/o/OpenBLAS/OpenBLAS-0.3.17-GCC-11.2.0.eb`]
+
+and the only dependency is `GCC-11.2.0`.
+This is installed via:
+
+-----
+eb OpenBLAS-0.3.17-GCC-11.2.0.eb
+-----
+
+=== FlexiBLAS-3.0.4 for GCC-11.2.0
+
+FlexiBLAS is a BLAS and LAPACK wrapper library with runtime exchangable backends.
+It allows the underlying BLAS implementation to be changed at run-time via an
+environment variable.  It requires neither recompiling or relinking an application.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/FlexiBLAS/FlexiBLAS-3.0.4-GCC-11.2.0.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/FlexiBLAS/FlexiBLAS-3.0.4-GCC-11.2.0.eb`]
+
+and the dependencies are `CMake`, `Python` and `OpenBLAS`, all of which have been installed.
+We can then install this via:
+
+-----
+eb FlexiBLAS-3.0.4-GCC-11.2.0.eb
+-----
+
+=== ScaLAPACK
+
+The ScaLAPACK (or Scalable LAPACK) library includes a subset of LAPACK routines
+redesigned for distributed memory MIMD parallel computers.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/s/ScaLAPACK/ScaLAPACK-2.1.0-gompi-2021.07-fb.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/s/ScaLAPACK/ScaLAPACK-2.1.0-gompi-2021.07-fb.eb`]
+
+and the dependencies are `CMake` and `FlexiBLAS-3.0.4`.  We have them but we
+do not have the required compiler chain `gompi-2021.07` so we must first install that.
+
+==== gompi-2021.07 for SYSTEM (with GCC-11.2.0)
+
+GNU Compiler Collection (GCC) based compiler toolchain,
+including OpenMPI for MPI support.
+
+The easyconfig file for this is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gompi/gompi-2021.07.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gompi/gompi-2021.07.eb`]
+
+and the dependencies are `GCC-11.2.0` and `OpenMPI-4.1.1`.  Both are available
+so we can install this via:
+
+-----
+eb gompi-2021.07.eb
+-----
+
+We will also need a variation on `gompi-2021.07.eb` called `gompic-2021.07.eb`,
+with the latter being the former plus the addition of `CUDA` and an
+`OpenMPI` compiled using the extended `gcccuda` compiler chain.
+That is, the former's dependencies are:
+
+-----
+    ('GCC', local_gccver),  # includes both GCC and binutils
+    ('OpenMPI', '4.1.1', '', ('GCC', local_gccver)),
+-----
+
+and the latter's are:
+
+-----
+    ('GCC', local_gccver),  # part of gcccuda
+    ('CUDA', '11.4.1', '', ('GCC', local_gccver)),  # part of gcccuda
+    ('OpenMPI', '4.1.1', '', ('gcccuda', version)),
+-----
+
+==== gompic-2021.07 for SYSTEM (with GCCcore-11.2.0)
+
+This is an extended compiler chain that adds both CUDA and OpenMPI
+capabilities to the basic GCCcore chain.
+
+The easyconfig file for `gompic-2020b` is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gompic/gompic-2020b.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/g/gompic/gompic-2020b.eb`]
+
+and the dependencies are:
+
+-----
+name = 'gompic'
+version = '2020b'
+toolchain = SYSTEM
+local_gccver = '10.2.0'
+dependencies = [
+    ('GCC', local_gccver),  # part of gcccuda
+    ('CUDA', '11.1.1', '', ('GCC', local_gccver)),  # part of gcccuda
+    ('OpenMPI', '4.0.5', '', ('gcccuda', version)),
+]
+-----
+
+The changes that need to be made to create a `gompic-2021.07.eb` file are:
+-----
+name = 'gompic'
+version = '2021.07'
+local_gccver = '11.2.0'
+dependencies = [
+    ('GCC', local_gccver),  # part of gcccuda
+    ('CUDA', '11.4.1', '', ('GCC', local_gccver)),  # part of gcccuda
+    ('OpenMPI', '4.1.1', '', ('gcccuda', version)),
+]
+-----
+
+We can create this `gompic-2021.07.eb` file using these changes:
+
+-----
+easyblock = "Toolchain"
+
+name = 'gompic'
+version = '2021.07'
+
+homepage = '(none)'
+description = """GNU Compiler Collection (GCC) based compiler toolchain along with CUDA toolkit,
+ including OpenMPI for MPI support with CUDA features enabled."""
+
+toolchain = SYSTEM
+
+local_gccver = '11.2.0'
+
+# compiler toolchain dependencies
+dependencies = [
+    ('GCC', local_gccver),  # part of gcccuda
+    ('CUDA', '11.4.1', '', ('GCC', local_gccver)),  # part of gcccuda
+    ('OpenMPI', '4.1.1', '', ('gcccuda', version)),
+]
+
+moduleclass = 'toolchain'
+-----
+
+==== ScaLAPACK-2.1.0 for gompi-2021.07 (with GCC-11.2.0)
+
+Now we can install `ScaLAPACK` via:
+
+-----
+eb ScaLAPACK-2.1.0-gompi-2021.07-fb.eb
+-----
+
+==== ScaLAPACK-2.1.0 for gompic-2021.07 (with GCC-11.2.0)
+
+We will also eventually need a version of this compiled using `gompic` rather than
+`gompi`.  This can be accomplished by simply renaming `ScaLAPACK-2.1.0-gompi-2021.07-fb.eb`
+to `ScaLAPACK-2.1.0-gompic-2021.07-fb.eb` and then editing the latter and replacing
+the toolchain name `gompi` with `gompic`.
+This can now be installed via:
+
+-----
+eb ScaLAPACK-2.1.0-gompic-2021.07-fb.eb
+-----
+
+== FFTW
+
+=== FFTW for gompi-2021.07 (with GCC-11.2.0)
+
+FFTW is a C subroutine library for computing the discrete Fourier transform (DFT)
+in one or more dimensions, of arbitrary input size, and of both real and complex data.
+
+The easyconfig file for this is at:
+
+https://raw.githubusercontent.com/easybuilders/easybuild-easyconfigs/develop/easybuild/easyconfigs/f/FFTW/FFTW-3.3.9-gompi-2021.07.eb[`https://raw.githubusercontent.com/easybuilders/easybuild-easyconfigs/develop/easybuild/easyconfigs/f/FFTW/FFTW-3.3.9-gompi-2021.07.eb`]
+
+and the only requirement is the `gompi-2021.07` extended compiler chain we've already
+installed.  Install this via:
+
+-----
+eb FFTW-3.3.9-gompi-2021.07.eb
+-----
+
+=== FFTW for gompic-2021.07 (with GCC-11.2.0)
+
+We will also need a version of `FFTW` compiled with the `gompic` toolchain
+instead of the `gompi` toolchain.
+This is as simple as renaming `FFTW-3.3.9-gompi-2021.07.eb`
+to `FFTW-3.3.9-gompic-2021.07.eb` and replacing the toolchain name in
+the latter with `gompic`.  This can then be installed via:
+
+-----
+eb FFTW-3.3.9-gompic-2021.07.eb
+-----
+
+== Extended Toolchains for MPI and CUDA
+
+There are other toolchains such as `foss`, `fosscuda`, `gcccuda`, `gompi` and
+`gompic` that extend the basic serial compiler toolchain to include OpenMP,
+MPI and/or CUDA capabilities.
+We have already installed `gcccuda` and `gompi` as required prerequisites
+for other modules, and now we will install the rest.
+
+=== foss with GCCcore-11.2.0
+
+This is an extended compiler chain that adds OpenMPI, FlexiBLAS, FFTW and
+ScaLAPACK capabilities to the basic GCCcore chain.
+
+
+The ScaLAPACK (or Scalable LAPACK) library includes a subset of LAPACK routines redesigned for distributed memory MIMD parallel computers.  It is designed for use on top of MPI.
+
+The easyconfig file for this is `foss-2021.07.eb` and is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/foss/foss-2021.07.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/foss/foss-2021.07.eb`]
+
+and the dependencies are:
+
+-----
+name = 'foss'
+version = '2021.07'
+toolchain = SYSTEM
+local_comp_mpi_tc = ('gompi', version)
+dependencies = [
+    ('GCC', local_gccver),
+    ('OpenMPI', '4.1.1', '', ('GCC', local_gccver)),
+    ('FlexiBLAS', '3.0.4', '', ('GCC', local_gccver)),
+    ('FFTW', '3.3.9', '', local_comp_mpi_tc),
+    ('ScaLAPACK', '2.1.0', '-fb', local_comp_mpi_tc),
+]
+-----
+
+All of these dependencies have been installed, so we can install this via:
+
+-----
+eb foss-2021.07.eb
+-----
+
+=== fosscuda with GCCcore-11.2.0
+
+This is an extended compiler chain that adds CUDA, OpenMPI, OpenBLAS, FFTW and
+ScaLAPACK capabilities to the basic GCCcore chain.
+
+No easyconfig file with GCCcore-11.2.0 is yet available for this.
+The closest analog available (as of 2021-09-15) is `fosscuda-2020b.eb`
+which is at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/fosscuda/fosscuda-2020b.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/fosscuda/fosscuda-2020b.eb`]
+
+and the pertinent dependencies are:
+
+-----
+name = 'fosscuda'
+version = '2020b'
+local_gccver = '10.2.0'
+local_comp_mpi_tc = ('gompic', version)
+dependencies = [
+    ('GCC', local_gccver),  # part of gompic
+    ('CUDA', '11.1.1', '', ('GCC', local_gccver)),  # part of gompic
+    ('OpenMPI', '4.0.5', '', ('gcccuda', version)),  # part of gompic
+    ('OpenBLAS', '0.3.12', '', ('GCC', local_gccver)),
+    ('FFTW', '3.3.8', '', local_comp_mpi_tc),
+    ('ScaLAPACK', '2.1.0', '', local_comp_mpi_tc),
+]
+-----
+
+We also need to take a look at the dependencies of the very similar almost-analog
+`foss-2021.07.eb` at:
+
+https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/foss/foss-2021.07.eb[`https://github.com/easybuilders/easybuild-easyconfigs/blob/develop/easybuild/easyconfigs/f/foss/foss-2021.07.eb`]
+
+which are:
+
+-----
+name = 'foss'
+version = '2021.07'
+local_gccver = '11.2.0'
+local_comp_mpi_tc = ('gompi', version)
+dependencies = [
+    ('GCC', local_gccver),
+    ('OpenMPI', '4.1.1', '', ('GCC', local_gccver)),
+    ('FlexiBLAS', '3.0.4', '', ('GCC', local_gccver)),
+    ('FFTW', '3.3.9', '', local_comp_mpi_tc),
+    ('ScaLAPACK', '2.1.0', '-fb', local_comp_mpi_tc),
+]
+-----
+
+The provisional easyconfig file `fosscuda-2021.07.eb` we have created from
+the dependencies in these two files is:
+
+-----
+easyblock = 'Toolchain'
+
+name = 'fosscuda'
+version = '2021.07'
+
+homepage = '(none)'
+description = """GCC based compiler toolchain __with CUDA support__, and including
+ OpenMPI for MPI support, OpenBLAS (BLAS and LAPACK support), FFTW and ScaLAPACK."""
+
+toolchain = SYSTEM
+
+local_gccver = '11.2.0'
+
+# toolchain used to build fosscuda dependencies
+local_comp_mpi_tc = ('gompic', version)
+
+# compiler toolchain dependencies
+# We need GCC, CUDA and OpenMPI as explicit dependencies instead of
+# gompic toolchain because of toolchain preperation functions.
+dependencies = [
+    ('GCC', local_gccver),  # part of gompic
+# CUDA-11.4.1-GCC-11.2.0
+    ('CUDA', '11.4.1', '', ('GCC', local_gccver)),  # part of gompic
+# OpenMPI-4.1.1-gcccuda-2021.07
+    ('OpenMPI', '4.1.1', '', ('gcccuda', version)),  # part of gompic
+# OpenBLAS-0.3.17-GCC-11.2.0
+    ('OpenBLAS', '0.3.17', '', ('GCC', local_gccver)),
+# FFTW-3.3.9-gompic-2021.07
+    ('FFTW', '3.3.9', '', local_comp_mpi_tc),
+# ScaLAPACK-2.1.0-gompic-2021.07
+    ('ScaLAPACK', '2.1.0', '-fb', local_comp_mpi_tc),
+]
+
+moduleclass = 'toolchain'
+-----
+
+We can install this via:
+
+-----
+eb fosscuda-2021.07.eb
+-----
+

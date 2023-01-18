@@ -1,0 +1,3886 @@
+TGLO/TABS System Script Hierarchy 
+=================================
+Steven K. Baum
+v0.0, 2019-07-19
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+The TGLO/TABS system - from downloading the NCEP data through running the ROMS model through munging the ROMS output
+into various formats - is a nightmarish melange of scripts written in csh, tcsh, bash, Perl, Python, IDL and GMT.
+They were written by two people over at least 15 years, and it bloody well shows.
+In an ideal universe this twisty maze would be reduced to a much smaller set of
+Python scripts with at least an order of magnitude fewer lines.
+
+abcmgr.tamu.edu
+---------------
+
+Start with the cron listing for Admin, archived at:
+
+/var/at/tabs/Admin
+~~~~~~~~~~~~~~~~~~
+
+Everything is done as Admin rather than root:
+
+sudo -i -u Admin
+cd /Volumes/abyss/ETA32CODE
+
+The cron file is:
+
+....
+# Sync the OTO files.
+0       2       *       *       *       /usr/bin/rsync /Users/james/Documents/* /Library/Server/Web/Data/Sites/Default/OTO
+# It appears the NCEP NAM fields are ready two hours after the model run times. 
+# 00z run is available at 02Z 
+# 06z run is available at 08Z
+# 12z run is available at 14Z
+# 18z run is available at 20Z
+# It also appears everyone piles on about that time. So - I'll come in later
+15      03      *       *       *       /Volumes/abyss/ETA32CODE/do_roms_plot.csh
+15      08      *       *       *       /Volumes/abyss/ETA32CODE/do_roms_plot.csh
+15      14      *       *       *       /Volumes/abyss/ETA32CODE/do_roms_plot.csh
+15      20      *       *       *       /Volumes/abyss/ETA32CODE/do_roms_plot.csh
+#
+# if central standard time (-6hr) then use this block.
+#30     23      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_00.csh
+#30     05      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_06.csh
+#30     11      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_12.csh
+#30     17      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_18.csh
+## 
+#40     23      *       *       *       /Volumes/abyss/ETA32CODE/doawip00a.csh
+#40     05      *       *       *       /Volumes/abyss/ETA32CODE/doawip06a.csh
+#40     11      *       *       *       /Volumes/abyss/ETA32CODE/doawip12a.csh
+#40     17      *       *       *       /Volumes/abyss/ETA32CODE/doawip18a.csh
+##
+#50     23      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb00.csh
+#50     05      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb06.csh
+#50     11      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb12.csh
+#50     17      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb18.csh
+# if daylight saving time (-5hr) then use this block
+50      00      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_00.py
+10      01      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_00.py
+50      06      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_06.py
+10      07      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_06.py
+50      12      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_12.py
+10      01      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_12.py
+50      18      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_18.py
+10      19      *       *       *       /Volumes/abyss/ETA32CODE/get_ncep_megara_18.py
+#
+59      00      *       *       *       /Volumes/abyss/ETA32CODE/doawip00a.csh
+59      06      *       *       *       /Volumes/abyss/ETA32CODE/doawip06a.csh
+59      12      *       *       *       /Volumes/abyss/ETA32CODE/doawip12a.csh
+59      18      *       *       *       /Volumes/abyss/ETA32CODE/doawip18a.csh
+#
+30      01      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb00.csh
+30      07      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb06.csh
+30      13      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb12.csh
+30      19      *       *       *       /Volumes/abyss/ETA32CODE/updatetwdb18.csh
+59      23      *       *       *       /Volumes/abyss/ETA32CODE/rollthem2.csh
+15      00      *       *       *       /Volumes/abyss/ETA32CODE/rollthem2.csh
+....
+
+/Volumes/abyss/ETA32CODE/*do_roms_plot.csh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A +csh+ script that runs the +get_copano_roms2.py+ script to grab the ASCII format current component files processed from ROMS netCDF output files on copano.
+It then runs the +make_3roms_plots.gmt+ script to create GIF and PDF files of the surface currents of the latest ROMS
+simulations for the western, eastern and whole Gulf of Mexico.
+Animation files are also produced for all three regions using +gifsicle+, and the resulting files moved to
+a directory accessible via the web server.
+
+....
+#! /bin/tcsh
+
+# copy ROM output files to working directory
+
+cd /Volumes/abyss/ETA32CODE/ROMSDIR/
+rm *.d
+rm *.gif
+rm *.pdf
+rm *.ps
+
+/Volumes/abyss/ETA32CODE/ROMSDIR/get_copano_roms2.py
+
+foreach f (TGLO-vec-*.d)
+ echo $f
+ /Volumes/abyss/ETA32CODE/ROMSDIR/make_3roms_plots.gmt $f
+# /Volumes/abyss/ETA32CODE/ROMSDIR/make_roms_plot_west.gmt $f 
+# /Volumes/abyss/ETA32CODE/ROMSDIR/make_roms_plot_east.gmt $f
+# /Volumes/abyss/ETA32CODE/ROMSDIR/make_roms_plot_wholeg.gmt $f
+end
+
+/opt/local/bin/gifsicle --loop --optimize=2 -d 20 RW*.gif > RWanimation.gif
+/opt/local/bin/gifsicle --loop --optimize=2 -d 20 RE*.gif > REanimation.gif
+/opt/local/bin/gifsicle --loop --optimize=2 -d 20 RG*.gif > RGanimation.gif
+
+cp /Volumes/abyss/ETA32CODE/ROMSDIR/*.gif /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+cp /Volumes/abyss/ETA32CODE/ROMSDIR/*.pdf /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+....
+
+/Volumes/abyss/ETA32CODE/ROMSDIR/*get_copano_roms2.py*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A Python script that uses +sshpass+ and +rsync+ to grab files from copano.
+
+....
+#!/Volumes/local/Users/Admin/Python/User/bin/python
+
+import datetime,os
+
+yymmdd = datetime.datetime.now().strftime("%y%m%d")
+
+#yymmdd = "190528"
+
+os.system("/usr/local/bin/sshpass -p \"******\" /usr/bin/rsync -tv baum@copano.tamu.edu:/d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/*.d /Volumes/abyss/ETA32CODE/ROMSDIR")
+....
+
+/Volumes/abyss/ETA32CODE/ROMSDIR/*make_3roms_plots.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A tcsh script that calls various GMT commands to create GIF and PDF graphics files of GOM surface currents.
+
+....
+#! /bin/tcsh -f
+# 
+#12345678901234567890123
+#TGLO-vec-16-05-18-12-69.d
+
+# MAKE PLOT OF ROMS Model Output 
+
+awk -f rom.nawk < $1 > romxyuv.txt
+
+set yymmdd  = `echo $1 | awk '{print 20substr($1,10,2)substr($1,13,2)substr($1,16,2)}'  `
+set runhr   = `echo $1 | awk '{print substr($1,19,2)}' `
+set validhr = `echo $1 | awk '{print substr($1,22,2)}' `
+
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set runhr   = `echo $runhr   | cut -f1 | sed 's/^0//' `
+set validhr = `echo $validhr | cut -f1 | sed 's/^0//' `
+
+#echo $yymmdd
+#echo $runhr
+#echo $validhr
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set yys      = `echo $1 | awk '{print 20substr($1,10,2)}'  `
+set mms      = `echo $1 | awk '{print   substr($1,13,2)}'  `
+set dds      = `echo $1 | awk '{print   substr($1,16,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ runhr   = $runhr
+@ validhr = $validhr
+@ hh      = $validhr + $runhr
+
+#echo "yy" $yy
+#echo "mm" $mm
+#echo "dd" $dd
+#echo "runhr" $runhr
+#echo "validhr" $validhr
+#echo "hh" $hh
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set fcdate    = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%y%m%d%H`
+set fcdates   = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%d"-"%b"-"%y" "%H":00"`
+#echo $fcdate
+#echo $fcdates
+
+# fcdate 12113000
+# fcdates 30-Nov-12 00:00
+set yys      = `echo $fcdate | awk '{print 20substr($1,1,2)}'  `
+set mms      = `echo $fcdate | awk '{print   substr($1,3,2)}'  `
+set dds      = `echo $fcdate | awk '{print   substr($1,5,2)}'  `
+set hhs      = `echo $fcdate | awk '{print   substr($1,7,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds | cut -f1 | sed 's/^0//' `
+set hhs      = `echo $hhs | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ hh      = $hhs
+
+# Daylight savings time local time
+set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%y%m%d%H`
+set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%d"-"%b"-"%y" "%H":00"`
+#echo $fclocal
+#echo $fclocals
+# POM_2m_03040923.gif
+
+#------------------------------------------------------------------------------------------------------
+#  Now that we have the file names and some of annotation strings - Let's make plots
+#  There are three repeated blocks of code, one for each of Western, Eastern and Whole Gulf of Mexico
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+#                                  Western Gulf of Mexico
+#------------------------------------------------------------------------------------------------------
+set output    = 'RW'$fcdate'.ps'
+set output2   = 'RW'$fcdate'.gif'
+set output3   = 'thumb_RW'$fcdate'.gif'
+set outputpdf = 'RW'$fcdate'.pdf'
+
+# Draw the Coastline
+
+pscoast -R-98.0/-85.0/25.0/30.5 -G245/222/179 -JM8.25 -Dh -B1g1 -W1 -Ia -Na -K -X1.50 -Y2.50 > $output
+
+# Plot the current vectors on the map
+psxy  romxyuv.txt   -R  -G0/0/255    -JM    -Svb0.000i/0.03i/0.04in0.125  -O -K        >> $output
+
+# Plot a box around the plot
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $output
+ 1.00 0.0
+10.00 0.0
+10.00 5.5
+ 1.00 5.5
+ 1.00 0.0
+END
+
+# legend meters per second
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.25
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 50 cm/s
+END
+
+# legend knots 
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.257222
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 1 knot  
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 5.2  18 0 4 6 Forecast Surface Currents from ROMS Model Using NCEP's NAM 12km Winds
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputpdf
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+
+(ppmtogif junk.ppmraw > temp2.gif) >& /dev/null
+/Applications/Nconvert/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp2.gif
+/Applications/Nconvert/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+
+#------------------------------------------------------------------------------------------------------
+#                                  Eastern Gulf of Mexico
+#------------------------------------------------------------------------------------------------------
+set output    = 'RE'$fcdate'.ps'
+set output2   = 'RE'$fcdate'.gif'
+set output3   = 'thumb_RE'$fcdate'.gif'
+set outputpdf = 'RE'$fcdate'.pdf'
+
+# Draw the Coastline
+
+pscoast -R-93.0/-80.0/25.0/30.5 -G245/222/179 -JM8.25 -Dh -B1g1 -W1 -Ia -Na -K -X1.50 -Y2.50 > $output
+
+# Plot the current vectors on the map
+psxy  romxyuv.txt   -R  -G0/0/255    -JM    -Svb0.000i/0.03i/0.04in0.125  -O -K        >> $output
+
+# Plot a box around the plot
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $output
+ 1.00 0.0
+10.00 0.0
+10.00 5.5
+ 1.00 5.5
+ 1.00 0.0
+END
+
+# legend meters per second
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.25
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 50 cm/s
+END
+
+# legend knots 
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.257222
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 1 knot  
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 5.2  18 0 4 6 Forecast Surface Currents from ROMS Model Using NCEP's NAM 12km Winds
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputpdf
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+
+(ppmtogif junk.ppmraw > temp2.gif) >& /dev/null
+/Applications/Nconvert/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp2.gif
+/Applications/Nconvert/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+
+#------------------------------------------------------------------------------------------------------
+#                                  Whole Gulf of Mexico
+#------------------------------------------------------------------------------------------------------
+set output    = 'RG'$fcdate'.ps'
+set output2   = 'RG'$fcdate'.gif'
+set output3   = 'thumb_RG'$fcdate'.gif'
+set outputpdf = 'RG'$fcdate'.pdf'
+
+# Draw the Coastline
+pscoast -R-98.0/-80.0/18.0/30.5 -G245/222/179 -JM8.25 -Dh -B2g1 -W1 -Ia -Na -K -X1.50 -Y1.25   > $output
+
+# Plot the current vectors on the map
+
+psxy  romxyuv.txt   -R  -G0/0/255    -JM    -Svb0.000i/0.03i/0.04in0.125  -O -K        >> $output
+
+# Plot a box around the plot
+
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $output
+ 0.75 0.0
+10.25 0.0
+10.25 8.0 
+ 0.75 8.0
+ 0.75 0.0
+END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.25
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 50 cm/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.257222
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 1 knot  
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 7.7  18 0 4 6 Forecast Surface Currents from ROMS Model Using NCEP's NAM 12km Winds
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputpdf
+
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+(ppmtogif junk.ppmraw > temp2.gif) >& /dev/null
+/Applications/Nconvert/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  50  10 906 900 temp2.gif
+/Applications/Nconvert/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+....
+
+/Volumes/abyss/ETA32CODE/*get_ncep_megara_00.py*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/Volumes/local/Users/Admin/Python/User/bin/python
+
+import datetime,os
+
+yymmdd = datetime.datetime.now().strftime("%y%m%d")
+
+#yymmdd = "190528"
+
+newdir = "/Volumes/abyss/ETA32CODE/B" + yymmdd + "/"
+
+os.system("/bin/mkdir " + newdir)
+
+os.system("/usr/local/bin/sshpass -p \"******\" /usr/bin/rsync -tv baum@copano.tamu.edu:/d2/home/baum/abyss/ETA32CODE/B" + yymmdd + "/*00.F* /Volumes/abyss/ETA32CODE/B" + yymmdd)
+....
+
+
+/Volumes/abyss/ETA32CODE/*doawip00a.csh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/bin/tcsh
+
+cd /Volumes/abyss/ETA32CODE/
+
+# Convert from AWIPS GRIB to ascii and extract GOM subregion
+
+#rm get_awip.log >& /dev/null
+
+if ( "$1" ==  "" ) then
+   set a=`date -u +%y%m%d`
+   echo  date is today: $a
+else
+   set a=$1
+   echo  date is: $a
+endif
+
+#set a=181017
+#set a=$1
+
+#echo "Extracting GOM subset"
+#foreach f (B$a/*00.F*.grb)
+# echo $f > awip12infile.txt
+# set upick = `wgrib2 -verf $f | grep "UGRD:10" | awk '{print substr($1,0,4)}'` >& /dev/null
+# set vpick = `wgrib2 -verf $f | grep "VGRD:10" | awk '{print substr($1,0,4)}'` >& /dev/null
+# wgrib2 $f -text $f'_u' -d $upick >& /dev/null
+# wgrib2 $f -text $f'_v' -d $vpick >& /dev/null
+# ./getawip
+# rm B$a/*_* >& /dev/null
+#end
+
+# ----------------------------------------------------------------------------------------
+#      Make POM plots for the western GOM which get converted to pdf and posted
+# ----------------------------------------------------------------------------------------
+rm  AWIP_WORKING/*.*
+echo "Makeplot21"
+#
+#  Use *.txt files copied from copano to create plots.
+#
+foreach f (B$a/*00.F*.grbuv.txt)
+     ./makeplot21.gmt $f
+end
+cd AWIP_WORKING/
+#
+#  Create animated GIF from idndividual GIF files.
+#
+/opt/local/bin/gifsicle --loop --optimize=2 -d 30 eta*_w.gif > wind_animation_w.gif
+mv *.gif /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+mv *.pdf /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+cd ..
+
+# ----------------------------------------------------------------------------------------
+#      Make POM plots for the eastern GOM which get converted to pdf and posted
+# ----------------------------------------------------------------------------------------
+rm  AWIP_WORKING/*.*
+echo "Makeplot22"
+foreach f (B$a/*00.F*.grbuv.txt)
+ ./makeplot22.gmt $f
+end
+cd AWIP_WORKING/
+/opt/local/bin/gifsicle --loop --optimize=2 -d 30 eta*_e.gif > wind_animation_e.gif
+mv *.gif /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+mv *.pdf /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+cd ..
+
+# ----------------------------------------------------------------------------------------
+#   Make ROMS plots for the Whole GOM Region - which get converted to pdf and posted
+# ----------------------------------------------------------------------------------------
+rm  AWIP_WORKING/*.*
+#echo " "
+echo "Makeplot23"
+foreach f (B$a/*00.F*.grbuv.txt)
+   ./makeplot23.gmt $f
+end
+cd AWIP_WORKING
+/opt/local/bin/gifsicle --loop --optimize=2 -d 30 eta*_wg.gif > wind_animation_wg.gif
+mv *.gif /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+mv *.pdf /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+cd ..
+
+# ----------------------------------------------------------------------------------------
+# Put Gulf of Mexico NAM Winds in pickup place for Baum 
+# ----------------------------------------------------------------------------------------
+#cp /abyss/ETA32CODE/B$a/*00.F*.txt /bosco/awipweather/
+#chmod 777 /bosco/awipweather/*.txt
+
+#cd /Volumes/abyss/ETA32CODE/B$a
+#/Volumes/abyss/ETA32CODE/gaftp.csh
+....
+
+/Volumes/abyss/ETA32CODE/*makeplot21.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#! /bin/tcsh -f
+# B990416/9910500.F00.grbuvtp.txt
+# --------------------------------------------------------------------------
+#         MAKE PLOT OF ETA WIND FIELDS FOR THE LATEX REGION
+# --------------------------------------------------------------------------
+
+
+echo $1 > inputfile.temp
+rm mkplt.log >& /dev/null
+
+(/Applications/exelis/idl85/bin/idl mkpltb >> mkplt.log ) >& /dev/null
+
+#A070710/0719100.F00.grbuv.txt
+#12345678901234567890123456789
+
+set fname   = `echo $1 | awk '{print substr($1,2,19)}' `
+set yymmdd  = `echo $1 | awk '{print 20substr($1,2,6)}' `
+set runhr   = `echo $1 | awk '{print substr($1,14,2)}' `
+set validhr = `echo $1 | awk '{print substr($1,18,2)}' `
+
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set runhr   = `echo $runhr   | cut -f1 | sed 's/^0//' `
+set validhr = `echo $validhr | cut -f1 | sed 's/^0//' `
+
+#echo $fname
+#echo $yymmdd
+#echo $runhr
+#echo $validhr
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set yys      = `echo $1 | awk '{print 20substr($1,2,2)}'  `
+set mms      = `echo $1 | awk '{print   substr($1,4,2)}'  `
+set dds      = `echo $1 | awk '{print   substr($1,6,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ runhr   = $runhr
+@ validhr = $validhr
+@ hh      = $validhr + $runhr
+
+#echo "yy" $yy
+#echo "mm" $mm
+#echo "dd" $dd
+#echo "runhr" $runhr
+#echo "validhr" $validhr
+#echo "hh" $hh
+
+set fcdate    = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%y%m%d%H`
+set fcdates   = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%d"-"%b"-"%y" "%H":00"`
+
+#echo "fcdate"  $fcdate
+#echo "fcdates" $fcdates
+
+# fcdate 12113000
+# fcdates 30-Nov-12 00:00
+set yys      = `echo $fcdate | awk '{print 20substr($1,1,2)}'  `
+set mms      = `echo $fcdate | awk '{print   substr($1,3,2)}'  `
+set dds      = `echo $fcdate | awk '{print   substr($1,5,2)}'  `
+set hhs      = `echo $fcdate | awk '{print   substr($1,7,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds | cut -f1 | sed 's/^0//' `
+set hhs      = `echo $hhs | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ hh      = $hhs
+
+#echo "setting the local dates"
+
+set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%y%m%d%H`
+set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%d"-"%b"-"%y" "%H":00"`
+#set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-6H +%y%m%d%H` 
+#set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-6H +%d"-"%b"-"%y" "%H":00"` 
+
+#echo "fclocal"  $fclocal
+#echo "fclocals" $fclocals
+
+set output   = AWIP_WORKING/$yymmdd$runhr$validhr'_w.ps'
+set output2  = AWIP_WORKING/'eta_'$fcdate'_w.gif'
+set output3  = AWIP_WORKING/'thumb_eta_'$fcdate'_w.gif'
+set outputps = AWIP_WORKING/'eta_'$fcdate'_w.pdf'
+
+#echo "OUTPUT " $output
+#echo "OUTPUT2 " $output2
+#echo "OUTPUT3 " $output3
+#echo "OUTPUTps " $outputps
+
+pscoast -R-98.0/-85.0/25.0/30.5 -G245/222/179 -JM8.25 -Dh -B1g1 -W1    -K -X1.50 -Y2.50   > $output
+psxy  test3.txt   -R  -G0/0/255   -JM    -SV0.000/0.03/0.04/n0.125  -O -K                   >> $output
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END            >> $output
+ 1.00 0.0
+10.00 0.0
+10.00 5.5
+ 1.00 5.5
+ 1.00 0.0
+END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.125
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 10 m/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.121490
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 5 knots 
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 5.2  18 0 4 6 Winds at +10m from the NCEP NAM 12km-grid Weather Model
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+#
+# Convert Postscript files to PDF using ps2pdf
+#
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputps
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+(ppmtogif junk.ppmraw > temp.gif) >& /dev/null
+#
+# Convert to GIF files using nconvert.
+#
+/Applications/Nconvert/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp.gif
+/Applications/Nconvert/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp.gif
+
+rm temp.gif
+rm junk.ppmraw
+
+#echo $output2
+#echo $output3
+#echo $outputps
+#echo $output
+....
+
+/Volumes/abyss/ETA32CODE/*makeplot22.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#! /bin/tcsh -f
+# B990416/9910500.F00.grbuvtp.txt
+# --------------------------------------------------------------------------
+#         MAKE PLOT OF ETA WIND FIELDS FOR THE NEGOM REGION
+# --------------------------------------------------------------------------
+#echo $1
+echo $1 > inputfile.temp
+rm mkplt.log >& /dev/null
+
+(/Applications/exelis/idl85/bin/idl mkpltb >> mkplt.log ) >& /dev/null
+
+#A070710/0719100.F00.grbuv.txt
+#12345678901234567890123456789
+
+set fname   = `echo $1 | awk '{print substr($1,2,19)}' `
+set yymmdd  = `echo $1 | awk '{print 20substr($1,2,6)}'  `
+set runhr   = `echo $1 | awk '{print substr($1,14,2)}' `
+set validhr = `echo $1 | awk '{print substr($1,18,2)}' `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set runhr   = `echo $runhr   | cut -f1 | sed 's/^0//' `
+set validhr = `echo $validhr | cut -f1 | sed 's/^0//' `
+
+#echo $fname
+#echo $yymmdd
+#echo $runhr
+#echo $validhr
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set yys      = `echo $1 | awk '{print 20substr($1,2,2)}'  `
+set mms      = `echo $1 | awk '{print   substr($1,4,2)}'  `
+set dds      = `echo $1 | awk '{print   substr($1,6,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms   | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds   | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ runhr   = $runhr
+@ validhr = $validhr
+@ hh      = $validhr + $runhr
+#echo "yy" $yy
+#echo "mm" $mm
+#echo "dd" $dd
+#echo "runhr" $runhr
+#echo "validhr" $validhr
+#echo "hh" $hh
+
+# For Daylight savings time CDT use
+#set fcdate    = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v-1H -v+"$hh"H +%y%m%d%H`
+#set fcdates   = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v-1H -v+"$hh"H +%d"-"%b"-"%y" "%H":00"`
+
+# For Standard time CST use
+set fcdate    = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%y%m%d%H`
+set fcdates   = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%d"-"%b"-"%y" "%H":00"`
+
+#echo "fcdate"  $fcdate
+#echo "fcdates" $fcdates
+
+# fcdate 12113000
+# fcdates 30-Nov-12 00:00
+set yys      = `echo $fcdate | awk '{print 20substr($1,1,2)}'  `
+set mms      = `echo $fcdate | awk '{print   substr($1,3,2)}'  `
+set dds      = `echo $fcdate | awk '{print   substr($1,5,2)}'  `
+set hhs      = `echo $fcdate | awk '{print   substr($1,7,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms   | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds   | cut -f1 | sed 's/^0//' `
+set hhs      = `echo $hhs   | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ hh      = $hhs
+
+#echo "setting the local dates"
+set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%y%m%d%H`
+set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%d"-"%b"-"%y" "%H":00"`
+#set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-6H +%y%m%d%H` 
+#set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-6H +%d"-"%b"-"%y" "%H":00"` 
+#echo "fclocal"  $fclocal
+#echo "fclocals" $fclocals
+
+set output   = AWIP_WORKING/$yymmdd$runhr$validhr'_e.ps'
+set output2  = AWIP_WORKING/'eta_'$fcdate'_e.gif'
+set output3  = AWIP_WORKING/'thumb_eta_'$fcdate'_e.gif'
+set outputps = AWIP_WORKING/'eta_'$fcdate'_e.pdf'
+
+#echo "OUTPUT " $output
+#echo "OUTPUT2 " $output2
+#echo "OUTPUT3 " $output3
+#echo "OUTPUTps " $outputps
+
+pscoast -R-93.0/-80.0/25.0/30.5 -G245/222/179 -JM8.25 -Dh -B1g1 -W1    -K -X1.50 -Y2.50   > $output
+psxy  test3.txt   -R  -G0/0/255   -JM    -SV0.000/0.03/0.04/n0.125  -O -K                   >> $output
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END            >> $output
+ 1.00 0.0
+10.00 0.0
+10.00 5.5
+ 1.00 5.5
+ 1.00 0.0
+END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.125
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 10 m/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.121490
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 5 knots 
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 5.2  18 0 4 6 Winds at +10m from the NCEP NAM 12km-grid Weather Model
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputps
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+(ppmtogif junk.ppmraw > temp.gif) >& /dev/null
+/Applications/Nconvert/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp.gif
+/Applications/Nconvert/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 650 325 100  75 temp.gif
+
+rm temp.gif
+rm junk.ppmraw
+....
+
+/Volumes/abyss/ETA32CODE/*makeplot23.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#! /bin/tcsh -f
+# B990416/9910500.F00.grbuvtp.txt
+# MAKE PLOT OF ETA WIND FIELDS FOR THE LATEX REGION
+
+#echo $1
+echo $1 > inputfile.temp
+rm mkplt.log >& /dev/null
+
+(/Applications/exelis/idl85/bin/idl mkpltb >> mkplt.log ) >& /dev/null
+
+#A070710/0719100.F00.grbuv.txt
+#12345678901234567890123456789
+
+set fname   = `echo $1 | awk '{print substr($1,2,19)}' `
+set yymmdd  = `echo $1 | awk '{print 20substr($1,2,6)}'  `
+set runhr   = `echo $1 | awk '{print substr($1,14,2)}' `
+set validhr = `echo $1 | awk '{print substr($1,18,2)}' `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set runhr    = `echo $runhr   | cut -f1 | sed 's/^0//' `
+set validhr  = `echo $validhr | cut -f1 | sed 's/^0//' `
+
+#echo $fname
+#echo $yymmdd
+#echo $runhr
+#echo $validhr
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set yys      = `echo $1 | awk '{print 20substr($1,2,2)}'  `
+set mms      = `echo $1 | awk '{print   substr($1,4,2)}'  `
+set dds      = `echo $1 | awk '{print   substr($1,6,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms   | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds   | cut -f1 | sed 's/^0//' `
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ runhr   = $runhr
+@ validhr = $validhr
+@ hh      = $validhr + $runhr
+
+#echo $yy
+#echo $mm
+#echo $dd
+#echo $runhr
+#echo $validhr
+#echo $hh
+
+# For Daylight savings time CDT use
+#set fcdate    = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v-1H -v+"$hh"H +%y%m%d%H`
+#set fcdates   = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v-1H -v+"$hh"H +%d"-"%b"-"%y" "%H":00"`
+
+# For Standard time CST use
+set fcdate    = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%y%m%d%H`
+set fcdates   = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v0H -v+"$hh"H +%d"-"%b"-"%y" "%H":00"`
+
+#echo "fcdate"  $fcdate
+#echo "fcdates" $fcdates
+
+# fcdate 12113000
+# fcdates 30-Nov-12 00:00
+set yys      = `echo $fcdate | awk '{print 20substr($1,1,2)}'  `
+set mms      = `echo $fcdate | awk '{print   substr($1,3,2)}'  `
+set dds      = `echo $fcdate | awk '{print   substr($1,5,2)}'  `
+set hhs      = `echo $fcdate | awk '{print   substr($1,7,2)}'  `
+# This fixes the problem when the shell interprets 08 and 09 as octal numbers
+set mms      = `echo $mms   | cut -f1 | sed 's/^0//' `
+set dds      = `echo $dds   | cut -f1 | sed 's/^0//' `
+set hhs      = `echo $hhs   | cut -f1 | sed 's/^0//' `
+#echo $yys
+#echo $mms
+#echo $dds
+#echo $hhs
+
+@ yy      = $yys
+@ mm      = $mms
+@ dd      = $dds
+@ hh      = $hhs
+
+set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%y%m%d%H`
+set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-5H +%d"-"%b"-"%y" "%H":00"`
+#set fclocal  = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-6H +%y%m%d%H` 
+#set fclocals = `date -j -v"$yy"y -v"$mm"m -v"$dd"d -v"$hh"H -v-6H +%d"-"%b"-"%y" "%H":00"` 
+#echo "fclocal"  $fclocal
+#echo "fclocals" $fclocals
+
+set output   = AWIP_WORKING/$yymmdd$runhr$validhr'_wg.ps'
+set output2  = AWIP_WORKING/'eta_'$fcdate'_wg.gif'
+set output3  = AWIP_WORKING/'thumb_eta_'$fcdate'_wg.gif'
+set outputps = AWIP_WORKING/'eta_'$fcdate'_wg.pdf'
+#echo "OUTPUT " $output
+#echo "OUTPUT2 " $output2
+#echo "OUTPUT3 " $output3
+#echo "OUTPUTps " $outputps
+
+#pscoast -R-98.0/-90.0/27.0/30.5 -G245/222/179 -JM8.25 -Dh -B2g1 -W1 -Ia -Na -K -X1.50 -Y1.25 > $output
+pscoast -R-98.0/-80.0/18.0/30.5 -G245/222/179 -JM8.25 -Dh -B2g1 -W1 -Ia -Na -K -X1.50 -Y1.25 > $output
+psxy  test3.txt   -R  -G0/0/255    -JM    -SVb0.000i/0.03i/0.04in0.125  -O -K        >> $output
+
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $output
+ 0.75 0.0
+10.50 0.0
+10.50 8.0 
+ 0.75 8.0
+ 0.75 0.0
+END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.125
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 10 m/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.121490
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 5 knots 
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 7.7  18 0 4 6 Winds at +10m from the NCEP NAM 12km-grid Weather Model
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputps
+
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+(ppmtogif junk.ppmraw > temp.gif) >& /dev/null
+/Applications/Nconvert/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  50  10 906 900 temp.gif
+/Applications/Nconvert/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp.gif
+
+rm temp.gif
+rm junk.ppmraw
+....
+
+
+/Volumes/abyss/ETA32CODE/*updatetwdb00.csh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+
+cd /Volumes/abyss/ETA32CODE/twdb2
+
+if ( "$1" ==  "" ) then
+   set a=`date -u +%y%m%d`
+   set b=`date -u +%m" "%d`
+   echo  date a is: $a
+   echo  date b is: $b
+else
+   set a=$1
+   set b=$2" "$3
+   echo  date a is: $a
+   echo  date b is: $b
+endif
+#set a=`date -u +%y%m%d`
+#set b=`date -u +%m" "%d`
+echo "******* Running updatetwdb00 for "$a" *******"
+echo $a
+echo $b
+#set a='181112'
+#set b='11 12'
+
+#  Replaces each *.tmp file with a copy containing
+#  data from all days previous to the current one.
+#  In other words, truncated to the previous day. 
+
+#  Create temporary clip.temp for for each twdb***.tmp file.
+
+foreach f (*.tmp)
+   grep -v "^$b" $f > clip.temp
+   cp clip.temp $f
+end
+
+set c = "/Volumes/abyss/ETA32CODE/"
+
+# For each new wind field - strip out the line
+# of data for each station and append to the
+# file for that station.
+
+#  Call Perl program baylinerb.pl to append values from each *uv.txt for this day/forecast hour to
+#  each twd***.tmp file.
+
+foreach f ($c"B"$a/*00.F*uv.txt)
+   /Volumes/abyss/ETA32CODE/twdb2/baylinerb.pl $f
+end
+rm clip.temp
+
+#source /usr/local/vni/wave/bin/wvsetup
+(idl bwbq >> baywatchbq.log ) >& /Volumes/abyss/ETA32CODE/twdb2/bwbq.log
+
+tar -cof twdb_lc.tar *.wndq >& /Volumes/abyss/ETA32CODE/twdb2/tar.log
+cp twdb_lc.tar /Volumes/abyss/tglopu >& /Volumes/abyss/ETA32CODE/twdb2/cp.log
+....
+
+
+/Volumes/abyss/ETA32CODE/twdb2/*baylinerb.pl*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#!/opt/local/bin/perl
+#/Volumes/abyss/ETA32CODE/B141204/1433806.F00.grbuv.txt
+#123456789 123456789 123456789 123456789 1234
+# 04 00 12 00 -3.77 -1.00
+$a  = $ARGV[0] ;
+print "$a\n"   ;
+$ic = 0        ;
+
+open(BL,"baylinesb_lc.save");
+@bayline  = <BL>       ;
+chop(@bayline)         ;
+close(BL)              ;
+
+open(BF,"bayfilesb_lc.save");
+@bayfile  = <BF>       ;
+chop(@bayfile)         ;
+close(BF)              ;
+
+open(IN,$a)            ;
+
+while ($_ = <IN>) {
+
+       if($. == $bayline[$ic]) {
+
+         ($F1,$F2,$F3,$F4,$F5,$F6) = split(' ', $_, 9999);
+         open(OUT,">>$bayfile[$ic]") ;
+         printf OUT "%02d %02d %02d %02d %5.2f %5.2f\n", substr($a,28,2),
+                                                         substr($a,30,2),
+                                                         substr($a,26,2),
+                                         substr($a,38,2)+substr($a,42,2),
+                                                         $F5, $F6 ;
+         close(OUT);
+         $ic = $ic + 1 ;
+                                   }
+
+                   }
+close(IN) ;
+....
+
+/Volumes/abyss/ETA32CODE/twdb2/*bwbq.pro*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+baybeta
+exit
+....
+
+/Volumes/abyss/ETA32CODE/twdb2/*baybeta.pro*
+++++++++++++++++++++++++++++++++++++++++++++
+
+....
+PRO baybeta
+
+restore,'bay_tmp_file_template.wve'
+
+; Baywatch reads ETA-12  ETA-22 or ETA-32 or ETA-80 U&V wind data for a particular
+; gridpoint from files of type *.tmp or t80. Data are converted to mph and meteorological
+; convention in earth coordinates, and local time, and reformatted to suit TWDB's needs. 
+; baylist12.txt is a list of input filenames, gridpoint locations, and output filenames.
+
+;infile = ' ' & outfile = ' ' 
+;st     = dc_read_free('baylist12b_lc.txt',infile,blon,blat,outfile,/col,resize=[1,2,3,4])
+
+restore,'baylist12b_lc.wve'
+nloop  = n_elements(infile)
+
+for j = 0,nloop-1 do begin
+;for j = 0,0 do begin 
+
+;--------------------------------------------------------------------------
+; Open each file and read columns of month, day, year, forcast hour, u & v.
+;--------------------------------------------------------------------------
+
+    openw,10,'/Volumes/abyss/ETA32CODE/twdb2/'+outfile(j)+'q'
+    result = read_ascii(infile(j),template=bay_tmp_file_template)
+    mm = result.mm
+    dd = result.dd
+    yy = result.yy
+    hh = result.hh
+    u  = result.u
+    v  = result.v
+
+;------------------------------------------------------------------
+; Convert yy,mm,dd to date and add forecast hour hh. 
+; Some hh will be over 24 pushing date to next day.
+;------------------------------------------------------------------
+
+    idx = where(yy ge 0 and yy le 90) ; good till year 2090
+
+    if(idx(0) ne -1) then yy(idx) = 2000 + yy(idx)
+    idx = where(yy eq 99)
+    if(idx(0) ne -1) then yy(idx) = 1999
+
+    print,j,mm,dd,yy,format='(i5,2x,i3,2x,i3,2x,i3,", Inputs to julday program:")'
+;    gdate = var_to_dt(yy,mm,dd)
+    gdate = julday(mm,dd,yy,0,0)
+    print,gdate,format='(2x,i10," - julian day")'
+;    print,mm,dd,yy,gdate,format='(i3,2x,i3,2x,i3,i10,", Inputs to julday program:")'
+
+    for i = 0,n_elements(hh)-1 do begin
+       gdate(i) = gdate(i)+hh(i)/24.
+    endfor
+
+; Put date into local time in Texas
+;  gmt2local,gdate,date 
+;   No keep in GMT
+
+    date = gdate
+
+; Convert speed from m/s to miles per hour
+
+    spd = sqrt(u*u+v*v)*2.236936e+00
+
+; Put wind into meteorological convention
+
+    dir = atan(-v,-u)
+; dtor converts degrees to radians
+    wdir = dir/!dtor
+
+; Put wind into earth coordinates
+
+    wdir = 90.-wdir
+    i = where(wdir lt 0.)
+    if(i(0) ne -1) then wdir(i) = wdir(i) + 360.
+
+; Design an array of dates beginning at 00:00 of first day of previous month
+; ending at 21:00 of the last day found in the input data file.
+; Then generate a date array spanning these dates with a delta-t of 3 hours
+
+; last date in input data
+
+     ldx   = n_elements(date)-1
+     caldat,date(ldx),month,day,year,hourx
+     lyy   = year
+     lmm   = month
+     ldd   = day
+     lday  = julday(lmm,ldd,lyy,0)
+
+;     lyy   = gdate(ldx).year
+;     lmm   = gdate(ldx).month
+;     ldd   = gdate(ldx).day
+;     lday  = var_to_dt(lyy,lmm,ldd)
+
+; first date in input data
+
+     if(ldd lt 15) then fmm = lmm-2
+     if(ldd ge 15) then fmm = lmm-1
+     fyy   = lyy
+     if(fmm le 0) then begin
+        fmm = 12+fmm
+        fyy = lyy-1
+     endif
+     fdd   = 1
+     fday  = julday(fmm,fdd,fyy,0)
+
+;     fday  = var_to_dt(fyy,fmm,fdd)
+
+; generate date array
+
+     deltad  = lday-fday+1
+
+     newdate = timegen(deltad*8,UNITS='Hours',STEP_SIZE=3,START=fday)
+;     newdate = dtgen(fday,fix(deltad*8),hour=3)
+
+     npts    = n_elements(newdate)
+     ndays   = fix(deltad)
+
+; load speed and dir with flag values
+
+     nspeed  = fltarr(npts)-99.9
+     ndir    = fltarr(npts)-99.9
+
+; Load NMC values into newdate array, overwriting
+; flag values where data are available.  When multiple
+; entries for a particular date are present - use the
+; last.
+
+     for i = 0,npts-1 do begin
+     caldat,newdate(i),mx,dx,yx,hx
+        index = where(abs(date-newdate(i)) lt .04)
+        if(index(0) ne -1) then begin
+           ikx = index(n_elements(index)-1)
+           nspeed(i) = spd(ikx)
+           ndir(i)   = wdir(ikx)
+        endif
+     endfor
+
+printf,10,"*******Wind Data (3Hourly) Time in GMT****"
+amsg = "**3-hourly winds from NAM  model for station "
+printf,10,amsg,strmid(infile(j),0,7),blat(j),blon(j),format='(a45,1x,a7,1x,f6.3,1x,f7.3)'
+printf,10,ndays,format='(i3,", number of days of this record")'
+for i = 0,npts-1 do begin
+    caldat,newdate(i),month1,day1,year1,hour1
+    printf,10,year1, month1, day1, hour1, nspeed(i),ndir(i), format='(i4,1x,3(I2.2,1x),f6.1,1x,f6.1)'
+
+endfor
+close,10
+endfor
+end
+....
+
+/Volumes/abyss/ETA32CODE/*rollthem2.csh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/csh
+cd /Volumes/abyss/ETA32CODE/
+date -u +%y\ %m\ %d\ %H > today.txt
+#(idl ig ) 
+(idl ig >> indexgen.log ) >& /dev/null
+mv index.html /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+mv index_e.html /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+mv index_g.html /Volumes/abyss/NEGOMWEBSITE/ancilldata/weather/
+....
+
+/Volumes/abyss/ETA32CODE/*ig.pro*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+!Quiet=3
+index_w
+index_e
+index_g
+!Quiet=0
+exit
+....
+
+/Volumes/abyss/ETA32CODE/*index_w.pro*
+++++++++++++++++++++++++++++++++++++++
+
+....
+pro index_w
+; ---------------------------------------------------------------------
+;            Frame for the western Gulf of Mexico
+; ---------------------------------------------------------------------
+; Modified to run under IDL
+; PV-Wave routine to generate the ROM_index.html page for the TGLO 
+; Wind/Current Forecast pages. This routine takes the current day (UTC)
+; and generates a web page containing slots for graphics. The tags are
+; based on date and time so that files whos filenames are also based on
+; date and time will hook into the page at the proper place.
+
+; Generate the time strings
+
+hrs        = [indgen(95)]
+date_zulu  = systime(/JULIAN,/UTC)
+date_local = systime(/JULIAN)
+zulu2local = date_zulu - date_local  ; Difference between zulu and local time in days.
+caldat,date_zulu,month,day,year
+base       = julday(month,day,year)
+localdt    = strarr(95)
+zuludt     = strarr(95)
+
+for i = 0,94 do begin
+   zulu  = base+hrs(i)/24.0D0-0.5    ; the 0.5 is because IDL thinks the day starts at noon
+   local = zulu-zulu2local  ; Local time (zulu time corrected for daylight or standard time offset)
+   caldat,zulu,monthz,dayz,yearz,hourz
+   caldat,local,monthl,dayl,yearl,hourl
+   zuludt(i)  = string(yearz-2000,format='(i2.2)') +     string(monthz,format='(i2.2)') +     string(dayz,      format='(i2.2)')     + string(hourz,format='(i2.2)')
+   localdt(i) = string(monthl,    format='(i2.2)') +'/'+ string(dayl,  format='(i2.2)') +'/'+ string(yearl,format='(I4)') +' '+ string(hourl,format='(i2.2)')+':00'
+endfor
+
+print,zulu
+print,local
+print,localdt
+print,zuludt
+
+; local 11/18/2012 18:00
+; zulu 12111900
+
+; Generate the file names based on UTC or Zulu times
+
+   thumb   = strarr(95)
+   big     = strarr(95)
+   pdfc    = strarr(95)
+   datestr = strarr(95)
+   ethumb  = strarr(30)
+   ebig    = strarr(30)
+   etadate = strarr(30)
+   epdf    = strarr(30)
+
+; ---------------------------------------------------------------------
+;                      For the Currents
+; ---------------------------------------------------------------------
+for i = 0,74 do begin
+   thumb(i)   = 'thumb_RW'+zuludt(i)+'.gif'
+   big(i)     = 'RW'+zuludt(i)+'.gif'
+   pdfc(i)    = 'RW'+zuludt(i)+'.pdf'
+   datestr(i) = localdt(i)
+endfor
+
+; ---------------------------------------------------------------------
+;                      For the Winds
+; ---------------------------------------------------------------------
+
+; The ETA are 3-hourly for now
+;  0, 3, 6, 9,12,15,18,21,24,27,30,33,36,39,42,45
+
+for i = 0,29 do begin
+   ethumb(i)  = 'thumb_eta_'+zuludt(i*3)+'_w.gif'
+   ebig(i)    = 'eta_'+zuludt(i*3)+'_w.gif'
+   epdf(i)    = 'eta_'+zuludt(i*3)+'_w.pdf'
+   etadate(i) = localdt(i*3)
+endfor
+
+luout = 10
+openw,luout,'index.html'
+
+; Header material
+
+printf,luout,'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">'
+printf,luout,'<HTML> <HEAD> <META NAME="Generator" CONTENT="Cosmo Create 1.0.3">'
+printf,luout,'<TITLE>Texas General Land Office - Coastal Current Forecast Page</TITLE>'
+printf,luout,'</HEAD> <BODY BGCOLOR="#ffffff"> <P> </P> <CENTER>'
+
+; Table for Logos and Headliner
+
+printf,luout,'<TABLE BORDER="0"> <TR> <TD WIDTH="20%"><IMG SRC="tglo_145.gif"></TD> <TD></TD>'
+printf,luout,'<TD WIDTH="60%" ALIGN="CENTER"><H1> Texas General Land Office<BR>'
+printf,luout,' Coastal Current Forecast Page</H1> </TD> <TD></TD> <TD WIDTH="20%"><IMG SRC="tamu_color_seal.gif" </TD> </TR> </TABLE>'
+printf,luout,'<hr><font size=+3>Forecast Surface Currents - ROMS Current Model</font><hr WIDTH="100%"></center>
+
+; First table
+
+printf,luout,'<TABLE BORDER="2" CELLPADDING="2" WIDTH="100%" HEIGHT="50%">'
+printf,luout,'<CAPTION><CENTER><P ALIGN="CENTER">'
+stra = 'Near-surface currents derived from a numerical model driven by NCEP forecast wind fields.'
+strb = '<BR> Click on thumbnail for larger view. Click on a date for a PDF version.'
+strc = '<BR><A HREF="RWanimation.gif"> Animate the current fields or </A>'
+strd = '<A HREF="wind_animation_w.gif">animate the winds</A>'
+stre = '<BR>Model-Data Comparisons<A HREF="http://csanady.tamu.edu/TGLO/ts.html"> are available through this link.</A>'
+strf = '<BR><A HREF="index.html">Western GOM </A>______'
+strg =     ' <A HREF="index_e.html">Eastern GOM </A>_____'
+strh =     '<A HREF="index_g.html">Whole GOM"</A>'
+printf,luout,stra+strb+strc+strd+stre+strf+strg+strh
+
+printf,luout,'</CENTER></CAPTION>'
+ic    = 0
+for i = 0,14 do begin
+   printf,luout,'<TR>'
+   for j = 0,4 do begin
+      printf,luout,'<TD><CENTER>'                                    + $
+             '<A HREF="'  + big(ic)     + '">'                       + $
+             '<IMG SRC="' + thumb(ic)   + '"</A></A>'                + $
+             '<A HREF="'  + pdfc(ic)    + '"><BR>' +datestr(ic)  + '</A> </CENTER></TD>'
+      ic = ic + 1
+   endfor
+   printf,luout,'</TR>'
+endfor
+printf,luout,'</TABLE>'
+
+; Second Table for ETA winds
+
+printf,luout,'<center><hr><font size=+3>Forecast Winds</font><hr WIDTH="100%"></center>
+printf,luout,'<TABLE BORDER="2" CELLPADDING="2" WIDTH="100%" HEIGHT="50%">'
+printf,luout,'<CAPTION><CENTER><P ALIGN="CENTER">'
+printf,luout,'National Center for Environmental Prediction (NCEP) NAM 12km Winds at 10m above ground level'
+printf,luout,'<BR> Click on thumbnail for larger view. Click on date for a PDF version.</P>'
+printf,luout,'</CENTER></CAPTION>'
+ic    = 0
+for i = 0,5 do begin
+   printf,luout,'<TR>'
+   for j = 0,4 do begin
+      printf,luout,'<TD><CENTER>'                                    + $
+             '<A HREF="'  + ebig(ic)    + '">'                       + $
+             '<IMG SRC="' + ethumb(ic)  + '"</A></A>'                + $
+             '<A HREF="'  + epdf(ic)    + '"><BR>' +etadate(ic)  + '</A> </CENTER></TD>'
+      ic = ic + 1
+   endfor
+   printf,luout,'</TR>'
+endfor
+
+;printf,luout,'<TR>'
+;      printf,luout,'<TD><CENTER>'                                    + $
+;             '<A HREF="'  + ebig(ic)    + '">'                       + $
+;             '<IMG SRC="' + ethumb(ic)  + '"</A></A>'                + $
+;             '<A HREF="'  + epdf(ic)    + '"><BR>' +etadate(ic)  + '</A> </CENTER></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'</TR>'
+
+printf,luout,'</TABLE> </CENTER> </P> </BODY> </HTML>'
+
+close,luout
+ 
+end
+....
+
+/Volumes/abyss/ETA32CODE/*index_e.pro*
+++++++++++++++++++++++++++++++++++++++
+
+....
+pro index_e
+; ---------------------------------------------------------------------
+;         Frame for the Eastern Gulf of Mexico    
+; ---------------------------------------------------------------------
+; Modified to run under IDL
+; PV-Wave routine to generate the ROM_index.html page for the TGLO 
+; Wind/Current Forecast pages. This routine takes the current day (UTC)
+; and generates a web page containing slots for graphics. The tags are
+; based on date and time so that files whos filenames are also based on
+; date and time will hook into the page at the proper place.
+
+; Generate the time strings
+
+hrs        = [indgen(95)]
+date_zulu  = systime(/JULIAN,/UTC)
+date_local = systime(/JULIAN)
+zulu2local = date_zulu - date_local  ; Difference between zulu and local time in days.
+caldat,date_zulu,month,day,year
+base       = julday(month,day,year)
+localdt    = strarr(95)
+zuludt     = strarr(95)
+
+for i = 0,94 do begin
+   zulu  = base+hrs(i)/24.0D0-0.5    ; the 0.5 is because IDL thinks the day starts at noon
+   local = zulu-zulu2local  ; Local time (zulu time corrected for daylight or standard time offset)
+   caldat,zulu,monthz,dayz,yearz,hourz
+   caldat,local,monthl,dayl,yearl,hourl
+   zuludt(i)  = string(yearz-2000,format='(i2.2)') +     string(monthz,format='(i2.2)') +     string(dayz,      format='(i2.2)')     + string(hourz,format='(i2.2)')
+   localdt(i) = string(monthl,    format='(i2.2)') +'/'+ string(dayl,  format='(i2.2)') +'/'+ string(yearl,format='(I4)') +' '+ string(hourl,format='(i2.2)')+':00'
+endfor
+
+; local 11/18/2012 18:00
+; zulu 12111900
+
+; Generate the file names based on UTC or Zulu times
+
+   thumb   = strarr(95)
+   big     = strarr(95)
+   pdfc    = strarr(95)
+   datestr = strarr(95)
+   ethumb  = strarr(30)
+   ebig    = strarr(30)
+   etadate = strarr(30)
+   epdf    = strarr(30)
+
+; ---------------------------------------------------------------------
+;                      For the Currents
+; ---------------------------------------------------------------------
+
+for i = 0,74 do begin
+   thumb(i)   = 'thumb_RE'+zuludt(i)+'.gif'
+   big(i)     = 'RE'+zuludt(i)+'.gif'
+   pdfc(i)    = 'RE'+zuludt(i)+'.pdf'
+   datestr(i) = localdt(i)
+endfor
+; ---------------------------------------------------------------------
+;                      For the Winds
+; ---------------------------------------------------------------------
+; The ETA are 3-hourly for now
+;  0, 3, 6, 9,12,15,18,21,24,27,30,33,36,39,42,45
+
+for i = 0,29 do begin
+   ethumb(i)  = 'thumb_eta_'+zuludt(i*3)+'_e.gif'
+   ebig(i)    = 'eta_'+zuludt(i*3)+'_e.gif'
+   epdf(i)    = 'eta_'+zuludt(i*3)+'_e.pdf'
+   etadate(i) = localdt(i*3)
+endfor
+
+luout = 10
+openw,luout,'index_e.html'
+
+; Header material
+
+printf,luout,'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">'
+printf,luout,'<HTML> <HEAD> <META NAME="Generator" CONTENT="Cosmo Create 1.0.3">'
+printf,luout,'<TITLE>Texas General Land Office - Coastal Current Forecast Page</TITLE>'
+printf,luout,'</HEAD> <BODY BGCOLOR="#ffffff"> <P> </P> <CENTER>'
+
+; Table for Logos and Headliner
+
+printf,luout,'<TABLE BORDER="0"> <TR> <TD WIDTH="20%"><IMG SRC="tglo_145.gif"></TD> <TD></TD>'
+printf,luout,'<TD WIDTH="60%" ALIGN="CENTER"><H1> Texas General Land Office<BR>'
+printf,luout,' Coastal Current Forecast Page</H1> </TD> <TD></TD> <TD WIDTH="20%"><IMG SRC="tamu_color_seal.gif" </TD> </TR> </TABLE>'
+printf,luout,'<hr><font size=+3>Forecast Surface Currents - ROMS Current Model</font><hr WIDTH="100%"></center>
+
+; First table
+
+printf,luout,'<TABLE BORDER="2" CELLPADDING="2" WIDTH="100%" HEIGHT="50%">'
+printf,luout,'<CAPTION><CENTER><P ALIGN="CENTER">'
+stra = 'Near-surface currents derived from a numerical model driven by NCEP forecast wind fields.'
+strb = '<BR> Click on thumbnail for larger view. Click on a date for a PDF version.'
+strc = '<BR><A HREF="REanimation.gif"> Animate the current fields or </A>'
+strd = '<A HREF="wind_animation_e.gif">animate the winds</A>'
+stre = '<BR>Model-Data Comparisons<A HREF="http://csanady.tamu.edu/TGLO/ts.html"> are available through this link.</A>'
+strf = '<BR><A HREF="index.html">Western GOM </A>______'
+strg =     ' <A HREF="index_e.html">Eastern GOM </A>_____'
+strh =     '<A HREF="index_g.html">Whole GOM"</A>'
+printf,luout,stra+strb+strc+strd+stre+strf+strg+strh
+
+printf,luout,'</CENTER></CAPTION>'
+ic    = 0
+for i = 0,14 do begin
+   printf,luout,'<TR>'
+   for j = 0,4 do begin
+      printf,luout,'<TD><CENTER>'                                    + $
+             '<A HREF="'  + big(ic)     + '">'                       + $
+             '<IMG SRC="' + thumb(ic)   + '"</A></A>'                + $
+             '<A HREF="'  + pdfc(ic)    + '"><BR>' +datestr(ic)  + '</A> </CENTER></TD>'
+      ic = ic + 1
+   endfor
+   printf,luout,'</TR>'
+endfor
+printf,luout,'</TABLE>'
+
+; Second Table for ETA winds
+
+printf,luout,'<center><hr><font size=+3>Forecast Winds</font><hr WIDTH="100%"></center>
+printf,luout,'<TABLE BORDER="2" CELLPADDING="2" WIDTH="100%" HEIGHT="50%">'
+printf,luout,'<CAPTION><CENTER><P ALIGN="CENTER">'
+printf,luout,'National Center for Environmental Prediction (NCEP) NAM 12km Winds at 10m above ground level'
+printf,luout,'<BR> Click on thumbnail for larger view. Click on date for a PDF version.</P>'
+printf,luout,'</CENTER></CAPTION>'
+ic    = 0
+for i = 0,5 do begin
+   printf,luout,'<TR>'
+   for j = 0,4 do begin
+      printf,luout,'<TD><CENTER>'                                    + $
+             '<A HREF="'  + ebig(ic)    + '">'                       + $
+             '<IMG SRC="' + ethumb(ic)  + '"</A></A>'                + $
+             '<A HREF="'  + epdf(ic)    + '"><BR>' +etadate(ic)  + '</A> </CENTER></TD>'
+      ic = ic + 1
+   endfor
+   printf,luout,'</TR>'
+endfor
+
+;printf,luout,'<TR>'
+;      printf,luout,'<TD><CENTER>'                                    + $
+;             '<A HREF="'  + ebig(ic)    + '">'                       + $
+;             '<IMG SRC="' + ethumb(ic)  + '"</A></A>'                + $
+;             '<A HREF="'  + epdf(ic)    + '"><BR>' +etadate(ic)  + '</A> </CENTER></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'</TR>'
+
+printf,luout,'</TABLE> </CENTER> </P> </BODY> </HTML>'
+
+close,luout
+ 
+end
+....
+
+
+/Volumes/abyss/ETA32CODE/*index_g.pro*
+++++++++++++++++++++++++++++++++++++++
+
+....
+ro index_g
+; ---------------------------------------------------------------------
+;            Frame for the Whole Gulf of Mexico
+; ---------------------------------------------------------------------
+; Modified to run under IDL
+; PV-Wave routine to generate the ROM_index.html page for the TGLO 
+; Wind/Current Forecast pages. This routine takes the current day (UTC)
+; and generates a web page containing slots for graphics. The tags are
+; based on date and time so that files whos filenames are also based on
+; date and time will hook into the page at the proper place.
+
+ ; Generate the time strings
+
+hrs        = [indgen(95)]
+date_zulu  = systime(/JULIAN,/UTC)
+date_local = systime(/JULIAN)
+zulu2local = date_zulu - date_local  ; Difference between zulu and local time in days.
+caldat,date_zulu,month,day,year
+base       = julday(month,day,year)
+localdt    = strarr(95)
+zuludt     = strarr(95)
+
+for i = 0,94 do begin
+   zulu  = base+hrs(i)/24.0D0-0.5    ; the 0.5 is because IDL thinks the day starts at noon
+   local = zulu-zulu2local  ; Local time (zulu time corrected for daylight or standard time offset)
+   caldat,zulu,monthz,dayz,yearz,hourz
+   caldat,local,monthl,dayl,yearl,hourl
+   zuludt(i)  = string(yearz-2000,format='(i2.2)') +     string(monthz,format='(i2.2)') +     string(dayz,      format='(i2.2)')     + string(hourz,format='(i2.2)')
+   localdt(i) = string(monthl,    format='(i2.2)') +'/'+ string(dayl,  format='(i2.2)') +'/'+ string(yearl,format='(I4)') +' '+ string(hourl,format='(i2.2)')+':00'
+endfor
+
+; local 11/18/2012 18:00
+; zulu 12111900
+
+; Generate the file names based on UTC or Zulu times
+
+   thumb   = strarr(66)
+   big     = strarr(66)
+   pdfc    = strarr(66)
+   datestr = strarr(66)
+   ethumb  = strarr(30)
+   ebig    = strarr(30)
+   etadate = strarr(30)
+   epdf    = strarr(30)
+; ---------------------------------------------------------------------
+;                   For the Currents 
+; ---------------------------------------------------------------------
+for i = 0,65 do begin
+   thumb(i)   = 'thumb_RG'+zuludt(i)+'.gif'
+   big(i)     = 'RG'+zuludt(i)+'.gif'
+   pdfc(i)    = 'RG'+zuludt(i)+'.pdf'
+   datestr(i) = localdt(i)
+endfor
+
+; The ETA are 3-hourly for now
+;  0, 3, 6, 9,12,15,18,21,24,27,30,33,36,39,42,45
+; ---------------------------------------------------------------------
+;                  For the Winds 
+; ---------------------------------------------------------------------
+for i = 0,29 do begin
+   ethumb(i)  = 'thumb_eta_'+zuludt(i*3)+'_wg.gif'
+   ebig(i)    = 'eta_'+zuludt(i*3)+'_wg.gif'
+   epdf(i)    = 'eta_'+zuludt(i*3)+'_wg.pdf'
+   etadate(i) = localdt(i*3)
+endfor
+
+luout = 10
+openw,luout,'index_g.html'
+
+; Header material
+
+printf,luout,'<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">'
+printf,luout,'<HTML> <HEAD> <META NAME="Generator" CONTENT="Cosmo Create 1.0.3">'
+printf,luout,'<TITLE>Texas General Land Office - Coastal Current Forecast Page</TITLE>'
+printf,luout,'</HEAD> <BODY BGCOLOR="#ffffff"> <P> </P> <CENTER>'
+
+; Table for Logos and Headliner
+
+printf,luout,'<TABLE BORDER="0"> <TR> <TD WIDTH="20%"><IMG SRC="tglo_145.gif"></TD> <TD></TD>'
+printf,luout,'<TD WIDTH="60%" ALIGN="CENTER"><H1> Texas General Land Office<BR>'
+printf,luout,' Coastal Current Forecast Page</H1> </TD> <TD></TD> <TD WIDTH="20%"><IMG SRC="tamu_color_seal.gif" </TD> </TR> </TABLE>'
+printf,luout,'<hr><font size=+3>Forecast Surface Currents - ROMS Current Model</font><hr WIDTH="100%"></center>
+
+; First table
+
+printf,luout,'<TABLE BORDER="2" CELLPADDING="2" WIDTH="100%" HEIGHT="50%">'
+printf,luout,'<CAPTION><CENTER><P ALIGN="CENTER">'
+stra = 'Near-surface currents derived from a numerical model driven by NCEP forecast wind fields.'
+strb = '<BR> Click on thumbnail for larger view. Click on a date for a PDF version.'
+strc = '<BR><A HREF="RGanimation.gif"> Animate the current fields or </A>'
+strd = '<A HREF="wind_animation_wg.gif">animate the winds</A>'
+stre = '<BR>Model-Data Comparisons<A HREF="http://csanady.tamu.edu/TGLO/ts.html"> are available through this link.</A>'
+strf = '<BR><A HREF="index.html">Western GOM </A>______'
+strg =     ' <A HREF="index_e.html">Eastern GOM </A>_____'
+strh =     '<A HREF="index_g.html">Whole GOM"</A>'
+printf,luout,stra+strb+strc+strd+stre+strf+strg+strh
+
+printf,luout,'</CENTER></CAPTION>'
+ic    = 0
+for i = 0,12 do begin
+   printf,luout,'<TR>'
+   for j = 0,4 do begin
+      printf,luout,'<TD><CENTER>'                                    + $
+             '<A HREF="'  + big(ic)     + '">'                       + $
+             '<IMG SRC="' + thumb(ic)   + '"</A></A>'                + $
+             '<A HREF="'  + pdfc(ic)    + '"><BR>' +datestr(ic)  + '</A> </CENTER></TD>'
+      ic = ic + 1
+   endfor
+   printf,luout,'</TR>'
+endfor
+printf,luout,'</TABLE>'
+
+; Second Table for ETA winds
+
+printf,luout,'<center><hr><font size=+3>Forecast Winds</font><hr WIDTH="100%"></center>
+printf,luout,'<TABLE BORDER="2" CELLPADDING="2" WIDTH="100%" HEIGHT="50%">'
+printf,luout,'<CAPTION><CENTER><P ALIGN="CENTER">'
+printf,luout,'National Center for Environmental Prediction (NCEP) NAM 12km Winds at 10m above ground level'
+printf,luout,'<BR> Click on thumbnail for larger view. Click on date for a PDF version.</P>'
+printf,luout,'</CENTER></CAPTION>'
+ic    = 0
+for i = 0,5 do begin
+   printf,luout,'<TR>'
+   for j = 0,4 do begin
+      printf,luout,'<TD><CENTER>'                                    + $
+             '<A HREF="'  + ebig(ic)    + '">'                       + $
+             '<IMG SRC="' + ethumb(ic)  + '"</A></A>'                + $
+             '<A HREF="'  + epdf(ic)    + '"><BR>' +etadate(ic)  + '</A> </CENTER></TD>'
+      ic = ic + 1
+   endfor
+   printf,luout,'</TR>'
+endfor
+
+;printf,luout,'<TR>'
+;      printf,luout,'<TD><CENTER>'                                    + $
+;             '<A HREF="'  + ebig(ic)    + '">'                       + $
+;             '<IMG SRC="' + ethumb(ic)  + '"</A></A>'                + $
+;             '<A HREF="'  + epdf(ic)    + '"><BR>' +etadate(ic)  + '</A> </CENTER></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'<TD></TD>'
+;printf,luout,'</TR>'
+
+printf,luout,'</TABLE> </CENTER> </P> </BODY> </HTML>'
+
+close,luout
+
+; remove files from day before yesterday
+
+;result = today()
+;daybeforey = dt_subtract(result,day=2)
+;ys = string(daybeforey.year,format='(i4)')
+;ys = strmid(ys,2,2)
+;ms = string(daybeforey.month,format='(i2.2)')
+;ds = string(daybeforey.day,format='(i2.2)') 
+;oldf = '*_'+ys+ms+ds+'*'
+;command = 'rm '+oldf
+;spawn,command,result
+ 
+end
+....
+
+copano.tamu.edu
+---------------
+
+Start with the cron listing for +baum+, stored at:
+
+/var/spool/cron/baum
+~~~~~~~~~~~~~~~~~~~~
+
+....
+#
+#  Get and process the NCEP forcing fields.
+#
+# if central standard time (-6hrs) then do this block
+#05     22      *       *       *       /d2/home/baum/abyss/ETA32CODE/getawips_00.pl
+#10     23      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip00.csh
+#05     03      *       *       *       /d2/home/baum/abyss/ETA32CODE/getawips_06.pl
+#10     04      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip06.csh
+#05     09      *       *       *       /d2/home/baum/abyss/ETA32CODE/getawips_12.pl
+#10     10      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip12.csh
+#05     22      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_00.pl
+#10     16      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip18.csh
+# if central daylight saving time (-5hrs) then use this block
+00      23      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_00.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      23      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_00.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+40      23      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_00.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+00      00      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_00.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      00      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_00.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+30      00      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip00.csh >> /d2/home/baum/abyss/ETA32CODE/000-doawip.log 2>&1
+
+00      05      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_06.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      05      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_06.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+40      05      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_06.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+00      06      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_06.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      06      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_06.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+30      06      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip06.csh >> /d2/home/baum/abyss/ETA32CODE/000-doawip.log 2>&1
+
+00      11      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_12.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      11      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_12.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+40      11      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_12.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+00      12      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_12.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      12      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_12.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+30      12      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip12.csh >> /d2/home/baum/abyss/ETA32CODE/000-doawip.log 2>&1
+
+00      17      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_18.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      17      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_18.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+40      17      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_18.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+00      18      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_18.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+20      18      *       *       *       /d2/home/baum/abyss/ETA32CODE/ncepget_18.pl >> /d2/home/baum/abyss/ETA32CODE/000-ncepget.log 2>&1
+30      18      *       *       *       /d2/home/baum/abyss/ETA32CODE/doawip18.csh >> /d2/home/baum/abyss/ETA32CODE/000-doawip.log 2>&1
+
+#
+#  Run the TGLO/TABS simulations.
+#
+45 00 * * * /d2/home/baum/TGLO/SCRIPTS/TGLO-run.pl -t 1 -a 3.0 >> /d2/home/baum/TGLO/000-run.log 2>&1
+15 01 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+30 01 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+45 01 * * * /d2/home/baum/TGLO/GNOME/runthem.sh
+#
+45 06 * * * /d2/home/baum/TGLO/SCRIPTS/TGLO-run.pl -t 6 -a 3.0 >> /d2/home/baum/TGLO/000-run.log 2>&1
+15 07 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+30 07 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+45 07 * * * /d2/home/baum/TGLO/GNOME/runthem.sh
+#
+45 12 * * * /d2/home/baum/TGLO/SCRIPTS/TGLO-run.pl -t 12 -a 3.0 >> /d2/home/baum/TGLO/000-run.log 2>&1
+15 13 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+30 13 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+45 13 * * * /d2/home/baum/TGLO/GNOME/runthem.sh
+#
+45 18 * * * /d2/home/baum/TGLO/SCRIPTS/TGLO-run.pl -t 18 -a 3.0 >> /d2/home/baum/TGLO/000-run.log 2>&1
+15 19 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+30 19 * * * /d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/GNOME/gnome2-current.html
+45 19 * * * /d2/home/baum/TGLO/GNOME/runthem.sh
+#
+#  Attempt to snag the TABS buoy data several times.
+#
+#00 03 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 04 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 05 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 06 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 07 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 08 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 09 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#00 10 * * * /d2/home/baum/TGLO/SCRIPTS/get_tabs_dat_soap -d
+#
+#  Create a time series comparison plot for yesterday.
+#
+#15 07 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -yesterday
+#15 08 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -yesterday
+#15 09 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -yesterday
+#15 10 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -yesterday
+#
+#  Create a time series comparison plot for last week.
+#
+#20 07 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -lastweek
+#20 08 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -lastweek
+#20 09 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -lastweek
+#20 10 * * * /d2/home/baum/TGLO/SCRIPTS/plot_tabs_ts -lastweek
+#
+#  Create the daily web page showing the time series comparison plots.
+#
+#30 07 * * * /d2/home/baum/TGLO/TSPLOTS/ts.pl > /home/baum/TGLO/TSPLOTS/ts.html
+#30 08 * * * /d2/home/baum/TGLO/TSPLOTS/ts.pl > /home/baum/TGLO/TSPLOTS/ts.html
+#30 09 * * * /d2/home/baum/TGLO/TSPLOTS/ts.pl > /home/baum/TGLO/TSPLOTS/ts.html
+#30 10 * * * /d2/home/baum/TGLO/TSPLOTS/ts.pl > /home/baum/TGLO/TSPLOTS/ts.html
+
+# Run the howie script to the graphics *.d files for the TGLO web site.
+
+15  1 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+15  4 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+15  7 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+15 10 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+15 13 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+15 16 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+15 19 * * * /d2/home/baum/abyss/ETA32CODE/do_roms_plot.csh
+
+# Sheldon Gay's scripts replicated from megara.
+
+#scripts to generate GTS and MMS images
+32 * * * * /d2/home/baum/sgay/plotgts_sst.sh >> /d2/home/baum/sgay/plotgts_sst.log
+34 * * * * /d2/home/baum/sgay/plotgts_at.sh >> /d2/home/baum/sgay/plotgts_at.log
+36 * * * * /d2/home/baum/sgay/plotgts_bp.sh >> /d2/home/baum/sgay/plotgts_bp.log
+38 * * * * /d2/home/baum/sgay/plotgts_wvec.sh >> /d2/home/baum/sgay/plotgts_wvec.log
+#40 * * * * /d2/home/baum/sgay/gts_at_stn.sh >> /d2/home/baum/sgay/gts_at_stn.log
+41 * * * * /d2/home/baum/sgay/gts_sst_stn.sh >> /d2/home/baum/sgay/gts_sst_stn.log
+
+42  0 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.log
+42  6 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.log
+42 12 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.log
+42 18 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp2_50.log
+
+43  0 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.log
+43  6 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.log
+43 12 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.log
+43 18 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp100_150.log
+
+44  0 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.log
+44  6 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.log
+44 12 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.log
+44 18 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp200_300.log
+
+45  0 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.log
+45  6 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.log
+45 12 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.log
+45 18 * * * /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.sh >> /d2/home/baum/sgay/MMS_ADCP/plotmms_adcp400_600.log
+
+#scripts to ftp and archive images
+50 * * * * /d2/home/baum/sgay/copy_to_gcoos.sh >> /d2/home/baum/sgay/copy_to_gcoos.log
+51 * * * * /d2/home/baum/sgay/copy_to_gcoos3.sh >> /d2/home/baum/sgay/copy_to_gcoos3.log
+52 * * * * /d2/home/baum/sgay/move_files_to_archive.sh >> /d2/home/baum/sgay/move_files_to_archive.log
+0  2 * * * /d2/home/baum/sgay/create_dated_subdirs.sh >> /d2/home/baum/sgay/create_dated_subdirs.log
+....
+
+
+/d2/home/baum/abyss/ETA32CODE/*ncepget_00.pl*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/usr/bin/perl
+
+use Date::Calc qw(Day_of_Week Week_Number Day_of_Year);
+use Time::Local;
+
+$datdir = "/d2/home/baum/abyss/ETA32CODE";
+
+#  Set this to 00, 06, 12 or 18
+$mst = "00";
+
+$zed = "0";
+
+$yy = (localtime(time+86400))[5] - 100;
+$mm = (localtime(time+86400))[4] + 1;
+$dd = (localtime(time+86400))[3];
+$jjj = (localtime(time+86400))[7] + 1;
+
+print "yy = $yy  mm = $mm  dd = $dd  jjj = $jjj\n";
+
+#$yy = (localtime)[5] - 100;
+#$mm = (localtime)[4] + 1;
+#$dd = (localtime)[3];
+#$jjj = (localtime)[7] + 1;
+
+if ($yy < 10) {$yy = $zed.$yy};
+if ($mm < 10) {$mm = $zed.$mm};
+if ($dd < 10) {$dd = $zed.$dd};
+
+# Set these to override the default selection of today.
+#$yy = "19";
+#$mm = "03";
+#$dd = "10";
+
+$day_dir = "$datdir/B$yy$mm$dd";
+
+$mkdirstr = "/bin/mkdir $day_dir";
+print " mkdirstr = $mkdirstr\n";
+system($mkdirstr);
+
+print " day_dir = $day_dir\n";
+
+#goto FIN;
+
+#$jjj = Day_of_Year($yy,$mm,$dd);
+
+if ($jjj < 10) {
+        $jjj = $zed.$zed.$jjj;
+} elsif ($jjj < 100 and $jjj >= 10) {
+        $jjj = $zed.$jjj;
+}
+
+
+$get_roms_gom_eta12 = "$datdir/get_roms_gom_eta12";
+
+$wget = "/usr/bin/wget";
+$ncftpget = "/usr/bin/ncftpget";
+$wgrib = "/usr/bin/wgrib";
+
+$yyyymmdd = "20$yy$mm$dd";
+print " yyyymmdd = $yyyymmdd\n";
+
+$ftphost = "ftpprd.ncep.noaa.gov";
+$ftpdir = "pub/data/nccf/com/nam/prod/nam.$yyyymmdd"."/";
+
+print " ftpdir = $ftpdir\n";
+
+$tot = 28;
+#$tot = 4;
+
+print "  Starting ftp loop.\n";
+for ($i=0; $i <= $tot; $i++) {
+        $hr = $i*3;
+        if ($hr < 10) {$hr = $zed.$hr};
+        $ftpfile = "nam.t$mst"."z.awip12$hr.tm00.grib2";
+        $outfile = "$yy$jjj$mst.F$hr".".grb";
+        $outfile = "$day_dir/$outfile";
+#       system "mv $datdir/$ftpfile $datdir/$outfile";
+
+#       print " outfile = $outfile\n";
+        if (-e  $outfile) {
+#               if (-z $outfile) {
+                if (-s $outfile < 25000000) {
+                        print " File $day_dir/$outfile exists but is too small.  Getting again.\n";
+                        system "/bin/rm $day_dir/$outfile";
+                        print " wget command: $wget ftp://$ftphost/$ftpdir/$ftpfile -O $outfile\n";
+                        system "$wget ftp://$ftphost/$ftpdir/$ftpfile -O $outfile";
+                } else {
+                        print " File $day_dir/$outfile exists. Not getting.\n";
+                }
+        } else {
+                print " File $day_dir/$outfile doesn't exist. Getting.\n";
+                print " wget command: $wget ftp://$ftphost/$ftpdir/$ftpfile -O $outfile\n";
+                system "$wget ftp://$ftphost/$ftpdir/$ftpfile -O $outfile";
+        }
+
+}
+
+FIN:
+....
+
+
+/d2/home/baum/TGLO/SCRIPTS/*TGLO-run.pl*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/usr/bin/perl
+
+use PDL;
+use PDL::NetCDF;
+use PDL::Char;
+use Date::Calc qw(Day_of_Week Week_Number Day_of_Year);
+use Date::Calc qw(Add_Delta_Days);
+use Date::Calc qw(Add_Delta_DHMS);
+use Time::Local;
+
+use Getopt::Std;
+
+#  Set the base date from which all simulation times are set.
+$base_year = 2003;
+$base_month = 10;
+$base_day = 28;
+
+$err = 0;
+
+$zed = "0";
+$second = 0;
+$minute = 0;
+$hour = 0;
+
+#  Get today's date.
+$t_year = (localtime)[5] - 100;
+$t_month = (localtime)[4] + 1;
+$t_day = (localtime)[3];
+$t_yday = (localtime)[7] + 1;
+if ($t_day < 10) {$t_day = $zed.$t_day};
+if ($t_month < 10) {$t_month = $zed.$t_month};
+if ($t_year < 10) {$t_year = $zed.$t_year};
+$t_wyear = "20".$t_year;
+
+#  Calculate yesterday.
+
+$diff_day = -1;
+($y_year, $y_month, $y_mday) = Add_Delta_Days($t_year, $t_month, $t_day, $diff_day);
+
+if ($y_year < 10) {$y_year = $zed.$y_year;};
+if ($y_month < 10) {$y_month = $zed.$y_month;};
+if ($y_mday < 10) {$y_mday = $zed.$y_mday;};
+
+$date_yest = "$y_year-$y_month-$y_mday";
+
+#  Establishes the letters that represent valid arguments.
+getopts("hxfe:t:d:a:");
+
+#  Default is today rather than a forced date
+$forcetime = "0";
+
+$opt_t = int($opt_t);
+
+#  If no options are specified, supply the help message.
+
+if (!$opt_f and !$opt_e and !$opt_t and !$opt_d and !$opt_a) {
+
+#if ($opt_h) {
+        print "\n";
+        print "Usage:    TGLO-run [-t HOUR] [-d YEAR-MONTH-DAY] [-a DAYS] [-e BINARY] [-h]\n";
+        print "  where:    -t optional starting hour (0,6,12,18) [0]\n";
+        print "            -d optional forced starting date Y(1-1000) M(1-12) D(1-31) [today]\n";
+        print "            -a optional total number of simulation days [2]\n";
+        print "            -e optional binary filename [oceanS]\n";
+        print "            -f optional wind forcing from archives\n";
+        print "            -h supplies this message\n";
+        print "            -x create the scripts but don't run them\n";
+        print "             [default values in square brackets]\n";
+        print "\n";
+        goto FIN;
+
+#}
+
+}
+
+#  Optionally set the name of the ROMS binary.
+
+#$executable = "oceanS-orig-2.1";
+$executable = "oceanS";
+if ($opt_e) {
+        chomp($opt_e);
+        $executable = $opt_e;
+}
+
+#print "  opt_t = $opt_t\n";
+
+#  Mandatorily set a starting hour.
+
+$fh = 0;
+if ($opt_t) {
+
+        if ($opt_t == 1) {
+                $fh = 0;
+        } else {
+                $fh = $opt_t;
+        }
+}
+
+#  Optionally force a simulation date other than today.
+
+if ($opt_d) {
+
+        chomp($opt_f);
+        @date = split('-',$opt_d);
+        $year = $date[0];
+        $month = $date[1];
+        $mday = $date[2];
+        $forcetime = "1";
+
+        if ($month > 12) {
+                print "\n";
+                print "  Incorrect date:  The month is greater than 12\n";
+                print "  The format is:  -f Y(0-1000)-M(1-12)-D(1-31)-H(0,6,12,18)\n";
+                print "\n";
+                $err = 1;
+                goto ERROR;
+        }
+                                                                                                                
+        if ($mday > 31) {
+                print "\n";
+                print "  Incorrect date:  The day of the month is greater than 31\n";
+                print "  The format is:  -f Y(0-1000)-M(1-12)-D(1-31)-H(0,6,12,18)\n";
+                print "\n";
+                $err = 1;
+                goto ERROR;
+        }
+
+#  Calculate Julian day from year, month and day.
+        $sec = 0;
+        $min = 0;
+        $hours = 0;
+        $mnth = $month - 1;
+        $desired_time = timelocal($sec,$min,$hours,$mday,$mnth,$year);
+        ($sec,$min,$hour,$mday,$mon,$yyear,$wday,$yday,$isdst) = localtime($desired_time);
+        $yday = $yday + 1;
+
+}
+
+#  Number of hours in this simulation, e.g. default is 48.
+
+$hours_in_simulation = 48;
+if ($opt_a) {
+        $hours_in_simulation = 24*$opt_a;
+}
+
+############################################################################
+#  Set constants and directory names
+############################################################################
+
+#  The prefix used for all simulation-related filenames.
+$simbase = "TGLO";
+
+#  Base directory for ROMS code.
+# MEGARA
+$ROMSDIR = "/d2/home/baum/ROMS/roms-2.1";
+if (!-e "$ROMSDIR") {
+        print LOG "  Base ROMS directory $ROMSDIR not found.  Quitting.\n";
+        print "  Base ROMS directory $ROMSDIR not found.  Quitting.\n";
+        $err = 1;
+        goto ERROR;
+}
+#  Base directory for TGLO simulations.
+$BASEDIR = "/d2/home/baum/TGLO";
+if (!-e "$BASEDIR") {
+        print LOG "  Base TGLO directory $BASEDIR not found.  Quitting.\n";
+        print "  Base TGLO directory $BASEDIR not found.  Quitting.\n";
+        $err = 1;
+        goto ERROR;
+}
+#  Directory for input forcing files.
+$FRCDIR = "$BASEDIR/OUT/FRC";
+#  Directory for history files.
+$HISDIR = "$BASEDIR/OUT/HIS";
+#  Directory for restart files.
+$RSTDIR = "$BASEDIR/OUT/RST";
+#  Directory containing job scripts.
+$SCRIPTDIR = "/d2/home/baum/TGLO/SCRIPTS";
+if (!-e "$SCRIPTDIR") {
+        print LOG "  Script directory $SCRIPTDIR not found.  Quitting.\n";
+        print "  Script directory $SCRIPTDIR not found.  Quitting.\n";
+        $err = 1;
+        goto ERROR;
+}
+#  ROMS grid file, i.e. the NetCDF file containing the grid used by ROMS.
+$ROMS_GRDFILE = "$SCRIPTDIR/tglo2_lores_3m_grd.nc";
+if (!-e "$ROMS_GRDFILE") {
+        print LOG "  ROMS grid file $ROMS_GRDFILE not found.  Quitting.\n";
+        print "  ROMS grid file $ROMS_GRDFILE not found.  Quitting.\n";
+        $err = 1;
+        goto ERROR;
+}
+#$ROMS_GRDFILE = "$SCRIPTDIR/tglo_lores_3m_grd.nc";
+
+#  Remapping matrix file, i.e. the NetCDF file created by SCRIP via runscrip.pl.
+$REMAP_MATRIX = "$SCRIPTDIR/ncep_to_roms_v2.nc";
+if (!-e "$REMAP_MATRIX") {
+        print LOG "  Remapping matrix file $REMAP_MATRIX not found.  Quitting.\n";
+        print "  Remapping matrix file $REMAP_MATRIX not found.  Quitting.\n";
+        $err = 1;
+        goto ERROR;
+}
+#$REMAP_MATRIX = "$SCRIPTDIR/ncep2scrip_to_roms2scrip.nc";
+
+$zed = "0";
+
+#############################################################################
+#  Calculate and set time labels for year, day of month, and month.
+#############################################################################
+
+#  Set the year, month and day to today if not forced.
+if ($forcetime == 0) {
+        $year = (localtime)[5] - 100;
+        $month = (localtime)[4] + 1;
+        $mday = (localtime)[3];
+        $yday = (localtime)[7] + 1;
+}
+
+#  Create proper string for year, e.g. 03, 11, etc.
+if ($year < 10) {
+        $yrno = $zed.$year;
+} else {
+        $yrno = $year;
+}
+
+#  Create proper string for day of month, e.g. 07, 26, etc.
+if ($mday < 10) {
+        $daymon = $zed.$mday;
+} else {
+        $daymon = $mday;
+}
+
+#  Create proper string for month, e.g. 03, 11, etc.
+if ($month < 10) {
+        $mon = $zed.$month;
+} else {
+        $mon = $month;
+}
+
+$ymd = "$yrno-$mon-$daymon";
+
+#  Create proper string for day of month, e.g. 07, 26, etc.
+if ($fh < 10) {
+        $fh = $zed.$fh;
+} else {
+        $fh = $fh;
+}
+
+#  Create proper string for Julian day for today and yesterday.
+$ydayprev = $yday - 1;
+if ($yday < 10) {
+        $jday = $zed.$zed.$yday;
+        $jdayprev = $zed.$zed.$ydayprev;
+} elsif ($yday >= 10 && $yday < 100) {
+        $jday = $zed.$yday;
+        $jdayprev = $zed.$ydayprev;
+} else {
+        $jday = $yday;
+        $jdayprev = $ydayprev;
+}
+
+######################################################################
+#  Set time-variable filenames
+######################################################################
+
+#  Name of output history file.
+$ROMS_HISNAME = "$HISDIR/$simbase-his-$ymd-$fh-48.n";
+#  Name of log file.
+$TGLO_LOGFILE = "$BASEDIR/LOG/$simbase-$ymd-$fh.log";
+open (LOG, ">$TGLO_LOGFILE");
+print LOG "\n";
+print LOG " **************************\n";
+print LOG " STARTING DRIVER UBERSCRIPT\n";
+print LOG " **************************\n\n";
+print LOG "  Opening $TGLO_LOGFILE log file\n\n";
+
+#  Names of template and run files.
+$template = "$SCRIPTDIR/TGLO-run-template.pl";
+$runfile = "$SCRIPTDIR/TGLO-run-$ymd-$fh.pl";
+$template_cdf = "$SCRIPTDIR/TGLO-run-template-cdf-pom.pl";
+$runfile_cdf = "$SCRIPTDIR/TGLO-run-cdf-$ymd-$fh.pl";
+$roms2coards_template = "$SCRIPTDIR/roms2coards-template.pl";
+$roms2coards_run = "$SCRIPTDIR/roms2coards-$ymd-$fh.pl";
+$roms2gnome_template = "$SCRIPTDIR/roms2gnome-template.pl";
+$roms2gnome_run = "$SCRIPTDIR/roms2gnome-$ymd-$fh.pl";
+
+$roms2gnome_crv_template = "$SCRIPTDIR/roms2gnome-template-crv.pl";
+$roms2gnome_crv_run = "$SCRIPTDIR/roms2gnome-crv-$ymd-$fh.pl";
+
+$roms2gnome_crv_lev_template = "$SCRIPTDIR/roms2gnome-template-crv-lev.pl";
+$roms2gnome_crv_lev_run = "$SCRIPTDIR/roms2gnome-crv-lev-$ymd-$fh.pl";
+
+$roms2gnome_crv_all_template = "$SCRIPTDIR/roms2gnome-template-crv-all-fast.pl";
+$roms2gnome_crv_all_run = "$SCRIPTDIR/roms2gnome-crv-all-$ymd-$fh.pl";
+
+$eta2gnome_template = "$SCRIPTDIR/eta2gnome-template.pl";
+$eta2gnome_run = "$SCRIPTDIR/eta2gnome-$ymd-$fh.pl";
+$vecplot_48_both_template = "$SCRIPTDIR/vecplot-48hr-both-template-mb.pl";
+#$vecplot_48_both_template = "$SCRIPTDIR/vecplot-48hr-both-template.pl";
+$vecplot_48_both_run = "$SCRIPTDIR/vecplot-48hr-both-$ymd-$fh.pl";
+$vecplot_48_template = "$SCRIPTDIR/vecplot-48hr-1panel-template.pl";
+$vecplot_48_run = "$SCRIPTDIR/vecplot-48hr-1panel-$ymd-$fh.pl";
+$vecplot_48_all_template = "$SCRIPTDIR/vecplot-48hr-1panel-all-template.pl";
+$vecplot_48_all_run = "$SCRIPTDIR/vecplot-48hr-1panel-all-$ymd-$fh.pl";
+
+$move_06_temp = "$SCRIPTDIR/movefiles-06hr.temp";
+$move_06_run = "$SCRIPTDIR/movefiles-06hr";
+$move_24_temp = "$SCRIPTDIR/movefiles-24hr.temp";
+$move_24_run = "$SCRIPTDIR/movefiles-24hr";
+
+##################################################
+#  Build a script to move the 6-hr files.
+##################################################
+
+open(TEMPLATE_MOVE, "<$move_06_temp");
+if (-e "$move_06_run") {
+        system "rm $move_06_run";
+}
+open(RUNFILE_MOVE, ">$move_06_run");
+while (<TEMPLATE_MOVE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/YESTYMD/$date_yest/;
+        $line =~ s/YMD/$ymd/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        print RUNFILE_MOVE "$line\n";
+}
+close(TEMPLATE_MOVE);
+close(RUNFILE_MOVE);
+system "chmod a+x $move_06_run";
+
+##################################################
+#  Build a script to move the 24-hr files.
+##################################################
+
+#if ($fh == "18") {
+if ($fh == "00") {
+        open(TEMPLATE_MOVE, "<$move_24_temp");
+        if (-e "$move_24_run") {
+                system "rm $move_24_run";
+        }
+        open(RUNFILE_MOVE, ">$move_24_run");
+        while (<TEMPLATE_MOVE>) {
+                my($line) = $_;
+                chomp($line);
+                $line =~ s/YESTYMD/$date_yest/;
+                $line =~ s/YMD/$ymd/;
+                print RUNFILE_MOVE "$line\n";
+        }
+        close(TEMPLATE_MOVE);
+        close(RUNFILE_MOVE);
+        system "chmod a+x $move_24_run";
+}
+
+######################################################################
+#  Build a script to run the ROMS simulation
+#####################################################################
+
+print LOG "  Building ROMS script\n";
+
+print LOG "  NFORCETIME = $forcetime\n";
+print LOG "  FORCING_HOUR = $fh\n";
+print LOG "  EXECUTABLE = $executable\n";
+print LOG "  YEAR = $year\n";
+print LOG "  MONTH = $month\n";
+print LOG "  DAY = $mday\n";
+print LOG "  YDAY = $yday    JDAY = $jday   JDAYPREV = $jdayprev\n";
+
+open(TEMPLATE, "<$template");
+if (-e "$runfile") {
+        system "rm $runfile";
+}
+open(RUNFILE, ">$runfile");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/SIMHOURS/$hours_in_simulation/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/BASEYR/$base_year/;
+        $line =~ s/BASEMN/$base_month/;
+        $line =~ s/BASEDY/$base_day/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSDIRECTORY/$ROMSDIR/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/EXECUTABLE/$executable/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/REMAPMATRIX/$REMAP_MATRIX/;
+        $line =~ s/VECPLOTRUN/$vecplot_48_both_run/;
+        $line =~ s/VECPLOTALLRUN/$vecplot_48_all_run/;
+        $line =~ s/ROMS2COARDSRUN/$roms2coards_run/;
+        $line =~ s/ROMS2GNOMERUN/$roms2gnome_run/;
+        $line =~ s/ROMS2GNOMECRVRUN/$roms2gnome_crv_run/;
+        $line =~ s/ROMS2GNOMECRVLEVRUN/$roms2gnome_crv_lev_run/;
+        $line =~ s/ROMS2GNOMECRVALLRUN/$roms2gnome_crv_all_run/;
+        $line =~ s/ETA2GNOMERUN/$eta2gnome_run/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $runfile";
+
+######################################################################
+#  Build a script to process alternate NCEP wind data.
+######################################################################
+
+open(TEMPLATE_CDF, "<$template_cdf");
+if (-e "$runfile_cdf") {
+        system "rm $runfile_cdf";
+}
+open(RUNFILE_CDF, ">$runfile_cdf");
+while (<TEMPLATE_CDF>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/SIMHOURS/$hours_in_simulation/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSDIRECTORY/$ROMSDIR/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/EXECUTABLE/$executable/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/REMAPMATRIX/$REMAP_MATRIX/;
+        print RUNFILE_CDF "$line\n";
+}
+close(TEMPLATE_CDF);
+close(RUNFILE_CDF);
+system "chmod a+x $runfile_cdf";
+
+######################################################################
+#  Build a script to interpolate the ROMS output to COARDS output.
+######################################################################
+
+print LOG "  Building ROMS to COARDS script\n";
+
+open(TEMPLATE, "<$roms2coards_template");
+open(RUNFILE, ">$roms2coards_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $roms2coards_run";
+
+######################################################################
+#  Build a script to interpolate the ROMS output to GNOME-ready input.
+######################################################################
+
+#$roms2gnome_template = "$SCRIPTDIR/roms2gnome-template-c.pl";
+#$roms2gnome_template = "$SCRIPTDIR/roms2gnome-template-crv.pl";
+
+print LOG "  Building ROMS to GNOME script\n";
+
+open(TEMPLATE, "<$roms2gnome_template");
+open(RUNFILE, ">$roms2gnome_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $roms2gnome_run";
+
+######################################################################
+#  Build a script to interpolate the NCEP winds to GNOME-ready input.
+######################################################################
+
+print LOG "  Building ETA to GNOME script\n";
+
+open(TEMPLATE, "<$eta2gnome_template");
+open(RUNFILE, ">$eta2gnome_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $eta2gnome_run";
+
+######################################################################
+#  Build a script to interpolate the surface ROMS output to curvilinear GNOME-ready input.
+######################################################################
+
+print LOG "  Building ROMS to GNOME script\n";
+
+open(TEMPLATE, "<$roms2gnome_crv_template");
+open(RUNFILE, ">$roms2gnome_crv_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $roms2gnome_crv_run";
+
+######################################################################
+#  Build a script to interpolate the bottom ROMS output to curvilinear GNOME-ready input.
+######################################################################
+
+print LOG "  Building ROMS to GNOME script\n";
+
+open(TEMPLATE, "<$roms2gnome_crv_lev_template");
+open(RUNFILE, ">$roms2gnome_crv_lev_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $roms2gnome_crv_lev_run";
+
+######################################################################
+#  Build a script to interpolate the 3-D ROMS output to curvilinear GNOME-ready input.
+######################################################################
+
+print LOG "  Building ROMS to GNOME script\n";
+
+open(TEMPLATE, "<$roms2gnome_crv_all_template");
+open(RUNFILE, ">$roms2gnome_crv_all_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/SIMBASE/$simbase/;
+        $line =~ s/SCRIPTDIRECTORY/$SCRIPTDIR/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/ROMSGRIDFILE/$ROMS_GRDFILE/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $roms2gnome_crv_all_run";
+
+$vecplot_48_both_template = "$SCRIPTDIR/vecplot-48hr-both-template-mb.pl";
+#$vecplot_48_both_template = "$S_crvCRIPTDIR/vecplot-48hr-both-template.pl";
+$vecplot_48_both_run = "$SCRIPTDIR/vecplot-48hr-both-$ymd-$fh.pl";
+
+######################################################################
+#  Build a script to create the 48 hour animation of the NW GOM.
+######################################################################
+                                                                                                                                         
+print LOG "  Building 48 hour animation script for NW Gulf\n";
+                                                                                                                                         
+open(TEMPLATE, "<$vecplot_48_both_template");
+open(RUNFILE, ">$vecplot_48_both_run");
+while (<TEMPLATE>) {
+        my($line) = $_;
+        chomp($line);
+        $line =~ s/NFORCETIME/$forcetime/;
+        $line =~ s/SIMHOURS/$hours_in_simulation/;
+        $line =~ s/YEAR/$year/;
+        $line =~ s/MONTH/$month/;
+        $line =~ s/DAY/$mday/;
+        $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+        $line =~ s/FORCING_HOUR/$fh/;
+        $line =~ s/BASEDIRECTORY/$BASEDIR/;
+        $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+        print RUNFILE "$line\n";
+}
+close(TEMPLATE);
+close(RUNFILE);
+system "chmod a+x $vecplot_48_both_run";
+
+######################################################################
+#  Build a script to create the 48 hour animation of the NW GOM.
+######################################################################
+
+#print LOG "  Building 48 hour animation script for NW Gulf\n";
+
+#open(TEMPLATE, "<$vecplot_48_template");
+#open(RUNFILE, ">$vecplot_48_run");
+#while (<TEMPLATE>) {
+#       my($line) = $_;
+#       chomp($line);
+#       $line =~ s/NFORCETIME/$forcetime/;
+#       $line =~ s/SIMHOURS/$hours_in_simulation/;
+#       $line =~ s/YEAR/$year/;
+#       $line =~ s/MONTH/$month/;
+#       $line =~ s/DAY/$mday/;
+#       $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+#       $line =~ s/FORCING_HOUR/$fh/;
+#       $line =~ s/BASEDIRECTORY/$BASEDIR/;
+#       $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+#       print RUNFILE "$line\n";
+#}
+#close(TEMPLATE);
+#close(RUNFILE);
+#system "chmod a+x $vecplot_48_run";
+
+######################################################################
+#  Build a script to create the 48 hour animation of the full GOM.
+######################################################################
+
+#print LOG "  Building script for 48 hour full Gulf animation\n";
+
+#open(TEMPLATE, "<$vecplot_48_all_template");
+#open(RUNFILE, ">$vecplot_48_all_run");
+#while (<TEMPLATE>) {
+#       my($line) = $_;
+#       chomp($line);
+#       $line =~ s/BASEDIRECTORY/$BASEDIR/;
+#       $line =~ s/NFORCETIME/$forcetime/;
+#       $line =~ s/SIMHOURS/$hours_in_simulation/;
+#       $line =~ s/YEAR/$year/;
+#       $line =~ s/MONTH/$month/;
+#       $line =~ s/DAY/$mday/;
+#       $line =~ s/TGLOLOGFILE/$TGLO_LOGFILE/;
+#       $line =~ s/FORCING_HOUR/$fh/;
+#       $line =~ s/HISTORYNAME/$ROMS_HISNAME/;
+#       print RUNFILE "$line\n";
+#}
+#close(TEMPLATE);
+#close(RUNFILE);
+#system "chmod a+x $vecplot_48_all_run";
+
+#goto FIN;
+
+#######################################################################
+#  Run the scripts to process ASCII or NetCDF NCEP wind forcing files.
+#######################################################################
+
+#print " JUMPING TO END \n";
+
+if ($opt_x) {
+        print " Created scripts but not running them.\n";
+        goto FIN;
+}
+
+print LOG "  Running $runfile_cdf and $runfile scripts\n";
+close LOG;
+#system "$runfile_cdf";
+system "$runfile";
+open (LOG, ">>$TGLO_LOGFILE");
+print LOG "  Finished $runfile script\n";
+
+#  Process yesterday's restart files after the 00 simulation.
+
+SKIP:
+
+goto FIN;
+if ($opt_t eq 0) {
+        print LOG " Processing yesterday's restart files\n";
+
+        $YEST_00 = "$RSTDIR/$simbase-rst-$yrno-$jdayprev-00.nc";
+        if (-e "$YEST_00") {
+                print "  Converting $YEST_00 to $RSTDIR/TGLO-rst-$yrno-$jdayprev-00.nc\n";
+                system "$ncrcat -d time,0 $YEST_00 $RSTDIR/TGLO-rst-$yrno-$jdayprev-00.nc";
+#               system "rm $YEST_00";
+        } else {
+                print "  File $YEST_00 does not exist.\n";
+        }
+        $YEST_06 = "$RSTDIR/$simbase-rst-$yrno-$jdayprev-06.nc";
+        if (-e "$YEST_06") {
+                print "  Converting $YEST_06 to $RSTDIR/TGLO-rst-$yrno-$jdayprev-06.nc\n";
+                system "$ncrcat -d time,0 $YEST_06 $RSTDIR/TGLO-rst-$yrno-$jdayprev-06.nc";
+#               system "rm $YEST_06";
+        } else {
+                print "  File $YEST_06 does not exist.\n";
+        }
+        $YEST_12 = "$RSTDIR/$simbase-rst-$yrno-$jdayprev-12.nc";
+        if (-e "$YEST_12") {
+                print "  Converting $YEST_12 to $RSTDIR/TGLO-rst-$yrno-$jdayprev-12.nc\n";
+                system "$ncrcat -d time,0 $YEST_12 $RSTDIR/TGLO-rst-$yrno-$jdayprev-12.nc";
+#               system "rm $YEST_12";
+        } else {
+                print "  File $YEST_12 does not exist.\n";
+        }
+        $YEST_18 = "$RSTDIR/$simbase-rst-$yrno-$jdayprev-18.nc";
+        if (-e "$YEST_18") {
+                print "  Converting $YEST_18 to $RSTDIR/TGLO-rst-$yrno-$jdayprev-18.nc\n";
+                system "$ncrcat -d time,0 $YEST_18 $RSTDIR/TGLO-rst-$yrno-$jdayprev-18.nc";
+#               system "rm $YEST_18";
+        } else {
+                print "  File $YEST_18 does not exist.\n";
+        }
+}
+
+ERROR:
+
+print LOG "\n";
+print LOG " ******************************************\n";
+if ($err == 0) {
+        print LOG " SUCCESSFULLY FINISHED DRIVER UBERSCRIPT\n";
+        print " SUCCESSFULLY FINISHED DRIVER UBERSCRIPT\n";
+} elsif ($err == 1) {
+        print LOG " UNSUCCESSFULLY FINISHED DRIVER UBERSCRIPT\n";
+        print " UNSUCCESSFULLY FINISHED DRIVER UBERSCRIPT\n";
+}
+print LOG " ******************************************\n\n";
+
+close LOG;
+
+#  Move the LOG file to the archive directory, i.e. OLDRUN.
+#system "mv $TGLO_LOGFILE $SCRIPTDIR/LOG";
+
+FIN:
+....
+
+/d2/home/baum/TGLO/GNOME/*gnome2-current.pl*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/usr/bin/perl
+
+use Template::Magic;
+use Date::Calc qw(Day_of_Week Week_Number Day_of_Year);
+use Date::Calc qw(Add_Delta_Days);
+use Date::Calc qw(Add_Delta_DHMS);
+use Time::Local;
+use Getopt::Declare;
+
+
+$ARCHIVEBASE="/d2/home/baum/TGLO";
+
+#  Set parameters.
+
+#  The URL pointing to where the files will be served from.
+$gnomeurlbase = "http://pong.tamu.edu/GNOME";
+$gnomeurldods = "http://pong.tamu.edu:8080/thredds/dodsC";
+
+#  The directory containing the script and template file(s).
+$SCRIPT_DIR = "/d2/home/baum/TGLO/GNOME";
+
+$ARCHIVEFILE="gnome2-cat.html";
+
+#  Directory in which the GIF, PS and PDF files are archived.
+#$GNOME_WEB_DIR = "/d2/home/baum/TGLO/WEB/GNOME";
+$GNOME_DAT_DIR = "/d2/home/baum/GNOME";
+$GNOME_WEB_DIR = $GNOME_DAT_DIR;
+
+#  The prefixes used for the daily and weekly time-series comparison files.
+
+$zed = "0";
+
+#  Calculate today.
+
+$year = (localtime)[5] - 100;
+$month = (localtime)[4] + 1;
+$mday = (localtime)[3];
+
+#$year = 6;
+#$month = 5;
+#$mday = 22;
+
+#  Calculate yesterday.
+
+$diff_day = -1;
+($y_year, $y_month, $y_mday) = Add_Delta_Days($year, $month, $mday, $diff_day);
+
+$diff_week = -7;
+($w_year, $w_month, $w_mday) = Add_Delta_Days($year, $month, $mday, $diff_week);
+
+#  Prepend a zero to date strings (if necessary) for labeling purposes.
+
+if ($y_year < 10) {$y_year = $zed.$y_year;};
+if ($y_month < 10) {$y_month = $zed.$y_month;};
+if ($y_mday < 10) {$y_mday = $zed.$y_mday;};
+
+if ($w_year < 10) {$w_year = $zed.$w_year;};
+if ($w_month < 10) {$w_month = $zed.$w_month;};
+if ($w_mday < 10) {$w_mday = $zed.$w_mday;};
+
+$date_yest = "$y_year-$y_month-$y_mday";
+$date_last = "$w_year-$w_month-$w_mday";
+
+$yest_human = "$y_month/$y_mday/20$y_year";
+$last_human = "$w_month/$w_mday/20$w_year";
+
+#  Now to creating the archived file list.  The general strategy:
+#
+#  1.  Find and create lists of all of the available archived files.
+#  2.  Loop through the daily and weekly files and
+#     a.  Create a human readable date string from each file name
+#     b.  Create an array of hashes containing the linked date strings
+#           and file names
+#  3.  Use the {hasharray} {datestring}{filename} {\hasharray} construct
+#         from Template::Magic to print these in the template file.
+
+#  Find all the archived daily and weekly graphs in PDF format.
+
+@GNAM_fore_reg_72 = glob "$GNOME_DAT_DIR/GNAM-fore-reg-72/*";
+@GROM_fore_crv_all_72 = glob "$GNOME_DAT_DIR/GROM-fore-crv-all-72/*";
+@GROM_fore_crv_bot_72 = glob "$GNOME_DAT_DIR/GROM-fore-crv-bot-72/*";
+@GROM_fore_crv_sfc_72 = glob "$GNOME_DAT_DIR/GROM-fore-crv-sfc-72/*";
+@GROM_fore_reg_sfc_72 = glob "$GNOME_DAT_DIR/GROM-fore-reg-sfc-72/*";
+
+
+#  Create an array of hashes containing date strings and PDF file names.
+#    ...for the daily files
+
+$no = 0;
+$size = @GROM_fore_reg_sfc_72 -1;
+foreach $file (@GROM_fore_reg_sfc_72) {
+#  Strip off file path.
+        ($a,$filename) = split("\Q$GNOME_DAT_DIR/GROM-fore-reg-sfc-72/\E",$file);
+        $filelist[$no] = $filename;
+#  Split on the dash to get the date and time information.
+        ($GROM,$fore,$reg,$yr,$mn,$dy,$hr,$ln) = split("\Q-\E",$filename);
+        $date = "$mn/$dy/20$yr $hr"."00 UCT";
+        $dates[$no] = $date;
+#  Create an entry in an array of hashes.
+#       print " daystring = $daystring   dayfilename = $dayfilename\n";
+        $GROM_fore_reg_sfc_72_hash[$no] = {datestring => $date,  filename => "$filename"};
+        $no = $no + 1;
+}
+$GROM_fore_reg_sfc_72_latest = "$filelist[$size]";
+$GROM_fore_reg_sfc_72_latest = "$filelist[$size]";
+$GROM_fore_reg_sfc_72_url = "$gnomeurlbase/GROM-fore-reg-sfc-72/";
+$tmp = "$gnomeurldods/GROM-fore-reg-sfc-72/$GROM_fore_reg_sfc_72_latest";
+$GROM_fore_reg_sfc_72_dods_html = "$tmp".".html";
+$GROM_fore_reg_sfc_72_dods_dds = "$tmp".".dds";
+$GROM_fore_reg_sfc_72_dods_das = "$tmp".".das";
+$GROM_fore_reg_sfc_72_date = "$dates[$size]";
+
+#goto FIN;
+
+$no = 0;
+$size = @GROM_fore_crv_sfc_72 -1;
+foreach $file (@GROM_fore_crv_sfc_72) {
+#  Strip off file path.
+        ($a,$filename) = split("\Q$GNOME_DAT_DIR/GROM-fore-crv-sfc-72/\E",$file);
+        $filelist[$no] = $filename;
+#  Split on the dash to get the date and time information.
+        ($GROM,$fore,$crv,$yr,$mn,$dy,$hr,$ln) = split("\Q-\E",$filename);
+        $date = "$mn/$dy/20$yr $hr"."00 UCT";
+        $dates[$no] = $date;
+#  Create an entry in an array of hashes.
+#       print " daystring = $daystring   dayfilename = $dayfilename\n";
+        $GROM_fore_crv_sfc_72_hash[$no] = {datestring => $date,  filename => "$filename"};
+        $no = $no + 1;
+}
+$GROM_fore_crv_sfc_72_latest = "$filelist[$size]";
+$GROM_fore_crv_sfc_72_url = "$gnomeurlbase/GROM-fore-crv-sfc-72/";
+$tmp = "$gnomeurldods/GROM-fore-crv-sfc-72/$GROM_fore_crv_sfc_72_latest";
+$GROM_fore_crv_sfc_72_dods_html = "$tmp".".html";
+$GROM_fore_crv_sfc_72_dods_dds = "$tmp".".dds";
+$GROM_fore_crv_sfc_72_dods_das = "$tmp".".das";
+$GROM_fore_crv_sfc_72_date = "$dates[$size]";
+
+$no = 0;
+$size = @GROM_fore_crv_bot_72 -1;
+foreach $file (@GROM_fore_crv_bot_72) {
+#  Strip off file path.
+        ($a,$filename) = split("\Q$GNOME_DAT_DIR/GROM-fore-crv-bot-72/\E",$file);
+        $filelist[$no] = $filename;
+#  Split on the dash to get the date and time information.
+        ($GROM,$fore,$crv,$bot,$yr,$mn,$dy,$hr,$ln) = split("\Q-\E",$filename);
+        $date = "$mn/$dy/20$yr $hr"."00 UCT";
+        $dates[$no] = $date;
+#  Create an entry in an array of hashes.
+#       print " daystring = $daystring   dayfilename = $dayfilename\n";
+        $GROM_fore_crv_bot_72_hash[$no] = {datestring => $date,  filename => "$filename"};
+        $no = $no + 1;
+}
+$GROM_fore_crv_bot_72_latest = "$filelist[$size]";
+$GROM_fore_crv_bot_72_url = "$gnomeurlbase/GROM-fore-crv-bot-72/";
+$tmp = "$gnomeurldods/GROM-fore-crv-bot-72/$GROM_fore_crv_bot_72_latest";
+$GROM_fore_crv_bot_72_dods_html = "$tmp".".html";
+$GROM_fore_crv_bot_72_dods_dds = "$tmp".".dds";
+$GROM_fore_crv_bot_72_dods_das = "$tmp".".das";
+$GROM_fore_crv_bot_72_date = "$dates[$size]";
+
+$no = 0;
+$size = @GROM_fore_crv_all_72 -1;
+foreach $file (@GROM_fore_crv_all_72) {
+#  Strip off file path.
+        ($a,$filename) = split("\Q$GNOME_DAT_DIR/GROM-fore-crv-all-72/\E",$file);
+        $filelist[$no] = $filename;
+#  Split on the dash to get the date and time information.
+        ($GROM,$fore,$crv,$all,$yr,$mn,$dy,$hr,$ln) = split("\Q-\E",$filename);
+        $date = "$mn/$dy/20$yr $hr"."00 UCT";
+        $dates[$no] = $date;
+#  Create an entry in an array of hashes.
+#       print " daystring = $daystring   dayfilename = $dayfilename\n";
+        $GROM_fore_crv_all_72_hash[$no] = {datestring => $date,  filename => "$filename"};
+        $no = $no + 1;
+}
+$GROM_fore_crv_all_72_latest = "$filelist[$size]";
+$GROM_fore_crv_all_72_url = "$gnomeurlbase/GROM-fore-crv-all-72/";
+$tmp = "$gnomeurldods/GROM-fore-crv-all-72/$GROM_fore_crv_all_72_latest";
+$GROM_fore_crv_all_72_dods_html = "$tmp".".html";
+$GROM_fore_crv_all_72_dods_dds = "$tmp".".dds";
+$GROM_fore_crv_all_72_dods_das = "$tmp".".das";
+$GROM_fore_crv_all_72_date = "$dates[$size]";
+
+$no = 0;
+$size = @GNAM_fore_reg_72 -1;
+foreach $file (@GNAM_fore_reg_72) {
+#  Strip off file path.
+        ($a,$filename) = split("\Q$GNOME_DAT_DIR/GNAM-fore-reg-72/\E",$file);
+        $filelist[$no] = $filename;
+#       print " no = $no  filename = $filename\n";
+#       print " file = $file  filename = $filename\n";
+#  Split on the dash to get the date and time information.
+        ($GNAM,$fore,$reg,$yr,$mn,$dy,$hr,$ln) = split("\Q-\E",$filename);
+        $date = "$mn/$dy/20$yr $hr"."00 UCT";
+        $dates[$no] = $date;
+#  Create an entry in an array of hashes.
+#       print " daystring = $daystring   dayfilename = $dayfilename\n";
+        $GNAM_fore_reg_72_hash[$no] = {datestring => $date,  filename => "$filename"};
+        $no = $no + 1;
+}
+$GNAM_fore_reg_72_latest = "$filelist[$size]";
+$GNAM_fore_reg_72_url = "$gnomeurlbase/GNAM-fore-reg-72/";
+$tmp = "$gnomeurldods/GNAM-fore-reg-72/$GNAM_fore_reg_72_latest";
+$GNAM_fore_reg_72_dods_html = "$tmp".".html";
+$GNAM_fore_reg_72_dods_dds = "$tmp".".dds";
+$GNAM_fore_reg_72_dods_das = "$tmp".".das";
+$GNAM_fore_reg_72_date = "$dates[$size]";
+
+Template::Magic->new->print("$SCRIPT_DIR/gnome2_template_current");
+
+system "cp $SCRIPT_DIR/gnome2-current.html $GNOME_WEB_DIR/gnome2-current.html";
+system "cp $SCRIPT_DIR/gnome2-current.html $GNOME_WEB_DIR/gnome2.html";
+system "cp $SCRIPT_DIR/gnome2-current.html $GNOME_WEB_DIR/gnome-current.html";
+system "cp $SCRIPT_DIR/gnome2-current.html $GNOME_WEB_DIR/gnome.html";
+
+
+FIN:
+....
+
+/d2/home/baum/TGLO/GNOME/*runthem.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/bin/bash
+#
+/d2/home/baum/TGLO/GNOME/gnome2-current.pl > /d2/home/baum/TGLO/GNOME/gnome2-current.html
+cp /d2/home/baum/TGLO/GNOME/gnome2-current.html /d2/home/baum/GNOME/gnome2-current.html
+cp /d2/home/baum/TGLO/GNOME/gnome2-current.html /d2/home/baum/GNOME/gnome-current.html
+cp /d2/home/baum/TGLO/GNOME/gnome2-current.html /d2/home/baum/GNOME/gnome2.html
+cp /d2/home/baum/TGLO/GNOME/gnome2-current.html /d2/home/baum/GNOME/gnome.html
+#
+/d2/home/baum/TGLO/GNOME/gnome2-cat.pl > /d2/home/baum/TGLO/GNOME/gnome2-cat.html
+cp /d2/home/baum/TGLO/GNOME/gnome2-cat.html /d2/home/baum/GNOME/gnome2-cat.html
+cp /d2/home/baum/TGLO/GNOME/gnome2-cat.html /d2/home/baum/GNOME/gnome-cat.html
+....
+
+/d2/home/baum/abyss/ETA32CODE/*do_roms_plot.csh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+#source /home/howie/.cshrc
+
+# copy ROM output files to working directory
+
+cd /d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/
+rm *.d
+rm *.gif
+rm *.pdf
+rm *.ps
+
+# TGLO-vec-48-06-10-26-06-d.tar.gz
+set ROMSFILE = `ls -1 /d2/home/baum/bosco/tglopu/TGLO-vec-* | tail -1`
+echo "Copying " $ROMSFILE
+cp $ROMSFILE .
+
+set ROMSFILE = `ls -1 TGLO-vec-* | tail -1`
+echo "unzipping" $ROMSFILE
+gunzip $ROMSFILE
+
+set ROMSFILE = `ls -1 TGLO-vec-* | tail -1`
+echo "untaring " $ROMSFILE
+tar -xof $ROMSFILE
+rm $ROMSFILE
+
+foreach f (TGLO-vec-*.d)
+ echo $f
+ /d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/make_roms_plot.gmt $f
+ /d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/make_roms_plot_wg.gmt $f
+ /d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/make_roms_plot_w.gmt $f
+end
+
+/usr/bin/gifsicle --loop --optimize=2 -d 20 R1*.gif > animation.gif
+/usr/bin/gifsicle --loop --optimize=2 -d 20 RX1*.gif > RXanimation.gif
+
+#/abyss/ETA32CODE/tftp.csh
+#/abyss/ETA32CODE/tglo_ftp.csh
+....
+
+/d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/*make_roms_plot.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#! /bin/tcsh -f
+# 
+#123456789 123456789 12345
+#ROMSvec-03-12-04-12-01.d
+#TGLO-vec-06-10-26-06-36.d
+#123456789
+
+# MAKE PLOT OF ROMS Model Output 
+
+awk -f rom.nawk < $1 > romxyuv.txt
+
+set yymmdd  = `echo $1 | awk '{print 20substr($1,10,2)substr($1,13,2)substr($1,16,2)}'  `
+set rt      = `echo $1 | awk '{print substr($1,19,2)}' `
+set fh      = `echo $1 | awk '{print substr($1,22,2)}' `
+@ hr    = $rt + $fh - 1
+
+# monkey around with the daylight savings time
+
+set ba  = "+"
+@ ttt   =   $hr - 5
+@ sss   = -($hr - 5)
+set hhh = $ttt
+if ($ttt < 0) set hhh  = $sss
+if ($ttt < 0) set ba   = "-"
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set fcdate  = `date +%y%m%d%H --date "$yymmdd $hr hours"`
+set fcdates = `date +%d"-"%b"-"%y" "%H":00" --date "$yymmdd $hr hours"`
+
+# Daylight savings time local time
+set fclocal = `date +%y%m%d%H --date "$yymmdd $ba $hhh hours"`
+set fclocals = `date +%d"-"%b"-"%y" "%H":00" --date "$yymmdd $ba $hhh hours"`
+
+# POM_2m_03040923.gif
+
+set output    = 'R'$fcdate'.ps'
+set output2   = 'R'$fcdate'.gif'
+set output3   = 'thumb_R'$fcdate'.gif'
+set outputpdf = 'R'$fcdate'.pdf'
+
+# Draw the Coastline
+pscoast -R-98.0/-85.0/25.0/30.5 -G245/222/179 -JM8.25 -Dh -B1g1 -W1 -Ia -Na -K -X1.50 -Y2.50   > $output
+
+# Plot the current vectors on the map
+
+psxy  romxyuv.txt   -R  -G0/0/255    -JM    -Svb0.000i/0.03i/0.04in0.125  -O -K        >> $output
+
+# Plot a box around the plot
+
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $output
+ 1.00 0.0
+10.00 0.0
+10.00 5.5
+ 1.00 5.5
+ 1.00 0.0
+END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 270. 0.25
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 50 cm/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 270. 0.257222
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 1 knot  
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 5.2  18 0 4 6 Forecast Surface Currents from ROMS Model Using NCEP's NAM 12km Winds
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CST)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputpdf
+
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+
+(ppmtogif junk.ppmraw > temp2.gif) >& /dev/null
+#/usr/bin/convert -quiet  -rotate 90 -crop  87 131 806 494 temp2.gif $output2
+#/usr/bin/convert -quiet  -rotate 0 -crop 298 235 100  75 temp2.gif $output3
+#/usr/bin/convert -quiet  -rotate 90 -crop 806X494+87+131 temp2.gif $output2
+#/usr/bin/convert -quiet  -rotate 90 -crop 100X75+298+235 temp2.gif $output3
+
+/usr/local/bin/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp2.gif
+/usr/local/bin/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+....
+
+/d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/*make_roms_plot_wg.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#! /bin/tcsh -f
+# 
+#123456789 123456789 12345
+#ROMSvec-03-12-04-12-01.d
+#TGLO-vec-06-10-26-06-36.d
+#123456789
+
+# MAKE PLOT OF ROMS Model Output 
+
+awk -f rom.nawk < $1 > romxyuv.txt
+
+set yymmdd  = `echo $1 | awk '{print 20substr($1,10,2)substr($1,13,2)substr($1,16,2)}'  `
+set rt      = `echo $1 | awk '{print substr($1,19,2)}' `
+set fh      = `echo $1 | awk '{print substr($1,22,2)}' `
+@ hr    = $rt + $fh - 1
+
+# monkey around with the daylight savings time
+
+set ba  = "+"
+@ ttt   =   $hr - 5
+@ sss   = -($hr - 5)
+set hhh = $ttt
+if ($ttt < 0) set hhh  = $sss
+if ($ttt < 0) set ba   = "-"
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set fcdate  = `date +%y%m%d%H --date "$yymmdd $hr hours"`
+set fcdates = `date +%d"-"%b"-"%y" "%H":00" --date "$yymmdd $hr hours"`
+
+# Daylight savings time local time
+set fclocal = `date +%y%m%d%H --date "$yymmdd $ba $hhh hours"`
+set fclocals = `date +%d"-"%b"-"%y" "%H":00" --date "$yymmdd $ba $hhh hours"`
+
+# POM_2m_03040923.gif
+
+set ps_file    = 'RX'$fcdate'.ps'
+set gif_file   = 'RX'$fcdate'.gif'
+set gif_thumb_file   = 'thumb_RX'$fcdate'.gif'
+set pdf_file = 'RX'$fcdate'.pdf'
+
+# Draw the Coastline
+#pscoast -R-98.0/-80.0/18.0/30.5 -G245/222/179 -JM8.25 -Dh -B2g1 -W1 -Ia -Na -K -X1.50 -Y1.00   > $ps_file
+pscoast -R-98.0/-80.0/18.0/30.5 -G245/222/179 -JM8.25 -Dh -B2g1 -W1 -Ia -Na -K -X1.50 -Y1.25   > $ps_file
+#pscoast -R-98.0/-80.0/18.0/30.5 -G245/222/179 -JM8.25 -Dh -B2g1 -W1 -Ia -Na -K -X1.50 -Y2.50   > $ps_file
+
+# Plot the current vectors on the map
+
+psxy  romxyuv.txt   -R  -G0/0/255    -JM    -Svb0.000i/0.03i/0.04in0.125  -O -K        >> $ps_file
+
+# Plot a box around the plot
+
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $ps_file
+ 0.75 0.0
+10.25 0.0
+10.25 8.0 
+ 0.75 8.0
+ 0.75 0.0
+END
+
+#psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $ps_file
+# 1.00 0.0
+#10.00 0.0
+#10.00 5.5
+# 1.00 5.5
+# 1.00 0.0
+#END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $ps_file
+9.00 0.5 270. 0.25
+END
+pstext -R -Jx1                                                      -O -K << END         >> $ps_file
+9.00 0.25 12 0 4 6 50 cm/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $ps_file
+2.00 0.5 270. 0.257222
+END
+pstext -R -Jx1                                                      -O -K << END         >> $ps_file
+2.00 0.25 12 0 4 6 1 knot  
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $ps_file
+5.50 7.7  18 0 4 6 Forecast Surface Currents from ROMS Model Using NCEP's NAM 12km Winds
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CST)
+END
+
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $ps_file $pdf_file
+
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $ps_file << EOF >& /dev/null
+
+quit
+EOF
+
+(ppmtogif junk.ppmraw > temp2.gif) >& /dev/null
+
+/usr/local/bin/nconvert -quiet -o $gif_file       -out gif -rotate 90 -crop   50  10 906 900 temp2.gif
+#/usr/local/bin/nconvert -quiet -o $gif_file       -out gif -rotate 90 -crop  87 131 806 494 temp2.gif
+/usr/local/bin/nconvert -quiet -o $gif_thumb_file -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+....
+
+/d2/home/baum/abyss/ETA32CODE/ROMS_WORKING/*make_roms_plot_w.gmt*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+....
+#! /bin/tcsh -f
+# 
+#123456789 123456789 12345
+#ROMSvec-03-12-04-12-01.d
+#TGLO-vec-06-10-26-06-36.d
+#123456789
+
+# MAKE PLOT OF ROMS Model Output 
+
+awk -f rom.nawk < $1 > romxyuv.txt
+
+set yymmdd  = `echo $1 | awk '{print 20substr($1,10,2)substr($1,13,2)substr($1,16,2)}'  `
+set rt      = `echo $1 | awk '{print substr($1,19,2)}' `
+set fh      = `echo $1 | awk '{print substr($1,22,2)}' `
+@ hr    = $rt + $fh - 1
+
+# monkey around with the daylight savings time
+
+set ba  = "+"
+@ ttt   =   $hr - 5
+@ sss   = -($hr - 5)
+set hhh = $ttt
+if ($ttt < 0) set hhh  = $sss
+if ($ttt < 0) set ba   = "-"
+
+#  The file name includes the sum of the model run hour and forecast hour
+#  if it is less than 10 then preappend a leading 0
+
+set fcdate  = `date +%y%m%d%H --date "$yymmdd $hr hours"`
+set fcdates = `date +%d"-"%b"-"%y" "%H":00" --date "$yymmdd $hr hours"`
+
+# Daylight savings time local time
+set fclocal = `date +%y%m%d%H --date "$yymmdd $ba $hhh hours"`
+set fclocals = `date +%d"-"%b"-"%y" "%H":00" --date "$yymmdd $ba $hhh hours"`
+
+# POM_2m_03040923.gif
+
+set output    = 'R'$fcdate'.ps'
+set output2   = 'R'$fcdate'.gif'
+set output3   = 'thumb_R'$fcdate'.gif'
+set outputpdf = 'R'$fcdate'.pdf'
+
+# Draw the Coastline
+pscoast -R-98.0/-85.0/25.0/30.5 -G245/222/179 -JM8.25 -Dh -B1g1 -W1 -Ia -Na -K -X1.50 -Y2.50   > $output
+
+# Plot the current vectors on the map
+
+psxy  romxyuv.txt   -R  -G0/0/255    -JM    -Sv0.000/0.03/0.04/n0.125  -O -K        >> $output
+
+# Plot a box around the plot
+
+psxy    -R0/11/0/8.5 -Jx1 -W5 -X-1.50 -Y-1.00                       -O -K << END         >> $output
+ 1.00 0.0
+10.00 0.0
+10.00 5.5
+ 1.00 5.5
+ 1.00 0.0
+END
+
+# legend meters per second
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+9.00 0.5 180. 0.25
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+9.00 0.25 12 0 4 6 50 cm/s
+END
+
+# legend knots 
+
+psxy   -R -Jx1 -SV0.01/0.04/0.03                                    -O -K << END         >> $output
+2.00 0.5 180. 0.257222
+END
+pstext -R -Jx1                                                      -O -K << END         >> $output
+2.00 0.25 12 0 4 6 1 knot  
+END
+
+pstext  -R0/11/0/8.5 -Jx1 -G5                                                -O << END >> $output
+5.50 5.2  18 0 4 6 Forecast Surface Currents from ROMS Model Using NCEP's ETA-12 Winds
+5.50 0.6  18 0 4 6 Representing conditions at $fcdates (UTC)
+5.50 0.25 18 0 4 6 Representing conditions at $fclocals (CDT)
+END
+
+ps2pdf -r75 -dPDFSETTINGS=/screen $output $outputpdf
+
+gs -sDEVICE=ppmraw -r89 -q -sOutputFile=junk.ppmraw -- $output << EOF >& /dev/null
+
+quit
+EOF
+
+(ppmtogif junk.ppmraw > temp2.gif) >& /dev/null
+
+
+#/usr/bin/X11/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp2.gif
+#/usr/bin/X11/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+/usr/local/bin/nconvert -quiet -o $output2 -out gif -rotate 90 -crop  87 131 806 494 temp2.gif
+/usr/local/bin/nconvert -quiet -o $output3 -out gif -rotate 90 -crop 298 235 100  75 temp2.gif
+....
+
+/d2/home/baum/sgay/*plotgts_sst.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+
+set fdt = `/bin/date -u --date "-2 hour" +%y%m%d%H`
+set ldt = `/bin/date --date "-2 hour" +%y%m%d%H`
+set prfx = "G"
+set fxtn = "$prfx$fdt"
+
+set local_time = `/bin/date +%y/%m/%d-%H:%M:%S`
+echo "Starting plotgts_sst.sh at "$local_time >> /d2/home/baum/sgay/000-BIGLOG
+
+set gmtpth = /opt/GMT-4.5.0/bin
+
+set zephyr_archive = "/d2/home/baum/howie/ZEPHYR/GTSARCHIVE"
+#set zephyr_archive = "~/../howie/ZEPHYR/GTSARCHIVE"
+
+echo $fdt
+echo $prfx
+echo $fxtn
+
+rm gts_sst.dat
+
+#foreach file (~/data/*.$fdt)
+echo " Searching for files in: ",$zephyr_archive
+echo "                Of form: *.",$fxtn
+foreach file ($zephyr_archive/*.$fxtn)
+awk '{if ($11 > 0) {print $1, $2, $3, $11}}' $file >> gts_sst.dat
+#awk '{if ($11 > 0) {print $1, $2, $3, $11}}' $file
+end
+
+#print two extra lines of bogus data to close out fortran output
+awk '{print $1,$2,$3,$11}' $zephyr_archive/42001.$fxtn >> gts_sst.dat
+awk '{print $1,$2,$3,$11}' $zephyr_archive/42001.$fxtn >> gts_sst.dat
+
+./gtsllx4 <<EOF
+gts_sst.dat
+EOF
+
+#./gtsllx
+
+tail gts_sstll.dat
+
+rm gcoos_sst.ps
+rm gcoos_dt.ps
+echo "removing psfile"
+echo $gmtpth
+
+# extract the data into an x,y,z file 
+awk '{print $4, $5, $3}' gts_sstll.dat > gts_xyz.dat
+
+#create a block-averaged xyz file of the salinity data^M
+awk '{print $1,$2, $3}' gts_xyz.dat | $gmtpth/blockmean -I0.05/0.05 -R-98/-80/19/31  > xyzmean.dat
+
+#cpt file created by: makecpt -T20/38/1 -I^M
+$gmtpth/makecpt -Tgts_sstC.dat > gts_sst.cpt
+$gmtpth/makecpt -Tgts_sstF.dat > gts_sstF.cpt
+
+# Interpolate and grid the data^M
+$gmtpth/surface xyzmean.dat -Gxyzmean.grd -I0.05/0.05 -R -S0.5 -T.25
+$gmtpth/grd2xyz xyzmean.grd | $gmtpth/pscontour -Cgts_sst.cpt -Jm0.475i -R -X1.25 -Y0.75 -I -K -V > gcoos_sst.ps
+$gmtpth/grdcontour xyzmean.grd -C1 -A1.0 -W1. -Jm -R -V -O -K >> gcoos_sst.ps
+
+# draw the map
+#blue water and pastel land
+#Note to get the full resolution plot for the land use Df instead of Di
+$gmtpth/pscoast -Jm -R -G245/222/179 -Di -Ia -Na -B1g1a2WSne -W -V -O -K >> gcoos_sst.ps
+
+#blue water and light green land^M
+#pscoast -R-98/-90/26/31 -Jm0.8 -S148/227/255 -Df -Ia -Na -B1g1 -G194/255/194 -W -V -K >> gcoos_sst.ps^M
+
+#draw black circles where station data are located^M
+awk '{print $1, $2}' gts_xyz.dat | $gmtpth/psxy  -R -Jm -Sc0.04 -G0 -V -K -O >> gcoos_sst.ps
+
+#print stn ids next to dots
+#awk '{printf ("%s %s 8 0 0 5 %s \n", $4,$5,$1)}' gts_sstll.dat | pstext -R -Jm -O -D0.1/0.1 -K -N >> gcoos_sst.ps
+
+
+#cpt file created by: makecpt -T20/38/1 -I^M
+$gmtpth/psscale -Cgts_sst.cpt -B2/:"T (deg C/F):" -D5.0/6.9/5/.125h -O -K -V >> gcoos_sst.ps
+$gmtpth/psscale -Cgts_sstF.cpt -B3 -D5.0/6.9/5/.125h -A -O -K -V >> gcoos_sst.ps
+
+echo ' Printing title '
+#print title
+$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5 -O -K << END >> gcoos_sst.ps
+0.0 7.4 18 0 4 TM GTS Sea Surface Temp.
+END
+
+echo ' Printing time of observations '
+#print UT time of observations
+$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5 -O -K << END >> gcoos_sst.ps
+6.0 7.4 16 0 4 TM `echo "UT Date/Time:" $fdt`
+END
+
+echo ' Printing local time of observations '
+#print local time of observations 
+$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5 -O -K << END >> gcoos_sst.ps
+3.0 7.4 16 0 4 TM `echo "Local Date/Time:" $ldt`
+END
+echo ' Finished local time of observations '
+#copy files to jpeg and G$fdt.ps
+cp gcoos_sst.ps gts_sst_$fxtn.ps
+echo ' Starting conversions '
+/usr/bin/gm convert -rotate 90 gcoos_sst.ps gts_sst_$fxtn.jpeg
+/usr/bin/gm convert -rotate 90 gcoos_sst.ps gts_sst.jpeg
+echo ' Starting ps2pdf now '
+/usr/bin/ps2pdf -r75 -dPDFSETTINGS=/screen gcoos_sst.ps gts_sst.pdf
+
+# Clean up temporary files.
+#
+rm xyzmean.grd gts_sstF.cpt gts_sst.cpt xyzmean.dat gts_xyz.dat gts_sst_Cmx2.dat gts_sst_Fmx2.dat gts_sstll.dat gts_sst.dat
+
+
+###- ========== Added by Franke Hsu =========
+###- 2016-09-07 Check Point.
+##set mailct1 = "\t A auto-reminder for the LDM SST plot on gccos website.\n"
+##set mailct2 = "\t This procedure had finished on the time : "`date +%Y-%m-%dT%H:%M:%S`
+##set mailtxt = "$mailct1""$mailct2"
+##echo "$mailtxt" | mail -s "[gcoos web ldm plot] sst plot notification." chsu1@tamu.edu
+....
+
+/d2/home/baum/sgay/*plotgts_at.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/*plotgts_bp.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/*plotgts_wvec.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/*gts_at_stn.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/*gts_sst_stn.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/MMS_ADCP/*plotmms_adcp2_50.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/MMS_ADCP/*plotmms_adcp100_150.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/MMS_ADCP/*plotmms_adcp200_300.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/d2/home/baum/sgay/MMS_ADCP/*plotmms_adcp400_600.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+
+set gmtpth = /opt/GMT-4.5.0/bin
+
+set zephyr_archive = "/d2/home/baum/howie/ZEPHYR/GTSARCHIVE"
+
+#set fdt1 = 10022000
+#set fdt2 = 10022005
+
+set fdy = `/bin/date -u --date "-7 hour" +%y%m%d`
+set fdt0 = `/bin/date -u --date "-7 hour" +%y%m%d%H`
+set ldt0 = `/bin/date -u --date "-13 hour" +%y%m%d%H`
+#set fdt2 = `/bin/date -u --date "-2 hour" +%y%m%d%H`
+#set ldt2 = `/bin/date -u --date "-8 hour" +%y%m%d%H`
+
+set local_time = `/bin/date +%y/%m/%d-%H:%M:%S`
+echo "Starting plotmms_adcp400_500.sh at "$local_time >> /d2/home/baum/sgay/000-BIGLOG
+
+echo "start dates & times: UTM and Local"
+echo $fdt0
+echo $ldt0
+
+set file1 = $fdt0
+set finc = 1
+
+@ file2 = $file1 + $finc
+@ file3 = $file2 + $finc
+@ file4 = $file3 + $finc
+@ file5 = $file4 + $finc
+@ file6 = $file5 + $finc
+
+#echo $file1 $file2 $file3 $file4 $file5 $file6
+set file = ($file1 $file2 $file3 $file4 $file5 $file6)
+#echo $file[1]
+
+set file[1] = $file[1].adcp
+set file[2] = $file[2].adcp
+set file[3] = $file[3].adcp
+set file[4] = $file[4].adcp
+set file[5] = $file[5].adcp
+set file[6] = $file[6].adcp
+
+echo $file
+
+rm adcp.dat
+
+#foreach file (~/../howie/ZEPHYR/GTSARCHIVE/$file[1-6])  
+
+#note: putting a leading or ending space in the format statement for printf separates fields on the same line 
+awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $zephyr_archive/$file[1] >> adcp.dat
+awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $zephyr_archive/$file[2] >> adcp.dat
+awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $zephyr_archive/$file[3] >> adcp.dat
+awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $zephyr_archive/$file[4] >> adcp.dat
+awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $zephyr_archive/$file[5] >> adcp.dat
+awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $zephyr_archive/$file[6] >> adcp.dat
+#awk '{if ($1 >= 40000) {printf ("%s    %2.0f %s %s %6.3f %7.3f \n", $1,$2,$3,$4,$5,$6)}  else {printf ("%s %s %s \n", $1, $2, $3)}}' $file >> adcp.dat
+
+#end
+
+tail adcp.dat
+
+echo "ADCP data retrieved"
+
+#clear all temporary files                                                                                                             
+rm mmsadcpll.dat
+rm mmsadcpll2.dat
+rm mms_adcpllz.dat
+rm mms_adcpscl.dat
+rm mms_adcpvec.dat
+rm mms_adcpscl2.dat
+
+
+#f77 program to add lat lon data to adcp dir & mag
+./mmsll4x <<EOF                                                                                                          
+adcp.dat                                                                                                             
+EOF
+
+tail mmsadcpll.dat
+
+#command to remove spurious stn 42085 from S. Puerto Rico
+awk '{if ($1 != 42085 && $1 != 42868 && $1 != 42887) {printf ("%s %s %s %7.3f %6.3f %s %s %s \n", $1,$2,$3,$4,$5,$6,$7,$8)}}' mmsadcpll.dat  >> mmsadcpll2.dat
+
+#f77 program to remove excess no. of stn ids and lat lon data. File is used to plot stn locations and ids w/ GMT
+./mmsstnx
+
+#f77 program to select data only for the date, times specified in an input file and depth range specified below 
+./mmsadcpz3x <<EOF
+400
+600
+EOF
+
+tail mms_adcpllz.dat
+more mms_adcpscl.dat
+
+#f77 program to process mag and dir into a format used by GMT (i.e. dir, mag & scaled size)
+./mmsvc2x
+tail mms_adcpvec.dat
+more mms_adcpscl2.dat
+
+#echo "type go to continue"
+#set go $<
+
+#clear all temporary files
+rm mms_adcp.ps
+rm mms_adcp.jpeg
+rm *.tmp
+
+echo "removing psfile & tmp files"
+
+set file1 = mms_adcpvec.dat
+set file2 = mms_adcp.ps
+echo $gmtpth
+
+$gmtpth/pscoast -Jm0.5i -R-98/-80/19.0/31 -S148/227/255 -G245/222/179 -Df -Ia -Na -B1g1a2WSne -W -V -K > $file2
+
+set asize = 0.012/0.12/0.04 #original settings: .003/0.06/0.02
+#set acolor = 0/0/0 # = black
+set acolor = 250/0/0 # = red
+
+# extract the data: plot vectors as arrows 
+awk '{print $4, $5, $7, $8, $6}' $file1
+awk '{print $4, $5, $7, $8, $6}' $file1 | $gmtpth/psxy -R -Jm -SV$asize -G$acolor -O -K >> $file2
+
+#draw black circles where station data are located^M
+awk '{print $4, $5}' mms_stnlatlon.dat | $gmtpth/psxy  -R -Jm -Sc0.04 -G0 -V -K -O >> $file2
+
+#print station ids next to vectors
+awk '{printf ("%s %s 8 0 0 5 %s \n", $4,$5,$1)}' mms_stnlatlon.dat | $gmtpth/pstext -R -Jm -O -D0.1/0.1 -N -K >> $file2
+#awk '{printf ("%s %s 8 0 0 5 %s \n", $4,$5,$1)}' $file1 | $gmtpth/pstext -R -Jm -O -D0.1/0.1 -G$acolor -N -K >> $file2
+
+#print vector scale arrow
+$gmtpth/psxy -R0/11/0/8.5 -JX11/8.5 -Sv$asize -G$acolor -O -K << END >> $file2
+8.0 7.0 0.0 0.5
+END
+
+echo ""
+echo "vectors plotted, making text files"
+echo ""
+
+#make a new input files for pstext
+cp mms_adcpscl.txt vecscl.tmp
+cp adcpbins.txt adcpbins_z.tmp
+cp adcpdate.txt date.tmp
+cp adcpyear.txt year.tmp
+cp adcptimes.txt tim.tmp
+
+#read vector scale file and cat scale and bin values to end of input files for pstext
+awk '{printf ("%s", $1)}' mms_adcpscl.dat >> vecscl.tmp
+awk '{printf ("% s %s %s", $4, " to ", $5)}' mms_adcpscl.dat >> adcpbins_z.tmp
+#awk '{if (NR == 1) {printf ("% s", $2)}}' mms_adcpvec.dat >> date.tmp 
+awk '{if (NR == 1) {printf ("% s", $2)}}' mms_adcpvec.dat | cut -c1-4 >> year.tmp
+awk '{if (NR == 1) {printf ("% s", $2)}}' mms_adcpvec.dat | cut -c5-9 >> date.tmp
+awk '{printf ("% s %s %s", $2," to ", $3)}' mms_adcpscl.dat >> tim.tmp
+
+echo ""
+echo "placing text within the file"
+echo ""
+
+#The input parameters for adcpvec scale and bin depth are read from the following txt files. 
+#To change location of text in the plots edit these lines
+
+$gmtpth/pstext vecscl.tmp -R0/11/0/8.5 -JX11/8.5  -O -K  <<END >> $file2
+END
+
+$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5  -O -K << END >> $file2
+8.5 6.8 12 0 0 BL cm/s
+END
+
+$gmtpth/pstext banner1.txt -R0/11/0/8.5 -JX11/8.5  -O -K  <<END >> $file2
+END
+
+$gmtpth/pstext adcpbins_z.tmp -R0/11/0/8.5 -JX11/8.5  -O -K  <<END >> $file2
+END
+
+
+$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5  -O -K << END >> $file2
+5.75 7.2 20 0 0 TM m )
+END
+
+$gmtpth/pstext date.tmp -R0/11/0/8.5 -JX11/8.5 -O -K << END >> $file2
+END
+
+$gmtpth/pstext year.tmp -R0/11/0/8.5 -JX11/8.5 -O -K << END >> $file2
+END
+
+$gmtpth/pstext tim.tmp -R0/11/0/8.5 -JX11/8.5 -O -K << END >> $file2
+END
+
+$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5  -O -K <<END >> $file2 
+5.5 6.9 16 0 4 TM hr
+END
+
+echo ""
+echo "banner and meta data printed, converting plot to jpeg"
+echo ""
+
+#cp mms_adcp.ps mms_adcpvec_$fdt0.ps
+/usr/bin/gm convert -rotate 90 mms_adcp.ps mms_adcp4.jpeg
+/usr/bin/ps2pdf -r75 -dPDFSETTINGS=/screen $file2  mms_adcp4.pdf
+/usr/bin/ps2pdf -r75 -dPDFSETTINGS=/screen $file2  mms_adcp4_$fdt0.pdf
+/usr/bin/gm convert -rotate 90 mms_adcp.ps mms_adcp4_$fdt0.jpeg
+#$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5  -O -K << END >> $file2
+#5.0 7.0 14 0 4 TM `echo "Time:"`
+#END
+
+#$gmtpth/pstext -R0/11/0/8.5 -JX11/8.5 -O -K << END >> $file2
+#5.0 7.15 14 0 4 TM `echo "Date:"`
+#END
+
+
+#$gmtpth/pstext time.tmp -R0/11/0/8.5 -JX11/8.5 -O -K << END >> $file2
+#5.5 7.0 0.0 0.5 
+#END
+
+#/usr/bin/convert -rotate 90 mms_adcp.ps mms_adcp.jpeg
+
+#cp mms_adcpvec.ps mms_adcpvec_$fxtn.ps
+#/usr/bin/convert -rotate 90 mms_adcpvec.ps mms_adcpvec_$fxtn.jpeg
+#/usr/bin/convert -rotate 90 mms_adcpvec.ps gts_wvec.pdf
+#/usr/bin/convert -rotate 90 mms_adcp.ps mms_adcp.jpeg
+
+rm mms_adcp.ps date.tmp tim.tmp year.tmp adcpbins_z.tmp vecscl.tmp mms_adcpscl2.dat mms_adcpvec.dat mms_adcpllz.dat mms_adcpscl.dat mms_stnlatlon.dat mmsadcpll2.dat mmsadcpll.dat mms_adcptim.dat adcp.dat
+....
+
+/d2/home/baum/sgay/*copy_to_gcoos.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+
+#Script to ftp GTS & MMS jpegs and pdfs to gcoos.tamu.edu /Library/WebServer/Documents/GCOOS/products/  
+#This is done at 50 min past every hour (see crontab, to access this in a terminal window type crontab -e)
+
+set local_time = `/bin/date +%y/%m/%d-%H:%M:%S`
+echo "Starting copy_to_gcoos.sh at "$local_time >> /d2/home/baum/sgay/000-BIGLOG
+
+sftp Matthew@gcoos.tamu.edu <<EOF
+
+cd /Library/WebServer/Documents/GCOOS/products/surfacedata/GTS_files            
+put gts_at.jpeg                                                                 
+put gts_at.pdf
+put gts_bp.jpeg                                                                 
+put gts_bp.pdf                                                                 
+put gts_sst.jpeg                                                                
+put gts_sst.pdf                                                                 
+put gts_wvec.jpeg                                                               
+put gts_wvec.pdf
+                                                                                
+cd ../../GTSimages                                                              
+mput gts*.jpeg                                                                  
+
+cd ../surfacedata
+mput mms_adcp?.jpeg
+mput mms_adcp?.pdf
+bye                                                                             
+EOF 
+....
+
+/d2/home/baum/sgay/*copy_to_gcoos3.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+
+#Script to ftp GTS & MMS jpegs and pdfs to gcoos3.tamu.edu /d1/www/html/  
+#This is done at 50 min past every hour (see crontab, to access this in a terminal window type crontab -e)
+
+set local_time = `/bin/date +%y/%m/%d-%H:%M:%S`
+echo "Starting copy_to_gcoos3.sh at "$local_time >> /d2/home/baum/sgay/000-BIGLOG
+
+sftp shin@gcoos3.tamu.edu <<EOF
+
+cd /d1/www/html/surfacedata/GTS_files            
+put gts_at.jpeg
+put gts_at.pdf
+put gts_bp.jpeg
+put gts_bp.pdf
+put gts_sst.jpeg
+put gts_sst.pdf
+put gts_wvec.jpeg
+put gts_wvec.pdf
+                                                                                
+cd /d1/www/html/surfacedata
+mput mms_adcp?.jpeg
+mput mms_adcp?.pdf
+bye                                                                             
+EOF 
+....
+
+/d2/home/baum/sgay/*move_files_to_archive.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#! /bin/tcsh
+
+#Script to move GTS & MMS images to respective directories on megara.tamu.edu (GTSimages and MMSimages)
+#This is done at 52 min. past every hour (see crontab). 
+
+set local_time = `/bin/date +%y/%m/%d-%H:%M:%S`
+echo "Starting move_files_to_archive.sh at "$local_time >> /d2/home/baum/sgay/000-BIGLOG
+
+mv gts*.ps GTSimages/psfiles
+mv gts*.jpeg GTSimages/jpeg
+mv MMS_ADCP/mms_adcp?_*.jpeg MMS_ADCP/MMSimages/jpeg
+mv MMS_ADCP/mms_adcp?_*.pdf MMS_ADCP/MMSimages/pdf
+
+set now = `/bin/date`
+echo "GTS ps and jpeg files copied to gcoos.tamu.edu and moved on ", $now >> GTSimages/gtsimages.log
+echo "MMS pdf and jpeg files copied to gcoos.tamu.edu and moved on ", $now >> MMS_ADCP/MMSimages/mmsimages.log
+....
+
+/d2/home/baum/sgay/*create_dated_subdirs.sh*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+....
+#!/bin/tcsh
+
+#Script to create date locations (gts$fdt & mms$fdt) for archiving GTS and MMS images and moving
+#image jpeg & pdf files to these directories. This is done daily at 02:00 hrs (see crontab)
+
+set fdt = `/bin/date -u --date "-9 hour" +%y%m%d`
+echo $fdt
+
+set local_time = `/bin/date +%y/%m/%d-%H:%M:%S`
+echo "Starting create_dated_subdirs.sh at "$local_time >> /d2/home/baum/sgay/000-BIGLOG
+
+mkdir GTSimages/jpeg/gts$fdt
+mkdir GTSimages/psfiles/gts$fdt
+mkdir MMS_ADCP/MMSimages/jpeg/mms$fdt
+mkdir MMS_ADCP/MMSimages/pdf/mms$fdt
+
+mv GTSimages/jpeg/gts*G$fdt??.jpeg GTSimages/jpeg/gts$fdt
+mv GTSimages/psfiles/gts*G$fdt??.ps GTSimages/psfiles/gts$fdt
+mv MMS_ADCP/MMSimages/jpeg/mms*$fdt??.jpeg MMS_ADCP/MMSimages/jpeg/mms$fdt
+mv MMS_ADCP/MMSimages/pdf/mms*$fdt??.pdf MMS_ADCP/MMSimages/pdf/mms$fdt
+....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

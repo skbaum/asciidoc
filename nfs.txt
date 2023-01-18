@@ -1,0 +1,549 @@
+NFS on Linux
+============
+Steven K. Baum
+v0.1, 2016-12-14
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Links
+-----
+
+*Linux NFS Overview, FAQ and HOWTO Documents* - http://nfs.sourceforge.net/[+http://nfs.sourceforge.net/+]
+
+*NFS on Wikipedia* - https://en.wikipedia.org/wiki/Network_File_System[+https://en.wikipedia.org/wiki/Network_File_System+]
+
+*Linux NFS* - http://wiki.linux-nfs.org/wiki/index.php/Main_Page[+http://wiki.linux-nfs.org/wiki/index.php/Main_Page+]
+
+*How to Install and Configure NFS Server on Linux* - http://www.tutorialspoint.com/articles/how-to-install-and-configure-nfs-server-on-linux[+http://www.tutorialspoint.com/articles/how-to-install-and-configure-nfs-server-on-linux+]
+
+*Archlinux NFS* - https://wiki.archlinux.org/index.php/NFS[+https://wiki.archlinux.org/index.php/NFS+]
+
+NFS on Linux Overview
+~~~~~~~~~~~~~~~~~~~~~
+
+NFS Versions 2, 3, and 4 are supported on 2.6 and later kernels.
+
+NFS over UDP and TCP on IPv4 are supported on the latest 2.4 and 2.6 kernels.
+
+Linux NFS clients and servers have been tested against many non-Linux implementations.
+
+How to Use Version 4
+^^^^^^^^^^^^^^^^^^^^
+
+=====
+The protocol version is determined at mount time, and can be modified by specifying the version of the NFS protocol, or the version of the transport protocol, supported by the server. For example, the client mount command:
+
+-----
+mount -o vers=3 foo:/ /bar
+-----
+
+will request that the server use NFS Version 3 when granting a mount request (Note that "vers" and "nfsvers" have the same meaning in the mount command; The string "vers" is compatible with NFS implementations on Solaris and other vendors). If you wish to prevent use of NFS Version 2 in all cases, then you must restart rpc.mountd on the server, with the option "-N 1 -N 2". The best way to do this is to modify the nfs rpc.mountd configuration on the server by modifying the NFS startup script options, and then shutting down and restarting NFS as a whole:
+
+-----
+cd /etc/rc.d/init.d
+-----
+
+Modify +RPCMOUNTDOPTS+ in the NFS script to include +-N 1 -N 2+.
+
+*START UPDATE NOTE*
+
+Under +systemd+ there is no +RPCMOUNTDOPTS+ variable in any of the scripts in
+the directory:
+
+-----
+/usr/lib/systemd/system
+-----
+
+A bit of intertube searching brings us to:
+
+https://lists.fedoraproject.org/pipermail/users/2010-January/097515.html[+https://lists.fedoraproject.org/pipermail/users/2010-January/097515.html+]
+
+where we discover that +RPCMOUNTDOPTS+ has been replaced
+with +RPCNFSDARGS+ as the appropriate way to specify such things.
+We find two files that contain this variable:
+
+-----
+/usr/lib/systemd/system/nfs-server.service
+
+[Unit]
+Description=NFS server and services
+DefaultDependencies=no
+Requires= network.target proc-fs-nfsd.mount rpcbind.target
+Requires= nfs-mountd.service
+Wants=rpc-statd.service nfs-idmapd.service
+Wants=rpc-statd-notify.service
+
+After= local-fs.target
+After= network.target proc-fs-nfsd.mount rpcbind.service nfs-mountd.service
+After= nfs-idmapd.service rpc-statd.service
+Before= rpc-statd-notify.service
+
+# GSS services dependencies and ordering
+Wants=auth-rpcgss-module.service
+After=rpc-gssd.service gssproxy.service rpc-svcgssd.service
+
+Wants=nfs-config.service
+After=nfs-config.service
+
+[Service]
+EnvironmentFile=-/run/sysconfig/nfs-utils
+
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/usr/sbin/exportfs -r
+ExecStart=/usr/sbin/rpc.nfsd $RPCNFSDARGS
+ExecStop=/usr/sbin/rpc.nfsd 0
+ExecStopPost=/usr/sbin/exportfs -au
+ExecStopPost=/usr/sbin/exportfs -f
+
+ExecReload=-/usr/sbin/exportfs -r
+
+[Install]
+WantedBy=multi-user.target
+-----
+
+and
+
+-----
+/usr/lib/systemd/system/nfs.service
+
+[Unit]
+Description=NFS server and services
+DefaultDependencies=no
+Requires= network.target proc-fs-nfsd.mount rpcbind.target
+Requires= nfs-mountd.service
+Wants=rpc-statd.service nfs-idmapd.service
+Wants=rpc-statd-notify.service
+
+After= local-fs.target
+After= network.target proc-fs-nfsd.mount rpcbind.service nfs-mountd.service
+After= nfs-idmapd.service rpc-statd.service
+Before= rpc-statd-notify.service
+
+# GSS services dependencies and ordering
+Wants=auth-rpcgss-module.service
+After=rpc-gssd.service gssproxy.service rpc-svcgssd.service
+
+Wants=nfs-config.service
+After=nfs-config.service
+
+[Service]
+EnvironmentFile=-/run/sysconfig/nfs-utils
+
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/usr/sbin/exportfs -r
+ExecStart=/usr/sbin/rpc.nfsd $RPCNFSDARGS
+ExecStop=/usr/sbin/rpc.nfsd 0
+ExecStopPost=/usr/sbin/exportfs -au
+ExecStopPost=/usr/sbin/exportfs -f
+
+ExecReload=-/usr/sbin/exportfs -r
+
+[Install]
+WantedBy=multi-user.target
+-----
+
+This and other variables can be specified from within:
+
+-----
+/etc/sysconfig/nfs
+-----
+
+Here is the default configuration of that file in
+CentOS 7.
+
+-----
+#
+# To set lockd kernel module parameters please see
+#  /etc/modprobe.d/lockd.conf
+#
+
+# Optional arguments passed to rpc.nfsd. See rpc.nfsd(8)
+RPCNFSDARGS=""
+# Number of nfs server processes to be started.
+# The default is 8.
+#RPCNFSDCOUNT=16
+#
+# Set V4 grace period in seconds
+#NFSD_V4_GRACE=90
+#
+# Set V4 lease period in seconds
+#NFSD_V4_LEASE=90
+#
+# Optional arguments passed to rpc.mountd. See rpc.mountd(8)
+RPCMOUNTDOPTS=""
+# Port rpc.mountd should listen on.
+#MOUNTD_PORT=892
+#
+# Optional arguments passed to rpc.statd. See rpc.statd(8)
+STATDARG=""
+# Port rpc.statd should listen on.
+#STATD_PORT=662
+# Outgoing port statd should used. The default is port
+# is random
+#STATD_OUTGOING_PORT=2020
+# Specify callout program
+#STATD_HA_CALLOUT="/usr/local/bin/foo"
+#
+#
+# Optional arguments passed to sm-notify. See sm-notify(8)
+SMNOTIFYARGS=""
+#
+# Optional arguments passed to rpc.idmapd. See rpc.idmapd(8)
+RPCIDMAPDARGS=""
+#
+# Optional arguments passed to rpc.gssd. See rpc.gssd(8)
+# Note: The rpc-gssd service will not start unless the
+#       file /etc/krb5.keytab exists. If an alternate
+#       keytab is needed, that separate keytab file
+#       location may be defined in the rpc-gssd.service's
+#       systemd unit file under the ConditionPathExists
+#       parameter
+RPCGSSDARGS=""
+#
+#
+# Enable usage of gssproxy. See gssproxy-mech(8).
+GSS_USE_PROXY="yes"
+#
+# Optional arguments passed to rpc.svcgssd. See rpc.svcgssd(8)
+RPCSVCGSSDARGS=""
+#
+# Optional arguments passed to blkmapd. See blkmapd(8)
+BLKMAPDARGS=""
+-----
+
+This file tells us to see +rpc.mountd+ on the matter, which tells us:
+
+-----
+...
+      -N mountd-version  or  --no-nfs-version mountd-version
+              This  option  can be used to request that rpc.mountd do not offer
+              certain versions of NFS.  The current version of rpc.mountd can support
+              both NFS version 2, 3 and 4. If either one of these versions should
+              not be offered, rpc.mountd must be invoked with the
+              option --no-nfs-version <vers>.
+...
+      -V version  or  --nfs-version version
+              This option can be used to request that rpc.mountd offer certain
+              versions of NFS.  The current version of rpc.mountd can support both
+              NFS version 2 and the newer version 3.
+...
+-----
+
+although it says nothing about +RPCNFSDARGS+.  The man page documentation is
+lagging a bit behind the NFS development cycle.
+
+Searching again we find at:
+
+https://bugs.centos.org/view.php?id=9630[+https://bugs.centos.org/view.php?id=9630+]
+
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/SELinux_Users_and_Administrators_Guide/sect-Managing_Confined_Services-NFS-Configuration_Examples.html[+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/SELinux_Users_and_Administrators_Guide/sect-Managing_Confined_Services-NFS-Configuration_Examples.html+]
+
+that we specify the use of NFS 4.2 via adding
+
+-----
+RPCNFSDARGS="-V 4.2"
+-----
+
+to +/etc/sysconfig/nfs+,
+restarting the server with:
+
+-----
+systemctl restart nfs
+-----
+
+and then mounting on the client side via:
+
+-----
+mount -o v4.2 server:mntpoint localmountpoint
+-----
+
+*END UPDATE NOTE*
+
+Restart NFS via +./nfs restart+.
+
+You will then get an error when attempting to NFS mount using version 2:
+
+-----
+mount: RPC: Unable to receive; errno = Connection refused
+-----
+
+You will also get a warning when you unmount any NFS mounted filesystem, regardless of 
+when it was mounted.
+
+-----
+Bad UMNT RPC: RPC: Program/version mismatch; low version = 3, high version = 3
+-----
+=====
+
+
+NFS4
+----
+
+Overview and Links
+~~~~~~~~~~~~~~~~~~
+
+=====
+Version 4 (RFC 3010, December 2000; revised in RFC 3530, April 2003 and again in RFC 7530, March 2015), influenced by Andrew File System (AFS) and Server Message Block (SMB, also termed CIFS), includes performance improvements, mandates strong security, and introduces a stateful protocol. Version 4 became the first version developed with the Internet Engineering Task Force (IETF) after Sun Microsystems handed over the development of the NFS protocols.
+
+NFS version 4.1 (RFC 5661, January 2010) aims to provide protocol support to take advantage of clustered server deployments including the ability to provide scalable parallel access to files distributed among multiple servers (pNFS extension). NFS version 4.2 is currently being developed. - https://en.wikipedia.org/wiki/Network_File_System#NFSv4[+https://en.wikipedia.org/wiki/Network_File_System#NFSv4+]
+=====
+
+The features of NFS 4 include:
+
+=====
+* NFS Versions 2 and 3 are stateless protocols, but NFS Version 4 introduces state. An NFS Version 4 client uses state to notify an NFS Version 4 server of its intentions on a file: locking, reading, writing, and so on. An NFS Version 4 server can return information to a client about what other clients have intentions on a file to allow a client to cache file data more aggressively via delegation. To help keep state consistent, more sophisticated client and server reboot recovery mechanisms are built in to the NFS Version 4 protocol.
+
+* NFS Version 4 introduces support for byte-range locking and share reservation. Locking in NFS Version 4 is lease-based, so an NFS Version 4 client must maintain contact with an NFS Version 4 server to continue extending its open and lock leases.
+
+* NFS Version 4 introduces file delegation. An NFS Version 4 server can allow an NFS Version 4 client to access and modify a file in it's own cache without sending any network requests to the server, until the server indicates via a callback that another client wishes to access a file. This reduces the amount of traffic between NFS Version 4 client and server considerably in cases where no other clients wish to access a set of files concurrently.
+
+* NFS Version 4 uses compound RPCs. An NFS Version 4 client can combine several traditional NFS operations (LOOKUP, OPEN, and READ, for example) into a single RPC request to carry out a complex operation in one network round trip.
+
+* NFS Version 4 specifies a number of sophisticated security mechanisms, and mandates their implementation by all conforming clients. These mechanisms include Kerberos 5 and SPKM3, in addition to traditional AUTH_SYS security. A new API is provided to allow easy addition of new security mechanisms in the future.
+
+* NFS Version 4 standardizes the use and interpretation of ACLs across Posix and Windows environments. It also supports named attributes. User and group information is stored in the form of strings, not as numeric values. ACLs, user names, group names, and named attributes are stored with UTF-8 encoding.
+
+* NFS Version 4 combines the disparate NFS protocols (stat, NLM, mount, ACL, and NFS) into a single protocol specification to allow better compatibility with network firewalls.
+
+* NFS Version 4 introduces protocol support for file migration and replication.
+
+* NFS Version 4 requires support of RPC over streaming network transport protocols such as TCP. Although many NFS Version 4 clients continue to support RPC via datagrams, this support may be phased out over time in favor of more reliable stream transport protocols.
+
+http://nfs.sourceforge.net/[+http://nfs.sourceforge.net/+]
+=====
+
+*An Overview of NFSv4* - http://www.snia.org/sites/default/files/SNIA_An_Overview_of_NFSv4-3_0.pdf[+http://www.snia.org/sites/default/files/SNIA_An_Overview_of_NFSv4-3_0.pdf+]
+
+*IETF Working Group* - https://datatracker.ietf.org/wg/nfsv4/about/[+https://datatracker.ietf.org/wg/nfsv4/about/+]
+
+*NFS Version 4 Minor Version 2* - https://tools.ietf.org/html/draft-ietf-nfsv4-minorversion2-41[+https://tools.ietf.org/html/draft-ietf-nfsv4-minorversion2-41+]
+
+*NFSv4.1 End User Documentation* - http://wiki.linux-nfs.org/wiki/index.php/NFSv41_Introduction[+http://wiki.linux-nfs.org/wiki/index.php/NFSv41_Introduction+]
+
+=====
+Your client should automatically negotiate the highest NFS version supported by both client and server. If you want to turn on 4.1 while it's still experimental:
+
+On the client side: use the latest kernel possible (at least 2.6.31). Mount with:
+
+mount -tnfs4 -ominorversion=1 server:/export/path/
+
+On the server side:
+
+Follow instructions for exporting nfsv4.
+
+Build and install the most recent nfs-utils possible (at least 1.2.0). Restart nfsd.
+
+Troubleshooting:
+
+Check that /proc/fs/nfsd/versions on server says "+2 +3 +4 +4.1". (The "+4.1" is the important part.)
+
+Checking that 4.1 is actually working: watch some traffic in wireshark. The rpc header should list the program version as "4", and the nfs arguments should list the minorversion as "1". Also, all compounds except the first should start with a "SEQUENCE" operation. 
+=====
+
+Investigating NFS4 on mire
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check for NFS versions in kernel.
+
+-----
+less /proc/fs/nfsd/versions
+-2 -3 -4 -4.1 -4.2
+-----
+
+On the server side, install a version of +nfs-utils+ greater than 1.2.0 and
+restart +nfsd+.
+
+-----
+rpm -q nfs-utils
+nfs-utils-1.3.0-0.33.el7.x86_64
+-----
+
+On the client side, used a kernel version 2.6.31 or later:
+
+-----
+uname -a
+Linux mire.tamu.edu 3.10.0-514.el7.x86_64 #1 SMP Tue Nov 22 16:42:41 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+-----
+
+and mount with:
+
+-----
+mount -tnfs4 -ominorversion=1 server:/export/path/ /local/path
+-----
+
+Check that version 4 is working by watching traffic in Wireshark.
+
+-----
+yum install wireshark*
+...
+  Installing : libsmi-0.4.8-13.el7.x86_64
+  Installing : wireshark-1.10.14-10.el7.x86_64
+  Installing : wireshark-gnome-1.10.14-10.el7.x86_64
+  Installing : wireshark-devel-1.10.14-10.el7.x86_64
+...
+-----
+
+The RPC header should list the program version as +4+, and the NFS
+arguments should list the minorversion as +2+ (if version 4.2 is the
+most recent version available in the kernel).
+And all compounds except the first should start with a +SEQUENCE+ operation.
+
+pNFS
+~~~~
+
+=====
+Parallel NFS (pNFS) is a part of the NFS v4.1 standard that allows compute clients to access storage devices directly and in parallel. The pNFS architecture eliminates the scalability and performance issues associated with NFS servers deployed today. This is achieved by the separation of data and metadata, and moving the metadata server out of the data path. 
+
+A consortium of storage industry technology leaders created a parallel NFS (pNFS) protocol as an optional extension of the NFS v4.1 standard. pNFS takes a different approach by allowing compute clients to read and write directly to the storage, eliminating filer head bottlenecks and allowing single file system capacity and performance to scale linearly. 
+=====
+
+*Linux pNFS Kernel Development* - http://www.citi.umich.edu/projects/asci/pnfs/linux/[+http://www.citi.umich.edu/projects/asci/pnfs/linux/+]
+
+=====
+Linux pNFS features a pluggable client architecture that harnesses the potential of pNFS as a universal and scalable metadata protocol by enabling dynamic support for file layout format, storage protocol, and file system policies. The architecture has been tested with the file, block, object, and PVFS2 access methods.
+=====
+
+*PNFS Development* - http://wiki.linux-nfs.org/wiki/index.php/PNFS_Development[+http://wiki.linux-nfs.org/wiki/index.php/PNFS_Development+]
+
+=====
+Linux pNFS features a pluggable client and server architecture that harnesses the potential of pNFS as a universal and scalable metadata protocol by enabling dynamic support for the file, object, and block layouts.
+pNFS is part of the first NFSv4 minor version. This space is used to track and share Linux pNFS implementation ideas and issues. 
+=====
+
+Software
+--------
+
+*nfs4j*
+
+=====
+The pure java implementation of NFS server version 3, 4.0 and 4.1 including pNFS extension.
+=====
+
+https://github.com/dCache/nfs4j[+https://github.com/dCache/nfs4j+]
+
+
+Centos Implementation
+---------------------
+
+The NFS utilities are contained within the +nfs-utils+ package.
+
+-----
+rpm -q nfs-utils
+nfs-utils-1.3.0-0.33.el7.x86_64
+-----
+
+which contains:
+
+-----
+rpm -ql nfs-utils
+
+/etc/exports.d                                                                                      
+/etc/modprobe.d/lockd.conf                                                                          
+/etc/nfsmount.conf                                                                                  
+/etc/request-key.d/id_resolver.conf                                                                 
+/etc/sysconfig/nfs                                                                                  
+/sbin/mount.nfs                                                                                     
+/sbin/mount.nfs4                                                                                    
+/sbin/osd_login                                                                                     
+/sbin/rpc.statd                                                                                     
+/sbin/umount.nfs                                                                                    
+/sbin/umount.nfs4                                                                                   
+/usr/lib/systemd/scripts/nfs-utils_env.sh                                                           
+/usr/lib/systemd/system/auth-rpcgss-module.service                                                  
+/usr/lib/systemd/system/nfs-blkmap.service                                                          
+/usr/lib/systemd/system/nfs-client.target                                                           
+/usr/lib/systemd/system/nfs-config.service                                                          
+/usr/lib/systemd/system/nfs-idmap.service                                                           
+/usr/lib/systemd/system/nfs-idmapd.service                                                          
+/usr/lib/systemd/system/nfs-lock.service                                                            
+/usr/lib/systemd/system/nfs-mountd.service                                                          
+/usr/lib/systemd/system/nfs-secure-server.service                                                   
+/usr/lib/systemd/system/nfs-secure.service                                                          
+/usr/lib/systemd/system/nfs-server.service                                                          
+/usr/lib/systemd/system/nfs-utils.service                                                           
+/usr/lib/systemd/system/nfs.service
+/usr/lib/systemd/system/nfslock.service
+/usr/lib/systemd/system/proc-fs-nfsd.mount
+/usr/lib/systemd/system/rpc-gssd.service
+/usr/lib/systemd/system/rpc-statd-notify.service
+/usr/lib/systemd/system/rpc-statd.service
+/usr/lib/systemd/system/rpc-svcgssd.service
+/usr/lib/systemd/system/rpcgssd.service
+/usr/lib/systemd/system/rpcidmapd.service
+/usr/lib/systemd/system/rpcsvcgssd.service
+/usr/lib/systemd/system/var-lib-nfs-rpc_pipefs.mount
+/usr/sbin/blkmapd
+/usr/sbin/exportfs
+/usr/sbin/mountstats
+/usr/sbin/nfsdcltrack
+/usr/sbin/nfsidmap
+/usr/sbin/nfsiostat
+/usr/sbin/nfsstat
+/usr/sbin/rpc.gssd
+/usr/sbin/rpc.idmapd
+/usr/sbin/rpc.mountd
+/usr/sbin/rpc.nfsd
+/usr/sbin/rpc.svcgssd
+/usr/sbin/rpcdebug
+/usr/sbin/showmount
+/usr/sbin/sm-notify
+/usr/sbin/start-statd
+/usr/share/doc/nfs-utils-1.3.0
+/usr/share/doc/nfs-utils-1.3.0/ChangeLog
+/usr/share/doc/nfs-utils-1.3.0/KNOWNBUGS
+/usr/share/doc/nfs-utils-1.3.0/NEW
+/usr/share/doc/nfs-utils-1.3.0/README
+/usr/share/doc/nfs-utils-1.3.0/THANKS
+/usr/share/doc/nfs-utils-1.3.0/TODO
+/usr/share/man/man5/exports.5.gz
+/usr/share/man/man5/nfs.5.gz
+/usr/share/man/man5/nfsmount.conf.5.gz
+/usr/share/man/man7/nfsd.7.gz
+/usr/share/man/man8/blkmapd.8.gz
+/usr/share/man/man8/exportfs.8.gz
+/usr/share/man/man8/gssd.8.gz
+/usr/share/man/man8/idmapd.8.gz
+/usr/share/man/man8/mount.nfs.8.gz
+/usr/share/man/man8/mountd.8.gz
+/usr/share/man/man8/mountstats.8.gz
+/usr/share/man/man8/nfsd.8.gz
+/usr/share/man/man8/nfsdcltrack.8.gz
+/usr/share/man/man8/nfsidmap.8.gz
+/usr/share/man/man8/nfsiostat.8.gz
+/usr/share/man/man8/nfsstat.8.gz
+/usr/share/man/man8/rpc.gssd.8.gz
+/usr/share/man/man8/rpc.idmapd.8.gz
+/usr/share/man/man8/rpc.mountd.8.gz
+/usr/share/man/man8/rpc.nfsd.8.gz
+/usr/share/man/man8/rpc.sm-notify.8.gz
+/usr/share/man/man8/rpc.statd.8.gz
+/usr/share/man/man8/rpc.svcgssd.8.gz
+/usr/share/man/man8/rpcdebug.8.gz
+/usr/share/man/man8/showmount.8.gz
+/usr/share/man/man8/sm-notify.8.gz
+/usr/share/man/man8/statd.8.gz
+/usr/share/man/man8/svcgssd.8.gz
+/usr/share/man/man8/umount.nfs.8.gz
+/var/lib/nfs
+/var/lib/nfs/etab
+/var/lib/nfs/rmtab
+/var/lib/nfs/rpc_pipefs
+/var/lib/nfs/statd
+/var/lib/nfs/statd/sm
+/var/lib/nfs/statd/sm.bak
+/var/lib/nfs/state
+/var/lib/nfs/v4recovery
+/var/lib/nfs/xtab
+-----
+
+
+
+
+

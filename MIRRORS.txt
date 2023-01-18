@@ -1,0 +1,147 @@
+Mirrors of sunsite's Linux archive
+
+Continent Index
+
+   * Africa
+   * Asia
+   * Australia
+   * Europe
+   * North America
+   * South America
+   * Unknown
+
+----------------------------------------------------------------------------
+
+   * Africa
+        o South Africa
+             + Stellenbosch ftp.sun.ac.za:/pub/linux/sunsite/
+             + Johannesburg ftp.is.co.za:/linux/sunsite/
+
+   * Asia
+        o Hong Kong
+             + Hong Kong ftp.cs.cuhk.hk:/pub/Linux/
+             + Hong Kong sunsite.ust.hk:/pub/Linux/
+        o Japan
+             + Tokyo ftp.spin.ad.jp:/pub/linux/sunsite.unc.edu/
+        o Korea
+             + Seoul ftp.nuri.net:/pub/Linux/
+        o Malaysia
+             + Unknown ftp.jaring.my:/pub/Linux/
+        o Republic of Singapore
+             + Singapore ftp.nus.sg:/pub/unix/Linux/
+        o Thailand
+             + Bangkok ftp.nectec.or.th:/pub/mirrors/linux/
+
+   * Australia
+
+             + Brisbane ftp.dstc.edu.au:/pub/linux/
+             + Canbera sunsite.anu.edu.au:/pub/linux/
+             + Melbourne ftp.monash.edu.au:/pub/linux/
+             + Sydney ftp.sydutech.usyd.edu.au:/pub/linux/
+
+   * Europe
+        o Austria
+             + Vienna ftp.univie.ac.at:/systems/linux/sunsite/
+        o Czech Republic
+             + Brno ftp.fi.muni.cz:/pub/UNIX/linux/
+        o Finland
+             + Espo ftp.funet.fi:/pub/Linux/sunsite/
+        o France
+             + Angers ftp.univ-angers.fr:/pub/Linux/
+             + Belfort ftp.iut-bm.univ-fcomte.fr:/
+             + Paris ftp.ibp.fr:/pub/linux/sunsite/
+             + Nancy ftp.loria.fr:/pub/linux/sunsite/
+        o Germany (Deutschland)
+             + Aachen ftp.dfv.rwth-aachen.de:/pub/linux/sunsite/
+             + Dortmund ftp.germany.eu.net:/pub/os/Linux/Mirror.SunSITE/
+             + Dresden ftp.tu-dresden.de:/pub/Linux/sunsite/
+             + Erlangen ftp.uni-erlangen.de:/pub/Linux/MIRROR.sunsite/
+             + G"ottingen ftp.gwdg.de:/pub/linux/mirrors/sunsite/
+             + Karlsruhe ftp.rz.uni-karlsruhe.de:/pub/linux/mirror.sunsite/
+             + Mannheim ftp.ba-mannheim.de:/pub/linux/mirror.sunsite/
+             + Paderborn ftp.uni-paderborn.de:/pub/Mirrors/sunsite.unc.edu/
+             + Rostock ftp.uni-rostock.de:/Linux/sunsite/
+             + Stuttgart
+               ftp.rus.uni-stuttgart.de:/pub/unix/systems/linux/MIRROR.sunsite/
+             + Tuebingen ftp.uni-tuebingen.de:/pub/linux/Mirror.sunsite/
+             + Ulm ftp.rz.uni-ulm.de:/pub/mirrors/linux/sunsite/
+        o Hungary
+             + Budapest ftp.kfki.hu:/pub/linux/
+        o Italy
+             + Casale Monferrato linux.italnet.it:/pub/Linux/
+             + Naples ftp.unina.it:/pub/linux/sunsite/
+             + Padova giotto.unipd.it:/pub/unix/Linux/
+             + Pisa cnuce-arch.cnr.it:/pub/Linux/
+             + Rome ftp.flashnet.it:/mirror2/sunsite.unc.edu/
+        o Netherlands
+             + Amsterdam ftp.nijenrode.nl:/pub/linux/sunsite.unc-mirror/
+             + Leiden ftp.LeidenUniv.nl:/pub/linux/sunsite/
+        o Norway
+             + Trondheim ftp.nvg.unit.no:/pub/linux/sunsite/
+        o Poland
+             + Warsaw sunsite.icm.edu.pl:/pub/Linux/sunsite.unc.edu/
+        o Spain
+             + Madrid ftp.rediris.es:/software/os/linux/sunsite/
+             + Madrid sunsite.rediris.es:/software/linux/
+             + Seville ftp.cs.us.es:/pub/Linux/sunsite-mirror/
+             + Tarragone ftp.etse.urv.es:/pub/mirror/linux/
+             + Oviedo ftp.etsimo.uniovi.es:/pub/linux/
+             + Valladolid ftp.luna.gui.es:/pub/linux.new/
+        o Switzerland
+             + Zurich ftp.switch.ch:/mirror/linux/
+        o Turkey (Turkiye)
+             + Ankara ftp.metu.edu.tr:/pub/linux/sunsite/
+        o United Kingdom
+             + Canterbury unix.hensa.ac.uk:/mirrors/sunsite/pub/Linux/
+             + Coventry
+               ftp.maths.warwick.ac.uk:/mirrors/linux/sunsite.unc-mirror/
+             + Greenwich ftp.idiscover.co.uk:/pub/Linux/sunsite.unc-mirror/
+             + London
+               sunsite.doc.ic.ac.uk:/packages/linux/sunsite.unc-mirror/
+             + Mildenhall ftp.dungeon.com:/pub/linux/sunsite-mirror/
+
+   * North America
+        o Canada
+             + Toronto, Ontario ftp.io.org:/pub/mirrors/linux/sunsite/
+        o United States
+             + Atlanta, GA ftp.cc.gatech.edu:/pub/linux/
+             + Chapel Hill, NC sunsite.unc.edu:/pub/Linux/
+             + Concord, CA ftp.cdrom.com:/pub/linux/sunsite/
+             + Dallas, TX ftp.siriuscc.com:/pub/Linux/Sunsite/
+             + Fayetteville, AR ftp.engr.uark.edu:/pub/linux/sunsite/
+             + Flagstaff, AZ ftp.infomagic.com:/pub/mirrors/linux/sunsite/
+             + Laurel, MD ftp.linux.org:/pub/mirrors/sunsite/
+             + Minneapolis, MN ftp.cs.umn.edu:/pub/Linux/sunsite/
+             + Norman, OK ftp.uoknor.edu:/linux/sunsite/
+             + Pasadena, CA ftp.fuller.edu:/mirror/sunsite/
+             + Raleigh, NC ftp.redhat.com:/pub/mirrors/sunsite.unc.edu/
+             + Rochester, NY ftp.rge.com:/pub/systems/linux/sunsite/
+             + Salt Lake City, UT ftp.pht.com:/mirrors/linux/sunsite/
+             + Santa Clara, CA:brandy.jf.intel.com:/something (Intel
+               internal network only)
+             + San Jose, CA ftp.yggdrasil.com:/mirrors/sunsite/
+             + Sunnyvale, CA ftp.drcdrom.com:/pub/linux/sunsite/
+             + Waukesha, WI ftp.wit.com:/unix/linux/
+             + White Plains, NY:hypergly.watson.ibm.com:/pub/linux-sunsite
+               (IBM internal network only)
+             + Urbana, IL uiarchive.cso.uiuc.edu:/pub/systems/linux/sunsite/
+             + Unknown:aslan.afit.af.mil:/pub/sunsite (internal AFIT access
+               only)
+
+   * South America
+        o Brazil
+             + Campinas
+               ftp.fee.unicamp.br:/pub/Linux/mirrors/sunsite.unc.edu/
+             + Rio de Janeiro ftp.iis.com.br:/pub/Linux/
+             + Sao Paulo
+               linux.if.usp.br:/pub/mirror/sunsite.unc.edu/pub/Linux/
+             + Unknown farofa.ime.usp.br:/pub/linux/
+        o Chile
+             + Santa Maria:ftp.inf.utfsm.cl:/pub/Linux (only a parital
+               mirror)
+
+   * Unknown
+        o If you know where these sites are (including city), please mail
+          ewt@sunsite.unc.edu.
+          ------------------------------------------------------------------
+          Page prepared by ewt@sunsite.unc.edu

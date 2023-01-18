@@ -1,0 +1,42 @@
+
+= Database Software Notes
+:doctype: book
+:toc:
+:icons:
+
+:source-highlighter: coderay
+
+:numbered!:
+
+== Meta
+
+== Software
+
+=== Datasette
+
+https://datasette.io/[`https://datasette.io/`]
+
+"Datasette is a tool for exploring and publishing data. It helps people take data of any shape or size, analyze and explore it, and publish it as an interactive website and accompanying API.
+
+Datasette is aimed at data journalists, museum curators, archivists, local governments and anyone else who has data that they wish to share with the world. It is part of a wider ecosystem of tools and plugins dedicated to making working with structured data as productive as possible."
+
+=== DBeaver
+
+https://dbeaver.io/download/[`https://dbeaver.io/download/`]
+
+"Free multi-platform database tool for developers, database administrators, analysts and all people who need to work with databases. Supports all popular databases: MySQL, PostgreSQL, SQLite, Oracle, DB2, SQL Server, Sybase, MS Access, Teradata, Firebird, Apache Hive, Phoenix, Presto, etc."
+
+=== Superset
+
+https://superset.apache.org/[`https://superset.apache.org/`]
+
+"Superset is fast, lightweight, intuitive, and loaded with options that make it easy for users of all skill sets to explore and visualize their data, from simple line charts to highly detailed geospatial charts.
+
+Quickly and easily integrate and explore your data, using either our simple no-code viz builder or state of the art SQL IDE. 
+
+Superset can connect to any SQL based datasource through SQLAlchemy, including modern cloud native databases and engines at petabyte scale."
+
+
+
+
+

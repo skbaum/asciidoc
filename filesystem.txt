@@ -1,0 +1,148 @@
+
+= Filesystems and Data Storage
+:doctype: book
+:toc:
+:icons:
+:sectlinks:
+:source-highlighter: pygments
+
+== Data Transport
+
+=== ADIOS2
+
+https://github.com/ornladios/ADIOS2[`https://github.com/ornladios/ADIOS2`]
+
+https://adios2.readthedocs.io/en/latest/[`https://adios2.readthedocs.io/en/latest/`]
+
+https://csmd.ornl.gov/software/adios2[`https://csmd.ornl.gov/software/adios2`]
+
+*Streaming data pipelines with openPMP and ADIOS2* - https://arxiv.org/abs/2107.06108[`https://arxiv.org/abs/2107.06108`]
+
+*Parallel I/O in the WRF model with ADIOS2* - https://arxiv.org/abs/2201.08228[`https://arxiv.org/abs/2201.08228`]
+
+=====
+The Adaptable Input/Output (I/O) System (ADIOS2) transports data as groups of self-describing variables and attributes across different media types (such as files, wide-area-networks, and remote direct memory access) using a common application programming interface for all transport modes. ADIOS2 can be used on supercomputers, cloud systems, and personal computers.
+The features include:
+
+* Performance I/O scalability in high performance computing (HPC) applications.
+* Adaptability unified interfaces to allow for several modes of transport (files, memory-to-memory)
+* Ease of Use two-level application programming interface (APIs)
+** Full APIs for HPC applications: C++11, Fortran 90, C 99, Python 2 and 3
+** Simplified High-Level APIs for data analysis: Python 2 and 3, C++11, Matlab
+=====
+
+=== HTCondor
+
+https://htcondor.org/[`https://htcondor.org/`]
+
+https://htcondor.readthedocs.io/[`https://htcondor.readthedocs.io/`]
+
+*HTCondor data movement at 100 Gbps* - https://arxiv.org/abs/2107.03947[`https://arxiv.org/abs/2107.03947`]
+
+=====
+HTCondor is a software system that creates a High-Throughput Computing (HTC) environment. It effectively uses the computing power of machines connected over a network, be they a single cluster, a set of clusters on a campus, cloud resources either stand alone or temporarily joined to a local cluster, or international grids.
+
+A user submits jobs to HTCondor. HTCondor finds available machines and begins running the jobs there. HTCondor has the capability to detect that a machine running a job is no longer available (perhaps the machine crashed, or maybe it prefers to run another job). HTCondor will automatically restart the job on another machine without intervention from the user.
+=====
+
+=== PnetCDF
+
+https://github.com/Parallel-NetCDF/PnetCDF[`https://github.com/Parallel-NetCDF/PnetCDF`]
+
+https://parallel-netcdf.github.io/[`https://parallel-netcdf.github.io/`]
+
+=====
+PnetCDF is a high-performance parallel I/O library for accessing Unidata's NetCDF, files in classic formats, specifically the formats of CDF-1, 2, and 5. CDF-1 is the default NetCDF classic format. CDF-2 is an extended format created through using flag NC_64BIT_OFFSET to support 64-bit file offsets. The CDF-5 file format, an extension of CDF-2 and created through using flag NC_64BIT_DATA, supports unsigned data types and uses 64-bit integers to allow users to define large dimensions, attributes, and variables (> 2B array elements). 
+
+In addition to the conventional netCDF read and write APIs, PnetCDF provides a new set of nonblocking APIs. Nonblocking APIs allow users to post multiple read and write requests first, and let PnetCDF to aggregate them into a large request, hence to achieve a better performance.
+=====
+
+=== PSI/J
+
+https://exaworks.org/psij[`https://exaworks.org/psij`]
+
+https://github.com/ExaWorks/psij-python[`https://github.com/ExaWorks/psij-python`]
+
+=====
+A Python abstraction layer over cluster schedulers
+
+PSI/J is a portability layer across different HPC workload managers allowing workflow developers and users to create portable workflows with a standard API. PSI/J aims to focus effort by pooling into a single layer the collective knowledge obtained from these disparate efforts. PSI/J is composed of both a language-agnostic community-defined specification and the specification's language-specific implementations. The high-level goals of the specification are to be lightweight, user-space, minimally prescriptive, scalable via asynchronous operations, general, and extensible to different systems, schedulers, implementations. 
+=====
+
+== Data and Metadata Formats
+
+=== openPMD
+
+https://github.com/openPMD/openPMD-api[`https://github.com/openPMD/openPMD-api`]
+
+https://github.com/openPMD/openPMD-projects[`https://github.com/openPMD/openPMD-projects`]
+
+https://openpmd-api.readthedocs.io/[`https://openpmd-api.readthedocs.io/`]
+
+*Streaming data pipelines with openPMP and ADIOS2* - https://arxiv.org/abs/2107.06108[`https://arxiv.org/abs/2107.06108`]
+
+=====
+openPMD is an open meta-data schema that provides meaning and self-description for data sets in science and engineering. See the openPMD standard for details of this schema.
+
+This library provides a reference API for openPMD data handling. Since openPMD is a schema (or markup) on top of portable, hierarchical file formats, this library implements various backends such as HDF5, ADIOS1, ADIOS2 and JSON. Writing & reading through those backends and their associated files are supported for serial and MPI-parallel workflows.
+=====
+
+== Data Compression
+
+=== SZ
+
+https://szcompressor.org/[`https://szcompressor.org/`
+
+=====
+SZ is a modular parametrizable lossy compressor framework for scientific data (floating point and integers). It has applications in simulations, AI and instruments. It is a production quality software and a research platform for lossy compression.
+
+SZ can be used for classic use-cases: visualization, accelerating I/O, reducing memory and storage footprint and more advanced use-cases like compression of DNN models and training sets, acceleration of computation, checkpoint/restart, reducing streaming intensity and running efficiently large problems that cannot fit in memory.
+
+SZ has implementations on CPU, GPU, and FPGA and is integrated in the main I/O libraries: HFD5, ADIOS, PnetCDF.
+=====
+
+==== cuSZ
+
+https://github.com/szcompressor/cuSZ[`https://github.com/szcompressor/cuSZ`]
+
+=====
+cuSZ is a CUDA implementation of the widely used SZ lossy compressor for scientific data. It is the first error-bounded lossy compressor (circa 2020) on GPU for scientific data, aming to massively improve SZ's throughput on heterogeneous HPC systems.
+=====
+
+Building cuSZ from source code:
+
+-----
+git clone https://github.com/szcompressor/cuSZ.git cusz-latest
+cd cusz-latest && mkdir build && cd build
+
+# Example architectures (";"-separated when specifying)
+#   Volta        : 70
+#   Turing       : 75
+#   Ampere       : 80 86
+#   Ada Lovelace : 89 (as of CUDA 11.8)
+#   Hopper       : 90 (as of CUDA 11.8)
+cmake .. -DCUSZ_BUILD_EXAMPLES=on \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCUSZ_BUILD_TESTS=on \
+    -DCMAKE_CUDA_ARCHITECTURES="75;80;86" \
+    -DCMAKE_INSTALL_PREFIX=[/path/to/install/dir]
+make -j8
+# Install to [/path/to/install/dir]
+make install
+# An optional testcase run can be done using `ctest`.
+-----
+
+=== qcat
+
+https://github.com/szcompressor/qcat[`https://github.com/szcompressor/qcat`]
+
+==== SZ2
+
+https://github.com/szcompressor/SZ[`https://github.com/szcompressor/SZ`]
+
+=== SZ3
+
+https://github.com/szcompressor/SZ3[`https://github.com/szcompressor/SZ3`]
+
+== Filesystems
+

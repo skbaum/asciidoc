@@ -1,0 +1,1580 @@
+Acquisition and Processing of ROMS Forcing
+==========================================
+Steven K. Baum
+v0.5, 2013-02-18
+:doctype: book
+:toc:
+:icons:
+
+:numbered!:
+
+[preface]
+
+Synopsis
+--------
+
+How to automate the acquisition and processing of ROMS forcing.
+
+Required Fields
+---------------
+
+The fields required by ROMS are listed in a table at:
+
+http://stommel.tamu.edu/~baum/narr.html[+http://stommel.tamu.edu/~baum/narr.html+]
+
+The WGRIB abbreviations for them are +UGRD+, +VGRD+, +TMP+, +PRES+, +RH+,
++TCDC+, +PRATE+, +DSWRF+ and +USWRF+.
+The appropriate entries in the GRIB files are:
+
+-----
+9:660476:vt=2013072121:PRES:surface:3 hour fcst:
+11:970115:vt=2013072121:TMP:2 m above ground:3 hour fcsta:
+14:1203529:vt=2013072121:RH:2 m above ground:3 hour fcst:
+17.1:1387037:vt=2013072121:UGRD:10 m above ground:3 hour fcst:
+17.2:1387037:vt=2013072121:VGRD:10 m above ground:3 hour fcst:
+28:1782164:vt=2013072121:TCDC:entire atmosphere (considered as a single layer):3 hour fcst:
+29:1858690:vt=2013072121:DSWRF:surface:0-3 hour ave fcst:
+57:5190961:vt=2013072121:USWRF:surface:3 hour fcst:
+118:9756105:vt=2013072121:PRATE:surface:3 hour fcst:
+-----
+
+The corresponding variable names in the NetCDF file created by wgrib2 from
+the GRIB file are:
+
+-----
+PRES_surface
+TMP_2maboveground
+RH_2maboveground
+UGRD_10maboveground
+VGRD_10maboveground
+TCDC__entireatmosphere_consideredasasinglelayer_
+DSWRF_surface
+USWRF_surface
+PRATE_surface
+-----
+
+The NAM Model
+-------------
+
+The North American Mesoscale Forecast System (NAM) is one of the major weather
+models run by the National Centers for Environmental Prediction (NCEP) for
+producing weather forecasts. Dozens of weather parameters are available from
+the NAM grids, from temperature and precipitation to lightning and turbulent
+kinetic energy. The NAM generates multiple grids (or domains) of weather
+forecasts over the North American continent at various horizontal resolutions.
+High-resolution forecasts are generated within the NAM using additional
+numerical weather models. These high-resolution forecast windows are generated
+over fixed regions and are occasionally run to follow significant weather
+events, like hurricanes.
+
+NAM is one of the primary vehicles by which NCEP's Environmental Modeling
+Center provides mesoscale guidance to public and private sector
+meteorologists. It is run four times daily at 00z, 06z, 12z, and 18z and
+consists of the following components: 
+
+* The NOAA Environmental Modeling System (NEMS) version of the Non-Hydrostatic
+Multi-scale Model in B-grid (NMMB) 
+
+* The NCEP regional Grid-Point Statistical Interpolation (GSI) analysis 
+
+It is initialized with a 12-h run of the NAM Data Assimilation System, which
+runs a sequence of four GSI analyses and 3-h NEMS-NMMB forecasts using all
+available observations to provide a first guess to the NAM "on-time" analysis. 
+
+The home page of the NAM model system is at:
+
+http://www.emc.ncep.noaa.gov/index.php?branch=NAM[+http://www.emc.ncep.noaa.gov/index.php?branch=NAM+]
+
+and information about available output products can be found at:
+
+http://www.emc.ncep.noaa.gov/mmb/research/meso.products.html[+http://www.emc.ncep.noaa.gov/mmb/research/meso.products.html+]
+
+Obtaining NAM GRIB Files
+------------------------
+
+We use the +awip12+ 2-D surface fields, with the details for this grid
+available at:
+
+http://www.emc.ncep.noaa.gov/mmb/namgrids/[+http://www.emc.ncep.noaa.gov/mmb/namgrids/+]
+
+The fields are on a 12 km Lambert conformal grid, and are available in 3 hour
+time slices up to 84 hours.  The area covered by the grid can be seen at:
+
+http://www.emc.ncep.noaa.gov/mmb/namgrids/g212.12kmexp.jpg[+http://www.emc.ncep.noaa.gov/mmb/namgrids/g212.12kmexp.jpg+]
+
+The list of fields available in each GRIB2 file for +awip12+ can be found at:
+
+http://www.nco.ncep.noaa.gov/pmb/products/nam/nam.t00z.awip1206.tm00.grib2.shtml[+http://www.nco.ncep.noaa.gov/pmb/products/nam/nam.t00z.awip1206.tm00.grib2.shtml+]
+
+
+ETA Site URL
+~~~~~~~~~~~~
+
+The FTP address at which the files are obtained is:
+
+-----
+ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.YYYYMMDD
+-----
+
+where the +YYYYMMDD+ is a variable with obvious meaning.
+
+Filenames
+~~~~~~~~~
+
+The files obtained are of the form:
+
+-----
+nam.tHHz.awip12PP.tm00.grib2
+-----
+
+where +HH+ is +00+, +06+, +12+ or +18+, and +PP+ ranges from
++00+ to +84+ in increments of three.
+
+Python Script to Download Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A Python script to fetch the files is:
+
+[source,python]
+-----
+#!/usr/bin/python2.7
+
+import os, sys, fnmatch
+import urllib
+import time,datetime
+from time import strftime
+
+#  Read the desired FF, i.e. 00,06,12,18, from the command line.
+
+ff = sys.argv[1]
+print " ff = ",ff
+
+#  Find the current YYYYMMDD.
+
+yyyymmdd = strftime("%Y") + strftime("%m") + strftime("%d")
+
+urlpart = "ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam." + yyyymmdd + "/"
+downpath = "/raid/data/eta/grib/"
+
+#  Loop over all GRIB2 files.
+
+for hour in range(0, 87, 3):
+#for hour in range(0, 6, 3):
+
+        if hour < 10:
+                hourstr = "0" + str(hour)
+        else:
+                hourstr = str(hour)
+
+        gribfile = "nam.t" + ff + "z.awip12" + hourstr + ".tm00.grib2"
+        urltot = urlpart + gribfile
+        downname = "nam." + yyyymmdd + ".t" + ff + "z.awip12" + hourstr + ".tm00.grib2"
+        downfile = downpath + downname
+#  Check to see if file has already been obtained.
+        if os.path.exists(downfile):
+                print " The file ",downfile," is already present.  Not downloading."
+        else:
+#  Check to see if file is available for downloading.
+                try:
+                        urllib.urlretrieve(urltot,downfile)
+                        print " File " + gribfile + " available. Retrieving."
+                except:
+                        print " File " + gribfile + " not yet available."
+-----
+
+Interrogating GRIB Files
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A listing of the variables contained with the GRIB file can be obtained via:
+
+-----
+wgrib2 -verf filename.grib2
+-----
+
+which in the case of our files yields:
+
+-----
+1:0:vt=2013072806:MSLET:mean sea level:84 hour fcst:
+2:105449:vt=2013072806:PRMSL:mean sea level:84 hour fcst:
+3:239524:vt=2013072806:VIS:surface:84 hour fcst:
+4:285262:vt=2013072806:ABSV:250 mb:84 hour fcst:
+5:394710:vt=2013072806:ABSV:500 mb:84 hour fcst:
+6:442902:vt=2013072806:ABSV:700 mb:84 hour fcst:
+7:512776:vt=2013072806:ABSV:850 mb:84 hour fcst:
+8:571130:vt=2013072806:ABSV:1000 mb:84 hour fcst:
+9:647892:vt=2013072806:PRES:surface:84 hour fcst:
+10:831181:vt=2013072806:HGT:surface:84 hour fcst:
+11:956660:vt=2013072806:TMP:2 m above ground:84 hour fcst:
+12:1064295:vt=2013072806:SPFH:2 m above ground:84 hour fcst:
+13:1111661:vt=2013072806:DPT:2 m above ground:84 hour fcst:
+14:1202561:vt=2013072806:RH:2 m above ground:84 hour fcst:
+15:1271495:vt=2013072806:POT:10 m above ground:84 hour fcst:
+16:1354093:vt=2013072806:SPFH:10 m above ground:84 hour fcst:
+17.1:1399774:vt=2013072806:UGRD:10 m above ground:84 hour fcst:
+17.2:1399774:vt=2013072806:VGRD:10 m above ground:84 hour fcst:
+18:1567607:vt=2013072806:APCP:surface:81-84 hour acc fcst:
+19:1592637:vt=2013072806:ACPCP:surface:81-84 hour acc fcst:
+20:1611515:vt=2013072806:WEASD:surface:81-84 hour acc fcst:
+21:1611729:vt=2013072806:CSNOW:surface:84 hour fcst:
+22:1611919:vt=2013072806:CICEP:surface:84 hour fcst:
+23:1612109:vt=2013072806:CFRZR:surface:84 hour fcst:
+24:1612451:vt=2013072806:CRAIN:surface:84 hour fcst:
+25:1619012:vt=2013072806:CAPE:surface:84 hour fcst:
+26:1675881:vt=2013072806:CIN:surface:84 hour fcst:
+27:1732565:vt=2013072806:PWAT:entire atmosphere (considered as a single layer):84 hour fcst:
+28:1811001:vt=2013072806:TCDC:entire atmosphere (considered as a single layer):84 hour fcst:
+29:1888677:vt=2013072806:DSWRF:surface:81-84 hour ave fcst:
+30:1930843:vt=2013072806:HLCY:3000-0 m above ground:84 hour fcst:
+31:2012026:vt=2013072806:USTM:6000-0 m above ground:84 hour fcst:
+32:2076855:vt=2013072806:VSTM:6000-0 m above ground:84 hour fcst:
+33:2140970:vt=2013072806:TMP:30-0 mb above ground:84 hour fcst:
+34:2225833:vt=2013072806:RH:30-0 mb above ground:84 hour fcst:
+35.1:2280976:vt=2013072806:UGRD:30-0 mb above ground:84 hour fcst:
+35.2:2280976:vt=2013072806:VGRD:30-0 mb above ground:84 hour fcst:
+36:2471987:vt=2013072806:PLI:30-0 mb above ground:84 hour fcst:
+37:2525884:vt=2013072806:TMP:60-30 mb above ground:84 hour fcst:
+38.1:2611388:vt=2013072806:UGRD:60-30 mb above ground:84 hour fcst:
+38.2:2611388:vt=2013072806:VGRD:60-30 mb above ground:84 hour fcst:
+39:2798133:vt=2013072806:TMP:90-60 mb above ground:84 hour fcst:
+40:2883507:vt=2013072806:RH:90-60 mb above ground:84 hour fcst:
+41.1:2947206:vt=2013072806:UGRD:90-60 mb above ground:84 hour fcst:
+41.2:2947206:vt=2013072806:VGRD:90-60 mb above ground:84 hour fcst:
+42:3133357:vt=2013072806:TMP:120-90 mb above ground:84 hour fcst:
+43.1:3218954:vt=2013072806:UGRD:120-90 mb above ground:84 hour fcst:
+43.2:3218954:vt=2013072806:VGRD:120-90 mb above ground:84 hour fcst:
+44:3406806:vt=2013072806:TMP:150-120 mb above ground:84 hour fcst:
+45:3492671:vt=2013072806:RH:150-120 mb above ground:84 hour fcst:
+46.1:3562359:vt=2013072806:UGRD:150-120 mb above ground:84 hour fcst:
+46.2:3562359:vt=2013072806:VGRD:150-120 mb above ground:84 hour fcst:
+47:3751008:vt=2013072806:4LFTX:180-0 mb above ground:84 hour fcst:
+48:3822082:vt=2013072806:CAPE:180-0 mb above ground:84 hour fcst:
+49:3880547:vt=2013072806:CIN:180-0 mb above ground:84 hour fcst:
+50:3941464:vt=2013072806:LFTX:500-1000 mb:84 hour fcst:
+51:4004826:vt=2013072806:RH:60-30 mb above ground:84 hour fcst:
+52:4065638:vt=2013072806:RH:120-90 mb above ground:84 hour fcst:
+53:4132241:vt=2013072806:SHTFL:surface:84 hour fcst:
+54:4310958:vt=2013072806:LHTFL:surface:84 hour fcst:
+55:4530363:vt=2013072806:DSWRF:surface:84 hour fcst:
+56:4530987:vt=2013072806:DLWRF:surface:84 hour fcst:
+57:4729271:vt=2013072806:USWRF:surface:84 hour fcst:
+58:4729855:vt=2013072806:ULWRF:surface:84 hour fcst:
+59:4901083:vt=2013072806:ULWRF:top of atmosphere:84 hour fcst:
+60:5096595:vt=2013072806:BRTMP:top of atmosphere:84 hour fcst:
+61:5288668:vt=2013072806:LAND:surface:84 hour fcst:
+62:5293394:vt=2013072806:SFCR:surface:84 hour fcst:
+63:5364665:vt=2013072806:FRICV:surface:84 hour fcst:
+64:5421371:vt=2013072806:CAPE:90-0 mb above ground:84 hour fcst:
+65:5464977:vt=2013072806:CIN:90-0 mb above ground:84 hour fcst:
+66:5520765:vt=2013072806:HLCY:1000-0 m above ground:84 hour fcst:
+67:5597567:vt=2013072806:CAPE:255-0 mb above ground:84 hour fcst:
+68:5659222:vt=2013072806:CIN:255-0 mb above ground:84 hour fcst:
+69:5719652:vt=2013072806:PLPL:255-0 mb above ground:84 hour fcst:
+70:5822779:vt=2013072806:VVEL:500 mb:84 hour fcst:
+71:5877517:vt=2013072806:VVEL:700 mb:84 hour fcst:
+72:5942865:vt=2013072806:TMP:750 mb:84 hour fcst:
+73:5996908:vt=2013072806:TMP:800 mb:84 hour fcst:
+74:6054036:vt=2013072806:TMP:850 mb:84 hour fcst:
+75:6112836:vt=2013072806:TMP:900 mb:84 hour fcst:
+76:6174625:vt=2013072806:TMP:surface:84 hour fcst:
+77:6273413:vt=2013072806:WEASD:surface:84 hour fcst:
+78:6274489:vt=2013072806:PRES:1 hybrid level:84 hour fcst:
+79:6315340:vt=2013072806:HGT:1 hybrid level:84 hour fcst:
+80:6465552:vt=2013072806:TMP:1 hybrid level:84 hour fcst:
+81:6547336:vt=2013072806:POT:1 hybrid level:84 hour fcst:
+82:6629350:vt=2013072806:DPT:1 hybrid level:84 hour fcst:
+83:6695210:vt=2013072806:RH:1 hybrid level:84 hour fcst:
+84:6763470:vt=2013072806:SPFH:1 hybrid level:84 hour fcst:
+85.1:6808286:vt=2013072806:UGRD:1 hybrid level:84 hour fcst:
+85.2:6808286:vt=2013072806:VGRD:1 hybrid level:84 hour fcst:
+86:6957892:vt=2013072806:VVEL:1 hybrid level:84 hour fcst:
+87:7019144:vt=2013072806:TKE:1 hybrid level:84 hour fcst:
+88:7125859:vt=2013072806:RIME:1 hybrid level:84 hour fcst:
+89:7126913:vt=2013072806:TSOIL:0-0.1 m below ground:84 hour fcst:
+90:7194631:vt=2013072806:SOILW:0-0.1 m below ground:84 hour fcst:
+91:7295575:vt=2013072806:TSOIL:0.1-0.4 m below ground:84 hour fcst:
+92:7372687:vt=2013072806:SOILW:0.1-0.4 m below ground:84 hour fcst:
+93:7474882:vt=2013072806:TSOIL:0.4-1 m below ground:84 hour fcst:
+94:7551594:vt=2013072806:SOILW:0.4-1 m below ground:84 hour fcst:
+95:7656974:vt=2013072806:TSOIL:1-2 m below ground:84 hour fcst:
+96:7732878:vt=2013072806:SOILW:1-2 m below ground:84 hour fcst:
+97:7837668:vt=2013072806:TSOIL:3 m underground:84 hour fcst:
+98:7886823:vt=2013072806:MSTAV:0-1 m below ground:84 hour fcst:
+99:8005738:vt=2013072806:SOILM:0-2 m below ground:84 hour fcst:
+100:8067537:vt=2013072806:CNWAT:surface:84 hour fcst:
+101:8139916:vt=2013072806:SNOM:surface:81-84 hour acc fcst:
+102:8140844:vt=2013072806:SSRUN:surface:81-84 hour acc fcst:
+103:8146552:vt=2013072806:BGRUN:surface:81-84 hour acc fcst:
+104:8173499:vt=2013072806:SFEXC:surface:84 hour fcst:
+105:8265700:vt=2013072806:VEG:surface:84 hour fcst:
+106:8354106:vt=2013072806:LCDC:low cloud layer:84 hour fcst:
+107:8424885:vt=2013072806:MCDC:middle cloud layer:84 hour fcst:
+108:8479823:vt=2013072806:HCDC:high cloud layer:84 hour fcst:
+109:8532936:vt=2013072806:TMP:180-150 mb above ground:84 hour fcst:
+110.1:8602610:vt=2013072806:UGRD:180-150 mb above ground:84 hour fcst:
+110.2:8602610:vt=2013072806:VGRD:180-150 mb above ground:84 hour fcst:
+111:8752431:vt=2013072806:RH:0.47-1 sigma layer:84 hour fcst:
+112:8806585:vt=2013072806:ALBDO:surface:84 hour fcst:
+113:8847827:vt=2013072806:WTMP:surface:84 hour fcst:
+114:8946639:vt=2013072806:BMIXL:1 hybrid level:84 hour fcst:
+115:8946829:vt=2013072806:ICEC:surface:84 hour fcst:
+116:8947771:vt=2013072806:TMP:cloud top:84 hour fcst:
+117:9089986:vt=2013072806:CPOFP:surface:84 hour fcst:
+118:9123885:vt=2013072806:PRATE:surface:84 hour fcst:
+119:9150718:vt=2013072806:TCOLW:entire atmosphere (considered as a single layer):84 hour fcst:
+120:9231474:vt=2013072806:TCOLI:entire atmosphere (considered as a single layer):84 hour fcst:
+121:9356974:vt=2013072806:TCOLR:entire atmosphere (considered as a single layer):84 hour fcst:
+122:9394549:vt=2013072806:TCOLS:entire atmosphere (considered as a single layer):84 hour fcst:
+123:9449451:vt=2013072806:TCOLC:entire atmosphere (considered as a single layer):84 hour fcst:
+124:9563035:vt=2013072806:PRES:cloud base:84 hour fcst:
+125:9660840:vt=2013072806:PRES:cloud top:84 hour fcst:
+126:9764090:vt=2013072806:PRES:convective cloud bottom level:84 hour fcst:
+127:9862709:vt=2013072806:PRES:convective cloud top level:84 hour fcst:
+128:9961048:vt=2013072806:PRES:shallow convective cloud bottom level:84 hour fcst:
+129:10059082:vt=2013072806:PRES:shallow convective cloud top level:84 hour fcst:
+130:10155088:vt=2013072806:PRES:deep convective cloud bottom level:84 hour fcst:
+131:10191107:vt=2013072806:PRES:deep convective cloud top level:84 hour fcst:
+132:10225087:vt=2013072806:PRES:grid scale cloud bottom level:84 hour fcst:
+133:10316412:vt=2013072806:PRES:grid scale cloud top level:84 hour fcst:
+134:10409854:vt=2013072806:CDCON:entire atmosphere (considered as a single layer):84 hour fcst:
+135:10461555:vt=2013072806:CUEFI:entire atmosphere (considered as a single layer):84 hour fcst:
+136:10548580:vt=2013072806:SNOD:surface:84 hour fcst:
+137:10552237:vt=2013072806:MXSALB:surface:84 hour fcst:
+138:10607193:vt=2013072806:SOILL:0-0.1 m below ground:84 hour fcst:
+139:10708135:vt=2013072806:SOILL:0.1-0.4 m below ground:84 hour fcst:
+140:10810311:vt=2013072806:SOILL:0.4-1 m below ground:84 hour fcst:
+141:10915189:vt=2013072806:SOILL:1-2 m below ground:84 hour fcst:
+142:11020752:vt=2013072806:SNFALB:surface:84 hour fcst:
+143:11058027:vt=2013072806:RLYRS:surface:84 hour fcst:
+144:11075902:vt=2013072806:CCOND:surface:84 hour fcst:
+145:11112180:vt=2013072806:RSMIN:surface:84 hour fcst:
+146:11193307:vt=2013072806:WILT:surface:84 hour fcst:
+147:11269519:vt=2013072806:HPBL:surface:84 hour fcst:
+148:11610982:vt=2013072806:SOTYP:surface:84 hour fcst:
+149:11674695:vt=2013072806:VGTYP:surface:84 hour fcst:
+150:11748064:vt=2013072806:SMREF:surface:84 hour fcst:
+151:11824051:vt=2013072806:SMDRY:surface:84 hour fcst:
+152:11900263:vt=2013072806:SNOWC:surface:84 hour fcst:
+153:11902534:vt=2013072806:POROS:surface:84 hour fcst:
+154:11970715:vt=2013072806:RCS:surface:84 hour fcst:
+155:12077878:vt=2013072806:RCT:surface:84 hour fcst:
+156:12130529:vt=2013072806:RCQ:surface:84 hour fcst:
+157:12187262:vt=2013072806:RCSOL:surface:84 hour fcst:
+158:12264109:vt=2013072806:HGT:level of adiabatic condensation from sfc:84 hour fcst:
+159:12326079:vt=2013072806:GUST:surface:84 hour fcst:
+160:12455117:vt=2013072806:HGT:lowest level of the wet bulb zero:84 hour fcst:
+161:12728050:vt=2013072806:CPRAT:surface:84 hour fcst:
+162:12748529:vt=2013072806:REFD:1 hybrid level:84 hour fcst:
+163:12874147:vt=2013072806:REFC:entire atmosphere (considered as a single layer):84 hour fcst:
+164:13067187:vt=2013072806:REFD:1000 m above ground:84 hour fcst:
+165:13150149:vt=2013072806:REFD:4000 m above ground:84 hour fcst:
+166:13216866:vt=2013072806:RETOP:entire atmosphere (considered as a single layer):84 hour fcst:
+167:13279690:vt=2013072806:HGT:cloud ceiling:84 hour fcst:
+168:13567441:vt=2013072806:TCLSW:entire atmosphere (considered as a single layer):84 hour fcst:
+169:13635795:vt=2013072806:TCOLM:entire atmosphere (considered as a single layer):84 hour fcst:
+170:13661780:vt=2013072806:HGT:lowest bottom level of supercooled liquid water layer:84 hour fcst:
+171:13744520:vt=2013072806:HGT:highest top level of supercooled liquid water layer:84 hour fcst:
+172:13828257:vt=2013072806:TMP:0.7 sigma level:84 hour fcst:
+173:13875837:vt=2013072806:TMP:0.75 sigma level:84 hour fcst:
+174:13926614:vt=2013072806:TMP:0.8 sigma level:84 hour fcst:
+175:13976794:vt=2013072806:TMP:0.85 sigma level:84 hour fcst:
+176:14027278:vt=2013072806:TMP:0.9 sigma level:84 hour fcst:
+177:14079254:vt=2013072806:SWHR:entire atmosphere (considered as a single layer):84 hour fcst:
+178:14080642:vt=2013072806:LWHR:entire atmosphere (considered as a single layer):84 hour fcst:
+179:14421729:vt=2013072806:LRGHR:entire atmosphere (considered as a single layer):81-84 hour ave fcst:
+180:14608900:vt=2013072806:CNVHR:entire atmosphere (considered as a single layer):81-84 hour ave fcst:
+181:14689787:vt=2013072806:MCONV:entire atmosphere (considered as a single layer):84 hour fcst:
+182.1:14994844:vt=2013072806:UGRD:planetary boundary layer:84 hour fcst:
+182.2:14994844:vt=2013072806:VGRD:planetary boundary layer:84 hour fcst:
+183:15204640:vt=2013072806:HGT:planetary boundary layer:84 hour fcst:
+184:15473943:vt=2013072806:RWMR:1 hybrid level:84 hour fcst:
+185:15489742:vt=2013072806:SNMR:1 hybrid level:84 hour fcst:
+186:15490501:vt=2013072806:VRATE:planetary boundary layer:84 hour fcst:
+187:15843436:vt=2013072806:HINDEX:surface:84 hour fcst:
+188:15899638:vt=2013072806:TMAX:2 m above ground:83-84 hour fcst:
+189:16006998:vt=2013072806:TMIN:2 m above ground:83-84 hour fcst:
+190:16114697:vt=2013072806:MAXRH:2 m above ground:83-84 hour missing fcst:
+191:16228246:vt=2013072806:MINRH:2 m above ground:83-84 hour missing fcst:
+192:16341734:vt=2013072806:MAXUW:10 m above ground:83-84 hour max fcst:
+193:16431631:vt=2013072806:MAXVW:10 m above ground:83-84 hour max fcst:
+194:16521673:vt=2013072806:LTNG:surface:84 hour fcst:
+-----
+
+
+Converting GRIB Files to NetCDF Files
+-------------------------------------
+
+Obtaining and Installing +wgrib2+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The +wgrib2+ software can be obtained at:
+
+http://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/[+http://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/+]
+
+Unpack and untar the file (version 1.9.8):
+
+-----
+tar xzvf wgrib2.tgz
+cd grib2
+vi makefile
+export FC=/usr/bin/gfortran
+-----
+
+The +makefile+ modifications are:
+
+-----
+USE_NETCDF3=0
+USE_NETCDF4=1
+USE_REGEX=1
+USE_TIGGE=1
+USE_MYSQL=0
+USE_IPOLATES=1
+USE_UDF=1
+USE_OPENMP=1
+USE_PROJ4=0
+USE_G2CLIB=1
+
+ifeq ($(USE_NETCDF4),1)
+   n4:=/opt/netcdf4/gfortran
+   h5:=/opt/hdf5/gfortran
+   wLDFLAGS+=-L${n4}/lib -lnetcdf -L${h5}/lib -lhdf5_hl -L${h5}/lib -lhdf5
+   wCPPFLAGS+=-I${n4}/include
+   a:=$(shell echo "\#define USE_NETCDF4" >> ${CONFIG_H})
+else
+   a:=$(shell echo "//\#define USE_NETCDF4" >> ${CONFIG_H})
+endif
+-----
+
+Conversion from GRIB to NETCDF Using +wgrib2+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A typical GRIB file downloaded is +nam.t18z.awip1203.tm00.grib2+.
+The latest generation of +wgrib2+ - if compiled with NetCDF4 - can
+convert a GRIB2 file to NetCDF.  The result NetCDF file also
+contains the lon/lat values for the grid, although it is over
+an order of magnitude bigger than the original GRIB file.  An
+example is:
+
+-----
+wgrib2  nam.t18z.awip1203.tm00.grib2 wgrib2  -netcdf nam.t18z.awip1203.tm00.nc
+-----
+
+The NetCDF filenames of interest are:
+
+-----
+PRES_surface
+TMP_2maboveground
+RH_2maboveground
+UGRD_10maboveground
+VGRD_10maboveground
+TCDC__entireatmosphere_consideredasasinglelayer_
+DSWRF_surface
+USWRF_surface
+PRATE_surface
+-----
+
+Interpolating ETA Fields to ROMS Grid
+-------------------------------------
+
+A Python program that reads the NetCDF versions of the GRIB
+files, interpolates the required ROMS surface forcing fields
+to the ROMS grid, and writes them to NetCDF files is:
+
+# PYTHON
+
+[source,python]
+-----
+#!/usr/bin/python2.7
+
+import os, sys, fnmatch
+import numpy as np
+import numpy.ma as ma
+import netCDF4
+import octant
+import time,datetime
+from octant import csa
+from mpl_toolkits.basemap import Basemap
+from octant.tools import rot2d
+from time import strftime
+from netCDF4 import Dataset
+import math
+
+#  Constants needed to rotate velocity components from ETA grid to lon/lat grid.
+
+pi = 4.*math.atan(1.)
+rad2deg  = 360.0/(2.*pi)
+dtr = 1.0/rad2deg
+xlat1 = 25.0
+cenlon = -95.0
+cocon = math.sin(xlat1*dtr)
+
+
+ROMS_name = ['Uwind','Vwind','Tair','Pair','Qair','cloud','rain','swrad','swrad']
+GRIB_name = ['UGRD','VGRD','TMP','PRES','RH','TCDC','PRATE','DSWRF']
+GRIB_lev = ['10_m_above_gnd','10_m_above_gnd','sfc','sfc','2_m_above_gnd','atmos_col','sfc','sfc']
+ROMS_longname = ['surface u-wind component','surface v-wind component',
+        'surface air temperature','surface air pressure',
+        'surface air relative humidity','cloud fraction',
+        'rain fall rate','solar shortwave radiation flux']
+ROMS_units = ['meter second-1','meter second-1','Celsius','millibar',
+        'percentage','nondimensional','kilogram meter-2 second-1','watt meter-2']
+ROMS_time = ['wind_time','wind_time','tair_time','pair_time','qair_time','cloud_time','rain_time','srf_time']
+
+cf_standard_name = ['eastward_wind','northward_wind',
+        'surface_temperature','air_pressure_at_sea_level',
+        'relative_humidity','cloud_area_fraction','precipitation_flux',
+        'downwelling_shortwave_flux_in_air']
+cf_units = ['m s-1','m s-1','K','Pa','1','1','kg m-2 s-1','W m-2']
+
+roms_grid = "txla_grd_v4_new.nc"
+time_units = "seconds since 1970-01-01 00:00:00.0 0:00"
+
+YYYY = "2013"
+MM = "07"
+DD = "24"
+FF = "18"
+
+title = "ETA Surface Forcing Fields Interpolated to ROMS GOM Grid"
+timestamp = strftime("%Y-%m-%d %H:%M:%S")
+history = "File creation date and time: " + timestamp
+source_url = "ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam." + YYYY + MM + DD
+grib_source_files = "nam.t" + FF + "z.awip12**.tm00.grib2"
+#outpres.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+wgrib2 = "/usr/local/bin/wgrib2"
+GRIBDIR = "/home/baum/ETA/GRIB2/"
+WORKDIR = "/home/baum/ETA/"
+
+#  Set Basemap-based projection parameters.
+proj = Basemap(projection='lcc',resolution='i',llcrnrlon=-100.0,llcrnrlat= 18.,
+               urcrnrlon=-80.0,urcrnrlat=32.0,lat_0=25.0,lon_0=-90.0)
+
+#  Read grid file and extract appropriate lon/lat and angle fields.
+
+grd = Dataset('txla_grd_v4_new.nc','r')
+
+lon_rho_in = grd.variables['lon_rho'][:]
+lat_rho_in = grd.variables['lat_rho'][:]
+n_lon_rho = lon_rho_in.shape[1]
+n_lat_rho = lon_rho_in.shape[0]
+angle_rho = grd.variables['angle'][:]
+
+#  CREATE INITIAL NETCDF FILES WITH TIME-INVARIANT BOILERPLATE.
+#  Note: The i8 designation can only be used with NETCDF4 format files.
+
+#  Create filenames.
+
+datestr = YYYY + MM + DD + FF
+out_pres = "roms_pair_" + datestr + ".nc"
+out_tmp = "roms_tair_" + datestr + ".nc"
+out_rh = "roms_qair_" + datestr + ".nc"
+out_ugrd = "roms_uwind_" + datestr + ".nc"
+out_vgrd = "roms_vwind_" + datestr + ".nc"
+out_tcdc = "roms_cloud_" + datestr + ".nc"
+out_prate = "roms_rain_" + datestr + ".nc"
+out_dswrf = "roms_swrad_" + datestr + ".nc"
+
+#  Open output files.
+
+outpres = netCDF4.Dataset(out_pres,'w',format='NETCDF3_CLASSIC')
+outtmp = netCDF4.Dataset(out_tmp,'w',format='NETCDF3_CLASSIC')
+outrh = netCDF4.Dataset(out_rh,'w',format='NETCDF3_CLASSIC')
+outugrd = netCDF4.Dataset(out_ugrd,'w',format='NETCDF3_CLASSIC')
+outvgrd = netCDF4.Dataset(out_vgrd,'w',format='NETCDF3_CLASSIC')
+outtcdc = netCDF4.Dataset(out_tcdc,'w',format='NETCDF3_CLASSIC')
+outprate = netCDF4.Dataset(out_prate,'w',format='NETCDF3_CLASSIC')
+outdswrf = netCDF4.Dataset(out_dswrf,'w',format='NETCDF3_CLASSIC')
+
+#  Write all the tedious boilerplate for each file.
+
+outpres.createDimension('lon_rho',n_lon_rho)
+outpres.createDimension('lat_rho',n_lat_rho)
+outpres.createDimension('pair_time',None)
+lon_rho_pres = outpres.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_pres = outpres.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+pres_out = outpres.createVariable('Pair','f4',('pair_time','lat_rho','lon_rho',))
+time_pair = outpres.createVariable('pair_time','i4',('pair_time',))
+pres_out.units = "millibar"
+pres_out.standard_name = "air_pressure_at_sea_level"
+pres_out.coordinates = "pair_time lat_rho lon_rho"
+pres_out.ROMS_longname = "surface air pressure"
+pres_out.ROMS_units = "millibar"
+pres_out.ROMS_name = "Pair"
+pres_out.GRIB_level = "sfc"
+pres_out.GRIB_name = "PRES"
+#
+lon_rho_pres[:] = lon_rho_in
+lon_rho_pres.standard_name = "longitude"
+lon_rho_pres.units = "degrees_east"
+lon_rho_pres.coordinates = "lat_rho lon_rho"
+lat_rho_pres[:] = lat_rho_in
+lat_rho_pres.standard_name = "latitude"
+lat_rho_pres.units = "degrees_north"
+lat_rho_pres.coordinates = "lat_rho lon_rho"
+time_pair.units = time_units
+time_pair.coordinates = "pair_time"
+time_pair.long_name = "time"
+time_pair.standard_name = 'time'
+#
+outpres.title = title
+outpres.history = history
+outpres.roms_grid_file = roms_grid
+outpres.source_url = source_url
+outpres.grib_source_file = grib_source_files
+outpres.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+outtmp.createDimension('lon_rho',n_lon_rho)
+outtmp.createDimension('lat_rho',n_lat_rho)
+outtmp.createDimension('tair_time',None)
+lon_rho_tmp = outtmp.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_tmp = outtmp.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+tmp_out = outtmp.createVariable('Tair','f4',('tair_time','lat_rho','lon_rho',))
+time_tair = outtmp.createVariable('tair_time','i4',('tair_time',))
+tmp_out.units = "C"
+tmp_out.standard_name = "air_temperature"
+tmp_out.coordinates = "tair_time lat_rho lon_rho"
+tmp_out.ROMS_longname = "surface air temperature"
+tmp_out.ROMS_units = "Celsius"
+tmp_out.ROMS_name = "Tair"
+tmp_out.GRIB_level = "2_m_above_gnd"
+tmp_out.GRIB_name = "TMP"
+#
+lon_rho_tmp[:] = lon_rho_in
+lon_rho_tmp.standard_name = "longitude"
+lon_rho_tmp.units = "degrees_east"
+lon_rho_tmp.coordinates = "lat_rho lon_rho"
+lat_rho_tmp[:] = lat_rho_in
+lat_rho_tmp.standard_name = "latitude"
+lat_rho_tmp.units = "degrees_north"
+lat_rho_tmp.coordinates = "lat_rho lon_rho"
+time_tair.units = time_units
+time_tair.coordinates = "tair_time"
+time_tair.long_name = "time"
+time_tair.standard_name = 'time'
+#
+outtmp.title = title
+outtmp.history = history
+outtmp.roms_grid_file = roms_grid
+outtmp.source_url = source_url
+outtmp.grib_source_file = grib_source_files
+outtmp.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+outrh.createDimension('lon_rho',n_lon_rho)
+outrh.createDimension('lat_rho',n_lat_rho)
+outrh.createDimension('qair_time',None)
+lon_rho_rh = outrh.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_rh = outrh.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+rh_out = outrh.createVariable('Qair','f4',('qair_time','lat_rho','lon_rho',))
+time_qair = outrh.createVariable('qair_time','i4',('qair_time',))
+rh_out.units = "1"
+rh_out.standard_name = "relative_humidity"
+rh_out.coordinates = "qair_time lat_rho lon_rho"
+rh_out.ROMS_longname = "surface air relative humidity"
+rh_out.ROMS_units = "percentage"
+rh_out.ROMS_name = "Qair"
+rh_out.GRIB_level = "2_m_above_gnd"
+rh_out.GRIB_name = "RH"
+#
+lon_rho_rh[:] = lon_rho_in
+lon_rho_rh.standard_name = "longitude"
+lon_rho_rh.units = "degrees_east"
+lon_rho_rh.coordinates = "lat_rho lon_rho"
+lat_rho_rh[:] = lat_rho_in
+lat_rho_rh.standard_name = "latitude"
+lat_rho_rh.units = "degrees_north"
+lat_rho_rh.coordinates = "lat_rho lon_rho"
+time_qair.units = time_units
+time_qair.coordinates = "qair_time"
+time_qair.long_name = "time"
+time_qair.standard_name = 'time'
+#
+outrh.title = title
+outrh.history = history
+outrh.roms_grid_file = roms_grid
+outrh.source_url = source_url
+outrhgrib_source_file = grib_source_files
+outrh.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+outugrd.createDimension('lon_rho',n_lon_rho)
+outugrd.createDimension('lat_rho',n_lat_rho)
+outugrd.createDimension('wind_time',None)
+lon_rho_ugrd = outugrd.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_ugrd = outugrd.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+ugrd_out = outugrd.createVariable('Uwind','f4',('wind_time','lat_rho','lon_rho',))
+time_windu = outugrd.createVariable('wind_time','i4',('wind_time',))
+ugrd_out.units = "m s-1"
+ugrd_out.standard_name = "eastward_wind"
+ugrd_out.coordinates = "wind_time lat_rho lon_rho"
+ugrd_out.ROMS_longname = "surface u-wind component"
+ugrd_out.ROMS_units = "meter second-1"
+ugrd_out.ROMS_name = "Uwind"
+ugrd_out.GRIB_level = "10_m_above_gnd"
+ugrd_out.GRIB_name = "UGRD"
+#
+angle_rho_ugrd = outugrd.createVariable('angle','f4',('lat_rho','lon_rho',))
+angle_rho_ugrd[:] = angle_rho
+angle_rho_ugrd.long_name = "angle between curvilinear grid and geographic grid"
+angle_rho_ugrd.standard_name = "angle_of_rotation_from_east_to_x"
+angle_rho_ugrd.units = "radians"
+angle_rho_ugrd.coordinates = "lat_rho lon_rho"
+#
+lon_rho_ugrd[:] = lon_rho_in
+lon_rho_ugrd.standard_name = "longitude"
+lon_rho_ugrd.units = "degrees_east"
+lon_rho_ugrd.coordinates = "lat_rho lon_rho"
+lat_rho_ugrd[:] = lat_rho_in
+lat_rho_ugrd.standard_name = "latitude"
+lat_rho_ugrd.units = "degrees_north"
+lat_rho_ugrd.coordinates = "lat_rho lon_rho"
+time_windu.units = time_units
+time_windu.coordinates = "wind_time"
+time_windu.long_name = "time"
+time_windu.standard_name = 'time'
+#
+outugrd.title = title
+outugrd.history = history
+outugrd.roms_grid_file = roms_grid
+outugrd.source_url = source_url
+outugrd.grib_source_file = grib_source_files
+outugrd.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+outugrd.eta_rotation = "First step: ETA winds rotated to geographic grid"
+outugrd.roms_rotation = "Second step: Winds on geographic grid rotated to ROMS curvilinear grid using rot2d"
+
+outvgrd.createDimension('lon_rho',n_lon_rho)
+outvgrd.createDimension('lat_rho',n_lat_rho)
+outvgrd.createDimension('wind_time',None)
+lon_rho_vgrd = outvgrd.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_vgrd = outvgrd.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+vgrd_out = outvgrd.createVariable('Vwind','f4',('wind_time','lat_rho','lon_rho',))
+time_windv = outvgrd.createVariable('wind_time','i4',('wind_time',))
+vgrd_out.units = "m s-1"
+vgrd_out.standard_name = "northward_wind"
+vgrd_out.coordinates = "wind_time lat_rho lon_rho"
+vgrd_out.ROMS_longname = "surface v-wind component"
+vgrd_out.ROMS_units = "meter second-1"
+vgrd_out.ROMS_name = "Vwind"
+vgrd_out.GRIB_level = "10_m_above_gnd"
+vgrd_out.GRIB_name = "VGRD"
+#
+angle_rho_vgrd = outvgrd.createVariable('angle','f4',('lat_rho','lon_rho',))
+angle_rho_vgrd[:] = angle_rho
+angle_rho_vgrd.long_name = "angle between curvilinear grid and geographic grid"
+angle_rho_vgrd.standard_name = "angle_of_rotation_from_east_to_x"
+angle_rho_vgrd.units = "radians"
+angle_rho_vgrd.coordinates = "lat_rho lon_rho"
+#
+lon_rho_vgrd[:] = lon_rho_in
+lon_rho_vgrd.standard_name = "longitude"
+lon_rho_vgrd.units = "degrees_east"
+lon_rho_vgrd.coordinates = "lat_rho lon_rho"
+lat_rho_vgrd[:] = lat_rho_in
+lat_rho_vgrd.standard_name = "latitude"
+lat_rho_vgrd.units = "degrees_north"
+lat_rho_vgrd.coordinates = "lat_rho lon_rho"
+time_windv.units = time_units
+time_windv.coordinates = "wind_time"
+time_windv.long_name = "time"
+time_windv.standard_name = 'time'
+#
+outvgrd.title = title
+outvgrd.history = history
+outvgrd.roms_grid_file = roms_grid
+outvgrd.source_url = source_url
+outvgrd.grib_source_file = grib_source_files
+outvgrd.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+outvgrd.eta_rotation = "First step: ETA winds rotated to geographic grid"
+outvgrd.roms_rotation = "Second step: Winds on geographic grid rotated to ROMS curvilinear grid using rot2d"
+
+outtcdc.createDimension('lon_rho',n_lon_rho)
+outtcdc.createDimension('lat_rho',n_lat_rho)
+outtcdc.createDimension('cloud_time',None)
+lon_rho_tcdc = outtcdc.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_tcdc = outtcdc.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+tcdc_out = outtcdc.createVariable('cloud','f4',('cloud_time','lat_rho','lon_rho',))
+time_cloud = outtcdc.createVariable('cloud_time','i4',('cloud_time',))
+tcdc_out.units = "1"
+tcdc_out.standard_name = "cloud_area_fraction"
+tcdc_out.coordinates = "cloud_time lat_rho lon_rho"
+tcdc_out.ROMS_longname = "cloud fraction"
+tcdc_out.ROMS_units = "nondimensional"
+tcdc_out.ROMS_name = "cloud"
+tcdc_out.GRIB_level = "atmos_col"
+tcdc_out.GRIB_name = "TCDC"
+#
+lon_rho_tcdc[:] = lon_rho_in
+lon_rho_tcdc.standard_name = "longitude"
+lon_rho_tcdc.units = "degrees_east"
+lon_rho_tcdc.coordinates = "lat_rho lon_rho"
+lat_rho_tcdc[:] = lat_rho_in
+lat_rho_tcdc.standard_name = "latitude"
+lat_rho_tcdc.units = "degrees_north"
+lat_rho_tcdc.coordinates = "lat_rho lon_rho"
+time_cloud.units = time_units
+time_cloud.coordinates = "cloud_time"
+time_cloud.long_name = "time"
+time_cloud.standard_name = 'time'
+#
+outtcdc.title = title
+outtcdc.history = history
+outtcdc.roms_grid_file = roms_grid
+outtcdc.source_url = source_url
+outtcdc.grib_source_file = grib_source_files
+outtcdc.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+outprate.createDimension('lon_rho',n_lon_rho)
+outprate.createDimension('lat_rho',n_lat_rho)
+outprate.createDimension('rain_time',None)
+lon_rho_prate = outprate.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_prate = outprate.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+prate_out = outprate.createVariable('rain','f4',('rain_time','lat_rho','lon_rho',))
+time_rain = outprate.createVariable('rain_time','i4',('rain_time',))
+prate_out.units = "kg m-2 s-1"
+prate_out.standard_name = "precipitation_flux"
+prate_out.coordinates = "rain_time lat_rho lon_rho"
+prate_out.ROMS_longname = "rain fall rate"
+prate_out.ROMS_units = "kilogram meter-2 second-1"
+prate_out.ROMS_name = "rain"
+prate_out.GRIB_level = "sfc"
+prate_out.GRIB_name = "PRATE"
+#
+lon_rho_prate[:] = lon_rho_in
+lon_rho_prate.standard_name = "longitude"
+lon_rho_prate.units = "degrees_east"
+lon_rho_prate.coordinates = "lat_rho lon_rho"
+lat_rho_prate[:] = lat_rho_in
+lat_rho_prate.standard_name = "latitude"
+lat_rho_prate.units = "degrees_north"
+lat_rho_prate.coordinates = "lat_rho lon_rho"
+time_rain.units = time_units
+time_rain.coordinates = "rain_time"
+time_rain.long_name = "time"
+time_rain.standard_name = 'time'
+#
+outprate.title = title
+outprate.history = history
+outprate.roms_grid_file = roms_grid
+outprate.source_url = source_url
+outprate.grib_source_file = grib_source_files
+outprate.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+outdswrf.createDimension('lon_rho',n_lon_rho)
+outdswrf.createDimension('lat_rho',n_lat_rho)
+outdswrf.createDimension('srf_time',None)
+lon_rho_dswrf = outdswrf.createVariable('lon_rho','f4',('lat_rho','lon_rho',))
+lat_rho_dswrf = outdswrf.createVariable('lat_rho','f4',('lat_rho','lon_rho',))
+dswrf_out = outdswrf.createVariable('swrad','f4',('srf_time','lat_rho','lon_rho',))
+time_srf = outdswrf.createVariable('srf_time','i4',('srf_time',))
+dswrf_out.units = "W m-2"
+dswrf_out.standard_name = "downwelling_shortwave_flux_in_air"
+dswrf_out.coordinates = "srf_time lat_rho lon_rho"
+dswrf_out.ROMS_longname = "solar shortwave radiation flux"
+dswrf_out.ROMS_units = "watt meter-2"
+dswrf_out.ROMS_name = "swrad"
+dswrf_out.GRIB_level = "sfc"
+dswrf_out.GRIB_name = "DSWRF"
+#
+lon_rho_dswrf[:] = lon_rho_in
+lon_rho_dswrf.standard_name = "longitude"
+lon_rho_dswrf.units = "degrees_east"
+lon_rho_dswrf.coordinates = "lat_rho lon_rho"
+lat_rho_dswrf[:] = lat_rho_in
+lat_rho_dswrf.standard_name = "latitude"
+lat_rho_dswrf.units = "degrees_north"
+lat_rho_dswrf.coordinates = "lat_rho lon_rho"
+time_srf.units = time_units
+time_srf.coordinates = "srf_time"
+time_srf.long_name = "time"
+time_srf.standard_name = 'time'
+#
+outdswrf.title = title
+outdswrf.history = history
+outdswrf.roms_grid_file = roms_grid
+outdswrf.source_url = source_url
+outdswrf.grib_source_file = grib_source_files
+outdswrf.geographic_subset = "-100 to -80 lon, 18 to 32 lat"
+
+#  Four times per day - where NN = 00,06,12,18 - we will download
+#  29 files from 00 to 84 by 03 increments.  The filenames have
+#  the form:
+#
+# nam.tNNz.awip1200.tm00.grib2
+# nam.tNNz.awip1203.tm00.grib2
+# nam.tNNz.awip1206.tm00.grib2
+# ...
+# nam.tNNz.awip1284.tm00.grib2
+
+#  LOOP OVER ALL THE NETCDF FILES FOR A GIVEN FORECAST DOWNLOAD.
+
+n = 0
+#  ===========================================================================
+#for hour in range(0, 84, 3):
+for hour in range(0, 6, 3):
+#  ===========================================================================
+
+	print " hour = ",hour
+#  Create a string for the hour of the file.
+
+	if hour < 10:
+		hourstr = "0" + str(hour)
+	else:
+		hourstr = str(hour)
+
+#  Create filenames for the GRIB and NETCDF files.
+
+	gribfile = GRIBDIR + "nam.t" + FF + "z.awip12" + hourstr + ".tm00.grib2"
+        cdffile = "nam.t" + FF + "z.awip12" + hourstr + ".tm00.nc"
+        print "   GRIB file: ",gribfile
+        print " NETCDF file: ",cdffile
+
+#  Convert the GRIB file into an equivalent NETCDF file.
+
+	print " Converting GRIB file to NETCDF file..."
+	grib2netcdf = wgrib2 + " " + gribfile + " -netcdf " + WORKDIR + cdffile
+	os.system(grib2netcdf)
+	print " Conversion string: ",grib2netcdf 
+
+	eta = Dataset(cdffile,'r',format='NETCDF4')
+
+	time = eta.variables['time']
+	times = int(eta.variables['time'][:])
+
+	pres = eta.variables['PRES_surface'][:]
+	tmp = eta.variables['TMP_2maboveground'][:]
+	rh = eta.variables['RH_2maboveground'][:]
+	ugrd = eta.variables['UGRD_10maboveground'][:]
+	vgrd = eta.variables['VGRD_10maboveground'][:]
+	tcdc = eta.variables['TCDC_entireatmosphere_consideredasasinglelayer_'][:]
+	dswrf = eta.variables['DSWRF_surface'][:]
+	prate = eta.variables['PRATE_surface'][:]
+
+#  Extract longitude and latitude /lat as lon and lat.
+	lat = eta.variables['latitude'][:]
+	lon = eta.variables['longitude'][:]
+	lon = lon - 360
+
+#  Create lon and lat masks and extract the mask portions.
+#  -100 to -80, 18 to 32
+
+	lon_gulf_mask = ma.masked_outside(lon,-100.,-80.)
+	lon_mask = ma.getmask(lon_gulf_mask)
+	lat_gulf_mask = ma.masked_outside(lat,18.,32.)
+	lat_mask = ma.getmask(lat_gulf_mask)
+
+#  Combine the lon and lat masks.
+# http://docs.scipy.org/doc/numpy/reference/generated/numpy.ma.mask_or.html#numpy.ma.mask_or
+
+	all_mask = ma.mask_or(lon_mask,lat_mask)
+
+#  Collapse the 3-D u into 2-D.
+#  http://docs.scipy.org/doc/numpy-1.3.x/reference/generated/numpy.squeeze.html#numpy.squeeze
+
+	pres = np.squeeze(pres)
+	tmp = np.squeeze(tmp)
+	rh = np.squeeze(rh)
+	ugrd = np.squeeze(ugrd)
+	vgrd = np.squeeze(vgrd)
+	tcdc = np.squeeze(tcdc)
+	dswrf = np.squeeze(dswrf)
+	prate = np.squeeze(prate)
+
+#  Find all the valid entries, i.e. those not masked.
+
+	lon_gulf = lon[~all_mask]
+	lat_gulf = lat[~all_mask]
+
+	pres_gulf = pres[~all_mask]
+	tmp_gulf = tmp[~all_mask]
+	rh_gulf = rh[~all_mask]
+	ugrd_gulf = ugrd[~all_mask]
+	vgrd_gulf = vgrd[~all_mask]
+	tcdc_gulf = tcdc[~all_mask]
+	dswrf_gulf = dswrf[~all_mask]
+	prate_gulf = prate[~all_mask]
+
+#  Rotate the ugrd_gulf and vgrd_gulf components to a geographic grid.
+
+        angle_eta = cocon * (lon_gulf - cenlon) * dtr
+        ugrd_geo = np.cos(angle_eta) * ugrd_gulf + np.sin(angle_eta) * vgrd_gulf
+	vgrd_geo = np.cos(angle_eta) * vgrd_gulf - np.sin(angle_eta) * ugrd_gulf
+
+#  Calculate x and y from lon_gulf and lat_gulf using proj.
+
+	x,y = proj(lon_gulf,lat_gulf)
+
+#  Create the interpolation grid for pres_gulf using csa.
+
+	interp_pres = csa.CSA(x,y,pres_gulf)
+	interp_tmp = csa.CSA(x,y,tmp_gulf)
+	interp_rh = csa.CSA(x,y,rh_gulf)
+	interp_ugrd = csa.CSA(x,y,ugrd_geo)
+	interp_vgrd = csa.CSA(x,y,vgrd_geo)
+	interp_tcdc = csa.CSA(x,y,tcdc_gulf)
+	interp_dswrf = csa.CSA(x,y,dswrf_gulf)
+	interp_prate = csa.CSA(x,y,prate_gulf)
+
+#  Calculate x and y from lon_rho and lat_rho.
+
+	x_rho,y_rho = proj(lon_rho_in,lat_rho_in)
+
+#  Interpolate variable field to ROMS grid and perform any required unit
+#  conversions.
+
+	print " Starting interpolations...."
+	pres_roms = interp_pres(x_rho,y_rho)
+	pres_roms = pres_roms/100.
+	tmp_roms = interp_tmp(x_rho,y_rho)
+	tmp_roms = tmp_roms - 273.15
+	rh_roms = interp_rh(x_rho,y_rho)
+	ugrd_roms_geo = interp_ugrd(x_rho,y_rho)
+	vgrd_roms_geo = interp_vgrd(x_rho,y_rho)
+	tcdc_roms = interp_tcdc(x_rho,y_rho)
+	tcdc_roms = tcdc_roms/100.
+	dswrf_roms = interp_dswrf(x_rho,y_rho)
+	prate_roms = interp_prate(x_rho,y_rho)
+	print " Finished interpolations."
+
+#  Rotate the ugrd_roms_geo and vgrd_roms_geo components from a geographic grid
+#  to the curvilinear, rotated ROMS grid.
+
+	ugrd_roms_rot,vgrd_roms_rot = rot2d(ugrd_roms_geo,vgrd_roms_geo,angle_rho)
+
+#  Write the time for this time slice to each file.
+
+	time_pair[n] = times
+	time_tair[n] = times
+	time_qair[n] = times
+	time_windu[n] = times
+	time_windv[n] = times
+	time_cloud[n] = times
+	time_rain[n] = times
+	time_srf[n] = times
+
+#  Write the field for this time slice to each file.
+
+	pres_out[n,:] = pres_roms
+	tmp_out[n,:] = tmp_roms
+	rh_out[n,:] = rh_roms
+	ugrd_out[n,:] = ugrd_roms_rot
+	vgrd_out[n,:] = vgrd_roms_rot
+	tcdc_out[n,:] = tcdc_roms
+	prate_out[n,:] = prate_roms
+	dswrf_out[n,:] = dswrf_roms
+
+	eta.close()
+
+	n = n + 1
+
+#  Close all the files.
+
+outpres.close()
+outtmp.close()
+outrh.close()
+outugrd.close()
+outvgrd.close()
+outtcdc.close()
+outprate.close()
+outdswrf.close()
+-----
+
+The header of the resulting file +nam.t18z.awip1203.tm00.nc+ is:
+
+-----
+netcdf test {
+dimensions:
+	y = 428 ;
+	x = 614 ;
+	time = UNLIMITED ; // (1 currently)
+variables:
+	double y(y) ;
+		y:long_name = "y coordinate of projection" ;
+		y:standard_name = "projection_y_coordinate" ;
+		y:units = "m" ;
+		y:grid_spacing = 12191. ;
+	double x(x) ;
+		x:long_name = "x coordinate of projection" ;
+		x:standard_name = "projection_x_coordinate" ;
+		x:units = "m" ;
+		x:grid_spacing = 12191. ;
+	double latitude(y, x) ;
+		latitude:units = "degrees_north" ;
+		latitude:long_name = "latitude" ;
+	double longitude(y, x) ;
+		longitude:units = "degrees_east" ;
+		longitude:long_name = "longitude" ;
+	double time(time) ;
+		time:units = "seconds since 1970-01-01 00:00:00.0 0:00" ;
+		time:long_name = "verification time generated by wgrib2 function verftime()" ;
+		time:reference_time = 1374429600. ;
+		time:reference_time_type = 3 ;
+		time:reference_date = "2013.07.21 18:00:00 UTC" ;
+		time:reference_time_description = "forecast or accumulated, reference date is fixed" ;
+		time:time_step_setting = "auto" ;
+		time:time_step = 0. ;
+...
+	float UGRD_10maboveground(time, y, x) ;
+		UGRD_10maboveground:_FillValue = 9.999e+20f ;
+		UGRD_10maboveground:short_name = "UGRD_10maboveground" ;
+		UGRD_10maboveground:long_name = "U-Component of Wind" ;
+		UGRD_10maboveground:level = "10 m above ground" ;
+		UGRD_10maboveground:units = "m/s" ;
+		UGRD_10maboveground:coordinates = "longitude latitude" ;
+	float VGRD_10maboveground(time, y, x) ;
+		VGRD_10maboveground:_FillValue = 9.999e+20f ;
+		VGRD_10maboveground:short_name = "VGRD_10maboveground" ;
+		VGRD_10maboveground:long_name = "V-Component of Wind" ;
+		VGRD_10maboveground:level = "10 m above ground" ;
+		VGRD_10maboveground:units = "m/s" ;
+		VGRD_10maboveground:coordinates = "longitude latitude" ;
+...
+-----
+
+Previous Work
+-------------
+
+Perl Script to Obtain GRIB Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One of the Perl scripts presently used to obtain the ETA model output is:
+
+-----
+/d1/abyss/ETA32CODE/getawips_00.pl
+-----
+
+and a listing of its contents follows:
+
+[source,perl]
+-----
+#!/usr/bin/perl
+#
+# meso_sfc.pl: Retrieve Eta model output from NCEP 
+#
+# Greg Thompson <gthompsn\@ncar.ucar.edu>
+# Version 1.0       15:31:40 UTC Mon 20 Oct 1997
+#
+
+require "/abyss/ETA32CODE/ftplib.pl";
+
+($prog = $0) =~ s%.*/%%;                 # Determine program basename.
+$| = 1;                                  # Unbuffer standard output.
+umask 002;                               # Set file permissions.
+
+$debug = 1;                              # Ordinary debugging flag.
+$verbose = 1;                            # Verbose debugging flag.
+$debug_ftp = 1;                          # FTP debugging flag.
+&ftp'debug(1) || &fail if $debug_ftp;    # Enable FTP debugging output.
+&ftp'timeout(240) || &fail;              # Timeout value for FTP commands.
+$debug = 1 if $verbose;
+
+#---- Miscellaneous variables.
+#$host   = "ftp.ncep.noaa.gov";                 # The NCEP FTP server's domain
+name.
+$host   = "ftpprd.ncep.noaa.gov";
+$user   = "anonymous";                      # The remote username.
+$pass   = "mkhoward\@tamu.edu";             # The remote password.
+$remote = '"pub/data/nccf/com/nam/prod/nam.${yyyymmdd}"';  # The Eta data
+directory.
+$data   = "/abyss/ETA32CODE";               # Local data directory.
+$tmp    = "$data/.$prog.tmp";               # Local temporary directory.
+$model_delay = 195 * 60;                    # approx delay for data avail (195
+mins).
+$model_wait  = 3 * 60;                      # interval between checks for data
+avail.
+$update_freq = 12 * 3600;                   # update frequency of model (12
+hours).
+$abort_time  = 11 * 3600;                   # give up after 11 hours.
+@months = ("01","02","03","04","05","06","07","08","09","10","11","12");
+
+$day_dirs    = '"B${yy}$months[${mm}-1]${dd}"';
+$local_files = '"${yy}${jjj}${model_time}.F${ff}.grb"';
+
+@remot_files = (
+                '"nam.t${model_time}z.awip1200.tm00.grib2"',
+                '"nam.t${model_time}z.awip1203.tm00.grib2"',
+                '"nam.t${model_time}z.awip1206.tm00.grib2"',
+                '"nam.t${model_time}z.awip1209.tm00.grib2"',
+                '"nam.t${model_time}z.awip1212.tm00.grib2"',
+                '"nam.t${model_time}z.awip1215.tm00.grib2"',
+                '"nam.t${model_time}z.awip1218.tm00.grib2"',
+                '"nam.t${model_time}z.awip1221.tm00.grib2"',
+                '"nam.t${model_time}z.awip1224.tm00.grib2"',
+                '"nam.t${model_time}z.awip1227.tm00.grib2"',
+                '"nam.t${model_time}z.awip1230.tm00.grib2"',
+                '"nam.t${model_time}z.awip1233.tm00.grib2"',
+                '"nam.t${model_time}z.awip1236.tm00.grib2"',
+                '"nam.t${model_time}z.awip1239.tm00.grib2"',
+                '"nam.t${model_time}z.awip1242.tm00.grib2"',
+                '"nam.t${model_time}z.awip1245.tm00.grib2"',
+                '"nam.t${model_time}z.awip1248.tm00.grib2"',
+                '"nam.t${model_time}z.awip1251.tm00.grib2"',
+                '"nam.t${model_time}z.awip1254.tm00.grib2"',
+                '"nam.t${model_time}z.awip1257.tm00.grib2"',
+                '"nam.t${model_time}z.awip1260.tm00.grib2"',
+                '"nam.t${model_time}z.awip1263.tm00.grib2"',
+                '"nam.t${model_time}z.awip1266.tm00.grib2"',
+                '"nam.t${model_time}z.awip1269.tm00.grib2"',
+                '"nam.t${model_time}z.awip1272.tm00.grib2"',
+                '"nam.t${model_time}z.awip1275.tm00.grib2"',
+                '"nam.t${model_time}z.awip1278.tm00.grib2"',
+                '"nam.t${model_time}z.awip1281.tm00.grib2"',
+                '"nam.t${model_time}z.awip1284.tm00.grib2"',
+               );
+
+#---------------------------------------------------------------------------
+#---- End Declaration Section.  Use caution when modifying below here
+#---------------------------------------------------------------------------
+
+$begin_time = $^T;
+
+# Get the current GMT
+
+($hour,$day,$month,$year,$yday) = (gmtime(time))[2..5,7];
+ $yy  = sprintf("%02d", $year-100);
+ $mm  = sprintf("%02d", $month+1);
+ $dd  = sprintf("%02d", $day);
+ $jjj = sprintf("%03d", $yday+1);
+
+print "Current year,month,day,hour,jday (in GMT) $yy $mm $dd $hour $jjj\n";
+
+$model_time = "00";
+$remot_string = '"nam.t${model_time}z.awip12??.tm00*"';
+
+$yyyymmdd = sprintf("%04d%02d%02d", $year+1900,$month+1,$day);
+
+print "\nHoping to retrieve ${model_time}Z data $day $months[$month] $yy
+($jjj)\n\n";
+
+#---- Create a clean temporary directory.
+system("/bin/rm -rf $tmp") if -e $tmp;
+mkdir("$tmp", 0775) || die "mkdir: $tmp: $!";
+
+$not_done = 1;
+#---- Main loop
+CYCLE: while ( (time < ($begin_time+$abort_time)) && $not_done ) {
+    print "\n";
+
+    $rdir = "/";
+    grep($_ = eval, $rstring = $remote);
+
+    @dir_listing = &dir_list($rdir, $rstring);
+
+    if (!@dir_listing) {
+        print "\tProblem encountered trying to ftp dir ...\n" if $debug;
+        print "\tWill try again in ", int($model_wait/60), " minutes\n" if
+$debug;
+        sleep $model_wait;
+        redo CYCLE;
+                       }
+
+    $dir_listing = join(' ',@dir_listing);
+    print "Remote DIR: $dir_listing\n" if $verbose;
+
+    if ( !($dir_listing =~ /$rstring/) ) {
+        print "\tRemote dir, $rstring, does not yet exist ...\n" if $debug;
+        print "\tWill try again in ", int($model_wait/60), " minutes\n" if
+$debug;
+        sleep $model_wait;
+        redo CYCLE;
+    }
+
+    $rdir = $rstring;
+    grep($_ = eval, @wanted = @remot_files);
+    grep($_ = eval, $rstring = $remot_string);
+    FILE: foreach $file (@wanted) {
+
+        ($ff) = $file =~ /(\d\d)...........$/;
+        print "Forecast hour: $ff\n" if $verbose;
+        @dir_listing = &dir_list($rdir, $rstring);
+        if (!@dir_listing) {
+            print "\tProblem encountered trying to ftp dir ...\n" if $debug;
+            print "\tWill try again in ", int($model_wait/60), " minutes\n" if
+$debug;
+            sleep $model_wait;
+            redo CYCLE;
+        }
+        $dir_listing = join(' ',@dir_listing);
+        print "Remote file list: $dir_listing\n" if $verbose;
+
+        if ( !($dir_listing =~ /$file/) ) {
+            print "\tRemote file, $file, does not yet exist ...\n" if $debug;
+            print "\tWill try again in ", int($model_wait/60), " minutes\n" if
+$debug;
+            sleep $model_wait;
+            redo FILE;
+        }
+
+        grep($_ = eval, $day_dir = $day_dirs);
+        grep($_ = eval, $local_file = $local_files);
+
+        if (-s "$data/$day_dir/$local_file") {
+            print "\tFile $data/$day_dir/$local_file already exists ...\n" if
+$debug;
+            print "Will skip ahead to next file\n" if $debug;
+            sleep 5;
+            next FILE;
+        }
+
+        # Connect to the remote FTP server; specify binary transfer mode.
+        print "\t\tConnecting to FTP server\n" if $debug;
+        $o_attempt = 0;
+        unless (&ftp'open($host, $user, $pass) ) {
+           &fail if ++$o_attempt > 10;
+           local($error) = &ftp'error;
+           warn "Error: $error";
+           &fail unless $error =~ /Timeout/;
+           sleep 30;
+           redo;
+        }
+        &ftp'binary || &fail;
+        &ftp'cwd($rdir) || &fail;
+
+        # Retrieve the desired file
+        print "\tRetrieving $file ... ";
+
+        $g_attempt = 0;
+        unless (&ftp'get($file, "$tmp/$file")) {
+            &fail if ++$g_attempt > 10;
+            local($error) = &ftp'error;
+            warn "Error: $error";
+            &fail unless $error =~ /Timeout/;
+            sleep 30;
+            redo;
+        }
+
+        # End the current FTP session.
+        &ftp'close;
+
+        if (! -e "$data/$day_dir") {
+            mkdir("$data/$day_dir", 0775) || die "mkdir: $data/$day_dir: $!";
+        }
+
+        rename("$tmp/$file", "$data/$day_dir/$local_file")
+            || die "rename: $tmp/$file: $!";
+        print "done.\n";
+
+    }   # end of foreach FILE loop
+
+#    $next_time =
+#    &timegm(0,0,$model_time,$dd,$mm-1,$yy)+$model_delay+$update_freq;
+#    ($nsec,$nmin,$nhour,$nday,$nmonth,$nyear) = (gmtime(time))[0..5];
+#    $now = timegm($nsec,$nmin,$nhour,$nday,$nmonth,$nyear);
+#    $sleepy_time = ($next_time-$now) < 0 ? $model_wait : ($next_time-$now);
+#    print "Will now wait ", int($sleepy_time/60), " minutes for next cycle\n"
+#    if $debug;
+#    sleep $sleepy_time;
+#    undef @dir_listing;
+
+$not_done = 0;
+
+}
+
+print "\n\nFinished script, $prog\n";
+exit 0;
+
+# --------------------------------------------------------------------
+#---- Subroutines below here
+# --------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# &dir_list: Get listing of directory that matches passed string from remote
+# host.
+# Package: main
+# Returns: An array containing a listing of the directory that matches the
+# input string.
+#          Each entry in the array is a single line of ftp's dir command.
+sub dir_list {
+    local($r_dir, $r_string) = @_;
+    local($attempt, @listings);
+
+    print "Listing contents of directory that matches $r_string\n" if $debug;
+
+    $attempt = 0;
+    unless (&ftp'open($host, $user, $pass)) {
+       &fail if ++$attempt > 10;
+       local($error) = &ftp'error;
+       warn "Error: $error";
+       &fail unless $error =~ /Timeout/;
+       sleep 15;
+       redo;
+                                            }
+
+    &ftp'cwd($r_dir) || &fail;
+
+    # Do a directory listing and capture the output
+
+    @listings = &ftp'list($r_string);
+    &ftp'close;
+
+    return (@listings);
+}
+# --------------------------------------------------------------------
+# &fail: Exit with error message on an FTP command failure.
+# Arguments: n/a
+# Returns: n/a
+sub fail {
+    local($error) = &ftp'error;
+    &ftp'close;
+    die "$error\n";
+}
+# --------------------------------------------------------------------
+-----
+
+Perl Script to Extract U and V from GRIB Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The script +doawip00.csh+ is:
+
+[source,perl]
+-----
+#!/bin/csh -f
+
+cd /abyss/ETA32CODE
+
+# Convert from AWIPS GRIB to ascii and extract GOM subregion
+
+rm get_awip.log >& /dev/null
+
+set a=`date -u +%y%m%d`
+#set a = "100405";
+
+
+cd /abyss/ETA32CODE
+
+foreach f (B$a/*00.F*.grb)
+ echo $f > awip12infile.txt
+ set upick = `/usr/local/bin/wgrib2 -verf $f | grep "UGRD:10" | awk '{print
+substr($1,0,4)}'` >& /dev/null
+ set vpick = `/usr/local/bin/wgrib2 -verf $f | grep "VGRD:10" | awk '{print
+substr($1,0,4)}'` >& /dev/null
+ /usr/local/bin/wgrib2 $f -text $f'_u' -d $upick >& /dev/null
+ /usr/local/bin/wgrib2 $f -text $f'_v' -d $vpick >& /dev/null
+ /abyss/ETA32CODE/getawip
+rm B$a/*_* >& /dev/null
+end
+
+# Put Gulf of Mexico NAM Winds in pickup place for Baum 
+
+cp /abyss/ETA32CODE/B$a/*00.F*.txt /bosco/awipweather/
+chmod 777 /bosco/awipweather/*.txt
+
+#
+# Copy the files to SALTWATER.TAMU.EDU where plots are made
+#
+
+cd /abyss/ETA32CODE/B$a/
+/d2/abyss/ETA32CODE/gaftp.csh
+/d2/abyss/ETA32CODE/gaftp2.csh
+-----
+
+Fortran Program to Extract GOM Subset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Perl script +doawip00.csh+ includes a call to the binary
++getawip+, which is a compiled version of the following
+Fortran source code.  This source code reads a file
+called +grid218.txt+, which contains a two-column listing
+of the lon/lat pairs within the Gulf of Mexico region
+that will be used to extract a GOM subset of U and V
+values from the GRIB file.  The program loops through all
+the pair values in the file and checks 
+
+[source,fortran]
+-----
+      program getawip
+
+c program to read ascii versions of grib awip12 data outputs:
+lat,lon,dir,spd,u,v
+
+      character*132 ufile,vfile
+      character*132 infile,outfile,gfile
+      character*5   ST
+      character*80  com(2)
+      real*4        alat,alon
+      real*8        u,v,unew,vnew,pi,rad2deg,dtr
+      integer*8     npts
+
+      ST       = 'G#218'
+      npts     = 262792
+      pi       = 4.0D0*atan(1.)
+      rad2deg  = 360.D0/(2.*pi)
+      dtr      = 1.0D0/rad2deg
+      cenlon   = -95.0  
+      xlat1    =  25.0
+
+      open(unit=88,file='awip12infile.txt',status='old')
+
+      do while(.true.)
+
+         read(88,'(a132)',end=9123)infile
+         do i = 132,1,-1
+            if(infile(i:i) .ne. ' ')goto 123
+         enddo
+         write(*,*)'Input filename string too long'
+         stop
+123      continue
+  
+
+         ufile    = infile(1:i)//'_u'
+         vfile    = infile(1:i)//'_v'
+         gfile    = 'grid218.txt'
+         outfile  = infile(1:i)//'uv.txt'
+
+c         write(*,*) infile
+c         write(*,*)'Input file  = ',infile(1:i)
+c         write(*,*)'output file = ',outfile
+c         write(*,*)'ufile  file = ',ufile
+c         write(*,*)'vfile  file = ',vfile
+c         write(*,*)'gfile  file = ',gfile
+
+         luinu   = 20
+         luinv   = 21
+         lugrid  = 22
+         luout   = 23
+
+         open(luinu,file=ufile,status='old')
+         open(luinv,file=vfile,status='old')
+         open(lugrid,file=gfile,status='old')
+         open(luout,file=outfile,status='unknown')
+
+c Blow off first line from the u and v files
+c Put some one time stuff in the output file
+
+         read(luinu,'(a80)') com(1)
+         read(luinv,'(a80)') com(1)
+         write(luout,'(a5)')ST
+         write(luout,99)
+99       format('  Long      Lat     Dir   Spd       U@10   V(m/s)')
+
+c Read u, v, and the associated lat-lons
+
+         do 10 j=1,npts
+            read(luinu,*) u
+            read(luinv,*) v
+            read(lugrid,*) alon,alat
+
+            if((alon.ge.-100.).and.(alon.le.-80.).and.  ! Gulf of Mexico
+     &         (alat.ge.  18.).and.(alat.le. 32.))then  ! Gulf of Mexico
+                  cocon = sin(xlat1*dtr)
+                  angle = cocon * (alon-cenlon) * dtr
+                  a     = cos(angle)
+                  b     = sin(angle)
+                  unew  = a*u + b*v
+                  vnew  = -b*u + a*v
+                  dir   = rad2deg*atan2(vnew,unew)
+                  spd   = sqrt(unew*unew+vnew*vnew)    
+                  dir   = 90. - dir
+                  if(dir .lt. 0.) dir = dir+360.
+                  write(luout,100) alon,alat,dir,spd,unew,vnew
+100               format(2(f8.3,1x),4(f7.2,1x))
+            endif
+10       continue
+         close(luinu)
+         close(luinv)
+         close(lugrid)
+         close(luout)
+      end do
+9123  continue
+      close(unit=88)
+      stop
+      end
+-----
+
+

@@ -1,0 +1,565 @@
+= A Brief Introduction to Environment Modules
+:doctype: book
+:toc:
+:icons:
+
+== Introduction
+
+When you log on to a computer you will find a default set of software packages installed.
+For example, the last released version of CentOS 7 contained version 4.8.5 of the GCC compiler
+suite as a default package.  As of this writing the latest version of the GCC suite has reached
+version 10.  A lot of software packages require versions of GCC well above 4.8.5 to compile at all,
+so you either have to install a newer version of it yourself - a daunting task involving compiling or
+installing whatever binaries are available for a newer version, and then attempting to keep the
+newer version separate from the default version that can't be removed because that would break a whole
+lot of things you don't want broken, etc. - or use a convenient system like Modules that's been 
+set up to enable you to easily switch among multiple versions of most of the packages you'll be
+needing to use to do your work.
+
+The official Modules site at:
+
+http://modules.sourceforge.net/[`http://modules.sourceforge.net/`]
+
+summarizes the package thusly:
+
+=====
+Typically users initialize their environment when they log in by setting environment information for every application they will reference during the session. The Environment Modules package is a tool that simplify shell initialization and lets users easily modify their environment during the session with modulefiles.
+
+Modules can be loaded and unloaded dynamically and atomically, in an clean fashion. All popular shells are supported, including bash, ksh, zsh, sh, csh, tcsh, fish, as well as some scripting languages such as perl, ruby, tcl, python, cmake and R.
+=====
+
+Much more and deeper information can be found at:
+
+https://modules.readthedocs.io/en/latest/[`https://modules.readthedocs.io/en/latest/`]
+
+although it is mostly useful to those setting up your local Modules system, and would
+serve only to confuse those who just want to use it.
+
+This document provides simple introduction to the use of Modules via the
+`module` command that will provide you with most of what you
+need for your day-to-day tasks.
+
+
+
+
+These examples were performed on the grace.tamu.edu cluster.
+
+== On Modules
+
+=== Introductory Example
+
+Instead of diving straight into the details we'll start with an easy example that
+demonstrates some of the essential features of the `module` command.
+
+==== Finding a Software Package and Loading It
+
+Suppose you want to use a recent version of Python 3.  Find out what the default version
+is via:
+
+.....
+$ python --version
+Python 2.7.5
+.....
+
+So how do you obtain Python 3?
+You use the `module` command to find out what versions of Python are available.
+Note that you need to use the capitalized version of `Python`.  A lower case `python`
+will not produce what you want.
+
+-----
+$ module spider Python
+
+----------------------------------------------------------------------------------------------------------
+  Python:
+----------------------------------------------------------------------------------------------------------
+    Description:
+      Python is a programming language that lets you work more quickly and integrate your systems more
+      effectively.
+
+     Versions:
+        Python/2.7.15-bare
+        Python/2.7.15
+        Python/2.7.16
+        Python/2.7.18
+        Python/3.6.6
+        Python/3.7.0
+        Python/3.7.2
+        Python/3.7.4
+        Python/3.8.2
+        Python/3.8.6
+     Other possible modules matches:
+        Biopython  Boost.Python  Clang-Python-bindings  GitPython  IPython  IntelPython  MDSplus-Python  ...
+...
+-----
+
+There's nothing like being on the bleeding edge, so let's load the most recent Python version.
+
+-----
+$ module load Python/3.8.6
+Lmod has detected the following error:  These module(s) or extension(s) exist but cannot be loaded
+as requested: "Python/3.8.6"
+   Try: "module spider Python/3.8.6" to see how to load the module(s).
+-----
+
+==== Discovering the Need for a Prerequisite and Loading It
+
+That didn't work, so let's try the suggested command.
+
+-----
+$ module spider Python/3.8.6
+
+----------------------------------------------------------------------------------------------------------
+  Python: Python/3.8.6
+----------------------------------------------------------------------------------------------------------
+    Description:
+      Python is a programming language that lets you work more quickly and integrate your systems more
+      effectively.
+
+
+    You will need to load all module(s) on any one of the lines below before the "Python/3.8.6" module is available to load.
+
+      GCCcore/10.2.0
+...
+-----
+
+This tells us that there is a prerequisite for installing Python, which in this case is version 10.2.0
+of the GCC compiler suite.  This is the version of GCC that was used to compile Python 3.8.6.
+The default version installed on the computer is:
+
+-----
+$ gcc --version
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
+-----
+
+So let's go ahead and load this prerequisite.
+
+-----
+$ module load GCCcore/10.2.0
+-----
+
+==== Checking for the Loaded Package
+
+Running the command produced no messages so it was successful, which we can check via:
+
+-----
+$ gcc --version
+gcc (GCC) 10.2.0
+-----
+
+We can also check by obtaining a list of loaded software packages can be found via:
+
+-----
+$ module list
+
+Currently Loaded Modules:
+  1) GCCcore/10.2.0
+-----
+
+==== Successfully Loading the Original Software Package
+
+Now we can try again to load our desired Python version.
+
+-----
+module load Python/3.8.6
+-----
+
+We can double check this via our previous procedure:
+
+-----
+$ python --version
+Python 3.8.6
+$ module list
+
+Currently Loaded Modules:
+  1) GCCcore/10.2.0   4) bzip2/1.0.8       7) Tcl/8.6.10     10) GMP/6.2.0
+  2) zlib/1.2.11      5) ncurses/6.2       8) SQLite/3.33.0  11) libffi/3.3
+  3) binutils/2.35    6) libreadline/8.0   9) XZ/5.2.5       12) Python/3.8.6
+-----
+
+We see that the version is the correct one and also that Python 3.8.6 has
+joined the list of currently loaded modules.  There are others that have magically
+appeared, but that's not important for now.
+
+==== Removing the Loaded Packages
+
+Now we will remove the packages we just loaded and check to see if we have succeeded.
+
+-----
+$ module purge
+$ module list
+No modules loaded.
+-----
+
+==== Swapping Software Versions
+
+Suppose we discover that we really wanted Python 3.8.2 rather than Python 3.8.6.
+We can swap the versions with the `swap` argument to `module`.  Note that the convention is that
+the first named package is the one being replaced and the second is the one replacing it.
+
+-----
+$ module swap Python/3.8.6 Python/3.8.2
+Lmod has detected the following error:  These module(s) or extension(s) exist but cannot be loaded
+as requested: "Python/3.8.2"
+   Try: "module spider Python/3.8.2" to see how to load the module(s).
+-----
+
+We discover something familiar, and follow through as we did above by finding the required
+prerequisite(s), installing them, and then finishing the swap.
+
+-----
+$ module spider Python/3.8.2
+...
+    You will need to load all module(s) on any one of the lines below before the "Python/3.8.2" module is available to load.
+
+      GCCcore/9.3.0
+...
+
+$ module load GCCcore/9.3.0
+
+Inactive Modules:
+  1) Python/3.8.6     2) SQLite/3.33.0
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) GMP/6.2.0      3) XZ/5.2.5          5) bzip2/1.0.8     7) libreadline/8.0     9) zlib/1.2.11
+  2) Tcl/8.6.10     4) binutils/2.35     6) libffi/3.3      8) ncurses/6.2
+
+The following have been reloaded with a version change:
+  1) GCCcore/10.2.0 => GCCcore/9.3.0
+
+$ module swap Python/3.8.6 Python/3.8.2
+
+Activating Modules:
+  1) Python/3.8.2     2) SQLite/3.31.1
+
+The following have been reloaded with a version change:
+  1) binutils/2.35 => binutils/2.34
+
+$ module list
+
+Currently Loaded Modules:
+  1) GCCcore/9.3.0   4) bzip2/1.0.8       7) XZ/5.2.5    10) binutils/2.34
+  2) zlib/1.2.11     5) libreadline/8.0   8) GMP/6.2.0   11) SQLite/3.31.1
+  3) ncurses/6.2     6) Tcl/8.6.10        9) libffi/3.3  12) Python/3.8.2
+
+$ python --version
+Python 3.8.2
+-----
+
+Note that the command `module load Python/3.8.2` would have had the same effect as the
+command `module swap Python/3.8.6 Python/3.8.2` in this example since the loading of
+GCC 9.3.0 rendered Python Python 3.8.6 inactive.
+If the software package whose versoin were being swapped had no dependencies like GCC then the 
+swap would have taken place with no errors.
+
+=== The `module` Command
+
+A paged listing of all the command arguments for `module` is obtained via:
+
+-----
+$ module --help
+Usage: module [options] sub-command [args ...]
+
+Options:
+  -h -? -H --help                   This help message
+  -s availStyle --style=availStyle  Site controlled avail style: system en_grouped fr_grouped (default:
+                                    en_grouped)
+  --regression_testing              Lmod regression testing
+  -D                                Program tracing written to stderr
+  --debug=dbglvl                    Program tracing written to stderr (where dbglvl is a number 1,2,3)
+  --pin_versions=pinVersions        When doing a restore use specified version, do not follow defaults
+  -d --default                      List default modules only when used with avail
+  -q --quiet                        Do not print out warnings
+  --expert                          Expert mode
+  -t --terse                        Write out in machine readable format for commands: list, avail,
+                                    spider, savelist
+  --initial_load                    loading Lmod for first time in a user shell
+  --latest                          Load latest (ignore default)
+  --ignore_cache                    Treat the cache file(s) as out-of-date
+  --novice                          Turn off expert and quiet flag
+  --raw                             Print modulefile in raw output when used with show
+  -w twidth --width=twidth          Use this as max term width
+  -v --version                      Print version info and quit
+  -r --regexp                       use regular expression match
+  --gitversion                      Dump git version in a machine readable way and quit
+  --dumpversion                     Dump version in a machine readable way and quit
+  --check_syntax --checkSyntax      Checking module command syntax: do not load
+  --config                          Report Lmod Configuration
+  --config_json                     Report Lmod Configuration in json format
+  --mt                              Report Module Table State
+  --timer                           report run times
+  --force                           force removal of a sticky module or save an empty collection
+  --redirect                        Send the output of list, avail, spider to stdout (not stderr)
+  --no_redirect                     Force output of list, avail and spider to stderr
+  --show_hidden                     Avail and spider will report hidden modules
+  --spider_timeout=timeout          a timeout for spider
+  -T --trace                        
+  --nx --no_extensions              
+
+
+module [options] sub-command [args ...]
+module [options] sub-command [args ...]
+...
+-----
+
+The remainder of the listing groups the arguments under separate headings
+such as loading/unloading and listing/searching.
+Now we'll go into a little more detail on the arguments that aren't fully explained in
+the above example.
+
+==== `module avail` for Finding All Available Packages
+
+The command will produce a list of all available modules on a machine.
+If you have loaded no modules - that is, the command `module list` yields no results - you
+will get a listing like the following.
+
+-----
+$ module avail
+
+------------------------------------------- /sw/hprc/mods/all/Core -------------------------------------------
+   Comsol/5.6                       Matlab/R2020b
+   EasyBuild-grace-myeb/0           Matlab/R2021a                            (D)
+   EasyBuild-grace-SCRATCH/0        NVBIO/2020.02.05-GCC-8.3.0-CUDA-10.1.243
+   EasyBuild-grace/0                STAR-CCM+/15.06.007-R8
+   GCC/9.3.0                        STAR-CCM+/15.06.007
+   LS-DYNA/R11.2.0                  STAR-CCM+/16.02.009-R8
+   LS-DYNA/R12.0.0           (D)    STAR-CCM+/16.02.009                      (D)
+   LS-OPT/7.0.1                     ucsctest/1.0
+   LS-PREPOST/4.8.9                 WebProxy/0000
+   LS-TASC/4.2-149271
+
+-------------------------------------------- /sw/eb/mods/all/Core --------------------------------------------
+   Anaconda2/5.3.0                              gettext/0.19.8.1
+   Anaconda2/2019.10                     (D)    gettext/0.20.1
+   Anaconda3/5.3.0                              gettext/0.21                         (D)
+   Anaconda3/2019.10                            gimkl/2018b
+   Anaconda3/2020.07                     (D)    gimpi/2018b
+   ANSYS/2019R3                                 git-lfs/2.11.0
+   ANSYS/2020R1                                 Go/1.14
+   ANSYS/2021R1                          (D)    Go/1.14.1                            (D)
+   AnsysEM/2021R1                               golf/2020a
+   ant/1.10.5-Java-1.8                          gomkl/2018b
+...
+-----
+
+If you install a module like, for instance:
+
+-----
+module load GCCcore/10.2.0
+-----
+
+then you will get a different list, i.e.
+
+-----
+$ module avail
+
+---------------------------------- /sw/eb/mods/all/Compiler/GCCcore/10.2.0 -----------------------------------
+   Autoconf/2.69                  LAME/3.100                 PCRE/8.44
+   Automake/1.16.2                libarchive/3.4.3           PCRE2/10.35
+   Autotools/20200321             libdrm/2.4.102             Perl/5.32.0
+   binutils/2.35           (D)    libevent/2.1.12            Pillow/8.0.1
+   Bison/3.7.1             (D)    libfabric/1.11.0           pixman/0.40.0
+-----
+
+To summarize, the modules available are dependent on what modules have been installed.
+
+==== `module del|unload` to Remove One or More Modules
+
+The command `module del` or `module unload` will remove one or more modules, and will not complain
+if any of those modules aren't found to delete.
+Suppose we load a version of Bison:
+
+-----
+$ module purge
+$ module spider Bison
+...
+     Versions:
+        Bison/2.7
+        Bison/3.0.4
+        Bison/3.0.5
+        Bison/3.3.2
+        Bison/3.5.3
+        Bison/3.7.1
+...
+$ module load Bison/3.3.2
+$ module list
+
+Currently Loaded Modules:
+  1) Bison/3.3.2
+$ module del Bison
+$ module list
+No modules loaded
+-----
+
+==== `module purge` to Remove All Modules
+
+The `module purge` command will remove or unload all modules that are presently loaded.
+If we start with no loaded modules, then an example would be.
+
+-----
+$ module spider Bison
+...
+     Versions:
+        Bison/2.7
+        Bison/3.0.4
+        Bison/3.0.5
+        Bison/3.3.2
+        Bison/3.5.3
+        Bison/3.7.1
+...
+$ module load Bison/3.7.1
+$ module spider Ncurses
+...
+     Versions:
+        ncurses/6.0
+        ncurses/6.1
+        ncurses/6.2
+...
+$ module load ncurses/6.2
+$ module list
+
+Currently Loaded Modules:
+  1) Bison/3.7.1   2) ncurses/6.2
+$ module purge
+$ module list
+No modules loaded
+-----
+
+==== `module spider` for Finding Information About Modules
+
+Once you have discovered what is available via `module avail` you
+can dig deeper to find more information about modules and their various
+versions via the `module spider` command.
+
+The command with no third argument will yield a list of every module and extension
+currently available along with a brief description of each.
+
+-----
+$ module spider
+
+----------------------------------------------------------------------------------------------------------
+The following is a list of the modules and extensions currently available:
+----------------------------------------------------------------------------------------------------------
+  4ti2: 4ti2/1.6.9
+    A software package for algebraic, geometric and combinatorial problems on linear spaces
+
+  ABINIT: ABINIT/8.10.2, ABINIT/8.10.3, ABINIT/9.2.1
+    ABINIT is a package whose main program allows one to find the total energy, charge density and
+    electronic structure of systems made of electrons and nuclei (molecules and periodic solids) within
+    Density Functional Theory (DFT), using pseudopotentials and a planewave or wavelet basis.
+
+  ABRicate: ABRicate/0.9.9-Perl-5.28.1, ABRicate/0.9.9
+    Mass screening of contigs for antimicrobial and virulence genes
+
+  ABySS: ABySS/2.0.2, ABySS/2.1.5
+    Assembly By Short Sequences - a de novo, parallel, paired-end sequence assembler
+...
+-----
+
+The command with a third argument that is the name of a module such as `GCC` will supply a
+list of versions of that module.
+
+-----
+$ module spider GCC
+
+
+----------------------------------------------------------------------------------------------------------
+  GCC:
+----------------------------------------------------------------------------------------------------------
+    Description:
+      The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Java, and Ada, as
+      well as libraries for these languages (libstdc++, libgcj,...).
+
+     Versions:
+        GCC/6.4.0-2.28
+        GCC/7.3.0-2.30
+        GCC/8.2.0-2.31.1
+        GCC/8.3.0
+        GCC/9.3.0
+        GCC/10.2.0
+     Other possible modules matches:
+        GCCcore  gcccuda
+...
+-----
+
+Adding the version number will obtain further information - if any - about that specific version of
+the module.
+
+-----
+$ module spider GCC/10.2.0
+
+----------------------------------------------------------------------------------------------------------
+  GCC: GCC/10.2.0
+----------------------------------------------------------------------------------------------------------
+    Description:
+      The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Java, and Ada, as
+      well as libraries for these languages (libstdc++, libgcj,...).
+
+
+    This module can be loaded directly: module load GCC/10.2.0
+
+    Help:
+      Description
+      ===========
+      The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Java, and Ada,
+       as well as libraries for these languages (libstdc++, libgcj,...).
+      
+      
+      More information
+      ================
+       - Homepage: https://gcc.gnu.org/
+...
+-----
+
+==== `module switch|swap` to Swap Versions of a Module
+
+This allows you to switch versions of a software module.
+
+-----
+$ module purge
+$ module spider Bison
+...
+     Versions:
+        Bison/2.7
+        Bison/3.0.4
+        Bison/3.0.5
+        Bison/3.3.2
+        Bison/3.5.3
+        Bison/3.7.1
+...
+$ module load Bison/3.7.1
+$ module list
+
+Currently Loaded Modules:
+  1) Bison/3.7.1
+$ module swap Bison/3.7.1 Bison/3.0.5
+
+The following have been reloaded with a version change:
+  1) Bison/3.7.1 => Bison/3.0.5
+$ module list
+
+Currently Loaded Modules:
+  1) Bison/3.0.5
+-----
+
+=== Automatically Loading Modules in `.bashrc`.
+
+If you consistently load and use the same modules you can have them
+automatically loaded by placing the commands in your `.bashrc` file.
+A familiar example would be:
+
+=====
+-----
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+module load GCCcore/10.2.0
+module load Python/3.8.6
+-----
+=====
+
+
+

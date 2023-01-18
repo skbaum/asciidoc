@@ -1,0 +1,636 @@
+= Machine Learning Literature and Notes
+:doctype: book
+:toc:
+:icons:
+:source-highlighter: coderay
+:numbered!:
+
+[preface]
+
+== Overview
+
+
+== General Reviews
+
+=== *Machine learning* - Wikipedia (2021)
+
+https://en.wikipedia.org/wiki/Machine_learning[`https://en.wikipedia.org/wiki/Machine_learning`]
+
+=== *Deep Learning -- A first Meta-Survey of selected Reviews across Scientific Disciplines and their Research Impact* (2020) - J. Egger et al.
+
+https://arxiv.org/abs/2011.08184[`https://arxiv.org/abs/2011.08184`]
+
+=== *Machine learning towards intelligent systems* (2021) - M. Injadat et al.
+
+https://arxiv.org/abs/2101.03655[`https://arxiv.org/abs/2101.03655`]
+
+=== *The history began from AlexNet: A comprehensive survey on deep learning approaches* (2018) - M. Z. Alom et al.
+
+https://arxiv.org/abs/1803.01164[`https://arxiv.org/abs/1803.01164`]
+
+=== *Interpretability and Explainability: A Machine Learning Zoo Mini-tour* - R. Marcinkevics and J. E. Vogt (2020)
+
+https://arxiv.org/abs/2012.01805[`https://arxiv.org/abs/2012.01805`]
+
+=== *Explainable Deep Learning: A Field Guide for the Uninitiated* (2020) - N. Xie et al.
+
+https://arxiv.org/abs/2004.14545[`https://arxiv.org/abs/2004.14545`]
+
+=== *A survey of machine learning for computer architecture and systems* (2021) - N. Wu et al.
+
+https://arxiv.org/abs/2102.07952[`https://arxiv.org/abs/2102.07952`]
+
+==== *The tribes of machine learning and the realm of computer architecture* (2020) - A. Akram et al.
+
+https://arxiv.org/abs/2012.04105[`https://arxiv.org/abs/2012.04105`]
+
+=== *Model-based deep learning* (2020) - N. Shlezinger et al.
+
+https://arxiv.org/abs/2012.08405[`https://arxiv.org/abs/2012.08405`]
+
+=== *Benchmarking and survey of explanation method for black box models* (2021) - F. Bodria et al.
+
+https://arxiv.org/abs/2102.13076[`https://arxiv.org/abs/2102.13076`]
+
+* *A survey of methods for explaining black box models* (2018) - R. Guidotti et al.
+
+https://arxiv.org/abs/1802.01933[`https://arxiv.org/abs/1802.01933`]
+
+=== *A survey on understanding, visualizations, and explanation of deep neural networks* (2021) - A. Shahroudnejad
+
+https://arxiv.org/abs/2102.01792[`https://arxiv.org/abs/2102.01792`]
+
+=== *The Secrets of Machine Learning: Ten Things You WIsh You Had Known Earlier to be More Effective at Data Analysis* - C. Rudin and D. Carlson (2019)
+
+https://arxiv.org/abs/1906.01998[`https://arxiv.org/abs/1906.01998`]
+
+* There are at least four main families of machine learning models
+for supervised learning
+
+** logical models (decision trees, rule-based models)
+** linear combinations of trees, stumps or other kinds of features (logistic regression, boosting, random
+forests, additive models)
+** case-based reasoning (K-nearest neighbors, kernel based methods, e.g. support vector machines with
+Gaussian kernels, kernel regression
+** iterative summation (neural networks)
+
+* All machine learning methods perform similarly
+
+*****
+"Neural networks seem to perform significantly better on many computer vision tasks than other
+machine learning methods."
+
+"Surprisingly, there appears to be no practical significant difference in performance between
+machine learning methods for a huge number of data science problems."
+
+"Adding more data, adding domain knowledge, or improving the quality of data, can often often
+be much more valuable than switching algorithms or changing tuning parameters."
+
+"Adding in domain knowledge in various ways can sometimes be more powerful than anything else."
+
+"If you have classification or regression data with inherently meaningful covariates, then try
+several different algorithms.  If several of them all perform similarly after parameter tuning,
+use the simplest or most meaningful model."
+
+"Neural networks would almost never be the first approach to try on a new
+dataset, as their training is finicky and difficult, and they tend to be black boxes that are
+difficult to understand and troubleshoot."
+*****
+
+* Neural networks are hard to train and weird stuff happens
+
+* If you don't use and interpretable model, you can make bad mistakes
+
+*****
+"How
+do we know that a complex black box trained on a static dataset in a particular controlled
+environment is going to behave as we expect when launched in the wild? Conversely, how
+do we know our algorithm is not picking up on confounding signals? Recently in a study
+of deep neural networks on xray images, the networks were found to be looking at some
+writing indicating the type of xray equipment rather than at the actual medical content
+of the xray."
+
+"For high stakes decisions,
+black box models should not be used unless absolutely necessary, and it is unclear that
+it is ever actually necessary to use a black box machine learning model – for high stakes
+decisions, one should always aim to construct an interpretable model that is as accurate as
+the black box."
+*****
+
+* Explanations can be misleading and we cannot trust them
+
+*****
+"An
+“explanation” is a separate interpretable model that approximates the predictions of a black
+box model. The problem with these explanations is that they do not actually explain what
+the black box is doing, they are instead summary statistics of the predictions."
+*****
+
+* It is generally possible to find an accurate-yet-interpretable model, even for neural networks
+
+*****
+"It is possible to produce an interpretable model that
+is approximately as accurate as the best available black box. However, creating an accurate
+interpretable model can be much more complicated than creating an accurate black box."
+
+"There is no reason to
+expect there to be a single performance measure of interpretability, since there is not a single
+performance measure for prediction performance across domains; accuracy, false positive
+rate, area under the ROC curve, F-score, discounted cumulative gain, etc., are performance
+measures used in various domains."
+*****
+
+* Special properties such as decision making, fairness, or robustness must be built in
+
+* Causal inference is different than prediction (correlation is not causation)
+
+* There is a method to the madness of deep neural network architectures, but not always
+
+*****
+"The fundamental idea of an RNN is that the architecture contains both layers to build
+depth at each entry in the sequence, but also connections to the past."
+
+"Overall, neural network architectures may seem to be a smorgasbord of possibilities,
+but network structures are becoming more standard with the ability to relatively easily
+swap out network components for alternative network components or building blocks."
+*****
+
+* It is a myth that machine learning can do anything
+
+*****
+"Performance on the famous machine learning benchmarks, while incredibly impressive, is largely
+evaluated on testing data that is nearly identical in distribution to the training data."
+
+"Generative models (i.e. models that can generate data samples that look like the
+observed data) have been constructed in recent years based on adversarial learning.
+The key idea to adversarial learning is to construct two separate networks, the generator
+and the discriminator, and have them compete against each other."
+
+"In essence, machine learning methods can be very useful, but, as of this moment, they
+can do only what we train them to do, which is to recognize and repeat patterns in data."
+*****
+
+=== *A review on generative adversarial networks: Algorithms, theory, and applications* (2020) - J. Gui
+
+https://arxiv.org/abs/2001.06937[`https://arxiv.org/abs/2001.06937`]
+
+=== *Generative adversarial networks (GANs): Challenges, solutions, and future directions* (2020) - D. Saxena
+
+https://arxiv.org/abs/2005.00065[`https://arxiv.org/abs/2005.00065`]
+
+=== *A survey on generative adversarial networks* (2020) - A. Jabbar
+
+https://arxiv.org/abs/2006.05132[`https://arxiv.org/abs/2006.05132`]
+
+=== *Generative adversarial networks for spatio-temporal data: A Survey* (2020) - N. Gao et al.
+
+https://arxiv.org/abs/2008.08903[`https://arxiv.org/abs/2008.08903`]
+
+=== *Regulation and normalization for generative adversarial networks: A survey* (2020) - Z. Li
+
+https://arxiv.org/abs/2008.08930[`https://arxiv.org/abs/2008.08930`]
+
+=== *Stabilizing generative adversarial networks: A survey* (2019) - M. Wiatrak et al.
+
+https://arxiv.org/abs/1910.00927[`https://arxiv.org/abs/1910.00927`]
+
+=== *Hyperbolic deep neural networks: A survey* (2021) - W. Peng et al.
+
+https://arxiv.org/abs/2101.04562[`https://arxiv.org/abs/2101.04562`]
+
+=== *Graph neural networks: Taxonomy, advances and trends* (2020) - Y. Zhou et al.
+
+https://arxiv.org/abs/2012.08752[`https://arxiv.org/abs/2012.08752`]
+
+=== *Deep Bayesian active learning: A brief survey on recent advances* (2020) - S. Mohamadi et al.
+
+https://arxiv.org/abs/2012.08044[`https://arxiv.org/abs/2012.08044`]
+
+=== *Data and its (dis)contents: A survey of dataset development and use in machine learning research* (2020) - A. Pauliada
+
+https://arxiv.org/abs/2012.05345[`https://arxiv.org/abs/2012.05345`]
+
+=== *A survey on principles, models and methods for learning from irregularly sampled time series* (2020) - S. N. Shukla et al.
+
+https://arxiv.org/abs/2012.00168[`https://arxiv.org/abs/2012.00168`]
+
+=== *Time Series Data Augmentation for Deep Learning: A Survey* (2020) - Q. Wen et al.
+
+https://arxiv.org/abs/2002.12478[`https://arxiv.org/abs/2002.12478`]
+
+*****
+"Deep learning performs remarkably well on many time series analysis tasks recently. The superior performance of deep neural networks relies heavily on a large number of training data to avoid overfitting. However, the labeled data of many real-world time series applications may be limited such as classification in medical time series and anomaly detection in AIOps. As an effective way to enhance the size and quality of the training data, data augmentation is crucial to the successful application of deep learning models on time series data. In this paper, we systematically review different data augmentation methods for time series. We propose a taxonomy for the reviewed methods, and then provide a structured review for these methods by highlighting their strengths and limitations. We also empirically compare different data augmentation methods for different tasks including time series anomaly detection, classification and forecasting. Finally, we discuss and highlight future research directions, including data augmentation in time-frequency domain, augmentation combination, and data augmentation and weighting for imbalanced class."
+*****
+
+=== *Convolutional neural networks: A survey of the foundations, selected improvements, and some current applications* (2020) - L. L. Ankile et al.
+
+https://arxiv.org/abs/2011.12960[`https://arxiv.org/abs/2011.12960`]
+
+=== *Survey on large-scale machine learning* (2020) - M. Wang et al. (2020)
+
+https://arxiv.org/abs/2008.03911[`https://arxiv.org/abs/2008.03911`]
+
+=== *Biological Blueprints for Next Generation AI Systems* (2019) - T. Dean et al.
+
+https://arxiv.org/abs/1912.00421[`https://arxiv.org/abs/1912.00421`]
+
+*****
+"Diverse subfields of neuroscience have enriched artificial intelligence for many decades. With recent advances in machine learning and artificial neural networks, many neuroscientists are partnering with AI researchers and machine learning experts to analyze data and construct models. This paper attempts to demonstrate the value of such collaborations by providing examples of how insights derived from neuroscience research are helping to develop new machine learning algorithms and artificial neural network architectures. We survey the relevant neuroscience necessary to appreciate these insights and then describe how we can translate our current understanding of the relevant neurobiology into algorithmic techniques and architectural designs. Finally, we characterize some of the major challenges facing current AI technology and suggest avenues for overcoming these challenges that draw upon research in developmental and comparative cognitive neuroscience."
+*****
+
+=== *A Survey on Deep Learning for Localization and Mapping: Towards the Age of Spatial Machine Intelligence* (2020) - C. Chen et al.
+
+https://arxiv.org/abs/2006.12567[`https://arxiv.org/abs/2006.12567`]
+
+=== *Symbolic Techniques for Deep Learning: Challenges and Opportunities* (2020) - B. Fang et al.
+
+https://arxiv.org/abs/2010.02727[`https://arxiv.org/abs/2010.02727`]
+
+=== *A Level-wise Taxonomic Perspective on Automated Machine Learning to Date and Beyond: Challenges and Opportunities* (2020) - S. K. K. Santu et al.
+
+https://arxiv.org/abs/2010.10777[`https://arxiv.org/abs/2010.10777`]
+
+=== *Sampling Algorithms, from Survey Sampling to Monte Carlo Methods: Tutorial and Literature Review* 92020) - B. Ghojogh et al.
+
+https://arxiv.org/abs/2011.00901[`https://arxiv.org/abs/2011.00901`]
+
+=== *Bayesian Neural Networks: An Introduction and Survey* (2020) - E. Goan et al.
+
+https://arxiv.org/abs/2006.12024[`https://arxiv.org/abs/2006.12024`]
+
+=== *A literature survey of matrix methods for data science* (2020) - M. Stoll
+
+https://arxiv.org/abs/1912.07896[`https://arxiv.org/abs/1912.07896`]
+
+*****
+"Efficient numerical linear algebra is a core ingredient in many applications across almost all scientific and industrial disciplines. With this survey we want to illustrate that numerical linear algebra has played and is playing a crucial role in enabling and improving data science computations with many new developments being fueled by the availability of data and computing resources. We highlight the role of various different factorizations and the power of changing the representation of the data as well as discussing topics such as randomized algorithms, functions of matrices, and high-dimensional problems. We briefly touch upon the role of techniques from numerical linear algebra used within deep learning."
+*****
+
+== Geoscience Applications
+
+=== Reviews
+
+==== *70 years of machine learning in geoscience in review* (2020) - J. S. Dramsch
+
+https://arxiv.org/abs/2006.13311[`https://arxiv.org/abs/2006.13311`]
+
+*****
+"This review gives an overview of the development of machine learning in geoscience. A thorough analysis of the co-developments of machine learning applications throughout the last 70 years relates the recent enthusiasm for machine learning to developments in geoscience. I explore the shift of kriging towards a mainstream machine learning method and the historic application of neural networks in geoscience, following the general trend of machine learning enthusiasm through the decades. Furthermore, this chapter explores the shift from mathematical fundamentals and knowledge in software development towards skills in model validation, applied statistics, and integrated subject matter expertise. The review is interspersed with code examples to complement the theoretical foundations and illustrate model validation and machine learning explainability for science. The scope of this review includes various shallow machine learning methods, e.g. Decision Trees, Random Forests, Support-Vector Machines, and Gaussian Processes, as well as, deep neural networks, including feed-forward neural networks, convolutional neural networks, recurrent neural networks and generative adversarial networks. Regarding geoscience, the review has a bias towards geophysics but aims to strike a balance with geochemistry, geostatistics, and geology, however excludes remote sensing, as this would exceed the scope. In general, I aim to provide context for the recent enthusiasm surrounding deep learning with respect to research, hardware, and software developments that enable successful application of shallow and deep machine learning in all disciplines of Earth science."
+*****
+
+==== *Intelligent systems for geosciences* (2019) - Y. Gil et al.
+
+https://dl.acm.org/doi/10.1145/3192335[`https://dl.acm.org/doi/10.1145/3192335`]
+
+==== *Geostatistical learning: Challenges and opportunities* (2021) - J. Hoffiman et al.
+
+https://arxiv.org/abs/2102.08791[`https://arxiv.org/abs/2102.08791`]
+
+*****
+"Statistical learning theory provides the foundation to applied machine learning, and its various successful applications in computer vision, natural language processing and other scientific domains. The theory, however, does not take into account the unique challenges of performing statistical learning in geospatial settings. For instance, it is well known that model errors cannot be assumed to be independent and identically distributed in geospatial (a.k.a. regionalized) variables due to spatial correlation; and trends caused by geophysical processes lead to covariate shifts between the domain where the model was trained and the domain where it will be applied, which in turn harm the use of classical learning methodologies that rely on random samples of the data. In this work, we introduce the geostatistical (transfer) learning problem, and illustrate the challenges of learning from geospatial data by assessing widely-used methods for estimating generalization error of learning models, under covariate shift and spatial correlation. Experiments with synthetic Gaussian process data as well as with real data from geophysical surveys in New Zealand indicate that none of the methods are adequate for model selection in a geospatial context. We provide general guidelines regarding the choice of these methods in practice while new methods are being actively researched."
+*****
+
+==== *A survey on mathematical aspects of machine learning in geophysics* (2021) - M. Kosanic et al.
+
+https://arxiv.org/abs/2102.03206[`https://arxiv.org/abs/2102.03206`]
+
+==== *Comprehensive survey of deep learning in remote sensing: theories, tools, and challenges for the community* - J. E. Ball et al. (2017)
+
+https://www.spiedigitallibrary.org/journals/journal-of-applied-remote-sensing/volume-11/issue-04/042609/Comprehensive-survey-of-deep-learning-in-remote-sensing--theories/10.1117/1.JRS.11.042609.full[`https://www.spiedigitallibrary.org/journals/journal-of-applied-remote-sensing/volume-11/issue-04/042609/Comprehensive-survey-of-deep-learning-in-remote-sensing--theories/10.1117/1.JRS.11.042609.full`]
+
+==== *A survey on spatial and spatiotemporal prediction methods* (2020) - Z. Jiang
+
+https://arxiv.org/abs/2012.13384[`https://arxiv.org/abs/2012.13384`]
+
+==== *Machine learning advances for time series forecasting* (2020) - R. P. Masini et al.
+
+https://arxiv.org/abs/2012.12802[`https://arxiv.org/abs/2012.12802`]
+
+==== *Machine learning for clouds and climate* (2020) - T. Beucler et al.
+
+http://tbeucler.scripts.mit.edu/tbeucler/research/[`http://tbeucler.scripts.mit.edu/tbeucler/research/`]
+
+==== *Machine learning for fluid mechanics* (2020) - S. L. Brunton et al.
+
+https://www.annualreviews.org/doi/abs/10.1146/annurev-fluid-010719-060214[`https://www.annualreviews.org/doi/abs/10.1146/annurev-fluid-010719-060214`]
+
+*****
+"The field of fluid mechanics is rapidly advancing, driven by unprecedented volumes of data from experiments, field measurements, and large-scale simulations at multiple spatiotemporal scales. Machine learning (ML) offers a wealth of techniques to extract information from data that can be translated into knowledge about the underlying fluid mechanics. Moreover, ML algorithms can augment domain knowledge and automate tasks related to flow control and optimization. This article presents an overview of past history, current developments, and emerging opportunities of ML for fluid mechanics. We outline fundamental ML methodologies and discuss their uses for understanding, modeling, optimizing, and controlling fluid flows. The strengths and limitations of these methods are addressed from the perspective of scientific inquiry that considers data as an inherent part of modeling, experiments, and simulations. ML provides a powerful information-processing framework that can augment, and possibly even transform, current lines of fluid mechanics research and industrial applications."
+*****
+
+==== *Machine learning for the geosciences* (2019) - A. Karpatne et al.
+
+https://arxiv.org/abs/1711.04708[`https://arxiv.org/abs/1711.04708`]
+
+* Introduction
+
+* Overview of  geoscience data
+
+* Geoscience properties
+
+*****
+"While spatio-temporal auto-correlation ensures
+strong connectivity among observations in close vicinity of
+space and time, a unique aspect of geoscience processes is
+that they also show long-range spatial and temporal dependencies."
+
+"Geoscience processes also show long-memory
+memory characteristics in time, e.g., the effect of climate
+indices such as the El Nino Southern Oscillation (ENSO)
+and Atlantic Multidecadal Oscillation (AMO) on global
+floods, droughts, and forest fires."
+
+"The Earth system is not stationary
+in time and goes through many cycles, ranging from
+seasonal and decadal cycles to long-term geological changes
+(e.g., glaciation, polarity reversals) and even climate change
+phenomena, that impact all local processes."
+
+"The form, structure,
+and patterns of geoscience objects and events are
+much more complex than those found in discrete spaces
+that ML algorithms typically deal with, such as items in
+market basket data."
+
+"In a number of geoscience problems, we are interested in
+studying objects, processes, and events that occur infrequently
+in space and time but have major impacts on our
+society and the Earth’s ecosystem. ... These processes may relate to
+emergent (or anomalous) states of the Earth system, or other
+features of complex systems such as anomalous state trajectories
+and basins of attractions."
+*****
+
+* Geoscience applications for ML
+
+** Detecting objects and events
+
+*****
+"Detecting objects and events in geoscience
+data is important for a number of reasons. For example,
+detecting spatial and temporal patterns in climate data can
+help in tracking the formation and movement of objects such
+as cyclones, weather fronts, atmospheric rivers, and ocean
+eddies, which are responsible for the transfer of precipitation,
+energy, and nutrients in the atmosphere and ocean."
+
+"There is a need to develop novel pattern
+mining approaches that can account for the spatial and
+temporal properties of objects and events, e.g., spatial
+coherence and temporal persistence, that can work with
+amorphous boundaries."
+*****
+
+** Estimating geoscience variables
+
+*****
+"An important category of geoscience
+problems where ML can contribute is to estimate physical
+variables that are difﬁcult to monitor directly, e.g., methane
+concentrations in air or groundwater seepage in soil, using
+information about other observed or simulated variables."
+
+"The combined effects of heterogeneity, paucity of
+labeled data, and rare classes make it difﬁcult for standard
+ML algorithms to achieve good prediction performance."
+
+"Another challenge for ML algorithms is the poor quality of
+geoscience data due to noise and missing values, that
+increases the risks of spurious estimates. ... Geosci-
+ence data show novel types of structured noise and missing
+values that are uncommon in other domains."
+*****
+
+*Active learning methods for remote sensing image classification* - https://ieeexplore.ieee.org/document/4812037[`https://ieeexplore.ieee.org/document/4812037`]
+
+*Deep learning in remote sensing: A comprehensive review and list of resources* (2017) - https://ieeexplore.ieee.org/abstract/document/8113128[`https://ieeexplore.ieee.org/abstract/document/8113128`]
+
+*A Survey of Deep Active Learning* (2020) - https://arxiv.org/abs/2009.00236[`https://arxiv.org/abs/2009.00236`]
+
+* Long-term forecasting of geoscience variables
+
+*****
+"From a
+machine learning perspective, the problem of forecasting
+can be treated as a time-series regression problem where
+the future conditions of a geoscience variable have to be predicted
+based on present and past conditions."
+
+"A key challenge in predicting the long-term
+trends of geoscience variables is to develop approaches that
+can represent and propagate prediction uncertainties, which
+is particularly difﬁcult given the small sample size (limited
+number of years with reliable historical records) faced in
+geoscience applications and the non-stationary nature of geoscience
+processes."
+*****
+
+* Mining relationships in geoscience data
+
+*****
+"An important problem in geoscience
+applications is to understand how different physical processes
+are related to each other, e.g., periodic changes in the
+sea surface temperature over eastern Pacific Ocean - also
+known as the El Nino-Southern Oscillation - and their
+impact on several terrestrial events such as ﬂoods, droughts,
+and forest fires."
+
+"Another family of approaches for
+mining relationships in climate science is based on represent-
+ing climate graphs as complex networks."
+
+"Causality-based
+networks, based typically on either the framework of Granger
+causality or of Pearl causality can be used to detect
+potential cause-effect relationships in geoscience applica-
+tions."
+
+"Methods for handling the high dimensionality of
+geoscience data along with small sample sizes have also been
+explored where sparsity-inducing regularizers such as
+sparse group Lasso were developed to model the domain
+characteristics of climate variables."
+
+"The fact that multi-variate causality
+tools based on VAR/LASSO or Pearl analysis, which have
+yielded tremendous breakthroughs in biology and medicine
+over the past decade, are still not commonly used in the
+geosciences, is in stark contrast to the huge potential these
+methods have for tackling numerous geoscience problems."
+*****
+
+*Complex networks as a unified framework for descriptive analysis and predictive modeling in climate science* (2010) - https://onlinelibrary.wiley.com/doi/10.1002/sam.10100[`https://onlinelibrary.wiley.com/doi/10.1002/sam.10100`]
+
+*Climate as complex networks* - https://en.wikipedia.org/wiki/Climate_as_complex_networks[`https://en.wikipedia.org/wiki/Climate_as_complex_networks`]
+
+*The probabilistic backbone of data-driven complex networks: an example in climate* (2020) - https://www.nature.com/articles/s41598-020-67970-y[`https://www.nature.com/articles/s41598-020-67970-y`]
+
+*PyUnicorn Toolbox* - https://github.com/pik-copan/pyunicorn[`https://github.com/pik-copan/pyunicorn`]
+
+*The structure and function of complex networks* (2003) - https://epubs.siam.org/doi/10.1137/S003614450342480[`https://epubs.siam.org/doi/10.1137/S003614450342480`]
+
+*What do networks have to do with climate?* (2006) - https://journals.ametsoc.org/view/journals/bams/87/5/bams-87-5-585.xml[`https://journals.ametsoc.org/view/journals/bams/87/5/bams-87-5-585.xml`]
+
+*Sparse group Lasso: Consistency and climate applications* (2012) - https://epubs.siam.org/doi/abs/10.1137/1.9781611972825.5[`https://epubs.siam.org/doi/abs/10.1137/1.9781611972825.5`]
+
+* Cross-cutting research themes
+
+** Deep learning
+
+*****
+"Deep learning methods can be
+used to detect geoscience objects and events, e.g., atmospheric
+rivers and weather fronts, automatically from the
+data as spatio-temporal patterns, without needing to build
+hand-coded features."
+
+"Deep learning
+methods can also be used for estimating geoscience variables
+from observations using supervised or semi-supervised
+techiques."
+
+"Deep learning based frameworks
+have also been explored for downscaling outputs of Earth
+system models and generating climate change projections at
+local scales, and classifying objects such as trees and
+buildings in high-resolution satellite images."
+
+"A key challenge for deep learn-
+ing in geoscience problems is the paucity of labeled samples
+that limit the effectiveness of conventional supervised deep
+learning frameworks. Hence, there is a need to develop novel
+frameworks in deep learning that can work with limited num-
+ber of labeled samples while leveraging the abundance of
+unlabeled samples available in geoscience problems."
+*****
+
+** Theory-guided data science
+
+*****
+"Theory-guided data science is an emerging paradigm of
+research that aims to combine scientiﬁc knowledge (or theory
+with ML methods to advance knowledge discovery in
+a number of scientiﬁc disciplines."
+
+"It is important to adopt the paradigm of theory-guided
+data science as an overarching philosophy in all applications
+of ML methods in geoscience problems, so that we discover
+patterns and relationships that are not only generalizable but
+also consistent with our existing scientiﬁc knowledge."
+*****
+
+*Theory-guided data science: A new paradigm for scientific discovery from data* (2017) - https://arxiv.org/abs/1612.08544[`https://arxiv.org/abs/1612.08544`]
+
+*Physics-guided machine learning for scientific discovery: An application in simulating lake temperature profiles* (2020) - https://arxiv.org/abs/2001.11086[`https://arxiv.org/abs/2001.11086`]
+
+==== *Machine learning information fusion in Earth observation: A comprehensive review of methods, applications and data sources* - S. Salcedo-Sanz et al. (2020)
+
+https://www.sciencedirect.com/science/article/pii/S1566253520303171[`https://www.sciencedirect.com/science/article/pii/S1566253520303171`]
+
+*****
+"This paper reviews the most important information fusion data-driven algorithms based on Machine Learning (ML) techniques for problems in Earth observation. Nowadays we observe and model the Earth with a wealth of observations, from a plethora of different sensors, measuring states, fluxes, processes and variables, at unprecedented spatial and temporal resolutions. Earth observation is well equipped with remote sensing systems, mounted on satellites and airborne platforms, but it also involves in-situ observations, numerical models and social media data streams, among other data sources. Data-driven approaches, and ML techniques in particular, are the natural choice to extract significant information from this data deluge. This paper produces a thorough review of the latest work on information fusion for Earth observation, with a practical intention, not only focusing on describing the most relevant previous works in the field, but also the most important Earth observation applications where ML information fusion has obtained significant results. We also review some of the most currently used data sets, models and sources for Earth observation problems, describing their importance and how to obtain the data when needed. Finally, we illustrate the application of ML data fusion with a representative set of case studies, as well as we discuss and outlook the near future of the field."
+*****
+
+==== *Integrating Physics-Based Modeling with Machine Learning: A Survey* (2020) - J. Willard et al.
+
+https://arxiv.org/abs/2003.04919[`https://arxiv.org/abs/2003.04919`]
+
+*****
+In this manuscript, we provide a structured and comprehensive overview of techniques to integrate machine learning with physics-based modeling. First, we provide a summary of application areas for which these approaches have been applied. Then, we describe classes of methodologies used to construct physics-guided machine learning models and hybrid physics-machine learning frameworks from a machine learning standpoint. With this foundation, we then provide a systematic organization of these existing techniques and discuss ideas for future research. 
+*****
+
+==== *A Survey of Deep Learning for Scientific Discovery* (2020) - M. Raghu et al.
+
+https://arxiv.org/abs/2003.11755[`https://arxiv.org/abs/2003.11755`]
+
+*****
+"Over the past few years, we have seen fundamental breakthroughs in core problems in machine learning, largely driven by advances in deep neural networks. At the same time, the amount of data collected in a wide array of scientific domains is dramatically increasing in both size and complexity. Taken together, this suggests many exciting opportunities for deep learning applications in scientific settings. But a significant challenge to this is simply knowing where to start. The sheer breadth and diversity of different deep learning techniques makes it difficult to determine what scientific problems might be most amenable to these methods, or which specific combination of methods might offer the most promising first approach. In this survey, we focus on addressing this central issue, providing an overview of many widely used deep learning models, spanning visual, sequential and graph structured data, associated tasks and different training methods, along with techniques to use deep learning with less data and better interpret these complex models --- two central considerations for many scientific use cases. We also include overviews of the full design process, implementation tips, and links to a plethora of tutorials, research summaries and open-sourced deep learning pipelines and pretrained models, developed by the community. We hope that this survey will help accelerate the use of deep learning across different scientific domains."
+*****
+
+==== *Time Series Forecasting With Deep Learning: A Survey* (2020) - B. Lim et al.
+
+https://arxiv.org/abs/2004.13408[`https://arxiv.org/abs/2004.13408`]
+
+*****
+"Numerous deep learning architectures have been developed to accommodate the diversity of time series datasets across different domains. In this article, we survey common encoder and decoder designs used in both one-step-ahead and multi-horizon time series forecasting -- describing how temporal information is incorporated into predictions by each model. Next, we highlight recent developments in hybrid deep learning models, which combine well-studied statistical models with neural network components to improve pure methods in either category. Lastly, we outline some ways in which deep learning can also facilitate decision support with time series data."
+*****
+
+==== *Deep Learning Techniques for Geospatial Data Analysis* (2020) - A. W> Kiwekelekar et al.
+
+https://arxiv.org/abs/2008.13146[`https://arxiv.org/abs/2008.13146`]
+
+==== *Internet of underwater things and big marine data analysis: A comprehensive survey* (2020) - M. Jahanbakht et al.
+
+https://arxiv.org/abs/2012.06712[`https://arxiv.org/abs/2012.06712`]
+
+==== *Surveying the reach and maturity of machine learning and artificial intelligence in astronomy* (2019) - C. J. Fluke et al.
+
+https://arxiv.org/abs/1912.02934[`https://arxiv.org/abs/1912.02934`]
+
+*****
+"Machine learning (automated processes that learn by example in order to classify, predict, discover or generate new data) and artificial intelligence (methods by which a computer makes decisions or discoveries that would usually require human intelligence) are now firmly established in astronomy. Every week, new applications of machine learning and artificial intelligence are added to a growing corpus of work. Random forests, support vector machines, and neural networks (artificial, deep, and convolutional) are now having a genuine impact for applications as diverse as discovering extrasolar planets, transient objects, quasars, and gravitationally-lensed systems, forecasting solar activity, and distinguishing between signals and instrumental effects in gravitational wave astronomy. This review surveys contemporary, published literature on machine learning and artificial intelligence in astronomy and astrophysics. Applications span seven main categories of activity: classification, regression, clustering, forecasting, generation, discovery, and the development of new scientific insight. These categories form the basis of a hierarchy of maturity, as the use of machine learning and artificial intelligence emerges, progresses or becomes established."
+*****
+
+==== *Data-driven geophysics: from dictionary learning to deep learning* (2020) - S. Yu et al.
+
+https://arxiv.org/abs/2007.06183[`https://arxiv.org/abs/2007.06183`]
+
+*****
+"Understanding the principles of geophysical phenomena is an essential and challenging task. "Model-driven" approaches have supported the development of geophysics for a long time; however, such methods suffer from the curse of dimensionality and may inaccurately model the subsurface. "Data-driven" techniques may overcome these issues with increasingly available geophysical data. In this article, we review the basic concepts of and recent advances in data-driven approaches from dictionary learning to deep learning in a variety of geophysical scenarios. Explorational geophysics including data processing, inversion and interpretation will be mainly focused. Artificial intelligence applications on geoscience involving deep Earth, earthquake, water resource, atmospheric science, satellite remoe sensing and space sciences are also reviewed. We present a coding tutorial and a summary of tips for beginners and interested geophysical readers to rapidly explore deep learning. Some promising directions are provided for future research involving deep learning in geophysics, such as unsupervised learning, transfer learning, multimodal deep learning, federated learning, uncertainty estimation, and activate learning."
+*****
+
+=== Case Studies
+
+==== *Machine learning-based optimal mesh generation in CFD* (2021) - K. Huang et al.
+
+https://arxiv.org/abs/2102.12923[`https://arxiv.org/abs/2102.12923`]
+
+==== *GeoGAN: A condition GAN with reconstruction and style loss to generate standard layer of maps from satellite images* (2019) - S. Ganguli
+
+https://arxiv.org/abs/1902.05611[`https://arxiv.org/abs/1902.05611`]
+
+==== *Challenges and approaches to time-series forecasting in data center telemetry: A survey* (2021) - S. Jadon
+
+https://arxiv.org/abs/2101.04224[`https://arxiv.org/abs/2101.04224`]
+
+==== *A Perspective on Machine Learning Methods in Turbulence Modelling* (2020) - A. Beck et al.
+
+https://arxiv.org/abs/2010.12226[`https://arxiv.org/abs/2010.12226`]
+
+==== *Integrating Machine Learning for Planetary Science: Perspectives for the Next Decade* (2020) - A. R. Azari et al.
+
+https://arxiv.org/abs/2007.15129[`https://arxiv.org/abs/2007.15129`]
+
+==== *A Survey of Numerical Methods Utilizing Mixed Precision Arithmetic* (2020) - A. Abdelfattah et al.
+
+https://arxiv.org/abs/2007.06674[`https://arxiv.org/abs/2007.06674`]
+
+*****
+"Within the past years, hardware vendors have started designing low precision special function units in response to the demand of the Machine Learning community and their demand for high compute power in low precision formats. Also the server-line products are increasingly featuring low-precision special function units, such as the NVIDIA tensor cores in ORNL's Summit supercomputer providing more than an order of magnitude higher performance than what is available in IEEE double precision. At the same time, the gap between the compute power on the one hand and the memory bandwidth on the other hand keeps increasing, making data access and communication prohibitively expensive compared to arithmetic operations. To start the multiprecision focus effort, we survey the numerical linear algebra community and summarize all existing multiprecision knowledge, expertise, and software capabilities in this landscape analysis report. We also include current efforts and preliminary results that may not yet be considered "mature technology," but have the potential to grow into production quality within the multiprecision focus effort. As we expect the reader to be familiar with the basics of numerical linear algebra, we refrain from providing a detailed background on the algorithms themselves but focus on how mixed- and multiprecision technology can help improving the performance of these methods and present highlights of application significantly outperforming the traditional fixed precision methods."
+*****
+
+== Python Tutorials and Software
+
+=== *Machine Learning in Python: Main developments and technology trends in data science, machine learning, and artificial intelligence* (2020) - S. Raschka et al.
+
+https://arxiv.org/abs/2002.04803[`https://arxiv.org/abs/2002.04803`]
+
+*****
+"Smarter applications are making better use of the insights gleaned from data, having an impact on every industry and research discipline. At the core of this revolution lies the tools and the methods that are driving it, from processing the massive piles of data generated each day to learning from and taking useful action. Deep neural networks, along with advancements in classical ML and scalable general-purpose GPU computing, have become critical components of artificial intelligence, enabling many of these astounding breakthroughs and lowering the barrier to adoption. Python continues to be the most preferred language for scientific computing, data science, and machine learning, boosting both performance and productivity by enabling the use of low-level libraries and clean high-level APIs. This survey offers insight into the field of machine learning with Python, taking a tour through important topics to identify some of the core hardware and software paradigms that have enabled it. We cover widely-used libraries and concepts, collected together for holistic comparison, with the goal of educating the reader and driving the field of Python machine learning forward."
+*****
+
+=== *Practical machine learning tutorial with Python* (2020) 
+
+https://pythonprogramming.net/machine-learning-tutorial-python-introduction/[`https://pythonprogramming.net/machine-learning-tutorial-python-introduction/`]
+
+=== *scikit-learn: Machine learning in Python* (2020)
+
+https://scikit-learn.org/stable/[`https://scikit-learn.org/stable/`]
+
+=== *Your First Machine Learning Project in Python Step-By-Step* (2020) - J. Brownlee
+
+https://machinelearningmastery.com/machine-learning-in-python-step-by-step/[`https://machinelearningmastery.com/machine-learning-in-python-step-by-step/`]
+
+
+
